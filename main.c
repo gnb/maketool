@@ -8,7 +8,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: main.c,v 1.15 1999-05-25 12:11:36 gnb Exp $");
+CVSID("$Id: main.c,v 1.16 1999-05-25 12:48:02 gnb Exp $");
 
 typedef enum
 {
@@ -703,6 +703,7 @@ uiInitAnimPixmaps(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+#include "maketool.xpm"
 
 static void
 uiCreate(void)
@@ -711,6 +712,8 @@ uiCreate(void)
     GtkWidget *menubar, *logwin;
     GtkTooltips *tooltips;
     GtkWidget *sw;
+    GdkPixmap *iconpm;
+    GdkBitmap *iconmask = 0;
     static char *titles[1] = { "Log" };
     
     toplevel = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -720,6 +723,13 @@ uiCreate(void)
     	GTK_SIGNAL_FUNC(file_exit_cb), NULL);
     gtk_container_border_width(GTK_CONTAINER(toplevel), 0);
     gtk_widget_show(GTK_WIDGET(toplevel));
+
+    /* gtk_widget_realize(toplevel); */
+    iconpm = gdk_pixmap_create_from_xpm_d(toplevel->window, &iconmask,
+    		0, maketool_xpm);
+    gdk_window_set_icon(toplevel->window, 0, iconpm, iconmask);
+    gdk_window_set_icon_name(toplevel->window, "Maketool");
+
         
     tooltips = gtk_tooltips_new();
 
