@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: print.c,v 1.1 1999-12-20 11:04:40 gnb Exp $");
+CVSID("$Id: print.c,v 1.2 2000-01-05 14:08:34 gnb Exp $");
 
 static GtkWidget	*print_shell = 0;
 typedef enum { D_PRINTER, D_FILE, D_NUM_DESTS } DEST;
@@ -232,14 +232,6 @@ print_ok_cb(GtkWidget *w, gpointer data)
     }
 
     gtk_widget_hide(print_shell);
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static void
-print_page_setup_cb(GtkWidget *w, gpointer data)
-{
-    fprintf(stderr, "print_page_setup_cb\n");
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
