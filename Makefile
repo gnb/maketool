@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.9 1999-05-25 15:08:41 gnb Exp $
+# $Id: Makefile,v 1.10 1999-05-28 13:52:02 gnb Exp $
 #
 # Makefile for maketool.
 #
@@ -39,7 +39,7 @@ clean::
 ###
 
 random:
-	$(CC) -c -o $O/crud.o crud.c
+	$(COMPILE.c) -c -o $O/crud.o crud.c
 	
 targets:
 	yes ' ' | head -20 | awk '{print NR}'
