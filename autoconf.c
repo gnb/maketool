@@ -23,6 +23,8 @@
 #include "maketool_task.h"
 #include "log.h"
 
+CVSID("$Id: autoconf.c,v 1.11 2003-02-09 04:51:26 gnb Exp $");
+
 extern Task *logged_task(char *command);
 
 #define strassign(x, s) \
@@ -1105,7 +1107,7 @@ show_configure_window(gboolean fc)
     return result;
 }
 
-void
+static void
 build_configure_cb(GtkWidget *w, gpointer data)
 {
     show_configure_window(/*from_client*/FALSE);
@@ -1139,7 +1141,7 @@ check_for_configure(void)
      * parsing the output of "configure --help") it doesn't exist.
      */
     /* First, check its some kind of script */
-    if (fgetc(fp) != '#' && fgetc(fp) != '!')
+    if (fgetc(fp) != '#' || fgetc(fp) != '!')
     {
     	fclose(fp);
     	return FALSE;
@@ -1162,6 +1164,128 @@ check_for_configure(void)
     fclose(fp);
     return gotmagic;
 }
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+/*
+ * MakeSystem for autoconf projects in distribution mode,
+ * i.e. the author has not distributed enough of the autoconf
+ * machinery in the source tarball to enable users to make
+ * changes to the autoconf machinery, in the expectation
+ * that the user will simply run the existing configure script.
+ * It's not supposed to be done that way, but it happens.
+ */
+
+static gboolean
+ac_dist_probe(void)
+{
+    return (check_for_configure());
+}
+
+static const char * const ac_dist_deps[] = 
+{
+    "Makefile.in",
+    "config.status",
+    "configure",
+    0
+};
+
+static const MakeCommand ac_dist_commands[] = 
+{
+    {N_("_Remove config.cache"), "/bin/rm -f config.cache"},
+    {N_("Run _configure..."), 0, build_configure_cb},
+    {N_("Run config._status"), "./config.status"},
+    {0}
+};
+
+const MakeSystem makesys_ac_dist = 
+{
+    "autoconf-dist",	    	    	    /* name */
+    N_("GNU autoconf (distribution only)"), /* label */
+    ac_dist_probe,  	    	    	    /* probe */
+    0,	    	    	    	    	    /* parent */
+    TRUE,  	    	    	    	    /* automatic */
+    "Makefile",     	    	    	    /* makefile */
+    ac_dist_deps,   	    	    	    /* makefile_deps */
+    0,	    	    	    	    	    /* standard_targets */
+    ac_dist_commands	    	    	    /* commands */
+};
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+/*
+ * MakeSystem for autoconf projects in maintainer mode,
+ * i.e. the full ability to futz with autoconf stuff is
+ * expected.
+ */
+ 
+static gboolean
+ac_maint_probe(void)
+{
+    return (check_for_configure_in());
+}
+
+static const char * const ac_maint_deps[] = 
+{
+    "configure.in",
+    0
+};
+
+static const MakeCommand ac_maint_commands[] = 
+{
+    {N_("Run a_utoconf"), "autoconf"},
+    {0}
+};
+
+const MakeSystem makesys_ac_maint = 
+{
+    "autoconf-maint",	    	    	    /* name */
+    N_("GNU autoconf"),     	    	    /* label */
+    ac_maint_probe, 	    	    	    /* probe */
+    &makesys_ac_dist,	    	    	    /* parent */
+    TRUE,  	    	    	    	    /* automatic */
+    "Makefile",     	    	    	    /* makefile */
+    ac_maint_deps,  	    	    	    /* makefile_deps */
+    0,	    	    	    	    	    /* standard_targets */
+    ac_maint_commands	    	    	    /* commands */
+};
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+/*
+ * MakeSystem for automake projects.  Note that we don't
+ * distinguish between distribution and maintainer modes
+ * and assume that if the Makefile.am file is distributed
+ * then all the rest of the autoconf machinery is available.
+ */
+
+static gboolean
+am_probe(void)
+{
+    return (file_exists("Makefile.am"));
+}
+
+static const char * const am_deps[] = 
+{
+    "Makefile.am",
+    0
+};
+
+static const MakeCommand am_commands[] = 
+{
+    {N_("Run auto_make"), "automake -a"},
+    {0}
+};
+
+const MakeSystem makesys_am = 
+{
+    "automake",	    	/* name */
+    N_("GNU automake"),	/* label */
+    am_probe, 	    	/* probe */
+    &makesys_ac_maint,	/* parent */
+    TRUE,  	    	/* automatic */
+    "Makefile",     	/* makefile */
+    am_deps,  	    	/* makefile_deps */
+    0,	    	    	/* standard_targets */
+    am_commands	    	/* commands */
+};
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 /*END*/
