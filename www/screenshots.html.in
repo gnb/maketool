@@ -1,0 +1,16 @@
+define(TITLE,Maketool Screenshots)
+include(_common.m4)
+BEGINHEAD
+include(_styles.html)
+ENDHEAD
+BEGINBODY
+
+<P>
+Here's a screenshot of the maketool main window. Note the colour coding
+of the errors and warnings from the make run.
+</P>
+<CENTER>
+<IMG WIDTH=430 HEIGHT=287 SRC="mainw.gif" ALT="main window">
+</CENTER>
+
+ENDBODY

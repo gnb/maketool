@@ -1,0 +1,22 @@
+
+Procedure to update the Change Log web page on new release.
+
+0.  In directory .. = ~/proj/maketool
+1.  Checkin all changes.
+2.  Choose a release number, e.g. 0.5
+3.  Tag the source:
+    cvs tag MAKETOOL_0_5
+4.  Build a list of change from the previous release (e.g. 0.4)
+    www/cvs2changes 0.4 0.5 > cc.txt
+5.  Manually edit the cc.txt file to remove, re-express and
+    re-order the change log items. Maintain the formatting.
+6.  Edit the file CHANGES and prepend cc.txt to it.
+7.  Checkin and re-tag CHANGES
+    cvs ci CHANGES
+    cvs tag -d MAKETOOL_0_5 CHANGES
+    cvs tag MAKETOOL_0_5 CHANGES
+8.  Rebuild the changelog.html page
+    make -C www
+9.  Connect to alphalink
+10. Install the web pages on alphalink
+    make -C www install

@@ -1,0 +1,35 @@
+define(TITLE,Maketool Features)dnl
+include(_common.m4)dnl
+BEGINHEAD
+include(_styles.html)
+ENDHEAD
+BEGINBODY
+
+
+<P>
+Maketool is a simple GTK+ based GUI front end for GNU make.
+It is released under GPL with <B>no warranty</B>.
+</P>
+
+<P>
+Maketool's features include:
+</P>
+
+<UL>
+  <LI>Figures out what targets are available and presents them in a menu.
+  <LI>Runs make and detects compiler errors and warnings in the output.
+  <LI>Double-clicking on errors starts an editor with that file and line.
+  <LI>Works with any makefile system that uses GNU make.
+  <LI>Special handling for standard GNU targets such as <I>all</I>,
+      <I>install</I>, <I>clean</I> etc.
+  <LI>Tested on Linux/x86.
+  <LI>Save and reload logs of make runs.
+  <LI>Summarise make logs to reduce visual clutter.
+  <LI>Override values of make and environment variables.
+  <LI>Make in series or in parallel, (using make's -j and -l flags).
+  <LI>Dryrun mode (using make's -n flag).
+  <LI>Implements many of make's command-line options.
+  <LI>Configure foreground & background colours of error & warnings lines.
+</UL>
+
+ENDBODY

@@ -1,0 +1,38 @@
+define(TITLE,Maketool Download)dnl
+include(_common.m4)dnl
+BEGINHEAD
+include(_styles.html)
+ENDHEAD
+BEGINBODY
+
+define(LATESTVERSION,0.4)
+
+<!-- TODO: mention in the features page that it's released under GPL -->
+<!-- TODO: news... ? -->
+<P>
+The latest version available is <B>LATESTVERSION</B>.
+</P>
+
+<P>
+Due to space limitations I am unable to provide downloads of older
+versions on this website; <A HREF="mailto:gnb@alphalink.com.au">contact me</A>
+if you really need an older version.
+<A
+</P>
+
+<P>
+Download the i386-linux RPM: <A HREF="maketool-LATESTVERSION-1.i386.rpm">maketool-LATESTVERSION-1.i386.rpm</A><BR>
+Download the source tarball: <A HREF="maketool-LATESTVERSION-src.tgz">maketool-LATESTVERSION-src.tgz</A><BR>
+</P>
+
+<P>
+<BR>
+<BR>
+<BR>
+<BR>
+You are the
+<img src="http://www.alphalink.com.au/cgi-bin/Count2.cgi?ft=0&dd=D&md=7&comma=T&df=count.dat" alt="Counter" border=0 align=absmiddle>
+<SUP>th</SUP> person to visit this page.
+</P>
+
+ENDBODY

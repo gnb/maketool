@@ -1,0 +1,122 @@
+#!/bin/sh
+#
+# $Id: cvs2changes,v 1.1 1999-10-09 15:22:01 gnb Exp $
+#
+# Shell script to build a change log for a new release
+# from CVS logs. The change log will still need some
+# manual editing to re-express changes for users, etc.
+#
+
+REV1=${1:-0.3}
+REV2=${2:-0.4}
+PACKAGE=${3:-maketool}
+#PREVIEW=yes
+#FILES="Makefile.in Makefile configure.in"
+DATE=`date '+%d %b %Y'`
+
+LOG=CHANGES
+OLDLOG=CHANGES.$$
+
+TAG1=`echo ${PACKAGE}_${REV1} | tr a-z. A-Z_`
+TAG2=`echo ${PACKAGE}_${REV2} | tr a-z. A-Z_`
+
+echo "Compiling changes from $PACKAGE version $REV1 to $REV2 into $LOG"
+
+# state:
+# 0 = reading log header
+# 1 = just read description separator, waiting for 1st line of description
+# 2 = reading 2nd & subsequent lines
+canonicalise ()
+{
+    awk '
+BEGIN {
+    state = 0;
+    inattic = 0;
+    desc = "";
+}
+/^date: / {
+    if (state == 0) {
+    	state = 1;
+	next;
+    }
+}
+/^RCS file: .*\/Attic\// {
+    if (state == 0) {
+    	inattic = 1;
+	next;
+    }
+}
+/^----------------/ {
+    if (desc != "") print desc;
+    state = 0;
+}
+/^================/ {
+    state = 0;
+    inattic = 0;
+    desc = "";
+}
+{
+    if (state == 0 || inattic) {
+    	next;
+    } else if (state == 1) {
+	indent = "x  ";
+	state++;
+    } else if (state == 2) {
+	indent = "   ";
+    }
+    line = $0;
+    if (substr(line, 1, 3) == "x  " || substr(line, 1, 3) == "   ") {
+    	prefix = "";
+    } else if (substr(line, 1, 2) == "x " || substr(line, 1, 2) == "  ") {
+    	line = substr(line, 3, length(line))
+    	prefix = indent;
+    } else {
+    	prefix = indent;
+    }
+    desc = desc"\n"prefix""line;
+}
+'
+}
+
+uniquify ()
+{
+    awk '
+BEGIN {
+    alldesc[""] = 0;
+    desc = "";
+}
+/^$/ {
+    next;
+}
+/^x  / {
+    alldesc[desc]++;
+    desc = $0;
+}
+/^   / {
+    desc = desc"\n"$0
+}
+END {
+    alldesc[desc]++;
+    for (i in alldesc) {
+    	if (i != "") print i;
+    }
+}
+'
+}
+
+gatherChanges ()
+{
+    echo "* $REV2  ($DATE)"
+    cvs log -r${TAG1}:${TAG2} $FILES 2>&1 | canonicalise | uniquify
+    echo ""
+}
+
+
+if [ "$PREVIEW" = yes ] ; then
+    gatherChanges
+else
+    mv $LOG $OLDLOG && \
+    gatherChanges > $LOG && \
+    cat $OLDLOG >> $LOG && \
+    rm $OLDLOG
+fi

@@ -1,0 +1,10 @@
+define(TITLE,Maketool Change Log)dnl
+include(_common.m4)dnl
+BEGINHEAD
+include(_styles.html)
+ENDHEAD
+BEGINBODY
+
+include(_changelist.html)
+
+ENDBODY
