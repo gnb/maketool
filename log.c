@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.29 2000-01-08 04:26:56 gnb Exp $");
+CVSID("$Id: log.c,v 1.30 2000-01-08 14:33:13 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -907,25 +907,34 @@ log_prev_error(LogRec *lr)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+#define FIRST() \
+    	(forward ? log : g_list_last(log))
+#define NEXT(l) \
+	(forward ? (l)->next : (l)->prev)
+    
 void
-log_apply_after(LogApplyFunc func, gpointer user_data, LogRec *start)
+log_apply_after(
+    LogApplyFunc func,
+    gboolean forward,
+    LogRec *start,
+    gpointer user_data)
 {
     GList *list;
     
     if (start == 0)
     {
-    	list = log;
+    	list = FIRST();
     }
     else
     {
     	list = g_list_find(log, start);
 	if (list == 0)
-	    list = log;
+    	    list = FIRST();
 	else
-	    list = list->next;
+	    list = NEXT(list);
     }
     
-    for ( ; list!=0 ; list=list->next)
+    for ( ; list!=0 ; list=NEXT(list))
     {
     	LogRec *lr = (LogRec *)list->data;
 	
@@ -937,7 +946,7 @@ log_apply_after(LogApplyFunc func, gpointer user_data, LogRec *start)
 void
 log_apply(LogApplyFunc func, gpointer user_data)
 {
-    log_apply_after(func, user_data, 0);
+    log_apply_after(func, TRUE, 0, user_data);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

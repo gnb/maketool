@@ -24,7 +24,7 @@
 #include <regex.h>	/* POSIX regular expression fns */
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: find.c,v 1.1 2000-01-07 17:10:07 gnb Exp $");
+CVSID("$Id: find.c,v 1.2 2000-01-08 14:33:13 gnb Exp $");
 
 static GtkWidget	*find_shell = 0;
 typedef enum { FD_FORWARDS, FD_BACKWARDS, FD_MAX_DIRECTIONS } FindDirections;
@@ -38,10 +38,10 @@ typedef enum
 static GtkWidget    	*dirn_radio[FD_MAX_DIRECTIONS];
 static GtkWidget    	*type_radio[FT_MAX_TYPES];
 static GtkWidget    	*string_entry;
+static FindDirections	direction = FD_FORWARDS;
 
 typedef struct 
 {
-    FindDirections direction;
     FindTypes type;
     char *string;
     regex_t regexp;
@@ -77,20 +77,7 @@ find_state_print(FILE *fp, const FindState *s)
 	break;
     }
     
-    switch (s->direction)
-    {
-    case FD_FORWARDS:
-    	dirn_str = "forwards";
-	break;
-    case FD_BACKWARDS:
-    	dirn_str = "backwards";
-	break;
-    default:
-    	dirn_str = "unknown";
-	break;
-    }
-    
-    fprintf(fp, "{ type=%s direction=%s string=\"%s\" }",
+    fprintf(fp, "{ type=%s string=\"%s\" }",
     	type_str, dirn_str, s->string);
 }
 
@@ -99,8 +86,6 @@ find_state_print(FILE *fp, const FindState *s)
 static int
 find_state_compare(const FindState *s1, const FindState *s2)
 {
-    if (s1->direction != s2->direction)
-    	return (int)s1->direction - (int)s2->direction;
     if (s1->type != s2->type)
     	return (int)s1->type - (int)s2->type;
     return strcmp(s1->string, s2->string);
@@ -111,22 +96,9 @@ find_state_get(FindState *state)
 {
     int i;
     
-    state->direction = -1;
     state->type = -1;
     state->string = 0;
 
-    /* get current direction */
-    for (i=0 ; i<FD_MAX_DIRECTIONS ; i++)
-    {
-    	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(dirn_radio[i])))
-	{
-	    state->direction = i;
-	    break;
-	}
-    }
-    if (state->direction == -1)
-    	return FALSE;
-    
     /* get current type */
     for (i=0 ; i<FT_MAX_TYPES ; i++)
     {
@@ -163,9 +135,6 @@ find_state_set(const FindState *state)
 {
     int i;
     
-    /* set current direction */
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dirn_radio[state->direction]), TRUE);
-
     /* set current type */
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(type_radio[state->type]), TRUE);
     
@@ -247,7 +216,6 @@ find_apply_func(LogRec *lr, gpointer user_data)
     return !found;
 }
 
-/* TODO: should the direction be part of the state stack ?!?! */
 
 static void
 do_find(void)
@@ -280,7 +248,19 @@ do_find(void)
 	find_state_push(state);
     }
     
-    log_apply_after(find_apply_func, (gpointer)state, log_selected());
+    /* get current direction */
+    direction = (gtk_toggle_button_get_active(
+    	GTK_TOGGLE_BUTTON(dirn_radio[FD_FORWARDS])) ?
+    	FD_FORWARDS : FD_BACKWARDS);
+
+    /* do the actual search */    
+    log_apply_after(
+    	find_apply_func,
+	(direction == FD_FORWARDS),
+	log_selected(),
+	(gpointer)state);
+    
+    /* The Find Again menu item is now available */
     grey_menu_items();
 }
 
@@ -292,8 +272,15 @@ do_find_again(void)
     /* TODO: implement finding backwards */
     assert(find_state_stack != 0);
     state = (FindState *)find_state_stack->data;
+
+    /* use previous direction */
     
-    log_apply_after(find_apply_func, (gpointer)state, log_selected());
+    /* do the actual search */    
+    log_apply_after(
+    	find_apply_func,
+	(direction == FD_FORWARDS),
+	log_selected(),
+	(gpointer)state);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

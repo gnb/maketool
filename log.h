@@ -73,7 +73,8 @@ const char *log_get_text(const LogRec *lr);
  */
 typedef gboolean (*LogApplyFunc)(LogRec *lr, gpointer user_data);
 void log_apply(LogApplyFunc func, gpointer user_data);
-void log_apply_after(LogApplyFunc func, gpointer user_data, LogRec *);
+void log_apply_after(LogApplyFunc func, gboolean forwards,
+    LogRec *after, gpointer user_data);
 
 /* Short term hack for colours sample in Preferences window */
 void log_get_icon(LogSeverity level,
