@@ -20,14 +20,14 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: makeprog.c,v 1.1 2003-02-09 05:01:58 gnb Exp $");
+CVSID("$Id: makeprog.c,v 1.2 2003-04-28 11:42:37 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 const char *
 mp_which_makefile(const MakeProgram *mp)
 {
-    const char **fn;
+    const char * const *fn;
     
     for (fn = mp->makefiles ; *fn ; fn++)
     {
