@@ -1059,33 +1059,22 @@ like this, according to the options you have chosen.\
 static void
 create_autoconf_shell(void)
 {
-    GtkWidget *vbox;
-    GtkWidget *bbox;
     GtkWidget *button;
     GtkWidget *sw;
     GtkWidget *page;
     GtkWidget *label;
     int cat;
     
-    autoconf_shell = gtk_window_new(GTK_WINDOW_DIALOG);
+    autoconf_shell = ui_create_dialog(toplevel,  _("Maketool: Configure Options"));
+    ui_set_help_name(autoconf_shell, "configure-window");
     
-    gtk_window_set_title(GTK_WINDOW(autoconf_shell), _("Maketool: Configure Options"));
-    
-    gtk_signal_connect(GTK_OBJECT(autoconf_shell), "destroy", 
-    	GTK_SIGNAL_FUNC(autoconf_cancel_cb), NULL);
-    gtk_container_border_width(GTK_CONTAINER(autoconf_shell), SPACING);
+/*    gtk_container_border_width(GTK_CONTAINER(autoconf_shell), SPACING); */
     
     /* TODO: centralize with ui.c */ 
     tooltips = gtk_tooltips_new();
  
-    vbox = gtk_vbox_new(/*homogeneous*/FALSE, /*spacing*/0);
-    gtk_container_border_width(GTK_CONTAINER(vbox), 0);
-    gtk_container_add(GTK_CONTAINER(autoconf_shell), vbox);
-    gtk_widget_show(vbox);
-    
-
     notebook = gtk_notebook_new();
-    gtk_box_pack_start(GTK_BOX(vbox), notebook,
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(autoconf_shell)->vbox), notebook,
     	    	    	/*expand*/TRUE, /*fill*/TRUE, /*padding*/0);
 			
     /* create a page for each category */
@@ -1144,31 +1133,16 @@ create_autoconf_shell(void)
     /* 
      * Create the action area.
      */
-    bbox = gtk_hbutton_box_new();
-    gtk_container_border_width(GTK_CONTAINER(bbox), SPACING);
-    gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_END);
-    gtk_box_pack_end(GTK_BOX(vbox), bbox,
-    	    	    	/*expand*/FALSE, /*fill*/TRUE, /*padding*/0);
-    gtk_widget_show(bbox);
-
-    button = gtk_button_new_with_label(_("Ok"));
-    gtk_container_add(GTK_CONTAINER(bbox), button);
-    gtk_signal_connect(GTK_OBJECT(button), "clicked", 
-    	GTK_SIGNAL_FUNC(autoconf_ok_cb), NULL);
-    gtk_widget_show(button);
-
-    button = gtk_button_new_with_label(_(advanced_btn_names[advanced]));
-    gtk_container_add(GTK_CONTAINER(bbox), button);
-    gtk_signal_connect(GTK_OBJECT(button), "clicked", 
-    	GTK_SIGNAL_FUNC(autoconf_advanced_cb), NULL);
-    gtk_widget_show(button);
-    advanced_btn = button;
-    
-    button = gtk_button_new_with_label(_("Cancel"));
-    gtk_container_add(GTK_CONTAINER(bbox), button);
-    gtk_signal_connect(GTK_OBJECT(button), "clicked", 
-    	GTK_SIGNAL_FUNC(autoconf_cancel_cb), NULL);
-    gtk_widget_show(button);
+    button = ui_dialog_create_button(autoconf_shell,
+    	    	    	    _("Ok"),
+    	    	    	    autoconf_ok_cb, 0);
+    gtk_window_set_default(GTK_WINDOW(autoconf_shell), button);
+    advanced_btn = ui_dialog_create_button(autoconf_shell,
+    	    	    	    _(advanced_btn_names[advanced]),
+			    autoconf_advanced_cb, 0);
+    ui_dialog_create_button(autoconf_shell,
+    	    	    	    _("Cancel"),
+			    autoconf_cancel_cb, 0);
 }
 
 
