@@ -20,7 +20,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: makeprog.c,v 1.2 2003-04-28 11:42:37 gnb Exp $");
+CVSID("$Id: makeprog.c,v 1.3 2003-05-04 04:18:00 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -44,16 +44,35 @@ extern const MakeProgram makeprog_pmake;
 #if HAVE_IRIX_SMAKE
 extern const MakeProgram makeprog_irix_smake;
 #endif
+#if HAVE_SUN_MAKE
+extern const MakeProgram makeprog_sun_make;
+#endif
 
 const MakeProgram * const makeprograms[] = 
 {
 &makeprog_gmake,
 &makeprog_pmake,
 #if HAVE_IRIX_SMAKE
-&makeprog_irix,
+&makeprog_irix_smake,
+#endif
+#if HAVE_SUN_MAKE
+&makeprog_sun_make,
 #endif
 0
 };
+
+const MakeProgram *
+mp_find(const char *name)
+{
+    int i;
+    
+    for (i = 0 ; makeprograms[i] != 0 ; i++)
+    {
+    	if (!strcmp(makeprograms[i]->name, name))
+	    return makeprograms[i];
+    }
+    return 0;
+}
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 /*END*/
