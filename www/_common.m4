@@ -1,6 +1,7 @@
 define(DATE,esyscmd(date +"%d %b %Y"))dnl
 define(YEAR,esyscmd(date +"%Y"))dnl
 define(BEGINHEAD,
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML><HEAD>
 include(_copyright.html)
 <title>TITLE</title>
