@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.78 2001-09-21 05:34:04 gnb Exp $");
+CVSID("$Id: main.c,v 1.79 2001-09-21 06:20:23 gnb Exp $");
 
 
 /*
@@ -233,7 +233,7 @@ expand_prog(
     if (prefs.dryrun)
 	expands['n'] = "-n";
 
-    expands['D'] = DATADIR;
+    expands['D'] = PKGDATADIR;
     expands['S'] = makesys->name;
     
     out = expand_string(prog, expands);
@@ -2275,7 +2275,7 @@ setup_environment(void)
     oldpath = getenv("PATH");
     if (oldpath == 0)
     	oldpath = "";	    /* should never happen anyway */
-    newvar = g_strdup_printf("PATH=" LIBEXECDIR ":%s", oldpath);
+    newvar = g_strdup_printf("PATH=" PKGLIBEXECDIR ":%s", oldpath);
 #if 0
     fprintf(stderr, "putenv(\"%s\")\n", newvar);
 #endif

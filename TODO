@@ -14,8 +14,6 @@ x  Change maketool_client to be public and its default mode to take
 x  Limit the sizes of target names in the Build menu, especially
    when a pair of them is used as a range for a submenu.
 
-x  Fix Makefile.in to use pkglibexecdir instead of libexecdir
-
 x  Rationalise use of handle_input()
 
 x  Create dummy N_() macros to seed the PO files with common autoconf
@@ -481,4 +479,6 @@ x  DONE: When running configure, pop up a dialog which requests arguments
 x  DONE: Add a GUI for setting CONFIGUREFLAGS based on ./configure --help
 
 x  DONE: Strongly limit the inclusion of gdkx.h.
+
+x  DONE: Fix Makefile.in to use pkglibexecdir instead of libexecdir
 

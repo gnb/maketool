@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.41 2001-09-21 05:52:47 gnb Exp $
+# $Id: Makefile.in,v 1.42 2001-09-21 06:20:23 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -26,16 +26,18 @@ INSTALL=	@INSTALL@
 PACKAGE=	@PACKAGE@
 VERSION=	@VERSION@
 localedir=	@datadir@/locale
-datadir=	@datadir@/$(PACKAGE)
-libexecdir=	@libexecdir@/$(PACKAGE)
-helpdir=	$(prefix)/@DATADIRNAME@/$(PACKAGE)/help
+datadir=	@datadir@
+pkgdatadir=	$(datadir)/$(PACKAGE)
+libexecdir=	@libexecdir@
+pkglibexecdir=	$(libexecdir)/$(PACKAGE)
+helpdir=	$(pkgdatadir)/help
 
 CC=		@CC@
 #CC=		gcc -Wall
 CFLAGS=		@CFLAGS@
-CPPFLAGS=	@GTK_CFLAGS@ -I. -Iicons -Iintl \
-		-DLOCALEDIR=\"$(localedir)\" -DLIBEXECDIR=\"$(libexecdir)\" \
-		-DHELPDIR=\"$(helpdir)\" -DDATADIR=\"$(datadir)\" \
+CPPFLAGS=	@GTK_CFLAGS@ -I$(top_srcdir) -Iicons -Iintl \
+		-DLOCALEDIR=\"$(localedir)\" -DPKGLIBEXECDIR=\"$(pkglibexecdir)\" \
+		-DHELPDIR=\"$(helpdir)\" -DPKGDATADIR=\"$(pkgdatadir)\" \
 		@CPPFLAGS@ $(TESTCPPFLAGS)
 LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 
@@ -90,14 +92,14 @@ CLIENT_OBJECTS=	$(CLIENT_SOURCES:.c=.o)
 maketool_client: $(CLIENT_OBJECTS) _libintl
 	$(_PURIFY) $(LINK.c) -o $@ $(CLIENT_OBJECTS) $(LDLIBS)
 	
-install:: $(libexecdir)/maketool_client
+install:: $(pkglibexecdir)/maketool_client
 
-$(libexecdir)/maketool_client: maketool_client
+$(pkglibexecdir)/maketool_client: maketool_client
 	test -d $(@D) || $(INSTALL) -m 755 -d $(@D)
 	$(INSTALL) -m 755 $< $@
 	
 uninstall::
-	$(RM) $(libexecdir)/maketool_client
+	$(RM) $(pkglibexecdir)/maketool_client
 	
 clean::
 	$(RM) maketool_client
@@ -106,14 +108,14 @@ clean::
 
 # extract_targets shell script
 
-install:: $(libexecdir)/extract_targets
+install:: $(pkglibexecdir)/extract_targets
 
-$(libexecdir)/extract_targets: extract_targets
+$(pkglibexecdir)/extract_targets: extract_targets
 	test -d $(@D) || $(INSTALL) -m 755 -d $(@D)
 	$(INSTALL) -m 755 $< $@
 	
 uninstall::
-	$(RM) $(libexecdir)/extract_targets
+	$(RM) $(pkglibexecdir)/extract_targets
 	
 ###
 
