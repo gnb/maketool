@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.20 2000-01-07 17:10:07 gnb Exp $
+# $Id: Makefile.in,v 1.21 2000-04-16 09:21:33 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -41,7 +41,7 @@ LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 O=		objs
 
 SOURCES=	main.c filter.c help.c preferences.c log.c print.c ps.c \
-		find.c ui.c spawn.c util.c glib_extra.c
+		find.c ui.c task.c util.c glib_extra.c
 HEADERS=	maketool.h filter.h common.h log.h ui.h \
 		spawn.h util.h glib_extra.h
 OBJECTS=	$(SOURCES:%.c=$O/%.o)

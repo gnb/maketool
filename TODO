@@ -9,9 +9,9 @@ x  Show a different icon on error lines which have been edited.
 
 x  DONE: Have to be able to resize the window down vertically.
 
-x  Implement printing and Print Settings window.
+x  IN PROGRESS: Implement printing and Print Settings window.
 
-x  Implement File->Change Directory  command.
+x  IN PROGRESS: Implement File->Change Directory  command.
 
 x  DONE: Add icon for non-GNOME w/ms.
 
@@ -181,7 +181,7 @@ x  DONE: Also number of errors & warnings.
 x  DONE: Should be able to edit main.c by clicking on "    from main.c" in gcc
    inclusion trace.
 
-x  Provide facility to search the log text.
+x  DONE: Provide facility to search the log text.
 
 x  DONE: Fix bug where sometimes list_targets doesn't finish, or isn't reaped,
    or something. This was a race condition between spawning the first make
@@ -191,7 +191,7 @@ x  Fix bug where build start line, updated to reflect number of errors,
    is displayed at wrong horizontal position (as if it had lost an indent).
    This seems to be a GTK display bug.
    
-x  The feature whereby targets are specified on the commandline should be
+x  DONE: The feature whereby targets are specified on the commandline should be
    modified to use the new task_*() routines. Check that this behaves
    correctly with autoconf support.
    
@@ -234,20 +234,20 @@ x  Printing: add notebook page to edit paper size, orientation, and
    
 x  Printing: add support for landscape mode.
 
-x  Printing: Print window's Page Setup button should pop up the Page Setup
+x  DONE: Printing: Print window's Page Setup button should pop up the Page Setup
    notebook page of the Preferences dialog.
    
 x  Printing: page numbers
 
 x  Printing: colours/icons for errors & warnings
 
-x  Printing: clip text.
+x  DONE: Printing: clip text.
 
 x  Printing: title line on every page.
 
 x  Printing: modal dialogs.
 
-x  Printing: dialogs come up at sensible locations, e.g. centred over
+x  DONE: Printing: dialogs come up at sensible locations, e.g. centred over
    the toplevel shell. Set transient-for flag too.
    
 x  Printing: option to print entire log file or just descendants of
@@ -256,7 +256,7 @@ x  Printing: option to print entire log file or just descendants of
 x  Printing: option to print using collapsed status of log lines or
    just entire log.
    
-x  are the fds for pipes to child processes leaked?
+x  DONE: are the fds for pipes to child processes leaked? NO.
 
 x  configure-time check for /usr/doc is insufficient. Need to use /usr/doc
    on Linux only, $(prefix)/share/$(PACKAGE) on NetBSD.
@@ -269,7 +269,32 @@ x  Frederick Bruckman says: To be able to pass in datadir or localedir to
 
 x  Implement case-insensitive literals in Find window.
 
-x  Implement backwards search in Find window.
+x  DONE: Implement backwards search in Find window.
 
 x  Populate Find window string from current selection on Edit->Find ?
 
+x  Handle configure.in/config.status being in an ancestor directory
+
+x  Handle dependancies of multiple files on their .in counterparts via
+   autoconf, in particular Makefiles in subdirs. Possible create a
+   temporary `Makefiles' target.
+   
+x  be able to merge multi-line MWOS error messages into 1 summary line??
+
+x  generate column info from MWOS "     ^" stuff
+
+x  possibly generate token span from line before the MWOS "   ^" stuff.
+
+x  apply the prefs option used at start of build to opening log files.
+
+x  Use gtk_window_set_transient_for() correctly.
+
+x  Add HAV_SYS_FILIO check for FIONREAD
+
+x  Bug: clicking Clear Log while build in progress coredumps
+
+x  Bug: Stop button no longer ungreys when running!
+
+x  Add filters to support MWOS cross-compiler (see sample mwos.errs)
+
+x  Option to always scroll to end on make output
