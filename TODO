@@ -2,9 +2,6 @@
 
 x  Help: make the browser command configuruable in preferences.
 
-x  Help: organise smart way to have consistent style etc between
-   the many HTML files which comprise the help.
-   
 x  Help: organise smart way to generate index at least semi-automatically.
 
 x  Help: figure out a way to hook up help to menu items
@@ -374,3 +371,7 @@ x  DONE: Option to always scroll to end on make output
 
 x  DONE: Fix bug where changing any of the log flags causes the current scroll
    position in the log to be lost as the log is repopulated.
+
+x  DONE: Help: organise smart way to have consistent style etc between
+   the many HTML files which comprise the help.
+   Uses DocBook SGML.
