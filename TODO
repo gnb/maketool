@@ -121,8 +121,6 @@ x  Provide filters for other compilers than gcc.
 x  Make filters configurable in Preferences GUI. This implies making
    the changes persistent too!
 
-x  Use a hashtable of filenames to reduce memory traffic for filenames.
-
 x  GNOME integration: drag'n'drop. Dragging in directory changes to
    that directory. Dragging in file or string makes it if it's a known
    target. Otherwise, if the MIMEtype indicates its text, open it as 
@@ -142,8 +140,6 @@ x  GNOME integration: use GNOME About and Preferences dialogs.
 x  GNOME integration: use GNOME URL handling in Help menu.
 
 x  GNOME integration: provide triggers for sounds etc.
-
-x  Doco.
 
 x  Fix bug whereby `configure --with-included-gettext' leaves a symlink
    intl/libintl.h -> intl/libgettext.h which is not removed again when
@@ -287,6 +283,10 @@ x  When ./configure is run from make_makefile(), config.status is also
    run afterward, redundantly.
 
 --- closed ---
+
+x  Doco.
+
+x  Use a hashtable of filenames to reduce memory traffic for filenames.
 
 x  Provide a progress indicator during the open of large log files.
 
