@@ -31,7 +31,7 @@
 #include <sys/filio.h>
 #endif
 
-CVSID("$Id: task.c,v 1.11 2002-09-24 14:16:28 gnb Exp $");
+CVSID("$Id: task.c,v 1.12 2003-02-09 05:03:23 gnb Exp $");
 
 /*
  * TODO: GDK is used only for the gdk_input_*() functions, which
@@ -122,6 +122,8 @@ task_linemode_input(Task *task, int len, const char *buf)
 	return;
     }
     
+    /* TODO: use append_chars here to deal with NULs in input stream */
+
     while (len > 0 && *buf)
     {
 	char *p = strchr(buf, '\n');
