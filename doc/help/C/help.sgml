@@ -6,7 +6,7 @@
 ]>
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.21 2003-09-28 13:11:11 gnb Exp $"
+         revision="$Id: help.sgml,v 1.22 2003-11-01 02:29:37 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool</title>
@@ -14,7 +14,7 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2003-09-28 13:11:11 $</pubdate>
+  <pubdate role="cvs">$Date: 2003-11-01 02:29:37 $</pubdate>
   <releaseinfo>This is version &version;</releaseinfo>
   <copyright>
     <year>2000</year>
@@ -526,6 +526,18 @@ gmake some-target >& <emphasis>make.log</emphasis>
   </varlistentry>
 
   <varlistentry>
+    <term><guibutton>Pause/Resume</guibutton></term>
+    <listitem>
+      <para>
+      <guibutton>Pause</guibutton> pauses a running &gmake;, and
+      <guibutton>Resume</guibutton> resumes running a paused &gmake;.
+      This menu item is only available while a &gmake; is running
+      and paused respectively.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
     <term><guibutton>Dryrun Only</guibutton></term>
     <listitem>
       <para>
@@ -834,8 +846,8 @@ one &gmake; run.
 <para>
 See also:
 <xref linkend="all-tool"> tool,
-<xref linkend="clean-tool"> tool
-<!-- <xref linkend="menu-build"> -->
+<xref linkend="clean-tool"> tool,
+<xref linkend="pause-tool"> tool
 </para>
 
 </section>
@@ -857,8 +869,33 @@ This tool becomes available only during a &gmake; run.
 <para>
 See also:
 <xref linkend="all-tool"> tool,
-<xref linkend="clean-tool"> tool
-<!-- <xref linkend="menu-build"> -->
+<xref linkend="clean-tool"> tool,
+<xref linkend="pause-tool"> tool
+</para>
+
+</section>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<section id="pause-tool" xreflabel="Pause tool">
+<title>Pause tool</title>
+
+<graphic format="GIF" fileref="tools-pause.gif"></graphic>
+
+<para>
+Click this tool to pause the current &gmake; run.  Click
+it again to resume the run.  This is useful for stopping
+the build temporarily e.g. while you do something else in
+a shell window.
+</para>
+
+<para>
+This tool becomes available only during a &gmake; run.
+</para>
+
+<para>
+See also:
+<xref linkend="again-tool"> tool,
+<xref linkend="stop-tool"> tool
 </para>
 
 </section>
