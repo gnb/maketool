@@ -27,3 +27,13 @@ x  Change the `Type' field in the Variables tab in the
    Preferences window to a combo box.
    
 x  I18N.
+
+x  Provide filters for other compilers thn gcc.
+
+x  Make filters configurable in Preferences GUI.
+
+x  Save & load preferences.
+
+x  Handle makes over multiple directories - get the filenames right.
+
+x  Use a hashtable of filenames to reduce memory traffic for filenames.
