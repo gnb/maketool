@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.40 1999-11-02 11:10:38 gnb Exp $");
+CVSID("$Id: main.c,v 1.41 1999-11-04 07:22:35 gnb Exp $");
 
 typedef enum
 {
@@ -73,7 +73,7 @@ static const char *standard_targets[] = {
 "all",
 "install", "install-strip", "installcheck", "installdirs", "uninstall",
 "mostlyclean", "clean", "distclean", "reallyclean", "maintainer-clean",
-"TAGS",
+"TAGS", "tags",
 "info", "dvi",
 "dist",
 "check",
@@ -89,7 +89,11 @@ static void handle_line(const char *line);
 #define g_list_find_str(l, s) \
 	g_list_find_custom((l), (s), (GCompareFunc)strcmp)
 
-
+/*
+ * Number of non-standard targets to be present before
+ * the build menu should be split up into multiple submenus.
+ */
+#define BUILD_MENU_THRESHOLD	20
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -338,15 +342,46 @@ start_make_makefile(void *arg)
 static void
 append_build_menu_items(GList *list)
 {
+    GtkWidget *menu;
     char *targ;
-
-    for ( ; list != 0 ; list = list->next)
+    int n;
+    gboolean multiple_mode = (g_list_length(list) > BUILD_MENU_THRESHOLD);
+    
+    for (n = 0 ; list != 0 ; list = list->next)
     {
-    	targ = (char*)list->data;
-    	if (!strcmp(targ, "-"))
-	    ui_add_separator(build_menu);	
+    	targ = (char *)list->data;
+
+    	if (multiple_mode)
+	{
+	    if (n == 0)
+	    {
+	    	GList *last;
+		
+		last = g_list_nth(list, BUILD_MENU_THRESHOLD-1);
+		if (last == 0)
+		    last = g_list_last(list);
+		if (last != list)
+		{
+		    char *label = g_strdup_printf("%s - %s", targ, (const char *)last->data);
+#if DEBUG
+	    	    fprintf(stderr, "creating Build submenu \"%s\"\n", label);
+#endif
+		    menu = ui_add_submenu(build_menu, /*douline*/FALSE, label);
+		    g_free(label);
+		}
+		else
+		    menu = build_menu;
+	    }
+	    if (++n == BUILD_MENU_THRESHOLD)
+		n = 0;
+	}
 	else
-	    ui_add_button_2(build_menu, targ, FALSE, 0, build_cb, targ,
+	    menu = build_menu;
+	    
+    	if (!strcmp(targ, "-"))
+	    ui_add_separator(menu);
+	else
+	    ui_add_button_2(menu, targ, FALSE, 0, build_cb, targ,
 	    			GR_NOTRUNNING);
     }
 }
@@ -389,11 +424,21 @@ reap_list(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	while ((t = strtok(buf, " \t\r\n")) != 0)
 	{
 	    {
-    	       t = g_strdup(t);
-	       if (is_standard_target(t))
-    		   std = g_list_append(std, t);
-	       else
-    		   available_targets = g_list_append(available_targets, t);
+		t = g_strdup(t);
+		if (is_standard_target(t))
+		{
+#if DEBUG
+    	    	    fprintf(stderr, "reap_list adding standard target \"%s\"\n", t);
+#endif
+    	    	    std = g_list_append(std, t);
+		}
+		else
+		{
+#if DEBUG
+    	    	    fprintf(stderr, "reap_list adding target \"%s\"\n", t);
+#endif
+    	    	    available_targets = g_list_append(available_targets, t);
+		}
     	    }
 	    buf = 0;
 	}

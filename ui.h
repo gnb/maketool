@@ -55,6 +55,7 @@ void ui_tool_add_space(GtkWidget *toolbar);
 void ui_set_accel_group(GtkAccelGroup *ag);
 GtkWidget *ui_add_menu(GtkWidget *menubar, const char *label);
 GtkWidget *ui_add_menu_right(GtkWidget *menubar, const char *label);
+GtkWidget *ui_add_submenu(GtkWidget *menu, gboolean douline, const char *label);
 GtkWidget *ui_add_button(
     GtkWidget *menu,
     const char *label,

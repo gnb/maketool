@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.15 1999-09-05 11:39:31 gnb Exp $");
+CVSID("$Id: ui.c,v 1.16 1999-11-04 07:22:36 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -161,24 +161,29 @@ _ui_create_label(
 
 static GtkWidget *
 _ui_add_menu_aux(
-    GtkWidget *menubar,
+    GtkWidget *parent,	    /* menubar or menu */
     const char *label,
+    gboolean douline,
     gboolean is_right)
 {
     GtkWidget *menu, *item;
-    guint uline_key;
+    guint uline_key = 0;
     
     item = gtk_menu_item_new();
-    _ui_create_label(item, label, &uline_key);
+    _ui_create_label(item, label, (douline ? &uline_key : 0));
     gtk_widget_show(item);
     
-    gtk_widget_add_accelerator(item, "activate_item", 
+    if (douline && uline_key != 0)
+	gtk_widget_add_accelerator(item, "activate_item", 
 				ui_accel_group, uline_key, GDK_MOD1_MASK, 0);
 
     menu = gtk_menu_new();
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), menu);
 
-    gtk_menu_bar_append(GTK_MENU_BAR(menubar), item);
+    if (GTK_IS_MENU_BAR(parent))
+	gtk_menu_bar_append(GTK_MENU_BAR(parent), item);
+    else
+	gtk_menu_append(GTK_MENU(parent), item);
     
     if (is_right)
     	gtk_menu_item_right_justify(GTK_MENU_ITEM(item));
@@ -189,13 +194,19 @@ _ui_add_menu_aux(
 GtkWidget *
 ui_add_menu(GtkWidget *menubar, const char *label)
 {
-    return _ui_add_menu_aux(menubar, label, FALSE);
+    return _ui_add_menu_aux(menubar, label, TRUE, FALSE);
 }
 
 GtkWidget *
 ui_add_menu_right(GtkWidget *menubar, const char *label)
 {
-    return _ui_add_menu_aux(menubar, label, TRUE);
+    return _ui_add_menu_aux(menubar, label, TRUE, TRUE);
+}
+
+GtkWidget *
+ui_add_submenu(GtkWidget *menu, gboolean douline, const char *label)
+{
+    return _ui_add_menu_aux(menu, label, douline, FALSE);
 }
 
 
