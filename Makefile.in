@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.52 2003-08-10 05:59:47 gnb Exp $
+# $Id: Makefile.in,v 1.53 2003-09-01 13:21:39 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -204,6 +204,7 @@ DISTFILES=	\
 		\
 		configure.in config.guess config.sub install-sh aclocal.m4 \
 		configure Makefile.in config.h.in mkinstalldirs makewrap.in \
+		version.m4.in \
 		\
 		$(SOURCES) $(HEADERS) @ALL_OS_SOURCE@ \
 		$(CLIENT_SOURCES) $(CLIENT_HEADERS)
