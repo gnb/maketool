@@ -1,11 +1,28 @@
-#define DEBUG 0
+/*
+ * Maketool - GTK-based front end for gmake
+ * Copyright (c) 1999 Greg Banks
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #include "common.h"
 #include "glib_extra.h"
 #include <signal.h>
 #include <sys/poll.h>
 
-CVSID("$Id: glib_extra.c,v 1.5 1999-05-25 08:02:47 gnb Exp $");
+CVSID("$Id: glib_extra.c,v 1.6 1999-05-30 11:24:39 gnb Exp $");
 
 
 typedef struct
@@ -46,7 +63,13 @@ g_unix_dispatch_reapers(gpointer data)
     
     for (;;)
     {
+#if HAVE_WAIT3    
 	pid = wait3(&status, WNOHANG, &usage);
+#else
+	memset(&usage, 0, sizeof(usage));	/* nothing to see here */
+	pid = waitpid(-1, &status, WNOHANG);
+#endif
+	
 #if DEBUG
 	fprintf(stderr, "g_unix_check_processes(): pid = %d\n", (int)pid);
 #endif
@@ -96,7 +119,7 @@ g_unix_poll_func(
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-static void
+static RETSIGTYPE
 g_unix_signal_handler(int sig)
 {
     g_unix_got_signal++;

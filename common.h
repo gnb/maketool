@@ -1,5 +1,5 @@
 /*
- * Autodep - automatic maintenance of make dependancies
+ * Maketool - GTK-based front end for gmake
  * Copyright (c) 1999 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -21,25 +21,14 @@
 #define _common_h_
 
 /*
- * $Id: common.h,v 1.2 1999-05-28 17:06:34 gnb Exp $
+ * $Id: common.h,v 1.3 1999-05-30 11:24:39 gnb Exp $
  */
 
-/* #include <config.h> */
-#define STDC_HEADERS 1
-#define HAVE_STRCHR 1
-#define HAVE_MEMORY_H 1
-#define HAVE_UNISTD_H 1
-#define HAVE_MALLOC_H 1
-#define HAVE_FCNTL_H 1
-#define HAVE_SYS_WAIT_H 1
-
+#include <config.h>
 
 #include <sys/types.h>
 #include <glib.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <errno.h>
-#include <malloc.h>
 #include <stdio.h>
 #include <libintl.h>
 #include "patchlevel.h"
@@ -69,34 +58,23 @@ extern char *strrchr(char *);
 #include <malloc.h>
 #endif
 
-#if HAVE_FCNTL_H
-#include <fcntl.h>
-#endif
-
 #if HAVE_SYS_WAIT_H
 #include <sys/wait.h>
 #endif
+
+#if HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+
 /*
  * TODO: autoconf reckons I should check and provide
  * default definitions for WEXITSTATUS etc...yeah right.
  */
 
-
-#define bool int
-#ifndef TRUE
-#define TRUE 1
-#endif
-#ifndef FALSE
-#define FALSE 0
-#endif
-
 #define CVSID(s) \
 	static const char * const __cvsid[2] = {(const char*)__cvsid, (s)}
 #define ARRAYLEN(a) \
 	(sizeof((a))/sizeof((a)[0]))
-#ifndef MIN
-#define MIN(x,y) ((x)<(y)?(x):(y))
-#endif
 
 
 #ifndef _

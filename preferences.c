@@ -1,8 +1,27 @@
+/*
+ * Maketool - GTK-based front end for gmake
+ * Copyright (c) 1999 Greg Banks
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
 #include "ui.h"
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: preferences.c,v 1.10 1999-05-25 12:11:36 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.11 1999-05-30 11:24:39 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -271,25 +290,25 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     prefs.edit_warnings = !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(editw_check));
     prefs.ignore_failures = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fail_check));
 
-    free(prefs.prog_make);
-    prefs.prog_make = strdup(gtk_entry_get_text(GTK_ENTRY(prog_make_entry)));
+    g_free(prefs.prog_make);
+    prefs.prog_make = g_strdup(gtk_entry_get_text(GTK_ENTRY(prog_make_entry)));
         
-    free(prefs.prog_list_targets);
-    prefs.prog_list_targets = strdup(gtk_entry_get_text(GTK_ENTRY(prog_targets_entry)));
+    g_free(prefs.prog_list_targets);
+    prefs.prog_list_targets = g_strdup(gtk_entry_get_text(GTK_ENTRY(prog_targets_entry)));
     
-    free(prefs.prog_list_version);
-    prefs.prog_list_version = strdup(gtk_entry_get_text(GTK_ENTRY(prog_version_entry)));
+    g_free(prefs.prog_list_version);
+    prefs.prog_list_version = g_strdup(gtk_entry_get_text(GTK_ENTRY(prog_version_entry)));
     
-    free(prefs.prog_edit_source);
-    prefs.prog_edit_source = strdup(gtk_entry_get_text(GTK_ENTRY(prog_edit_entry)));
+    g_free(prefs.prog_edit_source);
+    prefs.prog_edit_source = g_strdup(gtk_entry_get_text(GTK_ENTRY(prog_edit_entry)));
     
     prefs.start_action = uiComboGetCurrent(start_action_combo);
     
     /* TODO: strip `mf' of whitespace JIC */
     mf = gtk_entry_get_text(GTK_ENTRY(makefile_entry));
     if (prefs.makefile != 0)
-	free(prefs.makefile);
-    prefs.makefile = (mf == 0 || *mf == '\0' ? 0 : strdup(mf));
+	g_free(prefs.makefile);
+    prefs.makefile = (mf == 0 || *mf == '\0' ? 0 : g_strdup(mf));
     
     prefs_clear_variables();
     nrows = GTK_CLIST(var_clist)->rows;        

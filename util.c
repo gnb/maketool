@@ -1,6 +1,25 @@
+/*
+ * Maketool - GTK-based front end for gmake
+ * Copyright (c) 1999 Greg Banks
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
 #include "util.h"
 
-CVSID("$Id: util.c,v 1.7 1999-05-25 12:11:36 gnb Exp $");
+CVSID("$Id: util.c,v 1.8 1999-05-30 11:24:40 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -17,7 +36,7 @@ estring_init(estring *e)
    if ((e)->length + (dl) + 1 > (e)->available) \
    { \
    	(e)->available += MIN(1024, ((e)->length + (dl) + 1 - (e)->available)); \
-   	(e)->data = ((e)->data == 0 ? malloc((e)->available) : realloc((e)->data, (e)->available)); \
+   	(e)->data = ((e)->data == 0 ? g_new(char, (e)->available) : g_renew(char, (e)->data, (e)->available)); \
    }
 
 void
@@ -56,7 +75,7 @@ estring_free(estring *e)
 {
    if (e->data != 0)
    {
-   	free(e->data);
+   	g_free(e->data);
 	e->length = 0;
 	e->available = 0;
    }
@@ -93,11 +112,11 @@ do_expands(const char *in, estring *out, const char *expands[256])
 		if (doit)
 		{
 		    int sublen = len-6;
-		    char *sub = malloc(sublen+1);
+		    char *sub = g_new(char, sublen+1);
 		    memcpy(sub, in+5, sublen);
 		    sub[sublen] = '\0';
 	    	    do_expands(sub, out, expands);
-		    free(sub);
+		    g_free(sub);
 		}
 		in += len;
 	    }

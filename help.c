@@ -1,10 +1,27 @@
-#define DEBUG 1
+/*
+ * Maketool - GTK-based front end for gmake
+ * Copyright (c) 1999 Greg Banks
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #include "maketool.h"
 #include "spawn.h"
 #include "ui.h"
 
-CVSID("$Id: help.c,v 1.9 1999-05-28 17:06:34 gnb Exp $");
+CVSID("$Id: help.c,v 1.10 1999-05-30 11:24:39 gnb Exp $");
 
 static GtkWidget	*about_shell = 0;
 static GtkWidget	*about_make_shell = 0;
@@ -80,11 +97,11 @@ help_about_cb(GtkWidget *w, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-static char *make_version = 0;
-
 static void
 make_version_reap(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 {
+    estring *vers = (estring *)data;
+
     if (!(WIFEXITED(status) || WIFSIGNALED(status)))
     	return;
 	
@@ -96,7 +113,7 @@ make_version_reap(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	about_make_shell = uiCreateOkDialog(toplevel, _("About Make"));
 
 	/* TODO: logo */
-	label = gtk_label_new(make_version);
+	label = gtk_label_new(vers->data);
 	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_make_shell)->vbox), label);
 	gtk_widget_show(label);
     }
@@ -107,24 +124,12 @@ make_version_reap(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 static void
 make_version_input(int len, const char *buf, gpointer data)
 {
-    char *ptr;
+    estring *vers = (estring *)data;
     
-    if (make_version == 0)
-    {
-    	ptr = make_version = (char *)malloc(len + 1);
-    }
-    else
-    {
-    	int oldlen = strlen(make_version);
-	make_version = (char*)realloc(make_version, oldlen + len + 1);
-	ptr = &make_version[oldlen];
-    }
-    
-    memcpy(ptr, buf, len);
-    ptr[len] = '\0';
+    estring_append_chars(vers, buf, len);
     
 #if DEBUG
-    fprintf(stderr, "make_version_input(): make_version=\"%s\"\n", make_version);
+    fprintf(stderr, "make_version_input(): make_version=\"%s\"\n", vers->data);
 #endif
 }
 
@@ -132,6 +137,8 @@ make_version_input(int len, const char *buf, gpointer data)
 void
 help_about_make_cb(GtkWidget *w, gpointer data)
 {
+    static estring vers;
+    
     /* TODO: grey out menu item while make --version running */
 
     if (make_version == 0)
@@ -139,8 +146,8 @@ help_about_make_cb(GtkWidget *w, gpointer data)
 	char *prog;
 	prog = expand_prog(prefs.prog_list_version, 0, 0, 0);
 	spawn_with_output(prog, make_version_reap,
-		make_version_input, (gpointer)toplevel, 0);
-	free(prog);
+		make_version_input, (gpointer)toplevel, &vers);
+	g_free(prog);
     }
     else if (about_make_shell != 0)
     	gtk_widget_show(about_make_shell);

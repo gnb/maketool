@@ -17,18 +17,40 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _GLIB_EXTRA_H_
-#define _GLIB_EXTRA_H_
+#ifndef _config_h_
+#define _config_h_ 1
 
-#include "common.h"
-#include <sys/resource.h>
+/*
+ * $Id: config.h.in,v 1.1 1999-05-30 11:24:39 gnb Exp $
+ */
 
-typedef void (*GUnixReapFunc)(pid_t, int status, struct rusage *, gpointer);
+/*
+ * Define as non-zero to turn on debugging prints.
+ */
+#define DEBUG 0
 
-void
-g_unix_add_reap_func(
-    pid_t pid,
-    GUnixReapFunc reaper,	/* may be 0 -- uses default internal func */
-    gpointer user_data);
+/*
+ * The i18n package. Used to find .mo files at runtime.
+ */
+#define PACKAGE "maketool"
 
-#endif /* _GLIB_EXTRA_H_ */
+/*
+ * The directory into which the .mo files are installed.
+ */
+#define LOCALEDIR	"/usr/share/locale"
+
+/* Various standard autoconf defines */
+#define HAVE_MALLOC_H 0
+#define HAVE_MEMORY_H 0
+#define HAVE_STRCHR 0
+#define HAVE_SYS_WAIT_H 0
+#define HAVE_SYS_TIME_H 0
+#define HAVE_SYS_IOCTL_H 0
+#define HAVE_SIGNAL_H 0
+#define HAVE_REGCOMP 0
+#define HAVE_PUTENV 0
+#define HAVE_UNISTD_H 0
+#define STDC_HEADERS 0
+#define RETSIGTYPE void
+
+#endif /* _config_h_ */

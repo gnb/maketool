@@ -1,4 +1,9 @@
 *.bck
 maketool
-o.i586-unknown-linux
+objs
 make.log
+config.log
+configure
+config.cache
+config.status
+config.h

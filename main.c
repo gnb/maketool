@@ -1,14 +1,34 @@
+/*
+ * Maketool - GTK-based front end for gmake
+ * Copyright (c) 1999 Greg Banks
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
 #define DEFINE_GLOBALS
-#include <sys/time.h>
 #include <stdarg.h>
-#include <signal.h>
 #include "maketool.h"
 #include "spawn.h"
 #include "ui.h"
 #include "log.h"
 #include "util.h"
+#if HAVE_SIGNAL_H
+#include <signal.h>
+#endif
 
-CVSID("$Id: main.c,v 1.18 1999-05-28 17:06:34 gnb Exp $");
+CVSID("$Id: main.c,v 1.19 1999-05-30 11:24:39 gnb Exp $");
 
 typedef enum
 {
@@ -53,7 +73,7 @@ message(const char *fmt, ...)
     char buf[1024];
     
     va_start(args, fmt);
-    vsprintf(buf, fmt, args);
+    g_vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
     
     gtk_entry_set_text(GTK_ENTRY(messageent), buf);
@@ -193,7 +213,7 @@ reapList(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	}
 	else
 	{
-    	   t = strdup(t);
+    	   t = g_strdup(t);
     	   availableTargets = g_list_append(availableTargets, t);
 	   uiAddButton(buildMenu, t, build_cb, t, GR_NOTRUNNING);
     	}
@@ -228,7 +248,7 @@ listTargets(void)
     {
     	/* TODO: remove old menu items */
     }
-    free(prog);
+    g_free(prog);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -246,7 +266,7 @@ startEdit(LogRec *lr)
     if (spawn_simple(prog, 0, 0) > 0)
 	message(_("Editing %s (line %d)"), lr->res.file, lr->res.line);
 	
-    free(prog);
+    g_free(prog);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -366,7 +386,7 @@ buildStart(const char *target)
 	anim_start();
 	grey_menu_items();
     }
-    free(prog);
+    g_free(prog);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

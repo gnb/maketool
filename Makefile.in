@@ -1,0 +1,78 @@
+#
+# Maketool - GTK-based front end for gmake
+# Copyright (c) 1999 Greg Banks
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# 
+# $Id: Makefile.in,v 1.1 1999-05-30 11:24:39 gnb Exp $
+#
+
+# TODO: gtk flags should come from `configure'
+
+CC=		gcc -Wall
+CFLAGS=		-g
+CPPFLAGS:=	$(shell gtk-config --cflags) -D_USE_BSD -I. -Iicons
+LDLIBS:=	$(shell gtk-config --libs)
+O=		objs
+
+SOURCES=	main.c filter.c help.c preferences.c log.c ui.c \
+		spawn.c util.c glib_extra.c
+OBJECTS=	$(SOURCES:%.c=$O/%.o)
+
+###
+
+all:: maketool
+
+maketool: $(OBJECTS)
+	$(LINK.c) -o $@ $(OBJECTS) $(LDLIBS)
+	
+clean::
+	$(RM) maketool
+		
+###
+
+$O/%.o: %.c $O/.stamp
+	$(COMPILE.c) -o $@ $<
+	
+$O/.stamp:
+	-mkdir -p $(@D)
+	touch $@
+
+clean::
+	$(RM) -r $O
+		
+###
+
+random:
+	$(COMPILE.c) -c -o $O/crud.o crud.c
+	
+targets:
+	yes ' ' | head -20 | awk '{print NR}'
+	: VARIABLE_ONE = $(VARIABLE_ONE)
+	: VARIABLE_TWO = $(VARIABLE_TWO)
+	: VARIABLE_THREE = $(VARIABLE_THREE)
+	: VARIABLE_FOUR = $(VARIABLE_FOUR)
+	: VARIABLE_FIVE = $(VARIABLE_FIVE)
+	: VARIABLE_SIX = $(VARIABLE_SIX)
+	
+delay:
+	sleep 10
+
+SUBDIRS= subdir1 subdir2
+recurse:
+	for d in $(SUBDIRS) ; do \
+	    $(MAKE) -C $$d all ;\
+	done
+	

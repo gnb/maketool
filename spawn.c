@@ -1,12 +1,31 @@
+/*
+ * Maketool - GTK-based front end for gmake
+ * Copyright (c) 1999 Greg Banks
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
 #include "spawn.h"
 #include <signal.h>
 #include <sys/poll.h>
+#if HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
+#endif
 #include <gtk/gtk.h>
 
-#define DEBUG 1
-
-CVSID("$Id: spawn.c,v 1.6 1999-05-25 08:02:48 gnb Exp $");
+CVSID("$Id: spawn.c,v 1.7 1999-05-30 11:24:40 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -128,6 +147,7 @@ spawn_with_output(
 	dup2(pipefds[WRITE], STDERR);
 	close(pipefds[WRITE]);
 	
+#if HAVE_PUTENV
 	if (environ != 0)
 	{
 	    /* TODO: do a merge of the current env & Variables
@@ -138,6 +158,9 @@ spawn_with_output(
 	    for ( ; *environ != 0 ; environ++)
 	    	putenv(*environ);
 	}
+#else
+#warning putenv not defined - some functionality will be missing
+#endif
 
 	execl("/bin/sh", "/bin/sh", "-c", command, 0);
 	perror("execl");
