@@ -81,6 +81,7 @@ typedef struct
     gboolean scroll_on_output;
     
     enum { START_NOTHING, START_CLEAR, START_COLLAPSE } start_action;
+    enum { FINISH_NOTHING, FINISH_BEEP, FINISH_COMMAND, FINISH_DIALOG } finish_action;
     char *makefile;
     
     GList *variables;		/* list of Variable structs */
@@ -92,6 +93,7 @@ typedef struct
     char *prog_list_version;
     char *prog_edit_source;
     char *prog_make_makefile;
+    char *prog_finish;
     
     int win_width;		/* size of main window */
     int win_height;

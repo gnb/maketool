@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.67 2000-08-27 09:30:18 gnb Exp $");
+CVSID("$Id: main.c,v 1.68 2000-10-21 06:39:21 gnb Exp $");
 
 
 /*
@@ -652,6 +652,91 @@ handle_input(int len, const char *buf)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static TaskOps finish_prog_ops =
+{
+0,        	    	/* start */
+0,	    	    	/* input */
+0, 	 	    	/* reap */
+0	    	    	/* destroy */
+};
+
+static Task *
+finish_prog_task(const char *target)
+{
+    Task *fpt = g_new(Task, 1);
+
+    return task_create(
+    	fpt,
+	expand_prog(prefs.prog_finish, 0, 0, target),
+	prefs.var_environment,
+	&finish_prog_ops);
+}
+
+
+void
+finish_prog_start(const char *target)
+{
+    task_enqueue(finish_prog_task(target));
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+#include "gnome-info.xpm"
+
+static void
+finished_dialog(const char *target)
+{
+    static GtkWidget *finished_shell = 0;
+    static GtkWidget *finished_label;
+    estring s;
+    
+    if (finished_shell == 0)
+    {
+	GtkWidget *hbox;
+	GtkWidget *icon;
+	GdkPixmap *pm;
+	GdkBitmap *mask;
+
+	finished_shell = ui_create_ok_dialog(toplevel, _("Maketool: Finished"));
+	ui_autonull_pointer(&finished_shell);
+	
+	hbox = gtk_hbox_new(FALSE, 5);
+	gtk_container_border_width(GTK_CONTAINER(hbox), SPACING);
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(finished_shell)->vbox), hbox);
+	gtk_widget_show(hbox);
+	
+	pm = gdk_pixmap_create_from_xpm_d(toplevel->window,
+    		    &mask, 0, gnome_info_xpm);
+	icon = gtk_pixmap_new(pm, mask);
+	gtk_container_add(GTK_CONTAINER(hbox), icon);
+	gtk_widget_show(icon);
+
+	finished_label = gtk_label_new("");
+	gtk_misc_set_alignment(GTK_MISC(finished_label), 0.0, 0.5);
+	gtk_label_set_justify(GTK_LABEL(finished_label), GTK_JUSTIFY_LEFT);
+	gtk_container_add(GTK_CONTAINER(hbox), finished_label);
+	gtk_widget_show(finished_label);
+    }
+
+    /* Build the string to display in the box */
+    estring_init(&s);
+
+    estring_append_printf(&s, _("Finished building `%s'\n"), target);
+
+    if (log_num_errors() > 0)
+	estring_append_printf(&s, _("%d errors\n"), log_num_errors());
+
+    if (log_num_warnings() > 0)
+	estring_append_printf(&s, _("%d warnings\n"), log_num_warnings());
+
+    gtk_label_set_text(GTK_LABEL(finished_label), s.data);
+    estring_free(&s);
+    
+    gtk_widget_show(finished_shell);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 typedef struct
 {
     Task task;
@@ -688,6 +773,7 @@ make_input(Task *task, int len, const char *buf)
     handle_input(len, buf);
 }
 
+
 static void
 make_reap(Task *task)
 {
@@ -717,6 +803,24 @@ make_reap(Task *task)
 	g_free(warn_str);
 
     log_end_build(mt->target);
+    
+    if (!interrupted)
+    {
+	switch (prefs.finish_action)
+	{
+	case FINISH_BEEP:
+    	    gdk_beep();
+	    break;
+	case FINISH_COMMAND:
+    	    finish_prog_start(mt->target);
+    	    break;
+	case FINISH_DIALOG:
+	    finished_dialog(mt->target);
+	    break;
+	case FINISH_NOTHING:
+    	    break;
+	}
+    }
 }
 
 static TaskOps make_ops =

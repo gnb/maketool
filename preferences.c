@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.41 2000-08-01 15:37:30 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.42 2000-10-21 06:39:21 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -39,7 +39,9 @@ static GtkWidget	*prog_targets_entry;
 static GtkWidget	*prog_version_entry;
 static GtkWidget	*prog_edit_entry;
 static GtkWidget	*prog_make_makefile_entry;
+static GtkWidget	*prog_finish_entry;
 static GtkWidget	*start_action_combo;
+static GtkWidget	*finish_action_combo;
 static GtkWidget	*makefile_entry;
 static GtkWidget	*var_clist;
 static GtkWidget	*var_name_entry;
@@ -266,6 +268,13 @@ static UiEnumRec start_action_enum_def[] = {
 {"START_COLLAPSE",	START_COLLAPSE},
 {0, 0}};
 
+static UiEnumRec finish_action_enum_def[] = {
+{"FINISH_NOTHING",	FINISH_NOTHING},
+{"FINISH_BEEP",		FINISH_BEEP},
+{"FINISH_COMMAND",	FINISH_COMMAND},
+{"FINISH_DIALOG",	FINISH_DIALOG},
+{0, 0}};
+
 static UiEnumRec var_type_enum_def[] = {
 {"VAR_MAKE",		VAR_MAKE},
 {"VAR_ENVIRON",		VAR_ENVIRON},
@@ -297,6 +306,8 @@ preferences_load(void)
     
     prefs.start_action = ui_config_get_enum("start_action", START_COLLAPSE,
     				start_action_enum_def);
+    prefs.finish_action = ui_config_get_enum("finish_action", FINISH_NOTHING,
+    				finish_action_enum_def);
     prefs.makefile = ui_config_get_string("makefile", 0);
     
     prefs.variables = 0;
@@ -309,6 +320,7 @@ preferences_load(void)
     prefs.prog_list_version = ui_config_get_string("prog_list_version", GMAKE " --version");
     prefs.prog_edit_source = ui_config_get_string("prog_edit_source", "nc -noask %{l:+-line %l} %f");
     prefs.prog_make_makefile = ui_config_get_string("prog_make_makefile", "make_makefile %m");
+    prefs.prog_finish = ui_config_get_string("prog_finish", "");
 
     prefs.win_width = ui_config_get_int("win_width", 300);
     prefs.win_height = ui_config_get_int("win_height", 500);
@@ -368,6 +380,8 @@ preferences_save(void)
 
     ui_config_set_enum("start_action", prefs.start_action,
     				start_action_enum_def);
+    ui_config_set_enum("finish_action", prefs.finish_action,
+    				finish_action_enum_def);
     ui_config_set_string("makefile", prefs.makefile);
     
     /* TODO: save variables */
@@ -377,6 +391,7 @@ preferences_save(void)
     ui_config_set_string("prog_list_version", prefs.prog_list_version);
     ui_config_set_string("prog_edit_source", prefs.prog_edit_source);
     ui_config_set_string("prog_make_makefile", prefs.prog_make_makefile);
+    ui_config_set_string("prog_finish", prefs.prog_finish);
 
     ui_config_set_int("win_width", prefs.win_width);
     ui_config_set_int("win_height", prefs.win_height);
@@ -482,7 +497,11 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     g_free(prefs.prog_make_makefile);
     prefs.prog_make_makefile = g_strdup(gtk_entry_get_text(GTK_ENTRY(prog_make_makefile_entry)));
     
+    g_free(prefs.prog_finish);
+    prefs.prog_finish = g_strdup(gtk_entry_get_text(GTK_ENTRY(prog_finish_entry)));
+    
     prefs.start_action = ui_combo_get_current(start_action_combo);
+    prefs.finish_action = ui_combo_get_current(finish_action_combo);
     
     /* TODO: strip `mf' of whitespace JIC */
     mf = gtk_entry_get_text(GTK_ENTRY(makefile_entry));
@@ -528,7 +547,11 @@ static void
 changed_cb(GtkWidget *w, gpointer data)
 {
     if (!creating)
+    {
 	ui_dialog_changed(prefs_shell);
+	gtk_widget_set_sensitive(prog_finish_entry,
+	    (ui_combo_get_current(finish_action_combo) == FINISH_COMMAND));
+    }
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -570,10 +593,11 @@ prefs_create_general_page(GtkWidget *toplevel)
     GtkWidget *label;
     GtkWidget *combo;
     GtkWidget *button;
+    GtkWidget *entry;
     GList *list;
     int row = 0;
     
-    table = gtk_table_new(6, 3, FALSE);
+    table = gtk_table_new(8, 3, FALSE);
     gtk_container_border_width(GTK_CONTAINER(table), SPACING);
     ui_set_help_name(table, "prefs-general-page");
     gtk_widget_show(table);
@@ -724,6 +748,39 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_widget_show(combo);
     ui_set_help_name(combo, "prefs-start-action");
     start_action_combo = combo;
+    row++;
+
+    /*
+     * Action on finishing build.
+     */
+    label = gtk_label_new(_("On finishing each build: "));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
+    gtk_widget_show(label);
+    
+    combo = gtk_combo_new();
+    list = 0;
+    list = g_list_append(list, _("Do nothing"));
+    list = g_list_append(list, _("Beep"));
+    list = g_list_append(list, _("Run command"));
+    list = g_list_append(list, _("Show dialog"));
+    gtk_combo_set_popdown_strings(GTK_COMBO(combo), list);
+    gtk_entry_set_editable(GTK_ENTRY(GTK_COMBO(combo)->entry), FALSE);
+    gtk_signal_connect(GTK_OBJECT(GTK_COMBO(combo)->entry), "changed", 
+    	GTK_SIGNAL_FUNC(changed_cb), 0);
+    gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 3, row, row+1);
+    gtk_widget_show(combo);
+    ui_set_help_name(combo, "prefs-finish-action");
+    finish_action_combo = combo;
+    row++;
+
+    entry = gtk_entry_new();
+    gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 3, row, row+1);
+    gtk_signal_connect(GTK_OBJECT(entry), "changed", 
+    	GTK_SIGNAL_FUNC(changed_cb), 0);
+    gtk_widget_show(entry);
+    prog_finish_entry = entry;
     row++;
 
 
@@ -1782,6 +1839,7 @@ prefs_show(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(soo_check), prefs.scroll_on_output);
     gtk_entry_set_text(GTK_ENTRY(makefile_entry), (prefs.makefile == 0 ? "" : prefs.makefile));
     ui_combo_set_current(start_action_combo, prefs.start_action);
+    ui_combo_set_current(finish_action_combo, prefs.finish_action);
 
     gtk_clist_freeze(GTK_CLIST(var_clist));
     gtk_clist_clear(GTK_CLIST(var_clist));
@@ -1805,6 +1863,8 @@ prefs_show(void)
     gtk_entry_set_text(GTK_ENTRY(prog_version_entry), prefs.prog_list_version);
     gtk_entry_set_text(GTK_ENTRY(prog_edit_entry), prefs.prog_edit_source);
     gtk_entry_set_text(GTK_ENTRY(prog_make_makefile_entry), prefs.prog_make_makefile);
+    gtk_entry_set_text(GTK_ENTRY(prog_finish_entry), prefs.prog_finish);
+    gtk_widget_set_sensitive(prog_finish_entry, (prefs.finish_action == FINISH_COMMAND));
 
     /* TODO: need to set these 2 combos to the current values */
     ui_combo_set_current(paper_name_combo, 0);

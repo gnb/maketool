@@ -83,9 +83,6 @@ x  Add ability to delete individual make runs from view window
 
 x  Add a feature to watch an existing log file as it grows.
 
-x  Provide a Preferences setting to control what happens when a make
-   run finishes. Nothing; Sound Bell; Flash Window; Run Program.
-   
 x  Add timestamp to log start line, either current time for normal builds
    or file modification time for log files.
    
@@ -375,3 +372,6 @@ x  DONE: Fix bug where changing any of the log flags causes the current scroll
 x  DONE: Help: organise smart way to have consistent style etc between
    the many HTML files which comprise the help.
    Uses DocBook SGML.
+
+x  DONE: Provide a Preferences setting to control what happens when a make
+   run finishes. Nothing; Sound Bell; Flash Window; Run Program.
