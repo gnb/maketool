@@ -21,7 +21,7 @@
 #define _common_h_
 
 /*
- * $Id: common.h,v 1.13 2003-05-24 05:48:20 gnb Exp $
+ * $Id: common.h,v 1.14 2003-08-10 06:01:55 gnb Exp $
  */
 
 #include <config.h>
@@ -65,6 +65,13 @@ extern char *strrchr(char *);
 
 #if HAVE_SYS_TIME_H
 #include <sys/time.h>
+#endif
+
+/*
+ * Define as non-zero to turn on debugging prints.
+ */
+#ifndef DEBUG 
+#define DEBUG 0
 #endif
 
 #if __GLIBC__ >= 2 && __STDC__

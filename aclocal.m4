@@ -30,7 +30,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl 
-dnl $Id: aclocal.m4,v 1.5 2003-07-25 14:18:22 gnb Exp $
+dnl $Id: aclocal.m4,v 1.6 2003-08-10 06:01:00 gnb Exp $
 dnl
 
 dnl For gcc, ensure that the given flags are in $CFLAGS
@@ -117,9 +117,15 @@ main(int argc, char **argv)
     	return 2;
     }
 }
-],AC_DEFINE(HAVE_SYSV_SIGNAL,1) AC_MSG_RESULT(sysv),
-AC_DEFINE(HAVE_SYSV_SIGNAL,0) AC_MSG_RESULT(bsd),
-AC_DEFINE(HAVE_SYSV_SIGNAL,0) AC_MSG_RESULT(assuming bsd))
+],AC_DEFINE(HAVE_SYSV_SIGNAL,,[
+Whether SysV signal semantics apply (handler is 
+deregistered at delivery).  Note that you can
+have different semantics depending on the compiler
+flags as well as platform; on Linux you get BSD
+semantics with gcc and SysV with gcc -ansi.
+]) AC_MSG_RESULT(sysv),
+AC_MSG_RESULT(bsd),
+AC_MSG_RESULT(assuming bsd))
 ])dnl
 
 # isc-posix.m4 serial 1 (gettext-0.10.40)
