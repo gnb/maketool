@@ -1,0 +1,45 @@
+Summary: GTK+ front end for gmake
+Name: @PACKAGE@
+Version: @VERSION@
+Release: 1
+Copyright: GPL
+Group: Development/Building
+Source: http://www.alphalink.com.au/~gnb/maketool/@PACKAGE@-@VERSION@-src.tgz
+BuildRoot: /var/tmp/maketool-root
+Vendor: Greg Banks
+
+%description
+Maketool is a simple GUI front end for the GNU make program,
+written using the GTK toolkit. It presents a menu of targets
+and detects compiler error messages in the output of make.
+Clicking on an error message starts an editor.
+
+%prep
+%setup -q
+
+autoconf --localdir=/usr/share/aclocal
+
+%build
+OS=`echo ${RPM_OS} | tr '[A-Z]' '[a-z]'`
+CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr ${RPM_ARCH}-redhat-${OS}
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make install prefix=$RPM_BUILD_ROOT/usr
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root)
+/usr/bin/maketool
+/usr/bin/extract_targets
+/usr/doc/@PACKAGE@-@VERSION@/COPYING
+/usr/doc/@PACKAGE@-@VERSION@/COPYRIGHT
+/usr/doc/@PACKAGE@-@VERSION@/TODO
+
+%changelog
+* Tue Jun 1 1999 Greg Banks <gnb@alphalink.com.au>
+- Building RPM for first release
+

@@ -16,13 +16,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.3 1999-06-01 12:48:52 gnb Exp $
+# $Id: Makefile.in,v 1.4 1999-06-01 14:04:15 gnb Exp $
 #
 
 prefix=		@prefix@
 exec_prefix=	@exec_prefix@
 BINDIR=		@bindir@
 INSTALL=	@INSTALL@
+PACKAGE=	@PACKAGE@
+VERSION=	@VERSION@
 
 CC=		@CC@
 CFLAGS=		@CFLAGS@
@@ -105,17 +107,34 @@ all install uninstall clean::
 		
 ###
 
+# doco. Such as it is...
+
+DOCDIR=		$(prefix)/doc/$(PACKAGE)-$(VERSION)
+install::
+	test -d $(DOCDIR) || $(INSTALL) -m 755 -d $(DOCDIR)
+	$(INSTALL) -m 755 COPYING $(DOCDIR)/COPYING
+	$(INSTALL) -m 755 COPYRIGHT $(DOCDIR)/COPYRIGHT
+	$(INSTALL) -m 755 TODO $(DOCDIR)/TODO
+	
+
+uninstall::
+	$(RM) $(DOCDIR)/COPYING
+	$(RM) $(DOCDIR)/COPYRIGHT
+	$(RM) $(DOCDIR)/TODO
+
+###
+
 # Making a distribution
-PACKAGE=	@PACKAGE@
-VERSION=	@VERSION@
 distdir=	$(PACKAGE)-$(VERSION)
+DISTTAR=	$(PACKAGE)-$(VERSION)-src.tgz
 DISTFILES=	\
-		ABOUT-NLS COPYING COPYRIGHT TODO \
+		ABOUT-NLS COPYING COPYRIGHT TODO maketool.spec.in \
 		\
 		configure.in aclocal.m4 config.guess config.sub install-sh \
-		configure Makefile.in config.h.in \
+		configure Makefile.in config.h.in mkinstalldirs \
 		\
-		$(SOURCES) $(HEADERS)
+		$(SOURCES) $(HEADERS) \
+		extract_targets.sh
 
 
 dist:
@@ -130,8 +149,13 @@ dist:
 	  chmod 777 $(distdir)/$$subdir; \
 	  $(MAKE) -C $$subdir $@ || exit 1; \
 	done
-	tar chozf $(distdir).tgz $(distdir)
+	tar chozf $(DISTTAR) $(distdir)
 	$(RM) -r $(distdir)
+
+rpm: dist
+	test -d /usr/src/redhat/SOURCES || $(INSTALL) -m 755 -d /usr/src/redhat/SOURCES
+	$(INSTALL) -m 644 $(DISTTAR) /usr/src/redhat/SOURCES/$(DISTTAR)
+	rpm -ba --clean maketool.spec
 	
 configure: configure.in
 	autoconf --localdir=/usr/share/aclocal
