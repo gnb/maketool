@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile,v 1.10 2003-10-26 14:24:01 gnb Exp $
+# $Id: Makefile,v 1.11 2003-10-26 14:24:37 gnb Exp $
 #
 
 
@@ -99,4 +99,8 @@ longlisting:
 
 .PHONY: this_directory_is_test
 this_directory_is_test:
+
+retest: retest.c
+#	gcc -g -Wall -o $@ $<
+	gcc -g -Wall -DHAVE_READLINE -o $@ $< -lreadline -lncurses
 
