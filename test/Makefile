@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile,v 1.9 2003-05-24 05:49:52 gnb Exp $
+# $Id: Makefile,v 1.10 2003-10-26 14:24:01 gnb Exp $
 #
 
 
@@ -40,7 +40,7 @@ error3:
 	gcc -ansi -Wall -c jane.c
 
 error4:
-	+$(MAKE) -C abs_sub $@
+	cd abs_sub ; $(MAKE) $@
 	
 targets:
 	yes ' ' | head -20 | awk '{print NR}'
@@ -52,10 +52,10 @@ targets:
 	: VARIABLE_SIX = $(VARIABLE_SIX)
 	
 nested:
-	+$(MAKE) -C level2 TOPDIR=.. CURRDIR=level2 all
+	cd level2 ; $(MAKE) TOPDIR=.. CURRDIR=level2 all
 
 clean::
-	+$(MAKE) -C level2 TOPDIR=.. CURRDIR=level2 clean
+	cd level2 ; $(MAKE) TOPDIR=.. CURRDIR=level2 clean
 
 delay:
 	sleep 10
@@ -63,7 +63,7 @@ delay:
 SUBDIRS= subdir1 subdir2
 recurse:
 	for d in $(SUBDIRS) ; do \
-	    $(MAKE) -C $$d all ;\
+	    ( cd $$d ; $(MAKE) all );\
 	done
 	
 really/deeply/located/target:
