@@ -22,7 +22,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: log.c,v 1.23 1999-11-26 13:05:43 gnb Exp $");
+CVSID("$Id: log.c,v 1.24 1999-11-28 05:19:08 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -418,7 +418,7 @@ log_add_line(const char *line)
     	/* TODO: */
     	break;
     default:
-    	if (res.file != 0 && log_current_dir() != 0)
+    	if (res.file != 0 && *res.file != '/' && log_current_dir() != 0)
 	{
 	    estring_append_string(&fullpath, log_current_dir());
 	    estring_append_char(&fullpath, '/');

@@ -90,7 +90,7 @@ x  DONE: Remove line length limitation in filter_apply_one().
 
 x  DONE: Add check for buffer overflow in ui_create_tools().
 
-x  Use getopt?
+x  CLOSED: Use getopt?
 
 x  DONE: Remove those irritating variable values from the Preferences window.
 
@@ -105,9 +105,8 @@ x  On startup, when preferences or args specify a non-existant makefile,
 x  DONE: Fix bug whereby run load spinbox saves wrong value to preferences.
    It was a float rounding problem.
    
-x  Add filters to summarise compile lines, and a View menu item
+x  DONE: Add filters to summarise compile lines, and a View menu item
    to choose between full and summarised version in log window.
-   DONE.
 
 x  Remove strict dependancy on POSIX regcomp() for older systems,
    conditionally replace regcomp with function based on <regex.h>
@@ -137,7 +136,7 @@ x  DONE: Loading a large make log does way too much updating of the scrollbar.
 
 x  DONE: use a GNU logo in the `Help->About make' dialog.
 
-x  When loading log file, should report number of errors & warnings.
+x  DONE: When loading log file, should report number of errors & warnings.
 
 x  DONE: Edit Next Error command should make the newly line visible by scrolling.
 
@@ -149,8 +148,9 @@ x  Should be able to drag & drop {filename, linenumber, message} or text.
 x  For the editing program, should be able to specify a %sequence which
    contains the quoted error message, for integration with IDEs.
 
-x  An error message which specifies an absolute pathname /abs/path tries
-   to open file /curr/dir/abs/path instead of /abs/path
+x  DONE: An error message which specifies an absolute pathname /abs/path tries
+   to open file /curr/dir/abs/path instead of /abs/path. Had to also be in
+   a recursive make.
    
 x  Add ability to delete individual make runs from view window
 
