@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.39 2001-09-22 02:20:58 gnb Exp $");
+CVSID("$Id: log.c,v 1.40 2002-09-24 14:10:51 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -42,6 +42,8 @@ typedef struct
     GdkBitmap *closed_mask;
 } NodeIcons;
 
+#define DO_FONTS 0  	/* TODO: support different fonts */
+
 static GtkWidget	*logwin;	/* a GtkCTree widget */
 static int		num_errors;
 static int		num_warnings;
@@ -50,7 +52,9 @@ static GList		*log;		/* list of LogRecs */
 /*static GList		*log_pending_lines = 0;*/ /*TODO*/
 static GList		*log_directory_stack = 0;
 static GList		*log_node_stack = 0;	/* stack of LogRec's */
+#if DO_FONTS
 static GdkFont		*fonts[L_MAX];
+#endif
 static GdkColor		foregrounds[L_MAX];
 static gboolean		foreground_set[L_MAX];
 static GdkColor		backgrounds[L_MAX];
@@ -71,29 +75,58 @@ filter_result_init(FilterResult *res)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-/* TODO: hmm, do the directory names need to be strdup()ed ?? */
+/* returns a new string */
+static char *
+log_normalise_dir(const char *dir)
+{
+    char *curr;
+    char *nd;
+
+    if (dir[0] == '/')
+    	return g_strdup(dir);
+    
+    curr = g_get_current_dir();
+    nd = g_strconcat(curr, "/", dir, 0);
+    g_free(curr);
+    
+    return nd;
+}
+
 
 static void
 log_change_dir(const char *dir)
 {
+    char *norm = log_normalise_dir(dir);
+
+#if DEBUG
+    fprintf(stderr, "log_change_dir(\"%s\") -> \"%s\"\n", dir, norm);
+#endif
     if (log_directory_stack == 0)
-	log_directory_stack = g_list_append(log_directory_stack, g_strdup(dir));
+	log_directory_stack = g_list_append(log_directory_stack, norm);
     else
     {
     	g_free((char*)log_directory_stack->data);
-	log_directory_stack->data = g_strdup(dir);
+	log_directory_stack->data = norm;
     }
 }
 
 static void
 log_push_dir(const char *dir)
 {
-    log_directory_stack = g_list_prepend(log_directory_stack, g_strdup(dir));
+    char *norm = log_normalise_dir(dir);
+
+#if DEBUG
+    fprintf(stderr, "log_push_dir(\"%s\") -> \"%s\"\n", dir, norm);
+#endif
+    log_directory_stack = g_list_prepend(log_directory_stack, norm);
 }
 
 static void
 log_pop_dir(void)
 {
+#if DEBUG
+    fprintf(stderr, "log_pop_dir()\n");
+#endif
     if (log_directory_stack != 0)
     {
     	g_free((char*)log_directory_stack->data);
@@ -199,18 +232,14 @@ log_rootmost_node(void)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static LogRec *
-log_add_rec(const char *line, const FilterResult *res)
+log_add_rec(char *line, const FilterResult *res)
 {
     LogRec *lr;
     
     lr = g_new(LogRec, 1);
     memset(lr, 0, sizeof(LogRec));
     lr->res = *res;
-    if (lr->res.file == 0 || *lr->res.file == '\0')
-    	lr->res.file = 0;
-    else
-	lr->res.file = g_strdup(lr->res.file);	/* TODO: hashtable */
-    lr->line = g_strdup(line);
+    lr->line = line;
     lr->expanded = TRUE;
 
     switch (lr->res.code)
@@ -386,24 +415,34 @@ log_update_build_start(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+#define MAX_PENDING 	16
+
 LogRec *
 log_add_line(const char *line)
 {
-    FilterResult res;
+    static FilterResult res;
+    static char *pending[MAX_PENDING];
+    static int num_pending;
     LogRec *lr;
     estring fullpath;
+    int i;
 
     estring_init(&fullpath);
-    filter_result_init(&res);
+    if (!(res.code & FR_PENDING))
+	filter_result_init(&res);
     filter_apply(line, &res);
 #if DEBUG
-    fprintf(stderr, "filter_apply: \"%s\" -> %d \"%s\" %d\n",
-    	line, (int)res.code, safe_str(res.file), res.line);
+    fprintf(stderr, "filter_apply(\"%s\") -> {code=%d file=\"%s\" line=%d summary=\"%s\"}\n",
+    	line, (int)res.code, safe_str(res.file), res.line, res.summary);
 #endif
 
-    if (res.file != 0 && *res.file == '\0')
-    	res.file = 0;
-	
+    /* add to the pending lines array */	
+    assert(num_pending < MAX_PENDING);
+    pending[num_pending++] = g_strdup(line);
+
+    if (res.code & FR_PENDING)
+    	return 0; /* go back and see some more lines */
+
     switch (res.code)
     {
     case FR_UNDEFINED:
@@ -418,25 +457,48 @@ log_add_line(const char *line)
     case FR_POPDIR:
 	log_pop_dir();
     	break;
-    case FR_PENDING:
-    	/* TODO: */
-    	break;
     default:
     	if (res.file != 0 && *res.file != '/' && log_current_dir() != 0)
 	{
 	    estring_append_string(&fullpath, log_current_dir());
 	    estring_append_char(&fullpath, '/');
 	    estring_append_string(&fullpath, res.file);
+#if DEBUG
+	    fprintf(stderr, "filename: \"%s\" -> \"%s\"\n", 
+	    	    	    res.file, fullpath.data);
+#endif
 	    res.file = fullpath.data;
+	    fullpath.data = 0;
 	}
     	break;
     }
     
-    lr = log_add_rec(line, &res);
-    log_show_rec(lr);
+    /* drain from the pending lines array, usually has exactly 1 element */
+    for (i = 0 ; i < num_pending ; i++)
+    {
+    	if (i > 0)
+	{
+	    /*
+	     * Only the first line has a summary, others disappear in
+	     * summary mode.  This is both to save memory and also to
+	     * make the summary presentation more compact.
+	     */
+	    res.summary = g_strdup("");
+	    /*
+	     * Only the first line is an error or warning, others are
+	     * informational.  This is so the error count presented
+	     * to the user is accurate.
+	     */
+	    res.code = FR_INFORMATION;
+	}
+	lr = log_add_rec(pending[i], &res);
+	log_show_rec(lr);
+	/* TODO: do this exactly once when loading from file */
+	log_update_build_start();
+    }
+    num_pending = 0;
+
     estring_free(&fullpath);
-    /* TODO: do this exactly once when loading from file */
-    log_update_build_start();
     return lr;
 }
 
@@ -763,7 +825,8 @@ log_set_selected(LogRec *lr)
 void
 log_ensure_visible(const LogRec *lr)
 {
-    if (gtk_ctree_node_is_visible(GTK_CTREE(logwin), lr->node) != GTK_VISIBILITY_FULL)
+    if (lr->node != 0 &&
+        gtk_ctree_node_is_visible(GTK_CTREE(logwin), lr->node) != GTK_VISIBILITY_FULL)
 	gtk_ctree_node_moveto(GTK_CTREE(logwin), lr->node, 0, 0.5, 0.0);
 }
 
@@ -874,28 +937,36 @@ log_init(GtkWidget *w)
     GdkWindow *win = toplevel->window;
     
     /* L_INFO */
+#if DO_FONTS
     fonts[L_INFO] = 0;
+#endif
     icons[L_INFO].closed_pm = gdk_pixmap_create_from_xpm_d(win,
     			&icons[L_INFO].closed_mask, 0, info_xpm);
     icons[L_INFO].open_pm = icons[L_INFO].closed_pm;
     icons[L_INFO].open_mask = icons[L_INFO].closed_mask;
     
     /* L_WARNING */
+#if DO_FONTS
     fonts[L_WARNING] = 0;
+#endif
     icons[L_WARNING].closed_pm = gdk_pixmap_create_from_xpm_d(win,
     			&icons[L_WARNING].closed_mask, 0, warning_xpm);
     icons[L_WARNING].open_pm = icons[L_WARNING].closed_pm;
     icons[L_WARNING].open_mask = icons[L_WARNING].closed_mask;
     
     /* L_ERROR */
+#if DO_FONTS
     fonts[L_ERROR] = 0;
+#endif
     icons[L_ERROR].closed_pm = gdk_pixmap_create_from_xpm_d(win,
     			&icons[L_ERROR].closed_mask, 0, error_xpm);
     icons[L_ERROR].open_pm = icons[L_ERROR].closed_pm;
     icons[L_ERROR].open_mask = icons[L_ERROR].closed_mask;
 
     /* L_SUMMARY */
+#if DO_FONTS
     fonts[L_SUMMARY] = 0;
+#endif
     icons[L_SUMMARY].closed_pm = icons[L_INFO].closed_pm;
     icons[L_SUMMARY].closed_mask = icons[L_INFO].closed_mask;
     icons[L_SUMMARY].open_pm = icons[L_SUMMARY].closed_pm;
@@ -932,7 +1003,7 @@ log_start_build(const char *message)
     filter_result_init(&res);
     res.code = FR_BUILDSTART;
 
-    log_show_rec(log_add_rec(message, &res));
+    log_show_rec(log_add_rec(g_strdup(message), &res));
 }
 
 
