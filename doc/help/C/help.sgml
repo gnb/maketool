@@ -1,10 +1,12 @@
 <!DOCTYPE ARTICLE PUBLIC "-//OASIS//DTD DocBook V3.1//EN" [
 <!ENTITY % buildents SYSTEM "entities.sgml">
+<!ENTITY % langents SYSTEM "langentities.sgml">
 %buildents;
+%langents;
 ]>
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.13 2001-09-28 04:51:28 gnb Exp $"
+         revision="$Id: help.sgml,v 1.14 2003-08-10 07:08:53 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool</title>
@@ -12,7 +14,7 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2001-09-28 04:51:28 $</pubdate>
+  <pubdate role="cvs">$Date: 2003-08-10 07:08:53 $</pubdate>
   <releaseinfo>This is version &version;</releaseinfo>
   <copyright>
     <year>2000</year>
@@ -29,7 +31,7 @@
   <abstract>
     <para>
     Maketool is a GUI program for running the GNU make utility, or
-    <command>gmake</command>, to build software.
+    &gmake;, to build software.
     </para>
     <para>
     GNU make is a powerful utility for organising the process of
@@ -41,12 +43,11 @@
 </artheader>
 
 
-
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
 <section id="main-window" xreflabel="Main window">
 <title>Main window</title>
 
-<graphic format=GIF fileref="mainwin.gif"></graphic>
+<graphic format="GIF" fileref="mainwin.gif"></graphic>
 
 <para>
 This is maketool's main window.  The various parts of the main window are:
@@ -58,6 +59,7 @@ This is maketool's main window.  The various parts of the main window are:
   <varlistentry>
     <term>menubar</term>
     <listitem>
+      <anchor id="main-menubar" xreflabel="Menubar">
       <para>
       Each menu contains commands which allow you to drive maketool.
       The menubar can be detached from maketool by dragging the handle
@@ -75,6 +77,7 @@ This is maketool's main window.  The various parts of the main window are:
   <varlistentry>
     <term>toolbar</term>
     <listitem>
+      <anchor id="main-toolbar" xreflabel="Toolbar">
       <para>
       Each tool is a shortcut to a menu item, arranged for your
       convenience.  The toolbar can be detached from maketool
@@ -82,9 +85,10 @@ This is maketool's main window.  The various parts of the main window are:
       </para>
       <para>
       See also <xref linkend="again-tool">,
-      <xref linkend="stop-tool">, <xref linkend="all-tool">,
-      <xref linkend="clean-tool">, <xref linkend="clear-tool">,
-      <xref linkend="edit-next-tool">, <xref linkend="edit-file-next-tool">,
+      <xref linkend="stop-tool">, <xref linkend="all-tool"> tool,
+      <xref linkend="clean-tool"> tool, <xref linkend="clear-tool">,
+      <xref linkend="edit-next-tool"> tool,
+      <xref linkend="edit-file-next-tool"> tool,
       <xref linkend="print-tool">.
       </para>
     </listitem>
@@ -93,8 +97,9 @@ This is maketool's main window.  The various parts of the main window are:
   <varlistentry>
     <term>log window<anchor id="log-window" xreflabel="Log window"></term>
     <listitem>
+      <anchor id="main-log-window" xreflabel="Log Window">
       <para>
-      This window shows the output of <command>gmake</command>.
+      This window shows the output of &gmake;.
       As shown in the example, errors and warnings are highlighted;
       double-clicking on an error or warning will start an editor
       showing you the line in the source file which caused the
@@ -114,9 +119,9 @@ This is maketool's main window.  The various parts of the main window are:
   <varlistentry>
     <term>status bar</term>
     <listitem>
+      <anchor id="main-statusbar" xreflabel="Statusbar">
       <para>
-      Messages from maketool itself (rather than <command>gmake</command>)
-      are displayed here.
+      Messages from maketool itself (rather than &gmake;) are displayed here.
       </para>
     </listitem>
   </varlistentry>
@@ -124,10 +129,10 @@ This is maketool's main window.  The various parts of the main window are:
   <varlistentry>
     <term>progress indicator</term>
     <listitem>
+      <anchor id="main-progress" xreflabel="Progress Indicator">
       <para>
-      When <command>gmake</command> is running, this area displays
-      an animation of a brick wall building itself, to show you 
-      that something is happening.
+      When &gmake; is running, this area displays an animation of a
+      brick wall building itself, to show you that something is happening.
       </para>
     </listitem>
   </varlistentry>
@@ -140,7 +145,7 @@ This is maketool's main window.  The various parts of the main window are:
 <section id="ok" xreflabel="Ok Button">
 <title>Ok Button</title>
 
-<graphic format=GIF fileref="ok.gif"></graphic>
+<graphic format="GIF" fileref="ok.gif"></graphic>
 
 <para>
 Click this button to apply all the changes you have made to this
@@ -159,7 +164,7 @@ See also:
 <section id="apply" xreflabel="Apply Button">
 <title>Apply Button</title>
 
-<graphic format=GIF fileref="apply.gif"></graphic>
+<graphic format="GIF" fileref="apply.gif"></graphic>
 
 <para>
 Click this button to apply all the changes you have made to this
@@ -178,7 +183,7 @@ See also:
 <section id="cancel" xreflabel="Cancel Button">
 <title>Cancel Button</title>
 
-<graphic format=GIF fileref="cancel.gif"></graphic>
+<graphic format="GIF" fileref="cancel.gif"></graphic>
 
 <para>
 Click this button to discard all the changes you have made to this
@@ -197,43 +202,48 @@ See also:
 <section id="file-menu" xreflabel="File menu">
 <title>File menu</title>
 
-<graphic format=GIF fileref="file-menu.gif"></graphic>
+<graphic format="GIF" fileref="file-menu.gif"></graphic>
 
 <variablelist>
 
   <varlistentry>
     <term><guibutton>Open Log...</guibutton></term>
     <listitem>
+      <anchor id="file-open-log" xreflabel="Open Log">
       <para>
       Shows the <xref linkend="open-log-file-window"> which allows you
-      to choose a filename of <command>gmake</command> output to be opened
-      and displayed in maketool.  This file can be a file saved by
-      the <guibutton>Save Log...</guibutton> menu item, or a file
+      to choose a filename of &gmake; output to be opened and displayed
+      in maketool.  This file can be a file saved by the
+      <guibutton>Save Log...</guibutton> menu item, or a file
       generated from the command line using a command like:
       </para>
-      <programlisting>
+<programlisting>
+# If you use sh, ksh, bash
 gmake some-target 2>&1 | tee <emphasis>make.log</emphasis>
-      </programlisting>
-      <para>
-      or
-      </para>
-      <programlisting>
+#  ...or...
 gmake some-target > <emphasis>make.log</emphasis> 2>&1
-      </programlisting>
+# If you use csh, tcsh
+gmake some-target |& tee <emphasis>make.log</emphasis>
+#  ...or...
+gmake some-target >& <emphasis>make.log</emphasis>
+</programlisting>
+    <para>
+    <!-- space out the listitem -->
+    </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
     <term><guibutton>Save Log...</guibutton></term>
     <listitem>
+      <anchor id="file-save-log" xreflabel="Save Log">
       <para>
       Shows the <xref linkend="save-log-file-window"> which allows you
       to choose a filename to which the text in the <xref linkend="log-window">
       will be saved.  The file will contain the raw text from all
-      <command>gmake</command> runs, exactly as <command>gmake</command>
-      emitted it.  The file can later be loaded into maketool again using
-      the <guibutton>Open Log...</guibutton> menu item, or viewed in a
-      text editor.
+      &gmake; runs, exactly as &gmake; emitted it.  The file can later be
+      loaded into maketool again using the <guibutton>Open Log...</guibutton>
+      menu item, or viewed in a text editor.
       </para>
     </listitem>
   </varlistentry>
@@ -241,15 +251,17 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
   <varlistentry>
     <term><guibutton>Change Directory...</guibutton></term>
     <listitem>
+      <anchor id="file-change-directory" xreflabel="Change Directory">
       <para>
-      <anchor id="change-directory" xreflabel="Change Directory menu item">
       Shows the <xref linkend="change-directory-window"> which allows you
       to choose a directory.  Maketool will make that directory it's
       current directory.  Maketool will then scan any Makefile present
       in the directory and show the targets defined by the Makefile
-      in the <xref linkend="build-menu">.  Finally, maketool will
-      add the old directory to the <guibutton>Previous Directories</guibutton>
-      menu.
+      in the <xref linkend="build-menu">.  Maketool will also detect
+      what if any make system (see <xref linkend="make-systems">) is
+      in use in that directory, and show menu items accordingly.  Finally,
+      maketool will add the old directory to the
+      <guibutton>Previous Directories</guibutton> menu.
       </para>
     </listitem>
   </varlistentry>
@@ -257,11 +269,14 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
   <varlistentry>
     <term><guibutton>Previous Directories</guibutton></term>
     <listitem>
+      <anchor id="file-previous-directories" xreflabel="Previous Directories">
       <para>
       Lists the last directories in which maketool has been used.
       Select a directory, and maketool will change to that directory
       as if you had used the <guibutton>Change Directory...</guibutton>
-      menu item.
+      menu item.  The previous directories are saved along with
+      maketool's preferences, and will be there next time you start
+      maketool.
       </para>
     </listitem>
   </varlistentry>
@@ -269,6 +284,7 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
   <varlistentry>
     <term><guibutton>Edit Makefile...</guibutton></term>
     <listitem>
+      <anchor id="file-edit-makefile" xreflabel="Edit Makefile">
       <para>
       Starts up an editor session editing the Makefile in the current
       directory.  If the current directory uses a system like
@@ -277,44 +293,58 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
       source file will be edited instead.
       </para>
       <para>
-      The exact filenames checked by this menu item are (in order):
+      The filenames checked by this menu item are (in order):
       </para>
       <itemizedlist>
 	<listitem>
 	  <para>
-	  <filename>GNUmakefile</filename>
+	  The filename, if any, specified by <xref linkend="general-makefile"> 
+	  in the Preferences.
 	  </para>
 	</listitem>
+      
 	<listitem>
 	  <para>
-	  <filename>makefile</filename>
+	  The filenames searched by the current make program.  For
+	  &gmake;, these are:
 	  </para>
-	</listitem>
-	<listitem>
-	  <para>
-	  <filename>Makefile</filename>
-	  </para>
+	    <itemizedlist>
+	      <listitem>
+		<para>
+		&GNUmakefile;
+		</para>
+	      </listitem>
+	      <listitem>
+		<para>
+		&makefile;
+		</para>
+	      </listitem>
+	      <listitem>
+		<para>
+		&Makefile;
+		</para>
+	      </listitem>
+	    </itemizedlist>
 	</listitem>
       </itemizedlist>
       <para>
       If no Makefile is present, or it's filename is
-      <filename>Makefile</filename>, the following filenames
-      are also checked (in order):
+      &Makefile;, the following filenames are also checked (in order):
       </para>
       <itemizedlist>
 	<listitem>
 	  <para>
-	  <filename>Makefile.am</filename> (for <command>automake</command>)
+	  &Makefileam; (for <command>automake</command>)
 	  </para>
 	</listitem>
 	<listitem>
 	  <para>
-	  <filename>Makefile.in</filename> (for <command>autoconf</command>)
+	  &Makefilein; (for <command>autoconf</command>)
 	  </para>
 	</listitem>
 	<listitem>
 	  <para>
-	  <filename>Imakefile</filename> (for <command>Imake</command>)
+	  &Imakefile; (for <command>Imake</command>)
 	  </para>
 	</listitem>
       </itemizedlist>
@@ -324,6 +354,7 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
   <varlistentry>
     <term><guibutton>Print...</guibutton></term>
     <listitem>
+      <anchor id="file-print" xreflabel="Print">
       <para>
       Shows the <xref linkend="print-window"> to allow you to print
       the contents of the <xref linkend="log-window"> to a printer.
@@ -334,6 +365,7 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
   <varlistentry>
     <term><guibutton>Exit</guibutton></term>
     <listitem>
+      <anchor id="file-exit" xreflabel="Exit">
       <para>
       Quits maketool.
       </para>
@@ -353,13 +385,14 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
 <section id="edit-menu" xreflabel="Edit menu">
 <title>Edit menu</title>
 
-<graphic format=GIF fileref="edit-menu.gif"></graphic>
+<graphic format="GIF" fileref="edit-menu.gif"></graphic>
 
 <variablelist>
 
   <varlistentry>
     <term><guibutton>Edit Error</guibutton></term>
     <listitem>
+      <anchor id="edit-edit-error" xreflabel="Edit Error">
       <para>
       Starts an editor session editing the source file and line
       mentioned in the line currently selected in the
@@ -371,6 +404,7 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
   <varlistentry>
     <term><guibutton>Edit Next Error</guibutton></term>
     <listitem>
+      <anchor id="edit-edit-next-error" xreflabel="Edit Next Error">
       <para>
       Searches forwards in the <xref linkend="log-window"> for the next
       error or warning message, starting at the currently selected
@@ -378,7 +412,7 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
       mentioned in that line.
       </para>
       <para>
-      If the <xref linkend="edit-next-ignores-warnings"> option is set,
+      If the <xref linkend="general-edit-next-ignores-warnings"> option is set,
       <guibutton>Edit Next Error</guibutton> will ignore warnings and
       only find errors.
       </para>
@@ -388,6 +422,7 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
   <varlistentry>
     <term><guibutton>Edit Prev Error</guibutton></term>
     <listitem>
+      <anchor id="edit-edit-prev-error" xreflabel="Edit Prev Error">
       <para>
       Like <guibutton>Edit Next Error</guibutton> but searches backwards.
       </para>
@@ -397,6 +432,7 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
   <varlistentry>
     <term><guibutton>Edit Next File Error</guibutton></term>
     <listitem>
+      <anchor id="edit-edit-next-file-error" xreflabel="Edit Next File Error">
       <para>
       Like <guibutton>Edit Next Error</guibutton> but first skips to
       the next source file.  This is useful when an error early in a
@@ -408,6 +444,7 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
   <varlistentry>
     <term><guibutton>Copy</guibutton></term>
     <listitem>
+      <anchor id="edit-copy" xreflabel="Copy">
       <para>
       Copies the text of the currently selected line in the
       <xref linkend="log-window"> to the clipboard, from where it can
@@ -419,9 +456,12 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
   <varlistentry>
     <term><guibutton>Find...</guibutton></term>
     <listitem>
+      <anchor id="edit-find" xreflabel="Find">
       <para>
       Shows the <xref linkend="find-window"> which allows you to
       search the contents of the <xref linkend="log-window">.
+      This menu item is available when there is text in the log
+      window.
       </para>
     </listitem>
   </varlistentry>
@@ -429,8 +469,10 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
   <varlistentry>
     <term><guibutton>Find Again...</guibutton></term>
     <listitem>
+      <anchor id="edit-find-again" xreflabel="Find Again">
       <para>
       Repeats the last search (from the <xref linkend="find-window">).
+      This menu item is available once a search has been performed.
       </para>
     </listitem>
   </varlistentry>
@@ -438,6 +480,7 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
   <varlistentry>
     <term><guibutton>Preferences...</guibutton></term>
     <listitem>
+      <anchor id="edit-preferences" xreflabel="Preferences">
       <para>
       Shows the <xref linkend="preferences-window"> which allows you
       to edit maketool's various options and parameters.
@@ -453,7 +496,7 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
 <section id="build-menu" xreflabel="Build menu">
 <title>Build menu</title>
 
-<graphic format=GIF fileref="build-menu.gif"></graphic>
+<graphic format="GIF" fileref="build-menu.gif"></graphic>
 
 <variablelist>
 
@@ -461,11 +504,11 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
     <term><guibutton>Again</guibutton></term>
     <listitem>
       <para>
-      Runs <command>gmake</command> with the same
-      target you used last time you ran <command>gmake</command> (from the
-      <guimenu>Build</guimenu> menu, the <xref linkend="all-tool">,
-      or the <xref linkend="clean-tool">).  The target is shown in
-      brackets.
+      Runs &gmake; with the same target you used last time you ran
+      &gmake; (from the <xref linkend="build-menu">, the
+      <xref linkend="all-tool"> tool, or the <xref linkend="clean-tool"> tool).
+      The target is shown in brackets.  This menu item is available when
+      &gmake; has been run at least once.
       </para>
     </listitem>
   </varlistentry>
@@ -474,7 +517,8 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
     <term><guibutton>Stop</guibutton></term>
     <listitem>
       <para>
-      Stops a running <command>gmake</command>.
+      Stops a running &gmake;.  This menu item is only available while a
+      &gmake; is running.
       </para>
     </listitem>
   </varlistentry>
@@ -483,12 +527,12 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
     <term><guibutton>Dryrun Only</guibutton></term>
     <listitem>
       <para>
-      While this checkbox is on, <command>gmake</command> does not
-      perform any building, and instead only shows the commands it
-      would use for building.  This is useful for debugging Makefiles.
+      While this checkbox is on, &gmake; does not perform any building, and
+      instead only shows the commands it would use for building.  This is
+      useful for debugging &Makefile;s.
       </para>
       <para>
-      This option uses the <option>-n</option> flag to <command>gmake</command>.
+      This option uses the <option>-n</option> flag to &gmake;.
       </para>
     </listitem>
   </varlistentry>
@@ -497,15 +541,13 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
     <term><guibutton>Makefile</guibutton></term>
     <listitem>
       <para>
-      Updates the <filename>Makefile</filename> from whatever
-      files are used to create it.  This command only appears
-      if the current directory uses a make system (see
-      <xref linkend="make-systems">) to generate the
-      <filename>Makefile</filename>.
+      Updates the &Makefile; from whatever files are used to create it.
+      This command only appears if the current directory uses a make
+      system (see <xref linkend="make-systems">) to generate the &Makefile;.
       </para>
       <para>
       Maketool can also perform this update automatically every
-      time a target is built; see the <xref linkend="enable-make-makefile">
+      time a target is built; see the <xref linkend="general-enable-make-makefile">
       checkbox.
       </para>
     </listitem>
@@ -522,7 +564,7 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
       </para>
       <para>
       This section is updated when the current directory
-      is changed using the <xref linkend="change-directory">.
+      is changed using the <xref linkend="file-change-directory"> menu item.
       </para>
     </listitem>
   </varlistentry>
@@ -538,13 +580,12 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
       are described in <xref linkend="standard-targets">.
       </para>
       <para>
-      Selecting a target causes that target to be built using
-      <command>gmake</command> and the output from <command>gmake</command>
-      to be displayed in the <xref linkend="log-window">.
+      Selecting a target causes that target to be built using &gmake; and
+      the output from &gmake; to be displayed in the <xref linkend="log-window">.
       </para>
       <para>
       This section is updated when the current directory is changed
-      using the <xref linkend="change-directory">.
+      using the <xref linkend="file-change-directory"> menu item.
       </para>
     </listitem>
   </varlistentry>
@@ -560,13 +601,12 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
       "internal" to the Makefile.
       </para>
       <para>
-      Selecting a target causes that target to be built using
-      <command>gmake</command> and the output from <command>gmake</command>
-      to be displayed in the <xref linkend="log-window">.
+      Selecting a target causes that target to be built using &gmake; and
+      the output from &gmake; to be displayed in the <xref linkend="log-window">.
       </para>
       <para>
       This section is updated when the current directory is changed
-      using the <xref linkend="change-directory">.
+      using the <xref linkend="file-change-directory"> menu item.
       </para>
     </listitem>
   </varlistentry>
@@ -579,7 +619,122 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
 <section id="view-menu" xreflabel="View menu">
 <title>View menu</title>
 
-<graphic format=GIF fileref="view-menu.gif"></graphic>
+<graphic format="GIF" fileref="view-menu.gif"></graphic>
+
+<variablelist>
+
+  <varlistentry>
+    <term><guibutton>Clear Log</guibutton></term>
+    <listitem>
+      <anchor id="view-clear-log" xreflabel="Clear Log">
+      <para>
+      Clears all text in the log window.  This menu item is
+      available when there is text in the log window.  See
+      <xref linkend="clear-tool">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Collapse All</guibutton></term>
+    <listitem>
+      <anchor id="view-collapse-all" xreflabel="Collapse All">
+      <para>
+      Collapses all the text in the log window so that only the top
+      level entries (i.e. &gmake; runs and loaded log files) are
+      visible.  This menu item is available when there is text in
+      the log window.  
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Toolbar</guibutton></term>
+    <listitem>
+      <anchor id="view-toolbar" xreflabel="Toolbar">
+      <para>
+      Controls whether the <xref linkend="main-toolbar"> is visible.
+      Hiding the toolbar reduces the amount of screen space maketool
+      needs.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Statusbar</guibutton></term>
+    <listitem>
+      <anchor id="view-statusbar" xreflabel="Statusbar">
+      <para>
+      Controls whether the <xref linkend="main-statusbar"> is visible.
+      Hiding the statusbar reduces the amount of screen space maketool
+      needs.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Errors</guibutton></term>
+    <listitem>
+      <anchor id="view-errors" xreflabel="Errors">
+      <para>
+      Controls whether lines of text which are classified as errors
+      by the filtering engine, are visible in the log window.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Warnings</guibutton></term>
+    <listitem>
+      <anchor id="view-warnings" xreflabel="Warnings">
+      <para>
+      Controls whether lines of text which are classified as warnings
+      by the filtering engine, are visible in the log window.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Information</guibutton></term>
+    <listitem>
+      <anchor id="view-information" xreflabel="Information">
+      <para>
+      Controls whether lines of text which are classified as information
+      (i.e. all lines which are not classified as errors or warnings,
+      and do not have summaries like compile lines) by the filtering
+      engine, are visible in the log window.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Summary</guibutton></term>
+    <listitem>
+      <anchor id="view-summary" xreflabel="Summary">
+      <para>
+      Controls whether lines of text which are not classified as warnings
+      or error but have short summaries (e.g. "Compiling fred.c") generated
+      by the filtering engine, are visible in the log window.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Indent Directories</guibutton></term>
+    <listitem>
+      <anchor id="view-indent-directories" xreflabel="Indent Directories">
+      <para>
+      If this checkbox is on, the text of recursive multiple-directory
+      &gmake; runs in the log window is indented according
+      to depth in the directory structure.  Each directory is accompanied
+      by a collapse/expand button so that entire sub-trees can be
+      conveniently hidden with the click of a button.  See the
+      <xref linkend="view-collapse-all"> menu item.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
 
 </section>
 
@@ -587,7 +742,92 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
 <section id="help-menu" xreflabel="Help menu">
 <title>Help menu</title>
 
-<graphic format=GIF fileref="help-menu.gif"></graphic>
+<graphic format="GIF" fileref="help-menu.gif"></graphic>
+
+<variablelist>
+
+  <varlistentry>
+    <term><guibutton>About Maketool...</guibutton></term>
+    <listitem>
+      <anchor id="help-about-maketool" xreflabel="About Maketool">
+      <para>
+      Shows the <xref linkend="about-maketool-window">, which contains
+      copyright, licence, and version information about maketool.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>About GNU make...</guibutton></term>
+    <listitem>
+      <anchor id="help-about-make" xreflabel="About GNU make">
+      <para>
+      Shows the <xref linkend="about-make-window">, which shows
+      copyright, licence, and version information about the &gmake;
+      program.  Note that if a different make program is selected
+      in the <xref linkend="programs-make"> entry of the Preferences,
+      this menu item will reflect the name of that make program, e.g.
+      <guibutton>About BSD 4.4 pmake</guibutton>.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Help on...</guibutton></term>
+    <listitem>
+      <anchor id="help-help-on" xreflabel="Help on">
+      <para>
+      Allows you to interactively pick a component of the maketool
+      user interface and see the help text for that component.  When
+      the menu item is selected, the cursor changes to a question
+      mark (<guibutton>?</guibutton>); move the cursor over any
+      component of the maketool user interface and click.  The help
+      text for that component will be displayed in the help browser.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Tutorial...</guibutton></term>
+    <listitem>
+      <anchor id="help-tutorial" xreflabel="Tutorial">
+      <para>
+      Shows the maketool Tutorial in the help browser. 
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Table of Contents...</guibutton></term>
+    <listitem>
+      <anchor id="help-table-of-contents" xreflabel="Table of Contents">
+      <para>
+      Shows the maketool help Table of Contents in the help browser.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Index...</guibutton></term>
+    <listitem>
+      <anchor id="help-index" xreflabel="Index">
+      <para>
+      Shows the maketool help Index in the help browser.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Web Page...</guibutton></term>
+    <listitem>
+      <anchor id="help-web-page" xreflabel="Web Page">
+      <para>
+      Shows the maketool web page in the help browser.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
 
 </section>
 
@@ -595,25 +835,24 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
 <section id="again-tool" xreflabel="Again tool">
 <title>Again tool</title>
 
-<graphic format=GIF fileref="tools-again.gif"></graphic>
+<graphic format="GIF" fileref="tools-again.gif"></graphic>
 
 <para>
-Click this tool to run <command>gmake</command> with the same target
-you used last time you ran <command>gmake</command> (from the
-<guimenu>Build</guimenu> menu, the <xref linkend="all-tool">,
-or the <xref linkend="clean-tool">).  The tooltip shows
-you which target this will be.
+Click this tool to run &gmake; with the same target you used last
+time you ran &gmake; (from the <xref linkend="build-menu">, the
+<xref linkend="all-tool"> tool, or the <xref linkend="clean-tool"> tool).
+The tooltip shows you which target this will be.
 </para>
 
 <para>
 This tool becomes available once you have started at least
-one <command>gmake</command> run.
+one &gmake; run.
 </para>
 
 <para>
 See also:
-<xref linkend="all-tool">,
-<xref linkend="clean-tool">
+<xref linkend="all-tool"> tool,
+<xref linkend="clean-tool"> tool
 <!-- <xref linkend="menu-build"> -->
 </para>
 
@@ -623,65 +862,62 @@ See also:
 <section id="stop-tool" xreflabel="Stop tool">
 <title>Stop tool</title>
 
-<graphic format=GIF fileref="tools-stop.gif"></graphic>
+<graphic format="GIF" fileref="tools-stop.gif"></graphic>
 
 <para>
-Click this tool to stop the current <command>gmake</command> run.
+Click this tool to stop the current &gmake; run.
 </para>
 
 <para>
-This tool becomes available only during a <command>gmake</command>
-run.
+This tool becomes available only during a &gmake; run.
 </para>
 
 <para>
 See also:
-<xref linkend="all-tool">,
-<xref linkend="clean-tool">
+<xref linkend="all-tool"> tool,
+<xref linkend="clean-tool"> tool
 <!-- <xref linkend="menu-build"> -->
 </para>
 
 </section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<section id="all-tool" xreflabel="Build All tool">
+<section id="all-tool" xreflabel="Build All">
 <title>Build All tool</title>
 
-<graphic format=GIF fileref="tools-all.gif"></graphic>
+<graphic format="GIF" fileref="tools-all.gif"></graphic>
 
 <para>
-Click this tool to run <command>gmake</command> with the
-target <varname>all</varname>.  Makefiles which adhere to GNU
-Makefile standards will compile and link all programs
-and libraries (but not necessarily any documentation).
+Click this tool to run &gmake; with the target <varname>all</varname>.
+Makefiles which adhere to GNU Makefile standards will compile and link
+all programs and libraries (but not necessarily any documentation).
 </para>
 
 <para>
-This tool becomes available if the <filename>Makefile</filename>
-in the current directory defines an <varname>all</varname> target.
-Like all build tools and menu items, it becomes unavailable while
-<command>gmake</command> is running.
+This tool becomes available if the &Makefile; in the current directory
+defines an <varname>all</varname> target.  Like all build tools and
+menu items, it becomes unavailable while &gmake; is running.
 </para>
 
 <para>
 See also:
-<xref linkend="clean-tool">.
+<xref linkend="clean-tool"> tool.
 </para>
 
 </section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<section id="clean-tool" xreflabel="Clean tool">
+<section id="clean-tool" xreflabel="Clean">
 <title>Clean tool</title>
 
-<graphic format=GIF fileref="tools-clean.gif"></graphic>
+<graphic format="GIF" fileref="tools-clean.gif"></graphic>
 
 <para>
-Click this tool to run <command>gmake</command> with the
-target <varname>clean</varname>.  Makefiles which adhere to GNU
-Makefile standards will delete all files which are normally
-created by building, such as programs, libraries, and object
-files, but not files which record the configuration.
+Click this tool to run &gmake; with the target <varname>clean</varname>.
+Makefiles which adhere to GNU Makefile standards will delete all
+files which are normally created by building, such as programs,
+libraries, and object files, but not files which record the
+ configuration.
 </para>
 
 <para>
@@ -692,15 +928,14 @@ in the <xref linkend="variables-pane">.
 </para>
 
 <para>
-This tool becomes available if the <filename>Makefile</filename>
-in the current directory defines a <varname>clean</varname> target.
-Like all build tools and menu items, it becomes unavailable while
-<command>gmake</command> is running.
+This tool becomes available if the &Makefile; in the current directory
+defines a <varname>clean</varname> target.  Like all build tools and
+menu items, it becomes unavailable while &gmake; is running.
 </para>
 
 <para>
 See also:
-<xref linkend="all-tool">
+<xref linkend="all-tool"> tool
 </para>
 
 </section>
@@ -709,23 +944,27 @@ See also:
 <section id="clear-tool" xreflabel="Clear Log tool">
 <title>Clear Log tool</title>
 
-<graphic format=GIF fileref="tools-clear.gif"></graphic>
+<graphic format="GIF" fileref="tools-clear.gif"></graphic>
 
 <para>
-Click this tool to delete all text in the window.
+Click this tool to delete all text in the log window.
 </para>
 
 <para>
 This toolbar button becomes available when the log window contains text.
 </para>
 
+<para>
+See the <xref linkend="view-clear-log"> menu item.
+</para>
+
 </section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<section id="edit-next-tool" xreflabel="Edit Next Error tool">
+<section id="edit-next-tool" xreflabel="Edit Next Error">
 <title>Edit Next Error tool</title>
 
-<graphic format=GIF fileref="tools-edit-next.gif"></graphic>
+<graphic format="GIF" fileref="tools-edit-next.gif"></graphic>
 
 <para>
 Click this tool to edit the next error or warning after the
@@ -746,18 +985,18 @@ See also:
 </section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<section id="edit-file-next-tool" xreflabel="Edit File Next Error tool">
+<section id="edit-file-next-tool" xreflabel="Edit File Next Error">
 <title>Edit File Next Error tool</title>
 
-<graphic format=GIF fileref="tools-edit-file-next.gif"></graphic>
+<graphic format="GIF" fileref="tools-edit-file-next.gif"></graphic>
 
 <para>
 Click this tool to edit the next error or warning after the
 currently selected line in the log window.  Unlike the
-<xref linkend="edit-next-tool">, this tool first skips all errors
+<xref linkend="edit-next-tool"> tool, this tool first skips all errors
 and warnings in the same file (compilation unit) as the selected
 line.  This is useful when an error early in the file confuses
-the compiler.  If the <xref linkend="edit-next-ignores-warnings">
+the compiler.  If the <xref linkend="general-edit-next-ignores-warnings">
 option is set, this tool will skip over warnings and only find errors.
 </para>
 
@@ -767,7 +1006,7 @@ This tool becomes available when the log window contains text.
 
 <para>
 See also:
-<xref linkend="edit-next-tool">
+<xref linkend="edit-next-tool"> tool.
 </para>
 
 </section>
@@ -776,7 +1015,7 @@ See also:
 <section id="print-tool" xreflabel="Print tool">
 <title>Print tool</title>
 
-<graphic format=GIF fileref="tools-print.gif"></graphic>
+<graphic format="GIF" fileref="tools-print.gif"></graphic>
 
 <para>
 Click this tool to pop up the <xref linkend="print-window">
@@ -793,7 +1032,13 @@ This tool becomes available when the log window contains text.
 <section id="open-log-file-window" xreflabel="Open Log File window">
 <title>Open Log File window</title>
 
-<graphic format=GIF fileref="open-log-file-window.gif"></graphic>
+<graphic format="GIF" fileref="open-log-file-window.gif"></graphic>
+
+<para>
+This window is shown when you select the <xref linkend="file-open-log">
+menu item, and allows you to choose a file to be loaded into the log
+window.
+</para>
 
 </section>
 
@@ -802,7 +1047,13 @@ This tool becomes available when the log window contains text.
 <title>Save Log File window</title>
 
 
-<graphic format=GIF fileref="save-log-file-window.gif"></graphic>
+<graphic format="GIF" fileref="save-log-file-window.gif"></graphic>
+
+<para>
+This window is shown when you select the <xref linkend="file-save-log">
+menu item, and allows you to choose a filename to which the contents
+of the log window will be saved.
+</para>
 
 </section>
 
@@ -811,7 +1062,15 @@ This tool becomes available when the log window contains text.
 <title>Change Directory window</title>
 
 
-<graphic format=GIF fileref="change-directory-window.gif"></graphic>
+<graphic format="GIF" fileref="change-directory-window.gif"></graphic>
+
+<para>
+This window is shown when you select the <xref linkend="file-change-directory">
+menu item, and allows you to choose a directory.  Maketool will make that
+directory its working directory and update the <xref linkend="build-menu">
+to reflect the targets in that directory's Makefile.  See the
+<xref linkend="file-previous-directories"> menu.
+</para>
 
 </section>
 
@@ -820,7 +1079,69 @@ This tool becomes available when the log window contains text.
 <title>Print window</title>
 
 
-<graphic format=GIF fileref="print-window.gif"></graphic>
+<graphic format="GIF" fileref="print-window.gif"></graphic>
+
+<para>
+This window is shown when you select the <xref linkend="file-print">
+menu item, and allows you to send the contents of the log window
+to a printer.
+</para>
+
+<variablelist>
+
+  <varlistentry>
+    <term><guibutton>Print to printer</guibutton></term>
+    <listitem>
+      <para>
+      If this checkbox is selected, the print output will be sent to
+      the printer currently selected in the adjacent combo box.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Print to file</guibutton></term>
+    <listitem>
+      <para>
+      If this checkbox is selected, the print output will be sent to
+      the filename currently selected in the adjacent combo box.
+      Click the <guibutton>Browse</guibutton> button to choose a
+      new filename.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>&OK;</term>
+    <listitem>
+      <para>
+      Click &OK; to generate the print output and
+      send it to the currently selected destination.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Page Setup...</guibutton></term>
+    <listitem>
+      <para>
+      Click <guibutton>Page Setup...</guibutton> to show the
+      <xref linkend="page-setup-pane"> of the Preferences.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>&Cancel;</term>
+    <listitem>
+      <para>
+      Click &Cancel; to close the Print window without generating
+      any print output.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
 
 </section>
 
@@ -829,7 +1150,122 @@ This tool becomes available when the log window contains text.
 <title>Find window</title>
 
 
-<graphic format=GIF fileref="find-window.gif"></graphic>
+<graphic format="GIF" fileref="find-window.gif"></graphic>
+
+<para>
+This window is shown when you select the <xref linkend="edit-find"> menu
+item, and allows you to search for words or regular expressions in
+the text in the log window.
+</para>
+
+<variablelist>
+
+  <varlistentry>
+    <term><guibutton>Search for:</guibutton></term>
+    <listitem>
+      <para>
+      Enter the string or regular expression you want to search for,
+      in this text field.
+      </para>
+      <para>
+      You can use the PageUp key on the keyboard to recall the last
+      string you searched for; use the PageUp and PageDown keys to
+      move through the history of all previous search strings.  Press
+      the Return key on the keyboard to perform the search.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Literal</guibutton></term>
+    <listitem>
+      <para>
+      Select this checkbox if you want the string in the
+      <guibutton>Search for</guibutton> text field to be 
+      interpreted as a plain string, i.e. regular expression
+      metacharacters are not significant.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Regular Expression</guibutton></term>
+    <listitem>
+      <para>
+      Select this checkbox if you want the string in the
+      <guibutton>Search for</guibutton> text field to be 
+      interpreted as a regular expression, i.e. regular expression
+      metacharacters are significant. See the system
+      manual page regex(7) for details of regular expression
+      syntax.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Search Forwards</guibutton></term>
+    <listitem>
+      <para>
+      Select this checkbox if you want maketool to search for
+      the search string starting at the currently selected line
+      in the log window and moving forwards (towards the end of
+      the log window).
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Search Backwards</guibutton></term>
+    <listitem>
+      <para>
+      Select this checkbox if you want maketool to search for
+      the search string starting at the currently selected line
+      in the log window and moving backwards (towards the start
+      of the log window).
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Wrap</guibutton></term>
+    <listitem>
+      <para>
+      Select this checkbox if you want maketool to continue searching
+      from the start of the log window when it reaches the end without
+      finding a matching line (or, if the <guibutton>Search
+      Backwards</guibutton> checkbox is on, continue from the end when
+      it reaches the start without finding a matching line).
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Find</guibutton></term>
+    <listitem>
+      <para>
+      Click <guibutton>Find</guibutton> to perform the search.  If maketool
+      can find a line in the log window matching the parameters in the
+      Find window, it will select that line, otherwise it will beep and
+      show the message "Pattern not found" in the statusbar.
+      </para>
+      <para>
+      Once you have performed a search, you can repeat the search without
+      opening the Find window by using the <xref linkend="edit-find-again">
+      menu item.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Close</guibutton></term>
+    <listitem>
+      <para>
+      Click <guibutton>Close</guibutton> to close the Find window.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
 
 </section>
 
@@ -838,8 +1274,43 @@ This tool becomes available when the log window contains text.
 <title>Preferences window</title>
 
 <para>
-Yadda, yadda, yadda.
+This window allows you to set preferences which control various
+aspects of maketool's operation.  All the preferences are saved
+in the file <filename>$HOME/.maketoolrc</filename> when you press
+the &OK; button and at certain other times.
 </para>
+
+<para>
+The Preferences window is divided into several panes:
+</para>
+
+<itemizedlist>
+  <listitem>
+    <para>
+    <xref linkend="general-pane">
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+    <xref linkend="variables-pane">
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+    <xref linkend="programs-pane">
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+    <xref linkend="colors-pane">
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+    <xref linkend="page-setup-pane">
+    </para>
+  </listitem>
+</itemizedlist>
 
 </section>
 
@@ -847,23 +1318,244 @@ Yadda, yadda, yadda.
 <section id="general-pane" xreflabel="General pane">
 <title>General pane</title>
 
-<graphic format=GIF fileref="general-pane.gif"></graphic>
-
-<anchor id="continue-despite-failures" xreflabel="Continue despite failures">
-<para>
-Select this toggle to have <command>gmake</command> continue building
-targets after a target fails to be built.  The normal behaviour of
-<command>gmake</command> is to stop when the first target fails.
-</para>
+<graphic format="GIF" fileref="general-pane.gif"></graphic>
 
 <para>
-This toggle sets the <option>-k</option> flag to <command>gmake</command>.
+This pane is part of the <xref linkend="preferences-window"> which
+is shown when you select the <xref linkend="edit-preferences"> menu item.
 </para>
 
-<anchor id="edit-next-ignores-warnings" xreflabel="Edit Next ignores warnings">
+<variablelist>
 
-<anchor id="enable-make-makefile"
-    xreflabel="Build Makefile from Imakefile or Makefile.in">
+  <varlistentry>
+    <term><guibutton>Make runs commands</guibutton></term>
+    <listitem>
+      <anchor id="general-parallelism" xreflabel="Make runs commands">
+      <para>
+      This area controls the way in which &gmake;
+      runs the commands specified in the Makefile to build targets.
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	  in series: commands are run one at a time, one after the other.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	  in parallel, with a limit on the number of processes
+	  (commands) run at the same time.  Equivalent to using
+	  the <option>-j</option> option to &gmake;.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	  in parallel, with a limit on the machine load (number of
+	  commands which can execute at any time).  Equivalent to
+	  using the <option>-l</option> option to &gmake;.
+	  </para>
+	</listitem>
+      </itemizedlist>
+
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Automatically edit first error</guibutton></term>
+    <listitem>
+      <anchor id="general-auto-edit-error"
+      	  xreflabel="Automatically edit first error">
+      <para>
+      If this checkbox is on, maketool will automatically open a text
+      editor on the filename and line number mentioned in the first
+      error message in a &gmake; run, as soon as the error message is
+      added to the log window.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Edit Next ignores warnings</guibutton></term>
+    <listitem>
+      <anchor id="general-edit-next-ignores-warnings"
+      	  xreflabel="Edit Next ignores warnings">
+      <para>
+      If this checkbox is on, maketool will skip warning messages
+      and only select error messages when you use the
+      <xref linkend="edit-edit-next-error">, 
+      <xref linkend="edit-edit-prev-error">, or
+      <xref linkend="edit-edit-next-file-error"> menu items, or the
+      <xref linkend="edit-next-tool"> or
+      <xref linkend="edit-file-next-tool"> tools.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Continue despite failures</guibutton></term>
+    <listitem>
+      <anchor id="general-continue-despite-failures"
+      	  xreflabel="Continue despite failures">
+      <para>
+      If this checkbox is on, &gmake; will continue building targets
+      after a target fails to be built.  The normal behaviour of &gmake;
+      is to stop when the first target fails.  Equivalent to using the
+      <option>-k</option> option to &gmake;.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Build Makefile from Imakefile or Makefile.in</guibutton></term>
+    <listitem>
+      <anchor id="general-enable-make-makefile"
+	  xreflabel="Build Makefile from Imakefile or Makefile.in">
+      <para>
+      If this checkbox is on, maketool will attempt to rebuild the Makefile
+      in the working directory from a &Makefileam;, &Makefilein; or
+      &Imakefile; file, every time a target is built.  See
+      <xref linkend="make-systems"> for more information.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Scroll to end on output</guibutton></term>
+    <listitem>
+      <anchor id="general-scroll-on-output"
+      	  xreflabel="Scroll to end on output">
+      <para>
+      If this checkbox is on, maketool will scroll to the end of the log
+      window every time new text is added to the end of the log window.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>On starting each build:</guibutton></term>
+    <listitem>
+      <anchor id="general-start-build-action"
+      	  xreflabel="On starting each build">
+      <para>
+      This combobox allows you to specify an action which maketool
+      will perform just before starting each &gmake;
+      run.
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	  Do nothing: maketool does not do anything special before each build.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	  Clear log: maketool clears all text from the log window before
+	  each build (as if you had used the <xref linkend="view-clear-log">
+	  menu item).
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	  Collapse all log items: maketool collapses all the indented text
+	  in the log window (as if you had used the
+	  <xref linkend="view-collapse-all"> menu item).
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>On finishing each build:</guibutton></term>
+    <listitem>
+      <anchor id="general-finish-build-action"
+      	  xreflabel="On finishing each build">
+      <para>
+      This combobox allows you to specify an action which maketool
+      will perform just after finishing each &gmake;
+      run.
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	  Do nothing: maketool does not do anything special after each build.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	  Beep: maketool emits a beep after each build.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	  Run command: maketool runs the command in the adjacent text field
+	  after each build, using all the maketool
+	  <xref linkend="percent-escapes"> and environment variable overrides.
+	  Maketool does not show the output of this command, wait for
+	  its completion, or take any notice of its exit code.
+	  </para>
+	  <para>
+	  Typically, you would use this command to notify yourself that a
+	  build has finished.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	  Show dialog: maketool shows a dialog (shown below) after each
+	  build, which describes the target built and how many errors and
+	  warnings were found.
+	  </para>
+      	  <graphic format="GIF" fileref="finished-dialog.gif"></graphic>
+	  <para>
+	  This is useful when your window manager provides multiple virtual
+	  desktops; you can start a build, change to another virtual
+	  desktop, and be notified when the build finishes.
+	  <footnote>
+	    <para>
+	    You may need to configure your window manager to show
+	    dialogs on the current virtual desktop instead of with the 
+	    parent application.
+	    </para>
+	  </footnote>
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Makefile:</guibutton></term>
+    <listitem>
+      <anchor id="general-makefile" xreflabel="Makefile">
+      <para>
+      This combobox can be used to force &gmake; to use a different
+      filename than the default for the Makefile (equivalent to the
+      <option>-f</option> option).  You can select one of the standard
+      filenames in the menu, or type in any filename, or click the
+      <guibutton>Browse</guibutton> button to choose a filename.
+      </para>
+      <para>
+      If you enter an absolute pathname (i.e. one that begins with
+      the root directory, such as <filename>/usr/foo/bar/Makefile</filename>),
+      that one Makefile will be used regardless of maketool's working
+      directory.  This is probably not what you want, as most Makefiles
+      are not written to be used like that.
+      </para>
+      <para>
+      Normally you do not need to use the <guibutton>Makefile</guibutton>
+      combobox, as &gmake; will figure out which Makefile to use by itself.
+      Use the combobox only when you need to force &gmake; to use a
+      non-standard filename for the Makefile.  For example, when testing
+      new Makefile features a name of <filename>Makefile.test</filename>
+      would be useful.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
 
 </section>
 
@@ -872,7 +1564,246 @@ This toggle sets the <option>-k</option> flag to <command>gmake</command>.
 <title>Variables pane</title>
 
 
-<graphic format=GIF fileref="variables-pane.gif"></graphic>
+<graphic format="GIF" fileref="variables-pane.gif"></graphic>
+
+<para>
+This pane is part of the <xref linkend="preferences-window"> which
+is shown when you select the <xref linkend="edit-preferences"> menu item.
+It allows you to set up &gmake; variable overrides which are used
+every time you build a target.
+</para>
+
+<para>
+The main scrolling list shows the current set of variable overrides,
+with their name, value, and type.  The other items on this pane allow
+you to add, change and remove from this set.  Clicking the
+&OK; button accepts the variable overrides so that they will apply
+to the next &gmake; run
+<footnote>
+  <para>
+  Variable overrides are currently not saved in the preferences file, so
+  you have to enter them every time you start maketool.
+  </para>
+</footnote>
+.
+</para>
+
+
+<para>
+Maketool supports overriding &gmake; variables in two different ways,
+shown in the scrolling list as the `Type' of the variable override.
+</para>
+<variablelist>
+
+  <varlistentry>
+    <term>Make</term>
+    <listitem>
+      <para>
+      Variable overrides of this type are passed the &gmake; on the
+      commandline as a sequence of arguments of the form
+      <option>NAME='VALUE'</option>.  The %v escape sequence in
+      maketool commands is replaced with this sequence of options
+      (see <xref linkend="percent-escapes"> for other sequences).
+      </para>
+      <para>
+      Note that the behaviour of the Make type variable overrides
+      with recursive builds depends on which make program is selected
+      in the <xref linkend="programs-make"> field in the Preferences;
+      &gmake; will pass down the overrides to child makes and subdirectories,
+      many other make programs do not.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>Environ</term>
+    <listitem>
+      <para>
+      Variable overrides of this type are passed to &gmake; in the
+      process environment, as if you had used the shell
+      <command>export</command> (sh, ksh, bash) or
+      <command>setenv</command> (csh, tcsh) commands.
+      </para>
+      <para>
+      Note that the behaviour of variables set in the environment depends
+      on which make program is selected in the <xref linkend="programs-make">
+      field in the Preferences, and how the Makefile is written.  The value
+      you specify may well be ignored.
+      </para>
+      <para>
+      Environ type variables are useful for passing variables to
+      autoconf &configure; scripts, particularly the <varname>CC</varname>
+      and <varname>CFLAGS</varname> variables.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+
+
+<para>
+To add a new variable override:
+</para>
+<itemizedlist>
+  <listitem>
+    <para>
+    enter a name in the <guibutton>Name</guibutton> text field, 
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+    enter a value in the <guibutton>Value</guibutton> text field, 
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+    choose a type from the <guibutton>Type</guibutton> combobox, and
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+    click <guibutton>Set</guibutton> to add the new variable override
+    to the scrolling list.
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+    click &OK; to accept the set of variable overrides in the scrolling list.
+    </para>
+  </listitem>
+</itemizedlist>
+
+
+<para>
+To change an existing variable override:
+</para>
+<itemizedlist>
+  <listitem>
+    <para>
+    select a variable override in the scrolling list,
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+    change the value in the <guibutton>Value</guibutton>
+    text field or the type in the <guibutton>Type</guibutton> combobox. 
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+    click <guibutton>Set</guibutton> to change the variable override.
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+    click &OK; to accept the set of variable overrides in the scrolling list.
+    </para>
+  </listitem>
+</itemizedlist>
+
+
+<para>
+To remove a variable override:
+</para>
+<itemizedlist>
+  <listitem>
+    <para>
+    select a variable override in the scrolling list,
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+    click <guibutton>Unset</guibutton> to remove the variable override.
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+    click &OK; to accept the set of variable overrides in the scrolling list.
+    </para>
+  </listitem>
+</itemizedlist>
+
+
+<para>
+The controls on this pane are described in detail below.
+</para>
+<variablelist>
+
+  <varlistentry>
+    <term><guibutton>Name</guibutton></term>
+    <listitem>
+      <para>
+      This text field shows the name of the currently selected variable
+      override and allows you to enter names of new variable overrides.
+      Names must obey the same rules as &gmake; variable names (see the
+      &gmake; documentation).
+      </para>
+      <para>
+      In addition to the normal TAB key for moving between fields in
+      a window, you can use the equals (=) key to advance to the
+      <guibutton>Value</guibutton> text field.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Value</guibutton></term>
+    <listitem>
+      <para>
+      This text field shows the value of the currently selected variable
+      override and allows you to enter values of new variable overrides.
+      Values can be any string and may include whitespace
+      <footnote>
+	<para>
+	There is currently no way you can enter TAB or newline characters in
+	<guibutton>Value</guibutton> text field.
+	</para>
+      </footnote>
+      and shell metacharacters (although see <xref linkend="metacharacters">
+      for pitfalls with metacharacters).  Maketool will quote the string
+      if necessary before passing it to a shell.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Type</guibutton></term>
+    <listitem>
+      <para>
+      This combobox shows the type of the currently selected variable
+      override and allows you to choose types of new variable overrides.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Set</guibutton></term>
+    <listitem>
+      <para>
+      Click <guibutton>Set</guibutton> to add the name, value and type
+      combination currently in the <guibutton>Name</guibutton>,
+      <guibutton>Value</guibutton> and <guibutton>Type</guibutton> fields
+      into the scrolling list.  Note that you need to click the
+      &OK; or &Apply; buttons before the variable override will be used
+      in the next &gmake; run.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Unset</guibutton></term>
+    <listitem>
+      <para>
+      Click <guibutton>Unset</guibutton> to remove the variable override
+      corresponding to the name currently in the <guibutton>Name</guibutton>
+      text field from the scrolling list.  Note that you need to click the
+      &OK; or &Apply; button before the variable override will be removed
+      from the next &gmake; run.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
 
 </section>
 
@@ -881,7 +1812,126 @@ This toggle sets the <option>-k</option> flag to <command>gmake</command>.
 <title>Programs pane</title>
 
 
-<graphic format=GIF fileref="programs-pane.gif"></graphic>
+<graphic format="GIF" fileref="programs-pane.gif"></graphic>
+
+<para>
+This pane is part of the <xref linkend="preferences-window"> which
+is shown when you select the <xref linkend="edit-preferences"> menu item.
+It allows you to control the way in which maketool runs programs to do
+various tasks.
+</para>
+
+
+<variablelist>
+
+  <varlistentry>
+    <term><guibutton>Make Program:</guibutton></term>
+    <listitem>
+      <anchor id="programs-make" xreflabel="Make Program">
+      <para>
+      This combobox allows you to choose which make program will be used
+      to build targets.  Maketool knows about several make programs
+      including GNU &gmake;, BSD 4.4 <command>pmake</command>,
+      Solaris <command>make</command> and IRIX <command>smake</command>.
+      For each make program, maketool knows the commandline
+      options and other features of the make program necessary to
+      implement maketool features; many of the <xref linkend="percent-escapes">
+      used to construct commands depend on the value of this combobox.
+      </para>
+      <para>
+      This combobox appeared in maketool version 0.8; before that maketool
+      could only be used with &gmake;.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Make a target:</guibutton></term>
+    <listitem>
+      <anchor id="programs-make-target" xreflabel="Make a target">
+      <para>
+      The string in this text field is expanded (see
+      <xref linkend="percent-escapes">) and run when you start
+      building a target, e.g. <varname>all</varname>, from the
+      <xref linkend="build-menu"> menu or the <xref linkend="all-tool">
+      or <xref linkend="clean-tool"> tools.  The expanded command is
+      appended to the log window as a new top-level indented item; the
+      command's output is filtered for errors and warnings and appended
+      to the log window.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>List make targets:</guibutton></term>
+    <listitem>
+      <anchor id="programs-list-targets" xreflabel="List make targets">
+      <para>
+      The string in this text field is expanded (see
+      <xref linkend="percent-escapes">) and run when maketool
+      starts and every time maketool changes working directory
+      (i.e. you use the <xref linkend="file-change-directory">
+      menu item or the <xref linkend="file-previous-directories">
+      menu).  The command's output is filtered to extract the
+      set of targets defined by the &Makefile;, in a way which
+      depends on the make program selected in the
+      <guibutton>Make Program:</guibutton> combobox.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>List make version:</guibutton></term>
+    <listitem>
+      <anchor id="programs-list-version" xreflabel="List make version">
+      <para>
+      The string in this text field is expanded (see
+      <xref linkend="percent-escapes">) and run the first time you
+      open the <xref linkend="about-make-window">.  The command's
+      output is displayed in the About Make window.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Edit source files:</guibutton></term>
+    <listitem>
+      <anchor id="programs-edit" xreflabel="Edit source files">
+      <para>
+      The string in this text field is expanded (see
+      <xref linkend="percent-escapes">) and run every time you edit
+      a source file (using the <xref linkend="edit-edit-error">,
+      <xref linkend="edit-edit-next-error">,
+      <xref linkend="edit-edit-next-file-error">, or
+      <xref linkend="edit-edit-prev-error"> menu items, the
+      <xref linkend="edit-next-tool"> or 
+      <xref linkend="edit-file-next-tool"> tools, or double-clicking
+      on an error or warning in the log window.  Maketool discards
+      the command's output and does not wait for the command to
+      finish or check the command's exit code.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Build makefile:</guibutton></term>
+    <listitem>
+      <anchor id="programs-make-makefile" xreflabel="Build makefile">
+      <para>
+      If the <xref linkend="general-enable-make-makefile"> checkbox in
+      the Preferences is on, the string in this text field is expanded (see
+      <xref linkend="percent-escapes">) and run just before you start
+      building a target, e.g. <varname>all</varname>, from the
+      <xref linkend="build-menu"> menu or the <xref linkend="all-tool">
+      or <xref linkend="clean-tool"> tools.  The expanded command is
+      appended to the log window as a new top-level indented item; the
+      command's output is filtered for errors and warnings and appended
+      to the log window.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
 
 </section>
 
@@ -890,7 +1940,26 @@ This toggle sets the <option>-k</option> flag to <command>gmake</command>.
 <title>Colors pane</title>
 
 
-<graphic format=GIF fileref="colors-pane.gif"></graphic>
+<graphic format="GIF" fileref="colors-pane.gif"></graphic>
+
+<para>
+This pane is part of the <xref linkend="preferences-window"> which
+is shown when you select the <xref linkend="edit-preferences"> menu item.
+It allows you to control the colours used to show errors, warnings,
+and summarised lines in the log window.
+</para>
+
+<variablelist>
+
+  <varlistentry>
+    <term><guibutton>Unset</guibutton></term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
 
 </section>
 
@@ -899,7 +1968,11 @@ This toggle sets the <option>-k</option> flag to <command>gmake</command>.
 <title>Page Setup pane</title>
 
 
-<para>Yadda, yadda, yadda</para>
+<para>
+This pane is part of the <xref linkend="preferences-window"> which
+is shown when you select the <xref linkend="edit-preferences"> menu item.
+</para>
+
 
 </section>
 
@@ -907,17 +1980,17 @@ This toggle sets the <option>-k</option> flag to <command>gmake</command>.
 <section id="configure-window" xreflabel="Configure Options window">
 <title>Configure Options window</title>
 
-<graphic format=GIF fileref="configure-window-basic.gif"></graphic>
+<graphic format="GIF" fileref="configure-window-basic.gif"></graphic>
 
 <para>
 This window allows you to choose among the various configuration
-options provided by the <xref linkend="autoconf">
-<filename>configure</filename> script in the current directory.
+options provided by the <xref linkend="autoconf"> &configure;
+script in the current directory.
 </para>
 
 <para>
-This window can be opened automatically when the <filename>Makefile</filename>
-is being updated (if the <xref linkend="enable-make-makefile"> checkbox
+This window can be opened automatically when the &Makefile;
+is being updated (if the <xref linkend="general-enable-make-makefile"> checkbox
 is on), or manually by selecting <guibutton>Makefile</guibutton>
 or <guibutton>Run configure...</guibutton> from the <xref linkend="build-menu">.
 See <xref linkend="make-systems"> for more information.
@@ -971,10 +2044,9 @@ In Basic mode, the window has the following panes:
     <term><guibutton>Features and packages</guibutton></term>
     <listitem>
       <para>
-      Contains options which control user-selectable
-      features of the <filename>configure</filename> script.
-      The exact contents depend on the particular script, and
-      this may pane may not even be present if <filename>configure</filename>
+      Contains options which control user-selectable features of the
+      &configure; script.  The exact contents depend on the particular
+      script, and this may pane may not even be present if &configure;
       is particularly simple.
       </para>
     </listitem>
@@ -984,10 +2056,9 @@ In Basic mode, the window has the following panes:
     <term><guibutton>Preview</guibutton></term>
     <listitem>
       <para>
-      Shows the command line of the <filename>configure</filename>
-      script that corresponds to the options you have chosen.
-      Note that the tooltip on each option shows you the name of
-      the commandline option passed to <filename>configure</filename>.
+      Shows the command line of the &configure; script that corresponds to
+      the options you have chosen.  Note that the tooltip on each option
+      shows you the name of the commandline option passed to &configure;.
       </para>
     </listitem>
   </varlistentry>
@@ -999,7 +2070,7 @@ In Basic mode, the window has the following panes:
 <section>
 <title>Advanced mode</title>
 
-<graphic format=GIF fileref="configure-window-advanced.gif"></graphic>
+<graphic format="GIF" fileref="configure-window-advanced.gif"></graphic>
 
 <para>
 In Advanced mode, more options become available in all the panes,
@@ -1012,8 +2083,8 @@ and two new panes appear:
     <term><guibutton>Configuration</guibutton></term>
     <listitem>
       <para>
-      Contains options related to the behaviour of the
-      <filename>configure</filename> script itself.
+      Contains options related to the behaviour of the &configure; script
+      itself.
       </para>
     </listitem>
   </varlistentry>
@@ -1022,9 +2093,8 @@ and two new panes appear:
     <term><guibutton>Host Type</guibutton></term>
     <listitem>
       <para>
-      Contains options related to cross-compilation.
-      This may pane may not be present if <filename>configure</filename>
-      is particularly simple.
+      Contains options related to cross-compilation.  This may pane may
+      not be present if &configure; is particularly simple.
       </para>
     </listitem>
   </varlistentry>
@@ -1041,7 +2111,7 @@ and two new panes appear:
 <title>About Maketool window</title>
 
 
-<graphic format=GIF fileref="about-maketool-window.gif"></graphic>
+<graphic format="GIF" fileref="about-maketool-window.gif"></graphic>
 
 <para>
 This window shows information about Maketool's version, who owns
@@ -1057,7 +2127,7 @@ the copyright, what kinds of warranty you don't have.  The
 <section id="licence-window" xreflabel="Licence window">
 <title>Licence window</title>
 
-<graphic format=GIF fileref="licence-window.gif"></graphic>
+<graphic format="GIF" fileref="licence-window.gif"></graphic>
 
 <para>
 This window shows the text of the GNU General Public License
@@ -1076,15 +2146,28 @@ For more information on the GPL, please read
 <section id="about-make-window" xreflabel="About Make window">
 <title>About Make window</title>
 
-<graphic format=GIF fileref="about-make-window.gif"></graphic>
+<graphic format="GIF" fileref="about-make-window.gif"></graphic>
 
 <para>
 This window shows information about GNU make, extracted from
-the <command>gmake --version</command> command.
+the <command>gmake --version</command> command.  Note that if
+a different make program is selected in the <xref linkend="programs-make">
+entry of the Preferences, this window will show information
+about that make program instead.
 </para>
 
 </section>
 
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<section id="percent-escapes" xreflabel="% Escape Characters">
+<title>% Escape Characters</title>
+
+<para>
+TODO: this section describes the % escape sequences in commands
+that maketool expands before running.
+</para>
+
+</section>
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
 <section id="metacharacters" xreflabel="Metacharacters">
 <title>Metacharacters</title>
@@ -1123,7 +2206,7 @@ make debugging painful.
 
   <listitem>
     <para>
-    Many different &osname; programs (e.g. the shell, <command>gmake</command>,
+    Many different &osname; programs (e.g. the shell, &gmake;,
     <command>sed</command>, <command>m4</command>, <command>awk</command>
     and the C compiler) interpret metacharacters.
     </para>
@@ -1160,7 +2243,7 @@ make debugging painful.
     <para>
     The sets of metacharacters implemented by the various programs
     overlap, but only partially.  For example, <function>${HOME}</function>
-    has the same meaning in the shell and <command>gmake</command>
+    has the same meaning in the shell and &gmake;
     but <function>$(HOME)</function> does not.
     </para>
   </listitem>
@@ -1169,7 +2252,7 @@ make debugging painful.
     <para>
     A similar situation exists with whitespace (space, tab and
     newline) characters, which are interpreted specially in the
-    shell and <command>gmake</command>.
+    shell and &gmake;.
     </para>
   </listitem>
 
@@ -1196,22 +2279,20 @@ failure modes when using the <command>autoconf</command> system.
 First, a quick summary of how <command>autoconf</command> works.
 The developer uses the <command>autoconf</command> program, which
 runs <command>m4</command> to process the file <filename>configure.in</filename>
-into a shell script named <filename>configure</filename>, which
-is then distributed with the application source.  The builder runs
-the <filename>configure</filename> script, which amongst many other
-things uses <command>awk</command> and <command>sed</command> to process
-input data.  As it's final step,
-<filename>configure</filename> creates two new shell scripts named
+into a shell script named &configure;, which is then distributed with
+the application source.  The builder runs the &configure; script, which
+amongst many other things uses <command>awk</command> and
+<command>sed</command> to process input data.  As it's final step,
+&configure; creates two new shell scripts named
 <filename>config.cache</filename> and <filename>config.status</filename>
 and runs <filename>config.status</filename>.  The next time
-<filename>configure</filename> is run, it runs <filename>config.cache</filename>
+&configure; is run, it runs <filename>config.cache</filename>
 as it's first step.  The <filename>config.status</filename> script uses
 <command>sed</command> to create various other files from
-input templates, usually <filename>Makefile</filename> from
-<filename>Makefile.in</filename> and <filename>config.h</filename>
-from <filename>config.h.in</filename>.  Then the builder uses
-<command>gmake</command>, which uses the information in
-<filename>Makefile</filename> to construct and run shell commands to
+input templates, usually &Makefile; from &Makefilein; and
+<filename>config.h</filename> from <filename>config.h.in</filename>.
+Then the builder uses &gmake;, which uses the information in
+&Makefile; to construct and run shell commands to
 compile and link the source code.  Compilation usually uses information
 in <filename>config.h</filename>.
 </para>
@@ -1227,7 +2308,7 @@ precious system files.
 <para>
 Here's a summary of how each character can cause failures
 in the <command>autoconf</command> chain (for clarity, starting 
-at the step where you run the <filename>configure</filename>
+at the step where you run the &configure;
 script).
 </para>
 
@@ -1384,10 +2465,9 @@ script).
     <term><anchor id="metachar-note-2" xreflabel="config.site">config.site</term>
     <listitem>
       <para>
-      The <filename>configure</filename> script finishes correctly but
-      undesired whitespace expansion causes confusing error messages
-      when <filename>configure</filename> tries to load the site
-      configuration file <filename>config.site</filename> using a
+      The &configure; script finishes correctly but undesired whitespace
+      expansion causes confusing error messages when &configure; tries to
+      load the site configuration file <filename>config.site</filename> using a
       path relative to the directory specified with <option>--prefix</option>.
       </para>
     </listitem>
@@ -1397,10 +2477,10 @@ script).
     <term><anchor id="metachar-note-3" xreflabel="shell">shell</term>
     <listitem>
       <para>
-      The <filename>configure</filename> script works but <command>gmake</command>
-      will probably fail due to unexpected expansion by the shell of
-      metacharacters or whitespace in commands given to the shell
-      by <command>gmake</command>.  This may be solved by adding quoting.
+      The &configure; script works but &gmake; will probably fail due to
+      unexpected expansion by the shell of metacharacters or whitespace in
+      commands given to the shell by &gmake;.  This may be solved by adding
+      quoting.
       </para>
     </listitem>
   </varlistentry>
@@ -1409,10 +2489,10 @@ script).
     <term><anchor id="metachar-note-4" xreflabel="gmake runtime">gmake runtime</term>
     <listitem>
       <para>
-      The <filename>configure</filename> script works but <command>gmake</command>
-      will probably fail due to unexpected expansion by <command>gmake</command>
-      of metacharacters or whitespace in commands given to the shell
-      by <command>gmake</command>.  This may be solved by adding quoting.
+      The &configure; script works but &gmake; will probably fail due to
+      unexpected expansion by &gmake; of metacharacters or whitespace in
+      commands given to the shell by &gmake;.  This may be solved by
+      adding quoting.
       </para>
     </listitem>
   </varlistentry>
@@ -1421,11 +2501,10 @@ script).
     <term><anchor id="metachar-note-5" xreflabel="gmake parsetime">gmake parsetime</term>
     <listitem>
       <para>
-      The <filename>configure</filename> script works but <command>gmake</command>
-      will probably fail due to parse errors in <filename>Makefile</filename>
-      caused by expansion by <command>gmake</command> of variables
-      whose values contain metacharacters or whitespace.  This may be solved by adding quoting.
-      The error is typically:
+      The &configure; script works but &gmake; will probably fail due to
+      parse errors in &Makefile; caused by expansion by &gmake; of variables
+      whose values contain metacharacters or whitespace.  This may be solved
+      by adding quoting.  The error is typically:
       </para>
       <programlisting>
 Makefile:10: *** missing separator.  Stop.
@@ -1437,9 +2516,9 @@ Makefile:10: *** missing separator.  Stop.
     <term><anchor id="metachar-note-6" xreflabel="C strings">C strings</term>
     <listitem>
       <para>
-      The <filename>configure</filename> script works but the C compiler will
-      generate syntax errors if metacharacters are used in a string literal
-      in <filename>config.h</filename> or other C code.
+      The &configure; script works but the C compiler will generate syntax
+      errors if metacharacters are used in a string literal in
+      <filename>config.h</filename> or other C code.
       </para>
     </listitem>
   </varlistentry>
@@ -1448,8 +2527,8 @@ Makefile:10: *** missing separator.  Stop.
     <term><anchor id="metachar-note-7" xreflabel="balance">balance</term>
     <listitem>
       <para>
-      The <filename>configure</filename> script will fail with shell syntax
-      error if the quotes are unbalanced, i.e. do not occur in pairs.
+      The &configure; script will fail with shell syntax error if the quotes
+      are unbalanced, i.e. do not occur in pairs.
       </para>
     </listitem>
   </varlistentry>
@@ -1458,9 +2537,8 @@ Makefile:10: *** missing separator.  Stop.
     <term><anchor id="metachar-note-8" xreflabel="lost">lost</term>
     <listitem>
       <para>
-      The <filename>configure</filename> script works but the metacharacter
-      is lost from values in created files such as <filename>Makefile</filename>.
-      This may be solved by adding quoting.
+      The &configure; script works but the metacharacter is lost from values
+      in created files such as &Makefile;. This may be solved by adding quoting.
       </para>
     </listitem>
   </varlistentry>
@@ -1497,7 +2575,7 @@ is available online.  You will learn a powerful and useful tool.
 <para>
 The name <emphasis>make system</emphasis> is used in this documentation
 to refer to one of the various systems used to construct a
-<filename>Makefile</filename> from another source file.  These systems are
+&Makefile; from another source file.  These systems are
 intend to make the creation and maintenance of Makefiles simpler.
 </para>
 
@@ -1505,7 +2583,7 @@ intend to make the creation and maintenance of Makefiles simpler.
 The important thing to understand about make systems is that the source
 of a software project which uses one of these systems is delivered without a
 Makefile.  This means that some extra command(s) need to be
-performed before <command>gmake</command> can be run the first time.
+performed before &gmake; can be run the first time.
 </para>
 
 <para>
@@ -1534,7 +2612,7 @@ it.  Maketool tries to soften this impact by:
   <listitem>
     <para>
     automatically updating the Makefile every time a target is
-    built (if the <xref linkend="enable-make-makefile"> checkbox is on).
+    built (if the <xref linkend="general-enable-make-makefile"> checkbox is on).
     </para>
   </listitem>
 
@@ -1560,8 +2638,7 @@ free software today:
 <para>
 This is the most powerful and high-end make system available today.  To
 use automake, you only need to provide the briefest sketch of a
-<filename>Makefile</filename>, in a file called
-<filename>Makefile.am</filename>, and automake does the rest.
+&Makefile;, in a file called &Makefileam;, and automake does the rest.
 </para>
 
 <para>
@@ -1583,7 +2660,7 @@ the following commands appear in the <xref linkend="build-menu">.
     <listitem>
       <para>
       Performs all the actions necessary to update the
-      <filename>Makefile</filename> from whatever files it
+      &Makefile; from whatever files it
       depends on.  This is usually all you ever need to do:
       it performs all the other commands listed below but in
       the correct order and only if they are necessary.
@@ -1599,8 +2676,8 @@ the following commands appear in the <xref linkend="build-menu">.
     <listitem>
       <para>
       Runs the <command>automake -a</command> command to generate
-      <filename>Makefile.in</filename> from <filename>Makefile.am</filename>.
-      This is useful when you are working on <filename>Makefile.am</filename>.
+      &Makefilein; from &Makefileam;.  This is useful when you are
+      working on &Makefileam;.
       </para>
       <para>
       The output appears in the <xref linkend="log-window">.
@@ -1613,7 +2690,7 @@ the following commands appear in the <xref linkend="build-menu">.
     <listitem>
       <para>
       Runs the <command>autoconf</command> command to generate
-      <filename>configure</filename> from <filename>configure.in</filename>.
+      &configure; from <filename>configure.in</filename>.
       This is useful when you are working on <filename>configure.in</filename>.
       </para>
       <para>
@@ -1627,7 +2704,7 @@ the following commands appear in the <xref linkend="build-menu">.
     <listitem>
       <para>
       Removes the <filename>config.cache</filename> file, which is
-      used to cache information discovered by the <filename>configure</filename>
+      used to cache information discovered by the &configure;
       script.  This is sometimes necessary when you are working on
       <filename>configure.in</filename>.
       </para>
@@ -1642,11 +2719,10 @@ the following commands appear in the <xref linkend="build-menu">.
     <listitem>
       <para>
       Shows the <xref linkend="configure-window">, which allows
-      you to run the <filename>configure</filename> script.  This
-      script accepts your configuration choices, discovers various
-      information about the operating system, and finally generates
-      <filename>Makefile</filename> (and usually some other files,
-      such as <filename>config.h</filename>).
+      you to run the &configure; script.  This script accepts your
+      configuration choices, discovers various information about the
+      operating system, and finally generates &Makefile; (and usually
+      some other files, such as <filename>config.h</filename>).
       </para>
       <para>
       The output appears in the <xref linkend="log-window">.
@@ -1659,12 +2735,11 @@ the following commands appear in the <xref linkend="build-menu">.
     <listitem>
       <para>
       Runs the <filename>config.status</filename> script, which
-      is produced by the <filename>configure</filename> script
-      and generates <filename>Makefile</filename> (and usually some other 
-      files, such as <filename>config.h</filename>).  This is useful
-      when you are working on <filename>Makefile.am</filename> or
-      <filename>config.h.in</filename>, because it is faster than
-      running the <filename>configure</filename> script itself.
+      is produced by the &configure; script and generates &Makefile; (and
+      usually some other files, such as <filename>config.h</filename>).
+      This is useful when you are working on &Makefileam; or
+      <filename>config.h.in</filename>, because it is faster than running
+      the &configure; script itself.
       </para>
       <para>
       The output appears in the <xref linkend="log-window">.
@@ -1690,8 +2765,8 @@ provide a standard interface for selecting configurable options.
 </para>
 
 <para>
-Typically, autoconf will be used to generate the <filename>Makefile</filename>
-from a file called <filename>Makefile.in</filename>, and
+Typically, autoconf will be used to generate the &Makefile;
+from a file called &Makefilein;, and
 <filename>config.h</filename> from a file called
 <filename>config.h.in</filename>.
 </para>
@@ -1714,10 +2789,9 @@ the following commands appear in the <xref linkend="build-menu">.
     <term><guibutton>Makefile</guibutton></term>
     <listitem>
       <para>
-      Performs all the actions necessary to update the
-      <filename>Makefile</filename> from whatever files it
-      depends on.  This is usually all you ever need to do:
-      it performs all the other commands listed below but in
+      Performs all the actions necessary to update the &Makefile; from
+      whatever files it depends on.  This is usually all you ever need
+      to do: it performs all the other commands listed below but in
       the correct order and only if they are necessary.
       </para>
       <para>
@@ -1731,7 +2805,7 @@ the following commands appear in the <xref linkend="build-menu">.
     <listitem>
       <para>
       Runs the <command>autoconf</command> command to generate
-      <filename>configure</filename> from <filename>configure.in</filename>.
+      &configure; from <filename>configure.in</filename>.
       This is useful when you are working on <filename>configure.in</filename>.
       </para>
       <para>
@@ -1751,7 +2825,7 @@ the following commands appear in the <xref linkend="build-menu">.
     <listitem>
       <para>
       Removes the <filename>config.cache</filename> file, which is
-      used to cache information discovered by the <filename>configure</filename>
+      used to cache information discovered by the &configure;
       script.  This is sometimes necessary when you are working on
       <filename>configure.in</filename>.
       </para>
@@ -1766,11 +2840,10 @@ the following commands appear in the <xref linkend="build-menu">.
     <listitem>
       <para>
       Shows the <xref linkend="configure-window">, which allows
-      you to run the <filename>configure</filename> script.  This
-      script accepts your configuration choices, discovers various
-      information about the operating system, and finally generates
-      <filename>Makefile</filename> (and usually some other files,
-      such as <filename>config.h</filename>).
+      you to run the &configure; script.  This script accepts your
+      configuration choices, discovers various information about the
+      operating system, and finally generates &Makefile; (and usually
+      some other files, such as <filename>config.h</filename>).
       </para>
       <para>
       The output appears in the <xref linkend="log-window">.
@@ -1783,12 +2856,11 @@ the following commands appear in the <xref linkend="build-menu">.
     <listitem>
       <para>
       Runs the <filename>config.status</filename> script, which
-      is produced by the <filename>configure</filename> script
-      and generates <filename>Makefile</filename> (and usually some other 
-      files, such as <filename>config.h</filename>).  This is useful
-      when you are working on <filename>Makefile.am</filename> or
+      is produced by the &configure; script and generates &Makefile;
+      (and usually some other  files, such as <filename>config.h</filename>).
+      This is useful when you are working on &Makefileam; or
       <filename>config.h.in</filename>, because it is faster than
-      running the <filename>configure</filename> script itself.
+      running the &configure; script itself.
       </para>
       <para>
       The output appears in the <xref linkend="log-window">.
@@ -1814,11 +2886,10 @@ programs.
 <para>
 Most uses of imake are being replaced by autoconf, which does
 the same job but more flexibly.   For example, the
-<filename>configure</filename> script in autoconf has a
-<option>--help</option> option which shows the user what
-options are available; there is no equivalent in imake.
-If your project uses imake, please consider learning
-<xref linkend="autoconf">.
+&configure; script in autoconf has a <option>--help</option>
+option which shows the user what options are available; there
+is no equivalent in imake.  If your project uses imake, please
+consider learning <xref linkend="autoconf">.
 </para>
 
 <para>
@@ -1838,7 +2909,7 @@ the following commands appear in the <xref linkend="build-menu">.
     <listitem>
       <para>
       Performs all the actions necessary to update the
-      <filename>Makefile</filename> from whatever files it
+      &Makefile; from whatever files it
       depends on.  This is usually all you ever need to do:
       it performs all the other commands listed below but in
       the correct order and only if they are necessary.
@@ -1854,7 +2925,7 @@ the following commands appear in the <xref linkend="build-menu">.
     <listitem>
       <para>
       Runs the <command>xmkmf</command> command to generate
-      <filename>Makefile</filename> from <filename>Imakefile</filename>.
+      &Makefile; from &Imakefile;.
       </para>
       <para>
       The output appears in the <xref linkend="log-window">.
