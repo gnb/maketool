@@ -6,3 +6,17 @@ x  When user presses `Edit Next' the new selected error
    build or it has scrolled out of sight.
    
 x  Show a different icon on error lines which have been edited.
+
+x  Have to be able to resize the window down vertically.
+
+x  Implement printing and Print Settings window.
+
+x  Implement File->Change Directory  command.
+
+x  Add icon for non-GNOME w/ms.
+
+x  Implement extraction of targets and generating the Build menu.
+
+x  Implement extra stuff in the Help menu.
+
+x  ?? Implement tighter GNOME integration.
