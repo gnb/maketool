@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
-dnl $Id: configure.in,v 1.9 1999-10-16 16:36:56 gnb Exp $
+dnl $Id: configure.in,v 1.10 1999-10-17 06:23:22 gnb Exp $
 dnl
 
 AC_INIT(main.c)
@@ -37,8 +37,21 @@ AC_PROG_AWK
 AC_PROG_CC
 
 dnl Get name of GNU make
-AC_CHECK_PROGS(GMAKE, gmake make, make)dnl
-GMAKEBASE=`basename "$GMAKE"`
+AC_ARG_WITH(gmake,
+[  --with-gmake=CMD        Set the GNU make command (may include full
+                          pathname and flags)],
+[case "$withval" in
+no) AC_MSG_ERROR(Maketool requires gmake) ;;
+yes) AC_MSG_ERROR(Please specify a gmake command or let configure figure it out) ;;
+*) GMAKE="$withval" ;;
+esac],
+AC_CHECK_PROGS(GMAKE, gmake make, make))dnl
+
+
+dnl Generate basename part of GMAKE for filters
+changequote(,)dnl
+GMAKEBASE=`echo "$GMAKE" | sed -e 's:^[^     ]*/::' -e 's:[ 	].*$::'`
+changequote([,])dnl
 
 dnl Stuff for gettext
 ALL_LINGUAS="la"
