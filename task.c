@@ -31,7 +31,7 @@
 #include <sys/filio.h>
 #endif
 
-CVSID("$Id: task.c,v 1.14 2003-05-24 05:48:21 gnb Exp $");
+CVSID("$Id: task.c,v 1.15 2003-09-26 14:22:27 gnb Exp $");
 
 /*
  * TODO: GDK is used only for the gdk_input_*() functions, which
@@ -164,7 +164,7 @@ task_reap_func(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     if (task->pid != pid)
     {
     	/* it's not paranoia when they're really out to get you */
-    	fprintf(stderr, _("maketool: reaped unexpected pid %d\n"), pid);
+    	fprintf(stderr, _("maketool: reaped unexpected pid %d\n"), (int)pid);
     }
     
     /* Hack to cause any pending input from the pipe to
