@@ -129,20 +129,21 @@ HEAD)
     ) || exit 1
     ;;
 *)
-    message "Checking out a new directory with tag $CVSTAG"
+    message "Exporting a new directory with tag $CVSTAG"
 
-    BUILDDIR=build.d
+    BUILDDIR=/var/tmp/$PACKAGE-build
     [ -d $BUILDDIR ] && rm -rf $BUILDDIR
+    mkdir -p $BUILDDIR
     ROOT=$(cat CVS/Root)
     REPOS=$(cat CVS/Repository)
 
     message "Updating files from CVS"
     (
     	set -x
-	cvs -d $ROOT co -r$CVSTAG -d $BUILDDIR $REPOS || exit 1
-    ) || fatal "Can't check out from CVS"
+	cvs -d $ROOT export -r$CVSTAG -d $BUILDDIR $REPOS || exit 1
+    ) || fatal "Can't export from CVS"
     [ -z "$RPMDEST" ] && RPMDEST=$(/bin/pwd)
-    cd $BUILDDIR || fatal "Checkout succeeded but no directory"
+    cd $BUILDDIR || fatal "CVS export succeeded but no directory"
     ;;
 esac
 
