@@ -19,8 +19,7 @@ Double-clicking on an error message starts an editor.
 %setup -q
 
 %build
-@MAKE_ONLINE_HELP@EOH="--enable-online-help"
-CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr $EOH
+CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr
 make all non-gnu-makes.list
 
 %install
