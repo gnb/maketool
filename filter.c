@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <glib.h>
 #include <regex.h>	/* POSIX regular expression fns */
 #include "filter.h"
@@ -9,8 +10,10 @@ typedef struct
 {
     char *instate;
     regex_t regexp;
-    char *result_str;
-    FilterResult result;
+    char *file_str;
+    char *line_str;
+    char *col_str;
+    FilterCode code;
     char *comment;
 } Filter;
 
@@ -25,9 +28,11 @@ static Filter *
 filter_add(
     const char *instate,
     const char *regexp,
-    const char *result_str,
-    FilterResult result,
-    char *comment)
+    FilterCode code,
+    const char *file_str,
+    const char *line_str,
+    const char *col_str,
+    const char *comment)
 {
     Filter *f = g_new(Filter, 1);
     guint err;
@@ -44,8 +49,10 @@ filter_add(
 	return 0;
     }
     f->instate = strdup(instate);
-    f->result_str = strdup(result_str);
-    f->result = result;
+    f->code = code;
+    f->file_str = strdup(file_str);
+    f->line_str = strdup(line_str);
+    f->col_str = strdup(col_str);
     f->comment = strdup(comment);
     
     /* TODO: this is O(N^2) - try prepending then reversing O(N) */
@@ -58,13 +65,40 @@ filter_add(
 void
 filter_load(void)
 {
-    filter_add("", "^[^:]+:[0-9]+: \\(Each undeclared identifier is reported only once", "", FR_INFORMATION,
+    filter_add(
+    	"",
+	"^[^:]+:[0-9]+: \\(Each undeclared identifier is reported only once",
+	FR_INFORMATION,
+	"",
+	"",
+	"",
     	"gcc spurious message #1");
-    filter_add("", "^[^:]+:[0-9]+: for each function it appears in.\\)", "", FR_INFORMATION,
+
+    filter_add(
+    	"",
+	"^[^:]+:[0-9]+: for each function it appears in.\\)",
+	FR_INFORMATION,
+	"",
+	"",
+	"",
     	"gcc spurious message #2");
-    filter_add("", "^([^:]+):([0-9]+): warning:", "\\1|\\2|-1", FR_WARNING,
+	
+    filter_add(
+    	"",
+	"^([^:]+):([0-9]+): warning:",
+	FR_WARNING,
+	"\\1",
+	"\\2",
+	"",
     	"gcc warnings");
-    filter_add("", "^([^:]+):([0-9]+): ", "\\1|\\2|-1", FR_ERROR,
+	
+    filter_add(
+    	"",
+	"^([^:]+):([0-9]+): ",
+	FR_ERROR,
+	"\\1",
+	"\\2",
+	"",
     	"gcc errors");
 }
 
@@ -77,67 +111,83 @@ filter_init(void)
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-#define NUM_MATCHES 9
 
-FilterResult
-filter_apply_one(
-    Filter *f,
+static void
+filter_replace_matches(
+    const char *in,
+    char *out,
     const char *line,
-    char *result_str,
-    int result_len)
+    regmatch_t *matches)
 {
-    const char *in;
-    char *out;
-    regmatch_t matches[NUM_MATCHES];
-    
-    if (regexec(&f->regexp, line, NUM_MATCHES, matches, 0))
-    	return FR_UNDEFINED;	/* no match */
-
-    /*
-     * Set the result_str using the matched subexpressions.
-     */	
-    for (in = f->result_str, out = result_str ; *in ; in++)
+    for ( ; *in ; in++)
     {
-    	if (*in == '\\' && *in >= '1' && *in <= '9')
+    	if (*in == '\\' && in[1] >= '1' && in[1] <= '9')
 	{
-	    int n = (*in - '1');
+	    int n = (in[1] - '0');
 	    if (matches[n].rm_so >= 0)
 	    {
-	    	int len = matches[n].rm_eo - matches[n].rm_so + 1;
+	    	int len = matches[n].rm_eo - matches[n].rm_so;
 		memcpy(out, line + matches[n].rm_so, len);
 		out += len;
 	    }
+	    in++;
 	    /*TODO: check result_len */
 	}
 	else
 	    *out++ = *in;
     }
     *out = '\0';
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+#define NUM_MATCHES 9
+
+void
+filter_apply_one(
+    Filter *f,
+    const char *line,
+    FilterResult *result)
+{
+    regmatch_t matches[NUM_MATCHES];
+    static char buf[1024];
     
-    /* TODO:??? parse into file,line,col?? */
-    
-    return f->result;
+    if (regexec(&f->regexp, line, NUM_MATCHES, matches, 0))
+    {
+    	result->code = FR_UNDEFINED;	/* no match */
+	return;
+    }
+
+    /*
+     * Set the result using the matched subexpressions.
+     */
+    filter_replace_matches(f->line_str, buf, line, matches);
+    result->line = atoi(buf);
+    filter_replace_matches(f->col_str, buf, line, matches);
+    result->column = atoi(buf);
+    filter_replace_matches(f->file_str, buf, line, matches);
+    result->file = buf;
+    result->code = f->code;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-FilterResult
-filter_apply(const char *line, char *result_str, int result_len)
+void
+filter_apply(const char *line, FilterResult *result)
 {
     GList *fl;
     
     for (fl=filters ; fl != 0 ; fl=fl->next)
     {
-    	FilterResult res;
 	Filter *f = (Filter*)fl->data;
-	res = filter_apply_one(f, line, result_str, result_len);
+	filter_apply_one(f, line, result);
 #if DEBUG
-	fprintf(stderr, "filter [%s] on \"%s\" -> %d\n", f->comment, line, (int)res);
+	fprintf(stderr, "filter [%s] on \"%s\" -> %d\n",
+		f->comment, line, (int)result->code);
 #endif
-	if (res != FR_UNDEFINED)
-	    return res;
+	if (result->code != FR_UNDEFINED)
+	    return;
     }
-    return FR_UNDEFINED;
+    result->code = FR_UNDEFINED;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

@@ -14,10 +14,18 @@ typedef enum
     FR_POPDIR,		/* pop directory stack */
     
     FR_PENDING		/* result_str is new state for recognition machine */
+} FilterCode;
+
+typedef struct
+{
+    FilterCode code;
+    char *file;
+    int line;
+    int column;
 } FilterResult;
 
 void filter_load(void);
 void filter_init(void);
-FilterResult filter_apply(const char *line, char *result_str, int result_len);
+void filter_apply(const char *line, FilterResult *result);
 
 #endif /* _FILTER_H_ */

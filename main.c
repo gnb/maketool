@@ -11,19 +11,43 @@
 #include "filter.h"
 
 
+typedef struct
+{
+#if 0
+    char *text[2];	/* 2 verbosity levels */
+#endif
+    FilterResult res;
+    GtkCTreeNode *node;
+} LogRec;
+
+typedef enum
+{
+    SET_NOTEMPTY,
+    SET_NOTRUNNING,
+    SET_RUNNING,
+
+    NUM_SETS
+} WidgetSet;
+
+#ifndef GTK_CTREE_IS_EMPTY
+#define GTK_CTREE_IS_EMPTY(_ctree_) \
+	(gtk_ctree_node_nth(GTK_CTREE(_ctree_), 0) == 0)
+#endif
+
 const char	*argv0;
 char		**targets;
 int		numTargets;
 int		currentTarget;
 GtkWidget	*toplevel;
-GtkWidget	*menubar, *toolbar, *messagebox;
+GtkWidget	*toolbar, *messagebox;
 GtkWidget	*logwin, *messageent;
-GList		*widgets_notempty, *widgets_notrunning, *widgets_running;
+GList		*widgets[NUM_SETS];
 pid_t		currentPid = -1;
 gint		currentInput;
 int		currentFd;
 int		numErrors;
 int		numWarnings;
+GList		*log;	/* list of LogRecs */
 
 #define ANIM_MAX 8
 GdkPixmap	*animPixmaps[ANIM_MAX+1];
@@ -37,6 +61,29 @@ GdkColor	warningBackground, errorBackground;
 #define SPACING 4
 
 #define PASTE3(x,y,z) x##y##z
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static LogRec *
+lr_new(const char *line, const FilterResult *res)
+{
+    LogRec *lr;
+    
+    lr = g_new(LogRec, 1);
+    lr->res = *res;
+    if (lr->res.file != 0)
+	lr->res.file = g_strdup(lr->res.file);	/* TODO: hashtable */
+
+    return lr;
+}
+
+static void
+lr_delete(LogRec *lr)
+{
+    if (lr->res.file != 0)
+    	g_free(lr->res.file);
+    g_free(lr);
+}
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -56,25 +103,29 @@ message(const char *fmt, ...)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-widget_list_set_sensitive(GList *list, gboolean b)
+widgets_set_sensitive(WidgetSet set, gboolean b)
 {
-    while (list != 0)
-    {
+    GList *list;
+    
+    for (list = widgets[set] ; list != 0 ; list = list->next)
     	gtk_widget_set_sensitive(GTK_WIDGET(list->data), b);
-    	list = list->next;
-    }
 }
 
+static void
+widgets_add(WidgetSet set, GtkWidget *w)
+{
+    widgets[set] = g_list_prepend(widgets[set], w);
+}
 
 static void
 grey_menu_items(void)
 {
     gboolean running = (currentPid > 0);
-    gboolean empty = (gtk_text_get_length(GTK_TEXT(logwin)) > 0);
+    gboolean empty = GTK_CTREE_IS_EMPTY(logwin);
 
-    widget_list_set_sensitive(widgets_notrunning, !running);
-    widget_list_set_sensitive(widgets_running, running);
-    widget_list_set_sensitive(widgets_notempty, empty);
+    widgets_set_sensitive(SET_NOTRUNNING, !running);
+    widgets_set_sensitive(SET_RUNNING, running);
+    widgets_set_sensitive(SET_NOTEMPTY, !empty);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -152,22 +203,26 @@ static GList *directoryStack = 0;
 static void
 handleLine(char *line)
 {
-    gboolean do_grey = (gtk_text_get_length(GTK_TEXT(logwin)) == 0);
+    gboolean was_empty = GTK_CTREE_IS_EMPTY(logwin);
     GdkFont *font = 0;
     GdkColor *fore = 0;
     GdkColor *back = 0;
     FilterResult res;
-    char result_str[1024];
-    
-    result_str[0] = '\0';
-    res = filter_apply(line, result_str, sizeof(result_str));
+    LogRec *lr;
+
+    res.file = 0;
+    res.line = 0;
+    res.column = 0;
+    filter_apply(line, &res);
 #if DEBUG
-    fprintf(stderr, "filter_apply: \"%s\" -> %d \"%s\"\n", line, res, result_str);
+    fprintf(stderr, "filter_apply: \"%s\" -> %d \"%s\" %d\n",
+    	line, (int)res.code, res.file, res.line);
 #endif
-    switch (res)
+    switch (res.code)
     {
     case FR_UNDEFINED:		/* same as INFORMATION */
     case FR_INFORMATION:
+    	res.code = FR_INFORMATION;
     	/* use default font, fgnd, bgnd */
     	break;
     case FR_WARNING:
@@ -195,20 +250,30 @@ handleLine(char *line)
     	/* TODO: */
     	break;
     }
-    
-#if DEBUG    
-    gtk_text_insert(GTK_TEXT(logwin), font, fore, back, "-->", 3);
-#endif
-    gtk_text_insert(GTK_TEXT(logwin), font, fore, back, line, -1);
-#if DEBUG
-    gtk_text_insert(GTK_TEXT(logwin), font, fore, back, "<--\n", 4);
-#else
-    gtk_text_insert(GTK_TEXT(logwin), 0, 0, 0, "\n", 1);
-#endif
 
-    if (do_grey)
-    	grey_menu_items();
+    lr = lr_new(line, &res);
+    log = g_list_append(log, lr);		/* TODO: fix O(N^2) */
+
+    /* TODO: freeze & thaw if it redraws the wrong colour 1st */
+    lr->node = gtk_ctree_insert_node(GTK_CTREE(logwin),
+    	(GtkCTreeNode*)0,			/* parent */
+	(GtkCTreeNode*)0,			/* sibling */
+	&line,					/* text[] */
+	0,					/* spacing */
+	(GdkPixmap *)0, (GdkBitmap *)0,		/* pixmap_closed,mask_closed */
+	(GdkPixmap *)0, (GdkBitmap *)0,		/* pixmap_opened,mask_opened */
+	TRUE,					/* is_leaf */
+	TRUE);					/* expanded */
+    gtk_ctree_node_set_row_data(GTK_CTREE(logwin), lr->node, (gpointer)lr);
+    if (fore != 0)
+	gtk_ctree_node_set_foreground(GTK_CTREE(logwin), lr->node, fore);
+    if (back != 0)
+    	gtk_ctree_node_set_background(GTK_CTREE(logwin), lr->node, back);
+    
+    if (was_empty)
+    	grey_menu_items();	/* log window just became non-empty */
 }
+
 
 static void
 handleData(char *buf, int len)
@@ -360,11 +425,29 @@ show_widget_cb(GtkWidget *w, gpointer data)
 static void
 clear_log_cb(GtkWidget *w, gpointer data)
 {
-    GtkText *lw = GTK_TEXT(logwin);
-    
-    gtk_text_set_point(lw, 0);
-    gtk_text_forward_delete(lw, gtk_text_get_length(lw));
+    /* delete all LogRecs */
+    while (log != 0)
+    {
+    	lr_delete((LogRec *)log->data);
+	log = g_list_remove_link(log, log);
+    }
+
+    /* clear the log window */
+    gtk_clist_clear(GTK_CLIST(logwin));
+
+    /* update sensitivity of menu items */        
     grey_menu_items();
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+log_click_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gint column, gpointer data)
+{
+    LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, treeNode);
+    
+    fprintf(stderr, "log_click_cb: code=%d file=\"%s\" line=%d\n",
+    	lr->res.code, lr->res.file, lr->res.line);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -483,47 +566,46 @@ uiCreateMenus(GtkWidget *menubar)
     uiAddButton(menu, "Save Log...", unimplemented, 0);
     uiAddSeparator(menu);
     item = uiAddButton(menu, "Change Makefile...", unimplemented, 0);
-    widgets_notrunning = g_list_append(widgets_notrunning, (gpointer)item);
+    widgets_add(SET_NOTRUNNING, item);
     item = uiAddButton(menu, "Change directory...", unimplemented, 0);
-    widgets_notrunning = g_list_append(widgets_notrunning, (gpointer)item);
+    widgets_add(SET_NOTRUNNING, item);
     uiAddSeparator(menu);
     item = uiAddButton(menu, "Print", unimplemented, 0);
-    widgets_notempty = g_list_append(widgets_notempty, (gpointer)item);
+    widgets_add(SET_NOTEMPTY, item);
     uiAddButton(menu, "Print Settings...", unimplemented, 0);
     uiAddSeparator(menu);
     uiAddButton(menu, "Exit", file_exit_cb, 0);
     
     menu = uiAddMenu(menubar, "Build");
     item = uiAddButton(menu, "Again", unimplemented, 0);
-    widgets_notrunning = g_list_append(widgets_notrunning, (gpointer)item);
+    widgets_add(SET_NOTRUNNING, item);
     item = uiAddButton(menu, "Stop", unimplemented, 0);
-    widgets_running = g_list_append(widgets_running, (gpointer)item);
+    widgets_add(SET_RUNNING, item);
     uiAddSeparator(menu);
     item = uiAddButton(menu, "all", build_cb, "all");
-    widgets_notrunning = g_list_append(widgets_notrunning, (gpointer)item);
+    widgets_add(SET_NOTRUNNING, item);
     item = uiAddButton(menu, "install", build_cb, "install");
-    widgets_notrunning = g_list_append(widgets_notrunning, (gpointer)item);
+    widgets_add(SET_NOTRUNNING, item);
     item = uiAddButton(menu, "clean", build_cb, "clean");
-    widgets_notrunning = g_list_append(widgets_notrunning, (gpointer)item);
+    widgets_add(SET_NOTRUNNING, item);
     uiAddSeparator(menu);
 #if 1
     item = uiAddButton(menu, "random", build_cb, "random");
-    widgets_notrunning = g_list_append(widgets_notrunning, (gpointer)item);
+    widgets_add(SET_NOTRUNNING, item);
     item = uiAddButton(menu, "delay", build_cb, "delay");
-    widgets_notrunning = g_list_append(widgets_notrunning, (gpointer)item);
+    widgets_add(SET_NOTRUNNING, item);
     item = uiAddButton(menu, "targets", build_cb, "targets");
-    widgets_notrunning = g_list_append(widgets_notrunning, (gpointer)item);
+    widgets_add(SET_NOTRUNNING, item);
 #endif
     
     menu = uiAddMenu(menubar, "View");
     item = uiAddButton(menu, "Clear Log", clear_log_cb, 0);
-    widgets_notempty = g_list_append(widgets_notempty, (gpointer)item);
+    widgets_add(SET_NOTEMPTY, item);
     item = uiAddButton(menu, "Edit Next Error", unimplemented, 0);
-    widgets_notempty = g_list_append(widgets_notempty, (gpointer)item);
+    widgets_add(SET_NOTEMPTY, item);
     item = uiAddButton(menu, "Edit Prev Error", unimplemented, 0);
-    widgets_notempty = g_list_append(widgets_notempty, (gpointer)item);
+    widgets_add(SET_NOTEMPTY, item);
     uiAddSeparator(menu);
-    uiAddToggle(menu, "Menubar", show_widget_cb, (gpointer)&menubar, 0, TRUE);
     uiAddToggle(menu, "Toolbar", show_widget_cb, (gpointer)&toolbar, 0, TRUE);
     uiAddToggle(menu, "Messages", show_widget_cb, (gpointer)&messagebox, 0, TRUE);
     uiAddSeparator(menu);
@@ -619,12 +701,14 @@ static void
 uiCreate(void)
 {
     GtkWidget *mainvbox, *vbox; /* need 2 for correct spacing */
+    GtkWidget *menubar;
     GtkTooltips *tooltips;
-    GtkWidget *sb, *logbox;
+    GtkWidget *sb, *sw;
+    static char *titles[1] = { "Log" };
     
     toplevel = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(toplevel), "Maketool 0.1");
-    gtk_widget_set_usize(toplevel, 600, 500);
+    gtk_widget_set_usize(toplevel, 300, 500);
     gtk_signal_connect(GTK_OBJECT(toplevel), "destroy", 
     	GTK_SIGNAL_FUNC(file_exit_cb), NULL);
     gtk_container_border_width(GTK_CONTAINER(toplevel), 0);
@@ -653,19 +737,26 @@ uiCreate(void)
     uiCreateTools(toolbar);
     gtk_widget_show(GTK_WIDGET(toolbar));
     
-    logbox = gtk_hbox_new(FALSE, SPACING);
-    gtk_box_pack_start(GTK_BOX(vbox), logbox, TRUE, TRUE, 0);
-    gtk_container_border_width(GTK_CONTAINER(logbox), 0);
-    gtk_widget_show(GTK_WIDGET(logbox));
-    
-    logwin = gtk_text_new(0, 0);
-    gtk_text_set_editable(GTK_TEXT(logwin), FALSE);
-    gtk_box_pack_start(GTK_BOX(logbox), logwin, TRUE, TRUE, 0);   
+    sw = gtk_scrolled_window_new(0, 0);
+    gtk_container_border_width(GTK_CONTAINER(sw), 0);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
+    	GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_box_pack_start(GTK_BOX(vbox), sw, TRUE, TRUE, 0);
+    gtk_widget_show(GTK_WIDGET(sw));
+
+    logwin = gtk_ctree_new_with_titles(1, 0, titles);
+    gtk_ctree_set_line_style(GTK_CTREE(logwin), GTK_CTREE_LINES_NONE);
+    gtk_clist_column_titles_hide(GTK_CLIST(logwin));
+    gtk_clist_set_column_width(GTK_CLIST(logwin), 0, 400);
+    gtk_clist_set_column_auto_resize(GTK_CLIST(logwin), 0, TRUE);
+    gtk_signal_connect(GTK_OBJECT(logwin), "tree-select-row", 
+    	GTK_SIGNAL_FUNC(log_click_cb), 0);
+    gtk_container_add(GTK_CONTAINER(sw), logwin);
+    gtk_scrolled_window_set_hadjustment(GTK_SCROLLED_WINDOW(sw),
+    	GTK_CLIST(logwin)->hadjustment);
+    gtk_scrolled_window_set_vadjustment(GTK_SCROLLED_WINDOW(sw),
+    	GTK_CLIST(logwin)->vadjustment);
     gtk_widget_show(logwin);
-    
-    sb = gtk_vscrollbar_new(GTK_TEXT(logwin)->vadj);
-    gtk_box_pack_start(GTK_BOX(logbox), sb, FALSE, FALSE, 0);   
-    gtk_widget_show(sb);
     
     messagebox = gtk_hbox_new(FALSE, SPACING);
     gtk_box_pack_start(GTK_BOX(vbox), messagebox, FALSE, FALSE, 0);
