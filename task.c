@@ -31,7 +31,7 @@
 #include <sys/filio.h>
 #endif
 
-CVSID("$Id: task.c,v 1.15 2003-09-26 14:22:27 gnb Exp $");
+CVSID("$Id: task.c,v 1.16 2003-09-27 13:36:42 gnb Exp $");
 
 /*
  * TODO: GDK is used only for the gdk_input_*() functions, which
@@ -62,6 +62,7 @@ task_init(
 Task *
 task_create(Task *task, char *command, char **env, TaskOps *ops, int flags)
 {
+    task->refcount = 1;
     task->pid = -1;
     task->command = command;
     task->environ = env;
@@ -96,6 +97,20 @@ task_destroy(Task *task)
 	(*task->ops->destroy)(task);
     estring_free(&task->linebuf);
     g_free(task);
+}
+
+
+void
+task_ref(Task *task)
+{
+    task->refcount++;
+}
+
+void
+task_unref(Task *task)
+{
+    if (--task->refcount == 0)
+    	task_destroy(task);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -182,7 +197,7 @@ task_reap_func(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     	task_linemode_input(task, 0, 0);
     if (task->ops->reap != 0)
 	(*task->ops->reap)(task);
-    task_destroy(task);
+    task_unref(task);
     
     if (was_enqueued)
     {
@@ -382,16 +397,16 @@ task_spawn(Task *task)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-/* TODO: task object is leaked and possibly app logic confused if spawn fails */
-
 gboolean
 task_run(Task *task)
 {
     if (!task_spawn(task))
     	return FALSE;
     
+    task_ref(task);    
     while (task->pid != -1)
     	g_main_iteration(/*block*/TRUE);
+    task_unref(task);
 	
     return TRUE;
 }

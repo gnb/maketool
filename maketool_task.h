@@ -30,6 +30,7 @@ typedef struct _TaskOps TaskOps;
 
 struct _Task
 {
+    int refcount;
     char *command;
     char **environ;
     pid_t pid;
@@ -71,6 +72,7 @@ void task_init(
  * Equivalent of an inherited c'tor -- initialises the Task struct.
  * `command' is assumed to be a new string which is g_free()d later.
  * `env' is *not* g_free()d -- WARNING.
+ * Created with a reference count of 1.
  */
 Task *task_create(Task *, char *command, char **env, TaskOps *, int flags);
 
@@ -111,6 +113,11 @@ void task_kill_current(void);
  * Only useful inside a TaskOps reap handler.
  */
 gboolean task_is_successful(const Task *);
+
+/* Increment the task reference count */
+void task_ref(Task *);
+/* Decrement the task reference count; if zero free the Task */
+void task_unref(Task *);
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
