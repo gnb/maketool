@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.8 1999-07-04 00:56:05 gnb Exp $
+# $Id: Makefile.in,v 1.9 1999-07-14 06:16:04 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -178,3 +178,30 @@ rpm: dist
 configure: configure.in
 	autoconf --localdir=/usr/share/aclocal
 	
+##
+# deps
+	
+objs/filter.o:\
+filter.h common.h config.h
+objs/glib_extra.o:\
+common.h config.h glib_extra.h
+objs/help.o:\
+maketool.h common.h config.h spawn.h glib_extra.h ui.h util.h icons/maketool_l.xpm
+objs/log.o:\
+maketool.h common.h config.h filter.h log.h util.h icons/error.xpm icons/warning.xpm\
+icons/info.xpm
+objs/main.o:\
+maketool.h common.h config.h spawn.h glib_extra.h ui.h log.h filter.h util.h icons/all.xpm\
+icons/again.xpm icons/clean.xpm icons/clear.xpm icons/next.xpm icons/print.xpm icons/anim0.xpm\
+icons/anim0a.xpm icons/anim1.xpm icons/anim1a.xpm icons/anim1b.xpm icons/anim2.xpm\
+icons/anim2a.xpm icons/anim3.xpm icons/anim3a.xpm icons/anim3b.xpm icons/anim4.xpm\
+icons/anim4a.xpm icons/anim5.xpm icons/anim6.xpm icons/anim7.xpm icons/anim8.xpm\
+icons/maketool.xpm icons/stop.xpm
+objs/preferences.o:\
+ui.h common.h config.h maketool.h util.h
+objs/spawn.o:\
+spawn.h common.h config.h glib_extra.h
+objs/ui.o:\
+ui.h common.h config.h util.h
+objs/util.o:\
+util.h common.h config.h
