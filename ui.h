@@ -73,7 +73,8 @@ GtkWidget *ui_add_button_2(
     const char *accel,
     void (*callback)(GtkWidget*, gpointer),
     gpointer calldata,
-    gint group);
+    gint group,
+    gint position);
 GtkWidget *ui_add_tearoff(GtkWidget *menu);
 GtkWidget *ui_add_toggle(
     GtkWidget *menu,
@@ -141,6 +142,7 @@ void ui_config_set_int(const char *name, int val);
 void ui_config_set_enum(const char *name, int val, UiEnumRec *enumdef);
 void ui_config_set_flags(const char *name, int val, UiEnumRec *enumdef);
 void ui_config_set_boolean(const char *name, gboolean val);
+void ui_config_backup(void);
 void ui_config_sync(void);
 
 /* uix.c */

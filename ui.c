@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.29 2003-04-28 11:46:40 gnb Exp $");
+CVSID("$Id: ui.c,v 1.30 2003-05-04 04:27:56 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -192,7 +192,8 @@ _ui_add_menu_aux(
     GtkWidget *parent,	    /* menubar or menu */
     const char *label,
     gboolean douline,
-    gboolean is_right)
+    gboolean is_right,
+    gint position)
 {
     GtkWidget *menu, *item;
     guint uline_key = 0;
@@ -209,9 +210,19 @@ _ui_add_menu_aux(
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), menu);
 
     if (GTK_IS_MENU_BAR(parent))
-	gtk_menu_bar_append(GTK_MENU_BAR(parent), item);
+    {
+    	if (position < 0)
+	    gtk_menu_bar_append(GTK_MENU_BAR(parent), item);
+	else
+	    gtk_menu_bar_insert(GTK_MENU_BAR(parent), item, position);
+    }
     else
-	gtk_menu_append(GTK_MENU(parent), item);
+    {
+    	if (position < 0)
+	    gtk_menu_append(GTK_MENU(parent), item);
+	else
+	    gtk_menu_insert(GTK_MENU(parent), item, position);
+    }
     
     if (is_right)
     	gtk_menu_item_right_justify(GTK_MENU_ITEM(item));
@@ -222,19 +233,19 @@ _ui_add_menu_aux(
 GtkWidget *
 ui_add_menu(GtkWidget *menubar, const char *label)
 {
-    return _ui_add_menu_aux(menubar, label, TRUE, FALSE);
+    return _ui_add_menu_aux(menubar, label, TRUE, FALSE, -1);
 }
 
 GtkWidget *
 ui_add_menu_right(GtkWidget *menubar, const char *label)
 {
-    return _ui_add_menu_aux(menubar, label, TRUE, TRUE);
+    return _ui_add_menu_aux(menubar, label, TRUE, TRUE, -1);
 }
 
 GtkWidget *
 ui_add_submenu(GtkWidget *menu, gboolean douline, const char *label)
 {
-    return _ui_add_menu_aux(menu, label, douline, FALSE);
+    return _ui_add_menu_aux(menu, label, douline, FALSE, -1);
 }
 
 
@@ -296,7 +307,8 @@ ui_add_button_2(
     const char *accel,
     void (*callback)(GtkWidget*, gpointer),
     gpointer calldata,
-    gint group)
+    gint group,
+    gint position)
 {
     GtkWidget *item;
     guint uline_key = 0;
@@ -304,7 +316,10 @@ ui_add_button_2(
     item = gtk_menu_item_new();
     _ui_create_label(item, label, (douline ? &uline_key : 0));
 
-    gtk_menu_append(GTK_MENU(menu), item);
+    if (position < 0)
+	gtk_menu_append(GTK_MENU(menu), item);
+    else
+	gtk_menu_insert(GTK_MENU(menu), item, position);
     gtk_signal_connect(GTK_OBJECT(item), "activate", 
     	GTK_SIGNAL_FUNC(callback), calldata);
     if (group >= 0)
@@ -331,7 +346,7 @@ ui_add_button(
     gpointer calldata,
     gint group)
 {
-    return ui_add_button_2(menu, label, TRUE, accel, callback, calldata, group);
+    return ui_add_button_2(menu, label, TRUE, accel, callback, calldata, group, -1);
 }
 
 
@@ -994,6 +1009,17 @@ ui_config_set_boolean(const char *name, gboolean val)
     ui_config_set_enum(name, (val ? TRUE : FALSE), ui_boolean_enum_def);
 }
 
+
+void
+ui_config_backup(void)
+{
+    char *bakfile;
+    
+    bakfile = g_strconcat(ui_config_filename, ".OLD", 0);
+    if (rename(ui_config_filename, bakfile) < 0)
+    	perror(bakfile);
+    g_free(bakfile);
+}
 
 static void
 ui_config_save_one(gpointer keyp, gpointer valuep, gpointer user_data)
