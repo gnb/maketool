@@ -23,7 +23,7 @@
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.35 2003-02-09 04:58:21 gnb Exp $");
+CVSID("$Id: help.c,v 1.36 2003-05-04 04:15:18 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*options_shell = 0;
@@ -192,10 +192,8 @@ help_about_cb(GtkWidget *w, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-#include "babygnu_l.xpm"
-#define LOGO babygnu_l_xpm
-
 static estring make_version = ESTRING_STATIC_INIT;
+static MakeProgram *make_version_makeprog;
 
 static void
 make_version_input(Task *task, int len, const char *buf)
@@ -212,24 +210,31 @@ static void
 create_about_make_shell(void)
 {
     GtkWidget *label;
-    GtkWidget *icon;
     GtkWidget *hbox;
-    GdkPixmap *pm;
-    GdkBitmap *mask;
+    char *title;
 
-    about_make_shell = ui_create_ok_dialog(toplevel, _("Maketool: About Make"));
+    title = g_strdup_printf(_("Maketool: About %s"), makeprog->label);
+    about_make_shell = ui_create_ok_dialog(toplevel, title);
     ui_set_help_name(about_make_shell, "about-make-window");
+    g_free(title);
 
     hbox = gtk_hbox_new(FALSE, 5);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_make_shell)->vbox), hbox);
     gtk_container_border_width(GTK_CONTAINER(hbox), SPACING);
     gtk_widget_show(hbox);
 
-    pm = gdk_pixmap_create_from_xpm_d(toplevel->window,
-    		&mask, 0, LOGO);
-    icon = gtk_pixmap_new(pm, mask);
-    gtk_container_add(GTK_CONTAINER(hbox), icon);
-    gtk_widget_show(icon);
+    if (makeprog->logo_xpm != 0)
+    {
+	GdkPixmap *pm;
+	GdkBitmap *mask;
+	GtkWidget *icon;
+
+	pm = gdk_pixmap_create_from_xpm_d(toplevel->window,
+    		    &mask, 0, makeprog->logo_xpm);
+	icon = gtk_pixmap_new(pm, mask);
+	gtk_container_add(GTK_CONTAINER(hbox), icon);
+	gtk_widget_show(icon);
+    }
 
     label = gtk_label_new(make_version.data);
     gtk_container_add(GTK_CONTAINER(hbox), label);
@@ -269,13 +274,22 @@ help_about_make_cb(GtkWidget *w, gpointer data)
 {
     /* TODO: grey out menu item while make --version running */
 
-    if (make_version.data == 0)
+    if (make_version.data == 0 ||
+    	make_version_makeprog != makeprog)
     {
     	/* 
-	 * First time.  Haven't yet extracted version info from `make',
+	 * First time, or makeprog has been changed since last time.
+	 * Haven't yet extracted version info from `make',
 	 * so start `make' and delay creation of dialog box until we
 	 * have the output, i.e. in the reap function.
 	 */
+	if (about_make_shell != 0)
+	{
+	    gtk_widget_destroy(about_make_shell);
+	    about_make_shell = 0;
+	}
+	estring_truncate(&make_version);
+	make_version_makeprog = makeprog;
     	task_spawn(make_version_task());
     }
     else
