@@ -32,7 +32,7 @@
 #include "mqueue.h"
 #include "progress.h"
 
-CVSID("$Id: main.c,v 1.109 2003-10-29 12:39:18 gnb Exp $");
+CVSID("$Id: main.c,v 1.110 2003-10-30 14:19:44 gnb Exp $");
 
 
 /*
@@ -72,7 +72,9 @@ GtkWidget   	*target_history_menu;
 const char * const again_menu_label[2] = { N_("_Again"), N_("_Again (%s)") };
 const char * const again_tool_tooltip[2] = { N_("Build last target again"), N_("Build `%s' again") };
 #if HAVE_BSD_JOB_CONTROL
-GtkWidget   	*pause_tool_item;
+GtkWidget   	*pause_menu_item, *pause_tool_item;
+const char * const pause_menu_label[2] = {
+    N_("_Pause"), N_("_Resume") };
 const char * const pause_tool_tooltip[2] = {
     N_("Pause current build"),
     N_("Resume current build")
@@ -1473,6 +1475,7 @@ static void
 build_pause_cb(GtkWidget *w, gpointer data)
 {
     gboolean paused;
+    GtkLabel *label;
 
     if (!task_is_running())
     	return;
@@ -1493,6 +1496,11 @@ build_pause_cb(GtkWidget *w, gpointer data)
     /* Update the tooltip on the Pause tool */
     gtk_tooltips_set_tip(GTK_TOOLBAR(toolbar)->tooltips, pause_tool_item,
     	_(pause_tool_tooltip[paused]), 0);
+
+    /* Update the label on the Pause menu item */
+    label = GTK_LABEL(GTK_BIN(pause_menu_item)->child);
+    gtk_label_set_text(label, _(pause_menu_label[paused]));
+    gtk_label_parse_uline(label, _(pause_menu_label[paused]));
 }
 #endif /*HAVE_BSD_JOB_CONTROL*/
 
@@ -1761,6 +1769,10 @@ construct_build_menu_basic_items(void)
     
     again_menu_item = ui_add_button(build_menu, _(again_menu_label[0]), "<Ctrl>A", build_again_cb, 0, GR_AGAIN);
     ui_add_button(build_menu, _("_Stop"), 0, build_stop_cb, 0, GR_RUNNING);
+#if HAVE_BSD_JOB_CONTROL
+    pause_menu_item = ui_add_button(build_menu, _(pause_menu_label[0]),
+    	    	    	    	    "<Ctrl>Z", build_pause_cb, 0, GR_RUNNING);
+#endif
     ui_add_toggle(build_menu, _("_Dryrun Only"), "<Ctrl>D", build_dryrun_cb, 0,
     	0, prefs.dryrun);
 
