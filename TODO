@@ -206,6 +206,6 @@ x  Handle column in Java errors.
 
 x  ability to recursively delete a node from the log window
 
-x  tooltip for `again' icon, and possibly menu item, should mention
+x  DONE: tooltip for `again' icon, and possibly menu item, should mention
    what the actual last target is.
    

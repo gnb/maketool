@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.44 1999-11-07 10:24:03 gnb Exp $");
+CVSID("$Id: main.c,v 1.45 1999-11-26 07:35:16 gnb Exp $");
 
 typedef enum
 {
@@ -62,6 +62,8 @@ estring     	leftover = ESTRING_STATIC_INIT;
 GdkPixmap	*anim_pixmaps[ANIM_MAX+1];
 GdkBitmap	*anim_masks[ANIM_MAX+1];
 GtkWidget	*anim;
+GtkWidget   	*toolbar;
+GtkWidget   	*again_menu_item, *again_tool_item;
 
 /*
  * These are the targets specifically mentioned in the
@@ -214,6 +216,33 @@ expand_prog(
     estring_free(&fflag);
     
     return out;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+set_last_target(const char *target)
+{
+    GtkLabel *label;
+    char *menulabel;
+    char *tooltip;
+    
+    last_target = target;
+    
+    /* Note: this assumes that the accelerator remains constant, i.e. Ctrl+A,
+     *       even though the position of the underscore in the label
+     *       may change.
+     */
+    menulabel = g_strdup_printf(_("_Again (%s)"), last_target);
+    label = GTK_LABEL(GTK_BIN(again_menu_item)->child);
+    gtk_label_set_text(label, menulabel);
+    gtk_label_parse_uline(label, menulabel);
+    g_free(menulabel);
+
+    tooltip = g_strdup_printf(_("Build `%s' again"), last_target);
+    gtk_tooltips_set_tip(GTK_TOOLBAR(toolbar)->tooltips, again_tool_item,
+    	tooltip, 0);
+    g_free(tooltip);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -688,7 +717,7 @@ build_start(const char *target)
 	break;
     }
 
-    last_target = target;
+    set_last_target(target);
     interrupted = FALSE;
     first_error = TRUE;
     {
@@ -992,7 +1021,7 @@ ui_create_menus(GtkWidget *menubar)
     menu = ui_add_menu(menubar, _("_Build"));
     build_menu = menu;
     ui_add_tearoff(menu);
-    ui_add_button(menu, _("_Again"), "<Ctrl>A", build_again_cb, 0, GR_AGAIN);
+    again_menu_item = ui_add_button(menu, _("_Again"), "<Ctrl>A", build_again_cb, 0, GR_AGAIN);
     ui_add_button(menu, _("_Stop"), 0, build_stop_cb, 0, GR_RUNNING);
     ui_add_toggle(menu, _("_Dryrun Only"), "<Ctrl>D", build_dryrun_cb, 0,
     	0, prefs.dryrun);
@@ -1055,7 +1084,7 @@ ui_create_tools(GtkWidget *toolbar)
 {
     char *tooltip;
     
-    ui_tool_create(toolbar, _("Again"), _("Build last target again"),
+    again_tool_item = ui_tool_create(toolbar, _("Again"), _("Build last target again"),
     	again_xpm, build_again_cb, 0, GR_AGAIN);
 
     ui_tool_create(toolbar, _("Stop"), _("Stop current build"),
@@ -1139,7 +1168,7 @@ static void
 ui_create(void)
 {
     GtkWidget *table;
-    GtkWidget *menubar, *toolbar, *logwin;
+    GtkWidget *menubar, *logwin;
     GtkWidget *handlebox;
     GtkTooltips *tooltips;
     GtkWidget *sw;
