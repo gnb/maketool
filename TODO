@@ -1,5 +1,24 @@
 --- open ---
 
+x  memleak:
+==5761== 3074 bytes in 222 blocks are definitely lost in loss record 73 of 82
+==5761==    at 0x40044364: malloc (vg_clientfuncs.c:100)
+==5761==    by 0x403C58BC: g_malloc (in /usr/lib/libglib-1.2.so.0.0.10)
+==5761==    by 0x403CE421: g_strdup (in /usr/lib/libglib-1.2.so.0.0.10)
+==5761==    by 0x805FC82: gmake_list_targets_input (gmake.c:200)
+==5761==    by 0x8061DB7: task_linemode_input (task.c:143)
+==5761==    by 0x8061F83: task_input_func (task.c:237)
+==5761==    by 0x40391A66: gdk_io_invoke (in /usr/lib/libgdk-1.2.so.0.9.1)
+==5761==    by 0x403C2F9E: g_io_unix_dispatch (in /usr/lib/libglib-1.2.so.0.0.10)
+==5761==    by 0x403C4773: g_main_dispatch (in /usr/lib/libglib-1.2.so.0.0.10)
+==5761==    by 0x403C4D39: g_main_iterate (in /usr/lib/libglib-1.2.so.0.0.10)
+==5761==    by 0x403C4EEC: g_main_run (in /usr/lib/libglib-1.2.so.0.0.10)
+==5761==    by 0x402E12E3: gtk_main (in /usr/lib/libgtk-1.2.so.0.9.1)
+==5761==    by 0x8053970: main (main.c:2326)
+==5761==    by 0x42017499: (within /lib/i686/libc-2.2.5.so)
+==5761==    by 0x804FCB1: gtk_widget_grab_focus (in /home/gnb/proj/maketool/maketool)
+
+
 x  Force the licence window text widget, the preferences/programs
    pane key label, and (optionally?) the main log window, to be
    fixed width fonts.
