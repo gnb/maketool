@@ -1,0 +1,7 @@
+Makefile
+configure
+config.log
+config.cache
+config.status
+.maketool_makefile
+*.bck
