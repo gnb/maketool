@@ -24,7 +24,7 @@
 #include <regex.h>	/* POSIX regular expression fns */
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: find.c,v 1.7 2000-07-23 11:44:33 gnb Exp $");
+CVSID("$Id: find.c,v 1.8 2000-07-29 15:18:14 gnb Exp $");
 
 #define FINDCASE 0  	/* TODO: implement case-insensitive literals */
 
@@ -347,12 +347,6 @@ find_direction_cb(GtkWidget *w, void *user_data)
     	FD_FORWARDS : FD_BACKWARDS);
 }
 
-static void
-find_destroy_cb(GtkWidget *w, void *user_data)
-{
-    find_shell = 0;
-}
-
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
@@ -366,9 +360,7 @@ create_find_shell(void)
     int row = 0;
 
     find_shell = ui_create_dialog(toplevel, _("Maketool: Find"));
-    gtk_signal_connect(GTK_OBJECT(find_shell), "destroy", 
-    	GTK_SIGNAL_FUNC(find_destroy_cb), NULL);
-
+    ui_autonull_pointer(&find_shell);
 
     gtk_container_border_width(GTK_CONTAINER(GTK_DIALOG(find_shell)->vbox), SPACING);
 

@@ -299,7 +299,7 @@ x  DONE: Add filters to support MWOS cross-compiler (see sample mwos.errs)
 
 x  Option to always scroll to end on make output
 
-x  Handle user clicking E's X button on dialogs.
+x  DONE: Handle user clicking E's X button on dialogs.
 
 x  DONE: A.T. Hofkamp says: make_makefile and extract_targets should live
    somewhere like $prefix/libexec/maketool/ not $prefix/bin.

@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.37 2000-07-22 12:48:21 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.38 2000-07-29 15:18:14 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -1205,6 +1205,7 @@ color_choose_cb(GtkWidget *w, gpointer data)
     if (color_dialog == 0)
     {
     	color_dialog = ui_create_ok_dialog(toplevel, "");
+	ui_autonull_pointer(&color_dialog);
     	color_selector = gtk_color_selection_new();
 	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(color_dialog)->vbox),
 	    color_selector);
@@ -1797,7 +1798,10 @@ prefs_create_shell(GtkWidget *toplevel)
 
     prefs_shell = ui_create_apply_dialog(toplevel, _("Maketool: Preferences"),
     	prefs_apply_cb, (gpointer)0);
-
+    ui_autonull_pointer(&prefs_shell);
+    
+    creating = TRUE;
+    
     box = gtk_vbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(prefs_shell)->vbox), box);
     gtk_container_border_width(GTK_CONTAINER(box), SPACING);

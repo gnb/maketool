@@ -22,12 +22,11 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: print.c,v 1.5 2000-07-21 06:12:03 gnb Exp $");
+CVSID("$Id: print.c,v 1.6 2000-07-29 15:18:14 gnb Exp $");
 
 static GtkWidget	*print_shell = 0;
 typedef enum { D_PRINTER, D_FILE, D_NUM_DESTS } DEST;
 static GtkWidget    	*dest_radio[D_NUM_DESTS];
-static GList	    	*dest_widgets[D_NUM_DESTS]; /* widgets to grey out */
 static GtkWidget    	*file_entry;
 static GtkWidget    	*printer_entry;
 
@@ -38,6 +37,8 @@ static GtkWidget    	*printer_entry;
 static GList	    	*lpr_printers = 0;
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static gboolean _lpr_initialised = FALSE;
 
 static void
 _lpr_add_printer(const char *name)
@@ -62,6 +63,10 @@ lpr_init(void)
     FILE *fp;
     gboolean in_entry = FALSE;
     char buf[1024];
+    
+    if (_lpr_initialised)
+    	return;
+    _lpr_initialised = TRUE;
     
     if ((fp = fopen("/etc/printcap", "r")) == 0)
     {
@@ -113,6 +118,10 @@ lpr_init(void)
     FILE *fp;
     char *cmd
     char buf[1024];
+    
+    if (_lpr_initialised)
+    	return;
+    _lpr_initialised = TRUE;
     
     /* TODO: check that lpstat -c (IIRC) and output are correct */
     cmd = g_strdup_print("%s -c", LPSTAT_COMMAND)
@@ -258,11 +267,14 @@ print_file_browse_cb(GtkWidget *w, gpointer data)
     static GtkWidget *filesel = 0;
     
     if (filesel == 0)
+    {
     	filesel = ui_create_file_sel(
 	    	toplevel,
 	    	_("Maketool: Open Log File"),
 		print_file_func,
 		gtk_entry_get_text(GTK_ENTRY(file_entry)));
+    	ui_autonull_pointer(&filesel);
+    }
 
     /* TODO: set current filename from file_entry *every* time */
     /* TODO: modal popup */
@@ -277,15 +289,9 @@ print_dest_changed_cb(GtkWidget *w, gpointer data)
 {
     DEST dest = print_get_dest();
     int i;
-    GList *link;
     
     for (i=0 ; i<D_NUM_DESTS ; i++)
-    {
-	for (link = dest_widgets[i] ; link != 0 ; link = link->next)
-	{
-    	    gtk_widget_set_sensitive(GTK_WIDGET(link->data), (i == dest));
-	}
-    }
+    	ui_group_set_sensitive(GR_PRINT_PRINTER+i, (i == dest));
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -303,6 +309,7 @@ create_print_shell(void)
     lpr_init();
     
     print_shell = ui_create_dialog(toplevel, _("Maketool: Print"));
+    ui_autonull_pointer(&print_shell);
 
     gtk_container_border_width(GTK_CONTAINER(GTK_DIALOG(print_shell)->vbox), SPACING);
 
@@ -331,7 +338,7 @@ create_print_shell(void)
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 3, row, row+1);
     gtk_widget_show(combo);
     printer_entry = GTK_COMBO(combo)->entry;
-    dest_widgets[D_PRINTER] = g_list_append(dest_widgets[D_PRINTER], combo);
+    ui_group_add(GR_PRINT_PRINTER, combo);
 
     row++;    
     
@@ -349,7 +356,7 @@ create_print_shell(void)
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 2, row, row+1);
     gtk_widget_show(combo);
     file_entry = GTK_COMBO(combo)->entry;
-    dest_widgets[D_FILE] = g_list_append(dest_widgets[D_FILE], combo);
+    ui_group_add(GR_PRINT_FILE, combo);
 
     button = gtk_button_new_with_label(_("Browse..."));
     gtk_signal_connect(GTK_OBJECT(button), "clicked", 
@@ -358,7 +365,7 @@ create_print_shell(void)
 		       (GtkAttachOptions)0, (GtkAttachOptions)0,
 		       SPACING, 0);
     gtk_widget_show(button);
-    dest_widgets[D_FILE] = g_list_append(dest_widgets[D_FILE], button);
+    ui_group_add(GR_PRINT_FILE, button);
 
     row++;
     

@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: help.c,v 1.21 2000-07-21 06:12:03 gnb Exp $");
+CVSID("$Id: help.c,v 1.22 2000-07-29 15:18:14 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -47,6 +47,7 @@ licence_cb(GtkWidget *w, gpointer data)
 	GtkWidget *hbox, *text, *sb;
 
 	licence_shell = ui_create_ok_dialog(toplevel, _("Maketool: Licence"));
+	ui_autonull_pointer(&licence_shell);
 	gtk_widget_set_usize(licence_shell, 450, 300);
 
 	hbox = gtk_hbox_new(FALSE, SPACING);
@@ -102,6 +103,7 @@ help_about_cb(GtkWidget *w, gpointer data)
 	char *abt;
 
 	about_shell = ui_create_ok_dialog(toplevel, _("Maketool: About"));
+	ui_autonull_pointer(&about_shell);
 	
 	hbox = gtk_hbox_new(FALSE, 5);
 	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_shell)->vbox), hbox);
@@ -146,32 +148,37 @@ make_version_input(Task *task, int len, const char *buf)
 }
 
 static void
+create_about_make_shell(void)
+{
+    GtkWidget *label;
+    GtkWidget *icon;
+    GtkWidget *hbox;
+    GdkPixmap *pm;
+    GdkBitmap *mask;
+
+    about_make_shell = ui_create_ok_dialog(toplevel, _("Maketool: About Make"));
+    ui_autonull_pointer(&about_make_shell);
+
+    hbox = gtk_hbox_new(FALSE, 5);
+    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_make_shell)->vbox), hbox);
+    gtk_widget_show(hbox);
+
+    pm = gdk_pixmap_create_from_xpm_d(toplevel->window,
+    		&mask, 0, LOGO);
+    icon = gtk_pixmap_new(pm, mask);
+    gtk_container_add(GTK_CONTAINER(hbox), icon);
+    gtk_widget_show(icon);
+
+    label = gtk_label_new(make_version.data);
+    gtk_container_add(GTK_CONTAINER(hbox), label);
+    gtk_widget_show(label);
+}
+
+static void
 make_version_reap(Task *task)
 {
     if (about_make_shell == 0)
-    {
-	GtkWidget *label;
-	GtkWidget *icon;
-	GtkWidget *hbox;
-	GdkPixmap *pm;
-	GdkBitmap *mask;
-
-	about_make_shell = ui_create_ok_dialog(toplevel, _("Maketool: About Make"));
-
-	hbox = gtk_hbox_new(FALSE, 5);
-	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_make_shell)->vbox), hbox);
-	gtk_widget_show(hbox);
-	
-	pm = gdk_pixmap_create_from_xpm_d(toplevel->window,
-    		    &mask, 0, LOGO);
-	icon = gtk_pixmap_new(pm, mask);
-	gtk_container_add(GTK_CONTAINER(hbox), icon);
-	gtk_widget_show(icon);
-
-	label = gtk_label_new(make_version.data);
-	gtk_container_add(GTK_CONTAINER(hbox), label);
-	gtk_widget_show(label);
-    }
+    	create_about_make_shell();
 
     gtk_widget_show(about_make_shell);
 }
@@ -201,10 +208,19 @@ help_about_make_cb(GtkWidget *w, gpointer data)
 
     if (make_version.data == 0)
     {
+    	/* 
+	 * First time.  Haven't yet extracted version info from `make',
+	 * so start `make' and delay creation of dialog box until we
+	 * have the output, i.e. in the reap function.
+	 */
     	task_spawn(make_version_task());
     }
-    else if (about_make_shell != 0)
+    else
+    {
+    	if (about_make_shell == 0)
+	    create_about_make_shell();
     	gtk_widget_show(about_make_shell);
+    }
     
 }
 

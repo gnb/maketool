@@ -104,6 +104,11 @@ GtkWidget *ui_dialog_create_button(
     gpointer user_data);
 void ui_dialog_changed(GtkWidget *dialog);    
   
+/*
+ * Makes a widget-pointer magical in that it will be
+ * set to null when the widget it points to is destroyed
+ */
+void ui_autonull_pointer(GtkWidget **);
 
 /* config stuff */
 typedef struct

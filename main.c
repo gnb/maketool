@@ -29,26 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.62 2000-07-29 13:51:18 gnb Exp $");
-
-typedef enum
-{
-    GR_NONE=-1,
-    
-    GR_NOTEMPTY=0,
-    GR_NOTRUNNING,
-    GR_CLEAR_LOG,   	/* !running && !empty */
-    GR_RUNNING,
-    GR_SELECTED,
-    GR_EDITABLE,
-    GR_AGAIN,
-    GR_ALL,
-    GR_CLEAN,
-    GR_FIND_AGAIN,
-    GR_NEVER,	    	/* never active */
-
-    NUM_SETS
-} Groups;
+CVSID("$Id: main.c,v 1.63 2000-07-29 15:18:14 gnb Exp $");
 
 
 /*
@@ -817,11 +798,14 @@ file_open_cb(GtkWidget *w, gpointer data)
     static GtkWidget *filesel = 0;
     
     if (filesel == 0)
+    {
     	filesel = ui_create_file_sel(
 	    toplevel,
 	    _("Maketool: Open Log File"),
 	    file_open_file_func,
 	    "make.log");
+	ui_autonull_pointer(&filesel);
+    }
 
     gtk_widget_show(filesel);
 }
@@ -842,11 +826,14 @@ file_save_cb(GtkWidget *w, gpointer data)
     static GtkWidget *filesel = 0;
     
     if (filesel == 0)
+    {
     	filesel = ui_create_file_sel(
 	    toplevel,
 	    _("Maketool: Save Log File"),
 	    file_save_file_func,
 	    "make.log");
+	ui_autonull_pointer(&filesel);
+    }
 
     gtk_widget_show(filesel);
 }
@@ -976,12 +963,15 @@ file_change_dir_cb(GtkWidget *w, gpointer data)
     char *currdir, *fakefile;
     
     if (filesel == 0)
+    {
     	filesel = ui_create_file_sel(
 	    toplevel,
 	    _("Maketool: Change Directory"),
 	    file_change_dir_func,
 	    ".");
-	    
+	ui_autonull_pointer(&filesel);
+    }
+
     /*
      * Tel the filesel window the current directory.
      * Filesel window needs the trailing / so it doesn't

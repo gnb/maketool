@@ -116,6 +116,29 @@ typedef struct
 
 } Preferences;
 
+typedef enum
+{
+    GR_NONE=-1,
+    
+    GR_NOTEMPTY=0,
+    GR_NOTRUNNING,
+    GR_CLEAR_LOG,   	/* !running && !empty */
+    GR_RUNNING,
+    GR_SELECTED,
+    GR_EDITABLE,
+    GR_AGAIN,
+    GR_ALL,
+    GR_CLEAN,
+    GR_FIND_AGAIN,
+    GR_NEVER,	    	/* never active */
+    GR_PRINT_PRINTER,
+    GR_PRINT_FILE,
+
+    NUM_SETS
+} Groups;
+
+
+
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 /*
  * Global variable.

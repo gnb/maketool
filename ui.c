@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.21 2000-07-23 11:44:34 gnb Exp $");
+CVSID("$Id: ui.c,v 1.22 2000-07-29 15:18:14 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -579,6 +579,23 @@ ui_dialog_changed(GtkWidget *dialog)
 
     gtk_widget_set_sensitive(ad->ok_btn, TRUE);
     gtk_widget_set_sensitive(ad->apply_btn, TRUE);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+ui_autonull_destroy_cb(GtkWidget *w, void *user_data)
+{
+    GtkWidget **wpp = (GtkWidget **)user_data;
+    
+    *wpp = 0;
+}
+
+void
+ui_autonull_pointer(GtkWidget **wpp)
+{
+    gtk_signal_connect(GTK_OBJECT(*wpp), "destroy", 
+    	GTK_SIGNAL_FUNC(ui_autonull_destroy_cb), (void*)wpp);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
