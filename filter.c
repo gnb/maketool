@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.33 2003-09-27 15:04:50 gnb Exp $");
+CVSID("$Id: filter.c,v 1.34 2003-10-02 01:12:19 gnb Exp $");
 
 typedef struct
 {
@@ -137,20 +137,20 @@ filter_load(void)
 
     filter_add(
     	"",				/* state */
-	"^[a-zA-Z0-9_-]+\\[[0-9]+\\]: Entering directory `([^']+)'", /* regexp */
+	"^[a-zA-Z0-9_-]+\\[([0-9]+)\\]: Entering directory `([^']+)'", /* regexp */
 	FR_PUSHDIR,			/* code */
-	"\\1",				/* file */
-	"",				/* line */
+	"\\2",				/* file */
+	"\\1",				/* line */
 	"",				/* col */
 	"",		    	    	/* summary */
     	"gmake recursion - push");	/* comment */
 
     filter_add(
     	"",				/* state */
-	"^[a-zA-Z0-9_-]+\\[[0-9]+\\]: Leaving directory", /* regexp */
+	"^[a-zA-Z0-9_-]+\\[([0-9]+)\\]: Leaving directory `([^']+)'", /* regexp */
 	FR_POPDIR,			/* code */
-	"",				/* file */
-	"",				/* line */
+	"\\2",				/* file */
+	"\\1",				/* line */
 	"",				/* col */
 	"",				/* summary */
     	"gmake recursion - pop");	/* comment */

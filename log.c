@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.48 2003-09-27 15:03:08 gnb Exp $");
+CVSID("$Id: log.c,v 1.49 2003-10-02 01:12:19 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -49,8 +49,14 @@ static int		num_errors;
 static int		num_warnings;
 static gboolean     	num_ew_changed = FALSE;
 static GList		*log;		/* list of LogRecs */
-/*static GList		*log_pending_lines = 0;*/ /*TODO*/
-static GList		*log_directory_stack = 0;
+
+static GHashTable   	*dir_hash;  	/* hashtable of all normalised directories */
+static GPtrArray	*dir_stack; 	/* stack of GList of entries in dir_hash */
+static int  	    	dir_max_depth = 0;
+static int  	    	dir_stack_count = 0;
+#define stackhead(i)  	g_ptr_array_index(dir_stack, i)
+static gboolean     	context_dirty = FALSE;
+
 static GList		*log_node_stack = 0;	/* stack of LogRec's */
 #if DO_FONTS
 static GdkFont		*fonts[L_MAX];
@@ -60,6 +66,9 @@ static gboolean		foreground_set[L_MAX];
 static GdkColor		backgrounds[L_MAX];
 static gboolean		background_set[L_MAX];
 static NodeIcons	icons[L_MAX];
+
+static void log_context_unref(LogContext *con);
+static LogContext *log_context_ref(LogContext *con);
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -75,10 +84,52 @@ filter_result_init(FilterResult *res)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static const char *
+log_unique_dir(const char *dir)
+{
+    char *norm = file_normalise(dir);
+    char *uniq;
+    
+    if ((uniq = g_hash_table_lookup(dir_hash, norm)) != 0)
+    {
+    	g_free(norm);
+	return uniq;
+    }
+    g_hash_table_insert(dir_hash, norm, norm);
+    return norm;
+}
+
+#if DEBUG
+static void
+log_dump_stack(void)
+{
+    int i;
+    int n = 0;
+    GList *iter;
+
+    fprintf(stderr, "dir_stack = {\n");
+    for (i = 0 ; i < dir_max_depth ; i++)
+    {
+    	fprintf(stderr, "[%d] ", i+1);
+    	for (iter = stackhead(i) ; iter != 0 ; iter = iter->next)
+	{
+	    const char *dir = (const char *)iter->data;
+	    
+	    fprintf(stderr, " %s", dir);
+	    n++;
+	}
+	fprintf(stderr, "\n");
+    }
+    fprintf(stderr, "}\n");
+    assert(n == dir_stack_count);
+}
+#endif
+
 static void
 log_change_dir(const char *dir)
 {
-    char *norm = file_normalise(dir);
+#if 0
+    dir = log_unique_dir(dir);
 
 #if DEBUG
     fprintf(stderr, "log_change_dir(\"%s\") -> \"%s\"\n", dir, norm);
@@ -90,46 +141,183 @@ log_change_dir(const char *dir)
     	g_free((char*)log_directory_stack->data);
 	log_directory_stack->data = norm;
     }
+#endif
+    assert(0 && "log_change_dir not implemented");
 }
 
 static void
-log_push_dir(const char *dir)
+log_push_dir(int depth, const char *dir)
 {
-    char *norm = file_normalise(dir);
+    dir = log_unique_dir(dir);
 
 #if DEBUG
-    fprintf(stderr, "log_push_dir(\"%s\") -> \"%s\"\n", dir, norm);
+    fprintf(stderr, "log_push_dir(%d, \"%s\")\n", depth, dir);
 #endif
-    log_directory_stack = g_list_prepend(log_directory_stack, norm);
-}
 
-static void
-log_pop_dir(void)
-{
-#if DEBUG
-    fprintf(stderr, "log_pop_dir()\n");
-#endif
-    if (log_directory_stack != 0)
+    if (depth < 1 || depth > dir_max_depth+1)
     {
-    	g_free((char*)log_directory_stack->data);
-	log_directory_stack = g_list_remove_link(log_directory_stack, log_directory_stack);
+    	fprintf(stderr, "maketool: bad pushdir(%d, \"%s\")\n", depth, dir);
+    	return;
     }
+    
+    if (depth == dir_max_depth+1)
+    {
+	dir_max_depth = depth;
+	g_ptr_array_set_size(dir_stack, dir_max_depth);
+    }
+    stackhead(depth-1) = g_list_prepend(stackhead(depth-1), (gpointer)dir);
+    dir_stack_count++;
+    context_dirty = TRUE;
+
+#if DEBUG
+    log_dump_stack();
+#endif
+}
+
+static void
+log_pop_dir(int depth, const char *dir)
+{
+    GList *iter, *next;
+
+    dir = log_unique_dir(dir);
+
+#if DEBUG
+    fprintf(stderr, "log_pop_dir(%d, \"%s\")\n", depth, dir);
+#endif
+    if (depth < 1 || depth > dir_max_depth)
+    {
+    	fprintf(stderr, "maketool: bad popdir(%d, \"%s\")\n", depth, dir);
+    	return;
+    }
+    
+    for (iter = stackhead(depth-1) ; iter != 0 ; iter = next)
+    {
+    	next = iter->next;
+	
+	/* uniqueness property allows pointer comparison */
+	if ((char*)iter->data == dir)
+	{
+	    stackhead(depth-1) = g_list_remove_link(stackhead(depth-1), iter);
+	    dir_stack_count--;
+	    context_dirty = TRUE;
+	    break;
+	}
+    }
+
+    if (depth == dir_max_depth && stackhead(depth-1) == 0)
+    	dir_max_depth--;
+
+#if DEBUG
+    log_dump_stack();
+#endif
 }
 
 static void
 log_clear_dirs(void)
 {
-    while (log_directory_stack != 0)
+    int i;
+    
+    for (i = 0 ; i < dir_max_depth ; i++)
     {
-    	g_free((char*)log_directory_stack->data);
-	log_directory_stack = g_list_remove_link(log_directory_stack, log_directory_stack);
+    	while (stackhead(i) != 0)
+	    stackhead(i) = g_list_remove_link(stackhead(i), stackhead(i));
+    }
+    dir_max_depth = 0;
+    dir_stack_count = 0;
+    context_dirty = TRUE;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+log_context_unref(LogContext *con)
+{
+    if (--con->refcount == 0)
+    {
+    	g_free(con->dirs);
+	g_free(con);
     }
 }
 
-static const char *
-log_current_dir(void)
+static LogContext *
+log_context_ref(LogContext *con)
 {
-    return (log_directory_stack == 0 ? 0 : (const char *)log_directory_stack->data);
+    con->refcount++;
+    return con;
+}
+
+static LogContext *
+log_context_new(int n)
+{
+    LogContext *con;
+    
+    con = g_new(LogContext, 1);
+    con->refcount = 1;
+    con->num_dirs = n;
+    con->dirs = g_new(const char*, n);
+
+    return con;
+}
+
+static LogContext *
+log_get_context(void)
+{
+    int i;
+    GList *iter;
+    const char **p;
+    static LogContext *context = 0;
+
+    if (!context_dirty && context != 0)
+    	return context;
+    
+    if (context != 0)
+    	log_context_unref(context);
+    
+    /* TODO: in !jmode save just the stack top */
+    context = log_context_new(dir_stack_count);
+    p = context->dirs;
+    for (i = dir_max_depth-1 ; i >= 0 ; i--)
+    {
+    	for (iter = stackhead(i) ; iter != 0 ; iter = iter->next)
+	    *p++ = (const char *)iter->data;
+    }
+    assert(p == context->dirs+dir_stack_count);
+    
+    context_dirty = FALSE;
+    return context;
+}
+
+char **
+log_get_filenames(LogRec *lr)
+{
+    unsigned int i;
+    int nfiles = 0;
+    char **files;
+
+    if (lr->context == 0 || lr->context->num_dirs == 0)
+    	return 0;
+
+    files = g_new(char*, lr->context->num_dirs+1);
+
+    for (i = 0 ; i < lr->context->num_dirs ; i++)
+    {
+    	char *ff = g_strconcat(lr->context->dirs[i], "/", lr->res.file, 0);
+#if DEBUG
+    	fprintf(stderr, "log_get_filenames: trying \"%s\"\n", ff);
+#endif
+    	if (file_exists(ff))
+	    files[nfiles++] = ff;
+	else
+	    g_free(ff);
+    }
+    files[nfiles] = 0;
+    
+    if (!nfiles)
+    {
+    	g_free(files);
+    	return 0;
+    }
+    return files;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -214,7 +402,7 @@ log_rootmost_node(void)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static LogRec *
-log_add_rec(char *line, const FilterResult *res)
+log_add_rec(char *line, const FilterResult *res, LogContext *con)
 {
     LogRec *lr;
     
@@ -223,6 +411,8 @@ log_add_rec(char *line, const FilterResult *res)
     lr->res = *res;
     lr->line = line;
     lr->expanded = TRUE;
+    if (con != 0)
+    	lr->context = log_context_ref(con);
 
     switch (lr->res.code)
     {
@@ -251,6 +441,8 @@ log_del_rec(LogRec *lr)
     if (lr->res.summary != 0)
     	g_free(lr->res.summary);
     g_free(lr->line);
+    if (lr->context)
+    	log_context_unref(lr->context);
     g_free(lr);
 }
 
@@ -408,10 +600,9 @@ log_add_line(const char *line)
     static char *pending[MAX_PENDING];
     static int num_pending;
     LogRec *lr = 0;
-    estring fullpath;
     int i;
+    LogContext *con = 0;
 
-    estring_init(&fullpath);
     if (!(res.code & FR_PENDING))
 	filter_result_init(&res);
     filter_apply(line, &res);
@@ -436,28 +627,17 @@ log_add_line(const char *line)
     	log_change_dir(res.file);
     	break;
     case FR_PUSHDIR:
-	log_push_dir(res.file);
+	log_push_dir(res.line, res.file);
 	if (res.summary != 0)
 	    g_free(res.summary);
 	res.summary = file_denormalise(res.file, DEN_ALL);
     	break;
     case FR_POPDIR:
-	log_pop_dir();
+	log_pop_dir(res.line, res.file);
     	break;
     default:
-    	if (res.file != 0 && *res.file != '/' && log_current_dir() != 0)
-	{
-	    estring_append_string(&fullpath, log_current_dir());
-	    estring_append_char(&fullpath, '/');
-	    estring_append_string(&fullpath, res.file);
-#if DEBUG
-	    fprintf(stderr, "filename: \"%s\" -> \"%s\"\n", 
-	    	    	    res.file, fullpath.data);
-#endif
-    	    g_free(res.file);
-	    res.file = fullpath.data;
-	    fullpath.data = 0;
-	}
+    	if (res.file != 0 && *res.file != '/')
+	    con = log_get_context();
     	break;
     }
     
@@ -479,14 +659,13 @@ log_add_line(const char *line)
 	     */
 	    res.code = FR_INFORMATION;
 	}
-	lr = log_add_rec(pending[i], &res);
+	lr = log_add_rec(pending[i], &res, con);
 	log_show_rec(lr);
 	/* TODO: do this exactly once when loading from file */
 	log_update_build_start();
     }
     num_pending = 0;
 
-    estring_free(&fullpath);
     return lr;
 }
 
@@ -507,6 +686,8 @@ log_clear(void)
 
     /* update sensitivity of menu items */        
     grey_menu_items();
+    
+    /* TODO: empty dir_hash */
 }
 
 gboolean
@@ -971,6 +1152,9 @@ log_init(GtkWidget *w)
 			
     logwin = w;
     filter_load();
+    
+    dir_hash = g_hash_table_new(g_str_hash, g_str_equal);
+    dir_stack = g_ptr_array_new();
 }
 
 void
@@ -998,7 +1182,7 @@ log_start_build(const char *message)
     filter_result_init(&res);
     res.code = FR_BUILDSTART;
 
-    log_show_rec(log_add_rec(g_strdup(message), &res));
+    log_show_rec(log_add_rec(g_strdup(message), &res, 0));
 }
 
 

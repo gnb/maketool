@@ -27,10 +27,18 @@
 
 typedef struct
 {
+    int refcount;
+    unsigned int num_dirs;
+    const char **dirs;
+} LogContext;
+
+typedef struct
+{
     char *line;
     FilterResult res;
     GtkCTreeNode *node;
     gboolean expanded;
+    LogContext *context;    /* may be null */
 } LogRec;
 
 typedef enum
@@ -48,6 +56,13 @@ void log_collapse_all(void);
 gboolean log_is_empty(void);
 void log_start_build(const char *message);
 void log_end_build(const char *target);
+
+/*
+ * Generates full pathnames for source files which currently
+ * exist.  Returns a new null-terminated array of new strings,
+ * suitable for freeing with g_strfreev().
+ */
+char **log_get_filenames(LogRec *lr);
 
 LogRec *log_selected(void);
 void log_set_selected(LogRec *);

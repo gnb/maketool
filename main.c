@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.98 2003-09-29 01:07:20 gnb Exp $");
+CVSID("$Id: main.c,v 1.99 2003-10-02 01:12:19 gnb Exp $");
 
 
 /*
@@ -682,11 +682,33 @@ editor_task(const char *file, int line)
 static void
 start_edit(LogRec *lr)
 {
+    int i, nfiles;
+    char **files, **ff;
+
     if (lr->res.file == 0 || lr->res.file[0] == '\0')
     	return;
 	
-    message(_("Editing %s (line %d)"), lr->res.file, lr->res.line);
-    task_spawn(editor_task(lr->res.file, lr->res.line));	
+    files = log_get_filenames(lr);
+    
+    nfiles = 0;
+    if (files != 0)
+    {
+	for (ff = files ; *ff ; ff++)
+	    nfiles++;
+    }
+
+    if (nfiles > 1)
+    	message(_("%d files match %s"), nfiles, lr->res.file);
+    else if (nfiles == 1)
+	message(_("Editing %s (line %d)"), files[0], lr->res.line);
+    else
+    	message(_("No files match %s"), lr->res.file);
+
+    for (i = 0 ; i < nfiles ; i++)
+	task_spawn(editor_task(files[i], lr->res.line));
+
+    if (files)
+    	g_strfreev(files);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
