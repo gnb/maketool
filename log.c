@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.49 2003-10-02 01:12:19 gnb Exp $");
+CVSID("$Id: log.c,v 1.50 2003-10-02 05:54:13 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -229,6 +229,21 @@ log_clear_dirs(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+#if DEBUG
+static void
+log_context_dump(LogContext *con)
+{
+    unsigned int i;
+
+    fprintf(stderr, "context {\n");
+    fprintf(stderr, "    refcount = %d\n", con->refcount);
+    fprintf(stderr, "    dirs = {");
+    for (i = 0 ; i < con->num_dirs ; i++)   
+	fprintf(stderr, " %s", con->dirs[i]);
+    fprintf(stderr, "}\n");
+}
+#endif
+
 static void
 log_context_unref(LogContext *con)
 {
@@ -291,17 +306,47 @@ char **
 log_get_filenames(LogRec *lr)
 {
     unsigned int i;
+    unsigned int j;
     int nfiles = 0;
     char **files;
+    char *ff;
+
+    if (lr->res.file[0] == '/')
+    {
+    	/* absolute filename in error message, don't need to use context */
+#if DEBUG
+    	fprintf(stderr, "log_get_filenames: trying \"%s\"\n", lr->res.file);
+#endif
+	if (!file_exists(lr->res.file))
+	    return 0;
+	files = g_new(char*, 2);
+	files[0] = g_strdup(lr->res.file);
+	files[1] = 0;
+	return files;
+    }
 
     if (lr->context == 0 || lr->context->num_dirs == 0)
     	return 0;
 
     files = g_new(char*, lr->context->num_dirs+1);
 
+#if DEBUG
+    fprintf(stderr, "log_get_filenames: ");
+    log_context_dump(lr->context);
+#endif
+
     for (i = 0 ; i < lr->context->num_dirs ; i++)
     {
-    	char *ff = g_strconcat(lr->context->dirs[i], "/", lr->res.file, 0);
+    	/* check for duplicate directories -- this is a legitimate case */
+    	for (j = 0 ; j < i ; j++)
+	{
+	    if (lr->context->dirs[i] == lr->context->dirs[j])
+	    	break;
+	}
+	if (j < i)
+	    continue;	/* skip dup dir in context */
+	
+    	ff = g_strconcat(lr->context->dirs[i], "/", lr->res.file, 0);
 #if DEBUG
     	fprintf(stderr, "log_get_filenames: trying \"%s\"\n", ff);
 #endif
