@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.42 2003-05-24 05:48:20 gnb Exp $");
+CVSID("$Id: log.c,v 1.43 2003-08-10 10:16:14 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -780,6 +780,10 @@ log_print(FILE *fp)
 	 */
 	switch (lr->res.code)
 	{
+	case FR_INFORMATION:
+	    if ((prefs.log_flags & LF_SUMMARISE) && lr->res.summary != 0)
+		sev = L_SUMMARY;
+    	    break;
 	case FR_WARNING:
 	    sev = L_WARNING;
     	    break;
