@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999-2001 Greg Banks
+ * Copyright (c) 1999-2003 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 #error Why are you even bothering to compile with POSIX regular expressions?
 #endif
 
-CVSID("$Id: gmake.c,v 1.4 2003-05-13 01:16:01 gnb Exp $");
+CVSID("$Id: gmake.c,v 1.5 2003-05-24 05:48:20 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 

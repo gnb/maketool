@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999-2001 Greg Banks
+ * Copyright (c) 1999-2003 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 #include <sys/filio.h>
 #endif
 
-CVSID("$Id: task.c,v 1.13 2003-05-13 01:19:09 gnb Exp $");
+CVSID("$Id: task.c,v 1.14 2003-05-24 05:48:21 gnb Exp $");
 
 /*
  * TODO: GDK is used only for the gdk_input_*() functions, which

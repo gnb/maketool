@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999-2001 Greg Banks
+ * Copyright (c) 1999-2003 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include "mqueue.h"
 #include <gdk/gdkx.h>
 
-CVSID("$Id: mqueue.c,v 1.3 2003-05-13 01:17:20 gnb Exp $");
+CVSID("$Id: mqueue.c,v 1.4 2003-05-24 05:48:21 gnb Exp $");
 
 typedef struct
 {

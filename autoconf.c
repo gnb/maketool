@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999-2001 Greg Banks
+ * Copyright (c) 1999-2003 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include "maketool_task.h"
 #include "log.h"
 
-CVSID("$Id: autoconf.c,v 1.12 2003-05-13 01:13:44 gnb Exp $");
+CVSID("$Id: autoconf.c,v 1.13 2003-05-24 05:48:20 gnb Exp $");
 
 #define strassign(x, s) \
     do { \

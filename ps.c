@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999-2001 Greg Banks
+ * Copyright (c) 1999-2003 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include "util.h"
 #include <time.h>
 
-CVSID("$Id: ps.c,v 1.7 2001-09-21 04:32:03 gnb Exp $");
+CVSID("$Id: ps.c,v 1.8 2003-05-24 05:48:21 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -207,7 +207,7 @@ ps_prologue(PsDocument *ps)
     char *date;
     
     fprintf(ps->fp, "%%!PS-Adobe-2.0\n");
-    fprintf(ps->fp, "%%%%Creator: Maketool %s, Copyright (c) 1999-2001 Greg Banks. All Rights Reserved.\n", VERSION); 
+    fprintf(ps->fp, "%%%%Creator: Maketool %s, Copyright (c) 1999-2003 Greg Banks. All Rights Reserved.\n", VERSION); 
     assert(ps->num_pages > 0);
     fprintf(ps->fp, "%%%%Pages: %d\n", ps->num_pages); 
     fprintf(ps->fp, "%%%%Title: %s\n", ps->title);

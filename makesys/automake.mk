@@ -1,6 +1,6 @@
 #
 # Maketool - GTK-based front end for gmake
-# Copyright (c) 1999-2001 Greg Banks
+# Copyright (c) 1999-2003 Greg Banks
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: automake.mk,v 1.1 2001-09-21 04:33:09 gnb Exp $
+# $Id: automake.mk,v 1.2 2003-05-24 05:49:19 gnb Exp $
 #
 
 AUTOMAKE=	automake
