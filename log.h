@@ -34,7 +34,7 @@ typedef struct
 
 typedef enum
 {
-    L_INFO, L_WARNING, L_ERROR,
+    L_INFO, L_WARNING, L_ERROR, L_SUMMARY,
     
     L_MAX
 } LogSeverity;

@@ -64,6 +64,8 @@ typedef enum
     COL_FG_WARNING,
     COL_BG_ERROR,
     COL_FG_ERROR,
+    COL_BG_SUMMARY,
+    COL_FG_SUMMARY,
     
     COL_MAX
 } Colors;

@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.36 2001-07-25 08:35:22 gnb Exp $");
+CVSID("$Id: log.c,v 1.37 2001-07-26 15:32:58 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -269,6 +269,8 @@ log_show_rec(LogRec *lr)
     	/* use default font, fgnd, bgnd */
 	if (!(prefs.log_flags & LF_SHOW_INFO))
 	    return;
+	if ((prefs.log_flags & LF_SUMMARISE) && lr->res.summary != 0)
+	    sev = L_SUMMARY;
     	break;
     case FR_WARNING:
 	sev = L_WARNING;
@@ -839,6 +841,12 @@ _log_setup_colors(void)
     	    	    	    	&foregrounds[L_ERROR]);
     background_set[L_ERROR] = _log_load_color(colormap, prefs.colors[COL_BG_ERROR],
     	    	    	    	&backgrounds[L_ERROR]);
+
+    /* L_SUMMARY */
+    foreground_set[L_SUMMARY] = _log_load_color(colormap, prefs.colors[COL_FG_SUMMARY],
+    	    	    	    	&foregrounds[L_SUMMARY]);
+    background_set[L_SUMMARY] = _log_load_color(colormap, prefs.colors[COL_BG_SUMMARY],
+    	    	    	    	&backgrounds[L_SUMMARY]);
 }
 
 static void
@@ -888,6 +896,13 @@ log_init(GtkWidget *w)
     icons[L_ERROR].open_pm = icons[L_ERROR].closed_pm;
     icons[L_ERROR].open_mask = icons[L_ERROR].closed_mask;
 
+    /* L_SUMMARY */
+    fonts[L_SUMMARY] = 0;
+    icons[L_SUMMARY].closed_pm = icons[L_INFO].closed_pm;
+    icons[L_SUMMARY].closed_mask = icons[L_INFO].closed_mask;
+    icons[L_SUMMARY].open_pm = icons[L_SUMMARY].closed_pm;
+    icons[L_SUMMARY].open_mask = icons[L_SUMMARY].closed_mask;
+    
     _log_setup_colors();
 			
     logwin = w;

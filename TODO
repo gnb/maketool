@@ -82,9 +82,6 @@ x  Change the preferences so that the actual make executable used is
    
 x  Make the default text editor configurable, figured out in configure.
 
-x  In summary mode, need to highlight the `Compiling' lines visually to
-   separate them from the usual make clutter.
-
 x  Should be able to drag & drop {filename, linenumber, message} or text.
 
 x  For the editing program, should be able to specify a %sequence which
@@ -412,3 +409,6 @@ x  DONE: Bug where maketool crashes if first line of make output is empty,
    e.g. the XFree86 build.
    This has been fixed but unreleased for a while.
    
+x  DONE: In summary mode, need to highlight the `Compiling' lines visually to
+   separate them from the usual make clutter.
+

@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.46 2001-07-25 12:02:44 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.47 2001-07-26 15:32:58 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -79,9 +79,11 @@ static void update_color_sample(void);
 #define DEFAULT_COL_BG_INFO	0
 #define DEFAULT_COL_BG_WARNING  "#ffffc2"
 #define DEFAULT_COL_BG_ERROR	"#ffc2c2"
+#define DEFAULT_COL_BG_SUMMARY	"#e0e0e0"
 #define DEFAULT_COL_FG_INFO	0
 #define DEFAULT_COL_FG_WARNING  0
 #define DEFAULT_COL_FG_ERROR	0
+#define DEFAULT_COL_FG_SUMMARY	0
 
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -332,9 +334,11 @@ preferences_load(void)
     prefs.colors[COL_BG_INFO] = ui_config_get_string("bgcolor_info", DEFAULT_COL_BG_INFO);
     prefs.colors[COL_BG_WARNING] = ui_config_get_string("bgcolor_warning", DEFAULT_COL_BG_WARNING);
     prefs.colors[COL_BG_ERROR] = ui_config_get_string("bgcolor_error", DEFAULT_COL_BG_ERROR);
+    prefs.colors[COL_BG_SUMMARY] = ui_config_get_string("bgcolor_summary", DEFAULT_COL_BG_SUMMARY);
     prefs.colors[COL_FG_INFO] = ui_config_get_string("fgcolor_info", DEFAULT_COL_FG_INFO);
     prefs.colors[COL_FG_WARNING] = ui_config_get_string("fgcolor_warning", DEFAULT_COL_FG_WARNING);
     prefs.colors[COL_FG_ERROR] = ui_config_get_string("fgcolor_error", DEFAULT_COL_FG_ERROR);
+    prefs.colors[COL_FG_SUMMARY] = ui_config_get_string("fgcolor_summary", DEFAULT_COL_FG_SUMMARY);
 
     prefs.paper_name = ui_config_get_string("paper_name", "A4");
     prefs.paper_width = ui_config_get_int("paper_width", 595);
@@ -403,9 +407,11 @@ preferences_save(void)
     ui_config_set_string("bgcolor_info", prefs.colors[COL_BG_INFO]);
     ui_config_set_string("bgcolor_warning", prefs.colors[COL_BG_WARNING]);
     ui_config_set_string("bgcolor_error", prefs.colors[COL_BG_ERROR]);
+    ui_config_set_string("bgcolor_summary", prefs.colors[COL_BG_SUMMARY]);
     ui_config_set_string("fgcolor_info", prefs.colors[COL_FG_INFO]);
     ui_config_set_string("fgcolor_warning", prefs.colors[COL_FG_WARNING]);
     ui_config_set_string("fgcolor_error", prefs.colors[COL_FG_ERROR]);
+    ui_config_set_string("fgcolor_summary", prefs.colors[COL_FG_SUMMARY]);
 
     ui_config_set_string("paper_name", prefs.paper_name);
     ui_config_set_int("paper_width", prefs.paper_width);
@@ -1419,6 +1425,9 @@ update_color_sample(void)
     set_sample_colors(color_sample_node[L_ERROR],
     	gtk_entry_get_text(GTK_ENTRY(color_entries[COL_BG_ERROR])),
     	gtk_entry_get_text(GTK_ENTRY(color_entries[COL_FG_ERROR])));
+    set_sample_colors(color_sample_node[L_SUMMARY],
+    	gtk_entry_get_text(GTK_ENTRY(color_entries[COL_BG_SUMMARY])),
+    	gtk_entry_get_text(GTK_ENTRY(color_entries[COL_FG_SUMMARY])));
 }
 
 static void
@@ -1430,6 +1439,8 @@ color_reset_old_cb(GtkWidget *w, gpointer data)
     gtk_entry_set_text(GTK_ENTRY(color_entries[COL_FG_WARNING]), safe_str(prefs.colors[COL_FG_WARNING]));
     gtk_entry_set_text(GTK_ENTRY(color_entries[COL_BG_ERROR]), safe_str(prefs.colors[COL_BG_ERROR]));
     gtk_entry_set_text(GTK_ENTRY(color_entries[COL_FG_ERROR]), safe_str(prefs.colors[COL_FG_ERROR]));
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_BG_SUMMARY]), safe_str(prefs.colors[COL_BG_SUMMARY]));
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_FG_SUMMARY]), safe_str(prefs.colors[COL_FG_SUMMARY]));
     /* update_color_sample(); */
 }
 
@@ -1442,6 +1453,8 @@ color_reset_defaults_cb(GtkWidget *w, gpointer data)
     gtk_entry_set_text(GTK_ENTRY(color_entries[COL_FG_WARNING]), safe_str(DEFAULT_COL_FG_WARNING));
     gtk_entry_set_text(GTK_ENTRY(color_entries[COL_BG_ERROR]), safe_str(DEFAULT_COL_BG_ERROR));
     gtk_entry_set_text(GTK_ENTRY(color_entries[COL_FG_ERROR]), safe_str(DEFAULT_COL_FG_ERROR));
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_BG_SUMMARY]), safe_str(DEFAULT_COL_BG_SUMMARY));
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_FG_SUMMARY]), safe_str(DEFAULT_COL_FG_SUMMARY));
     /* update_color_sample(); */
 }
 
@@ -1466,6 +1479,8 @@ prefs_create_colors_page(GtkWidget *toplevel)
     color_labels[COL_FG_WARNING] = _("Warning Foreground:");
     color_labels[COL_BG_ERROR] = _("Error Background:");
     color_labels[COL_FG_ERROR] = _("Error Foreground:");
+    color_labels[COL_BG_SUMMARY] = _("Summary Background:");
+    color_labels[COL_FG_SUMMARY] = _("Summary Foreground:");
     
     for (i = 0 ; i < COL_MAX ; i++)
 	color_entries[i] = prefs_create_color_row(table, row++, i);
@@ -1497,6 +1512,9 @@ prefs_create_colors_page(GtkWidget *toplevel)
 	    break;
 	case L_ERROR:
 	    text = _("error: I'm sorry Dave I can't do that");
+	    break;
+	case L_SUMMARY:
+	    text = _("Executive Summary");
 	    break;
 	default:
 	    continue;
