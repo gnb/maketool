@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.85 2003-02-09 05:19:37 gnb Exp $");
+CVSID("$Id: main.c,v 1.86 2003-02-14 14:32:30 gnb Exp $");
 
 
 /*
@@ -92,7 +92,13 @@ static void dir_previous_cb(GtkWidget *w, gpointer data);
  * Number of non-standard targets to be present before
  * the build menu should be split up into multiple submenus.
  */
-#define BUILD_MENU_THRESHOLD	20
+#define BUILD_MENU_LENGTH_THRESHOLD	20
+/*
+ * How many characters across the names of targets in the
+ * build menu may be before they are abbreviated to fit.
+ */
+#define BUILD_MENU_WIDTH_THRESHOLD	28
+
 
 #define HOMEPAGE    "http://www.alphalink.com.au/~gnb/maketool/"
 
@@ -225,12 +231,71 @@ expand_prog(
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static int
+abbreviate_aux(estring *e, const char *str, int limit)
+{
+    int len = strlen(str);
+    static const char ellipsis[] = "...";
+
+    if (len > limit)
+    {
+    	len = limit;
+
+	if (len > sizeof(ellipsis)-1)
+	{
+	    estring_append_chars(e, str, len-(sizeof(ellipsis)-1));
+	    estring_append_string(e, ellipsis);
+	    return len;
+	}
+    }
+
+    estring_append_chars(e, str, len);
+    return len;
+}
+
+static char *
+abbreviate_target(const char *t, int maxlen)
+{
+    estring e;
+
+    estring_init(&e);
+    fprintf(stderr, "abbreviate_target(\"%s\")\n", t);
+    abbreviate_aux(&e, t, maxlen);
+    fprintf(stderr, "   = \"%s\"\n", e.data);
+    return e.data;
+}
+
+static char *
+abbreviate_targets(const char *t1, const char *t2, int maxlen)
+{
+    int l1 = strlen(t1);
+    int l2 = strlen(t2);
+    static const char dash[] = " - ";
+    estring e;
+
+    estring_init(&e);
+    
+    fprintf(stderr, "abbreviate_targets(\"%s\", \"%s\")\n", t1, t2);
+    if (l1 + sizeof(dash) + l2 > maxlen)
+	l1 = (l1 < 4 ? l1 : (maxlen - sizeof(dash)) * l1 / (l1 + l2));
+    l1 = abbreviate_aux(&e, t1, l1);
+    estring_append_string(&e, dash);
+    abbreviate_aux(&e, t2, (maxlen - sizeof(dash)) - l1);
+
+    fprintf(stderr, "   = \"%s\"\n", e.data);
+    return e.data;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+
 static void
 set_last_target(const char *target)
 {
     GtkLabel *label;
     char *menulabel;
     char *tooltip;
+    char *targ;
     
     last_target = target;
     
@@ -238,7 +303,12 @@ set_last_target(const char *target)
      *       even though the position of the underscore in the label
      *       may change.
      */
-    menulabel = g_strdup_printf(_(again_menu_label[!!last_target]), last_target);
+    targ = (last_target == 0 ? 0 : 
+	      abbreviate_target(last_target,
+	      	    	    	BUILD_MENU_WIDTH_THRESHOLD-5/*heuristic*/));
+    menulabel = g_strdup_printf(_(again_menu_label[!!last_target]), targ);
+    if (targ != 0)
+	g_free(targ);
     label = GTK_LABEL(GTK_BIN(again_menu_item)->child);
     gtk_label_set_text(label, menulabel);
     gtk_label_parse_uline(label, menulabel);
@@ -372,7 +442,9 @@ append_build_menu_items(GList *list)
     GtkWidget *menu = 0;
     char *targ;
     int n;
-    gboolean multiple_mode = (g_list_length(list) > BUILD_MENU_THRESHOLD);
+    gboolean multiple_mode = (g_list_length(list) > BUILD_MENU_LENGTH_THRESHOLD);
+    char *label;
+
     
     for (n = 0 ; list != 0 ; list = list->next)
     {
@@ -384,22 +456,23 @@ append_build_menu_items(GList *list)
 	    {
 	    	GList *last;
 		
-		last = g_list_nth(list, BUILD_MENU_THRESHOLD-1);
+		last = g_list_nth(list, BUILD_MENU_LENGTH_THRESHOLD-1);
 		if (last == 0)
 		    last = g_list_last(list);
 		if (last != list)
 		{
-		    char *label = g_strdup_printf("%s - %s", targ, (const char *)last->data);
+		    label = abbreviate_targets(targ, (const char *)last->data,
+		    	    	      	       BUILD_MENU_WIDTH_THRESHOLD);
 #if DEBUG
 	    	    fprintf(stderr, "creating Build submenu \"%s\"\n", label);
 #endif
 		    menu = ui_add_submenu(build_menu, /*douline*/FALSE, label);
-		    g_free(label);
+    	    	    g_free(label);
 		}
 		else
 		    menu = build_menu;
 	    }
-	    if (++n == BUILD_MENU_THRESHOLD)
+	    if (++n == BUILD_MENU_LENGTH_THRESHOLD)
 		n = 0;
 	}
 	else
@@ -410,8 +483,10 @@ append_build_menu_items(GList *list)
 	else
 	{
 	    const char *accel = get_target_accelerator(targ);
-	    ui_add_button_2(menu, targ, FALSE, accel, build_cb, targ,
+	    label = abbreviate_target(targ, BUILD_MENU_WIDTH_THRESHOLD);
+	    ui_add_button_2(menu, label, FALSE, accel, build_cb, targ,
 	    			GR_NOTRUNNING);
+    	    g_free(label);
 	}
     }
 }
