@@ -348,7 +348,7 @@ x  DONE: A.T. Hofkamp says running gvim works but he gets
    This was a side effect of the 0.6.1 anti-hack.  Now it checks for
    task->fd before calling task_input_func.
 
-x  A.T. Hofkamp says: add a button to edit the first error in the next file.
+x  DONE: A.T. Hofkamp says: add a button to edit the first error in the next file.
 
 x  DONE: A.T. Hofkamp says: Please make it possibe to edit the Makefile
 

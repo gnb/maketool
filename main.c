@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.60 2000-07-23 11:44:34 gnb Exp $");
+CVSID("$Id: main.c,v 1.61 2000-07-29 12:58:10 gnb Exp $");
 
 typedef enum
 {
@@ -1169,6 +1169,38 @@ edit_next_error_cb(GtkWidget *w, gpointer data)
     }
 }
 
+#define safe_strcmp(a, b) \
+	strcmp((a) == 0 ? "" : (a), (b) == 0 ? "" : (b))
+
+static void
+edit_file_next_error_cb(GtkWidget *w, gpointer data)
+{
+    LogRec *lr = log_selected();
+    const char *filename = (lr == 0 ? 0 : lr->res.file);
+    
+    for (;;)
+    {
+	lr = log_next_error(lr);
+	if (lr == 0)
+	    break;
+	if (!safe_strcmp(filename, lr->res.file))
+	    continue;
+	if (lr->res.code == FR_WARNING && !prefs.edit_warnings)
+	    continue;
+	break;
+    }
+    
+    if (lr != 0)
+    {	
+	log_set_selected(lr);
+	start_edit(lr);
+    }
+    else
+    {
+    	message(_("No more errors in log"));
+    }
+}
+
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
@@ -1295,6 +1327,7 @@ ui_create_menus(GtkWidget *menubar)
     ui_add_button(menu, _("Edit _Error"), 0, edit_error_cb, 0, GR_EDITABLE);
     ui_add_button(menu, _("Edit _Next Error"), "<Ctrl>E", edit_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
     ui_add_button(menu, _("Edit _Prev Error"), 0, edit_next_error_cb, GINT_TO_POINTER(FALSE), GR_NOTEMPTY);
+    ui_add_button(menu, _("Edit Next _File Error"), "<Shift><Ctrl>E", edit_file_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
     ui_add_separator(menu);
     ui_add_button(menu, _("_Copy"), "<Ctrl>C", edit_copy_cb, 0, GR_SELECTED);
     ui_add_separator(menu);
@@ -1348,6 +1381,7 @@ ui_create_menus(GtkWidget *menubar)
 #include "clean.xpm"
 #include "clear.xpm"
 #include "next.xpm"
+#include "file_next.xpm"
 #include "print.xpm"
 
 static void
@@ -1379,6 +1413,8 @@ ui_create_tools(GtkWidget *toolbar)
     	clear_xpm, view_clear_cb, 0, GR_CLEAR_LOG);
     ui_tool_create(toolbar, _("Next"), _("Edit next error or warning"),
     	next_xpm, edit_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
+    ui_tool_create(toolbar, _("File Next"), _("Edit first error or warning in next file"),
+    	file_next_xpm, edit_file_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
     
     ui_tool_add_space(toolbar);
     
