@@ -1,33 +1,14 @@
 --- open ---
 
+x  Provide a progress indicator during the open of large log files.
+
 x  Help->Help On reports "main-window" if clicked on the background of
    any dialog, and only reports the right dialog if clicked on some
    other widget in the dialog.
    
-x  There is no way to handle help tags which point to anchors inside
-   an HTML page rather than being the page name.
-
 x  Display in the statusbar, between the message and the progress
    indicator, running counts of number of warnings and errors found
    since last build start.
-
-x  memleak:
-==5761== 3074 bytes in 222 blocks are definitely lost in loss record 73 of 82
-==5761==    at 0x40044364: malloc (vg_clientfuncs.c:100)
-==5761==    by 0x403C58BC: g_malloc (in /usr/lib/libglib-1.2.so.0.0.10)
-==5761==    by 0x403CE421: g_strdup (in /usr/lib/libglib-1.2.so.0.0.10)
-==5761==    by 0x805FC82: gmake_list_targets_input (gmake.c:200)
-==5761==    by 0x8061DB7: task_linemode_input (task.c:143)
-==5761==    by 0x8061F83: task_input_func (task.c:237)
-==5761==    by 0x40391A66: gdk_io_invoke (in /usr/lib/libgdk-1.2.so.0.9.1)
-==5761==    by 0x403C2F9E: g_io_unix_dispatch (in /usr/lib/libglib-1.2.so.0.0.10)
-==5761==    by 0x403C4773: g_main_dispatch (in /usr/lib/libglib-1.2.so.0.0.10)
-==5761==    by 0x403C4D39: g_main_iterate (in /usr/lib/libglib-1.2.so.0.0.10)
-==5761==    by 0x403C4EEC: g_main_run (in /usr/lib/libglib-1.2.so.0.0.10)
-==5761==    by 0x402E12E3: gtk_main (in /usr/lib/libgtk-1.2.so.0.9.1)
-==5761==    by 0x8053970: main (main.c:2326)
-==5761==    by 0x42017499: (within /lib/i686/libc-2.2.5.so)
-==5761==    by 0x804FCB1: gtk_widget_grab_focus (in /home/gnb/proj/maketool/maketool)
 
 x  When using autoconf there seems to be a race condition between
    creation of "configure" and running it, because "configure" creates
@@ -55,19 +36,6 @@ x  When using autoconf there seems to be a race condition between
    The question is, does this "ls" behaviour still hold when not
    using the GNU "ls" ?
    
-
-x  Rajesh Gupta, running on Solaris 2.5.1, found the following bug.
-   The SIGCHLD signal handler is being lost, so extract_targets
-   works but the first make run is never reaped.  So far, typical
-   sysv signal semantics bug.  BUT attempting to re-register the
-   signal handler in the signal handler (the solution used in 0.7)
-   causes an immediate recursive signal delivery, and blows the stack.
-   A hack is to re-register the signal handler in g_unix_dispatch_reapers()
-   but there's a race condition where a signal can be lost.  The proper
-   solution is to use something like sigaction() where you can specify
-   the delivery semantics with flags.  Need to find a Solaris machine
-   to test (sf compile farm?).
-
 x  With autoconf, handle configure depending on aclocal.m4 acsite.m4
    and (automake?) acinclude.m4.
 
@@ -323,6 +291,39 @@ x  When ./configure is run from make_makefile(), config.status is also
    run afterward, redundantly.
 
 --- closed ---
+
+x  memleak:
+==5761== 3074 bytes in 222 blocks are definitely lost in loss record 73 of 82
+==5761==    at 0x40044364: malloc (vg_clientfuncs.c:100)
+==5761==    by 0x403C58BC: g_malloc (in /usr/lib/libglib-1.2.so.0.0.10)
+==5761==    by 0x403CE421: g_strdup (in /usr/lib/libglib-1.2.so.0.0.10)
+==5761==    by 0x805FC82: gmake_list_targets_input (gmake.c:200)
+==5761==    by 0x8061DB7: task_linemode_input (task.c:143)
+==5761==    by 0x8061F83: task_input_func (task.c:237)
+==5761==    by 0x40391A66: gdk_io_invoke (in /usr/lib/libgdk-1.2.so.0.9.1)
+==5761==    by 0x403C2F9E: g_io_unix_dispatch (in /usr/lib/libglib-1.2.so.0.0.10)
+==5761==    by 0x403C4773: g_main_dispatch (in /usr/lib/libglib-1.2.so.0.0.10)
+==5761==    by 0x403C4D39: g_main_iterate (in /usr/lib/libglib-1.2.so.0.0.10)
+==5761==    by 0x403C4EEC: g_main_run (in /usr/lib/libglib-1.2.so.0.0.10)
+==5761==    by 0x402E12E3: gtk_main (in /usr/lib/libgtk-1.2.so.0.9.1)
+==5761==    by 0x8053970: main (main.c:2326)
+==5761==    by 0x42017499: (within /lib/i686/libc-2.2.5.so)
+==5761==    by 0x804FCB1: gtk_widget_grab_focus (in /home/gnb/proj/maketool/maketool)
+
+x  There is no way to handle help tags which point to anchors inside
+   an HTML page rather than being the page name.
+
+x  Rajesh Gupta, running on Solaris 2.5.1, found the following bug.
+   The SIGCHLD signal handler is being lost, so extract_targets
+   works but the first make run is never reaped.  So far, typical
+   sysv signal semantics bug.  BUT attempting to re-register the
+   signal handler in the signal handler (the solution used in 0.7)
+   causes an immediate recursive signal delivery, and blows the stack.
+   A hack is to re-register the signal handler in g_unix_dispatch_reapers()
+   but there's a race condition where a signal can be lost.  The proper
+   solution is to use something like sigaction() where you can specify
+   the delivery semantics with flags.  Need to find a Solaris machine
+   to test (sf compile farm?).
 
 x  Help: make the browser command configuruable in preferences.
 
