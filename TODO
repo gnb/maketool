@@ -22,12 +22,6 @@ x  Create dummy N_() macros to seed the PO files with common autoconf
 x  When the user cancels a ./configure run from the GUI, this should
    show in the log window instead of "*** [config.status] Error 1".
    
-x  Change spec file to make the RPM depend on make.
-
-x  Add email address to Vendor: in spec file.
-
-x  Reduce use of @PACKAGE@ etc in spec file.
-
 x  Allow the Makefile to be built on-demand, with an entry in the
    first part of the Build menu.  Turn off automatically building
    by default.
@@ -481,4 +475,10 @@ x  DONE: Add a GUI for setting CONFIGUREFLAGS based on ./configure --help
 x  DONE: Strongly limit the inclusion of gdkx.h.
 
 x  DONE: Fix Makefile.in to use pkglibexecdir instead of libexecdir
+
+x  DONE: Add email address to Vendor: in spec file.
+
+x  DONE: Change spec file to make the RPM depend on make.
+
+x  DONE: Reduce use of @PACKAGE@ etc in spec file.
 

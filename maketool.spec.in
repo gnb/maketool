@@ -4,9 +4,10 @@ Version: @VERSION@
 Release: 1
 Copyright: GPL
 Group: Development/Building
-Source: http://www.alphalink.com.au/~gnb/@PACKAGE@/@PACKAGE@-@VERSION@-src.tar.gz
-BuildRoot: /var/tmp/@PACKAGE@-root
-Vendor: Greg Banks
+Source: http://www.alphalink.com.au/~gnb/%{name}/%{name}-%{version}-src.tar.gz
+BuildRoot: /var/tmp/%{name}-root
+Vendor: Greg Banks <gnb@alphalink.com.au>
+Requires: make
 
 %description
 Maketool is a simple GUI front end for the GNU make program,
@@ -21,8 +22,7 @@ autoconf
 
 %build
 [ "@ENABLE_ONLINE_HELP@" = yes ] && EOH="--enable-online-help"
-OS=`echo ${RPM_OS} | tr '[A-Z]' '[a-z]'`
-CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr $EOH ${RPM_ARCH}-redhat-${OS}
+CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr $EOH
 make
 
 %install
@@ -38,12 +38,14 @@ rm -rf $RPM_BUILD_ROOT
 /usr/libexec/maketool/extract_targets
 /usr/share/maketool/*.mk
 %doc COPYING COPYRIGHT TODO CHANGES
-%docdir /usr/share/@PACKAGE@/help
-/usr/share/@PACKAGE@/help
+%docdir /usr/share/maketool/help
+/usr/share/maketool/help
 /usr/share/locale/ja/LC_MESSAGES/maketool.mo
 /usr/share/locale/cs/LC_MESSAGES/maketool.mo
 
 %changelog
+* Fri Sep 21 2001 Greg Banks <gnb@alphalink.com.au>
+- Reduced use of autoconf subs; removed RH-specific OS stuff; added email to Vendor.
 * Mon Sep 17 2001 Greg Banks <gnb@alphalink.com.au>
 - Make_makefile is replaced.
 * Mon Dec 11 2000 Greg Banks <gnb@alphalink.com.au>
