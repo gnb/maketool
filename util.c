@@ -21,7 +21,7 @@
 #include <stdarg.h>
 #include <sys/stat.h>
 
-CVSID("$Id: util.c,v 1.15 2001-09-02 12:56:35 gnb Exp $");
+CVSID("$Id: util.c,v 1.16 2001-09-22 00:55:57 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -90,6 +90,43 @@ estring_truncate(estring *e)
     e->length = 0;
     if (e->data != 0)
 	e->data[0] = '\0';
+}
+
+/* remove leading whitespace */
+void
+estring_chug(estring *e)
+{
+    int skip;
+
+    for (skip = 0 ;
+    	 skip < e->length && isspace(e->data[skip]) ;
+	 skip++)
+	;
+	
+    if (skip != 0)
+    {
+	e->length -= skip;
+    	memmove(e->data, e->data+skip, e->length);
+	e->data[e->length] = '\0';
+    }
+}
+
+/* remove trailing whitespace */
+void
+estring_chomp(estring *e)
+{
+    int len;
+
+    for (len = e->length ;
+    	 len > 0 && isspace(e->data[len-1]) ;
+	 len--)
+	;
+	
+    if (len != e->length)
+    {
+	e->length = len;
+	e->data[len] = '\0';
+    }
 }
 
 void

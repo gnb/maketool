@@ -37,6 +37,10 @@ void estring_append_char(estring *e, char c);
 void estring_append_chars(estring *e, const char *buf, int len);
 void estring_append_printf(estring *e, const char *fmt, ...);
 void estring_truncate(estring *e);
+/* remove leading whitespace */
+void estring_chug(estring *e);
+/* remove trailing whitespace */
+void estring_chomp(estring *e);
 void estring_free(estring *e);
 
 #define ESTRING_STATIC_INIT \
