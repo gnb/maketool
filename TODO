@@ -266,3 +266,10 @@ x  DONE: Makefile.in needs to define CPPFLAGS with @CPPFLAGS@ at the end for
    
 x  Frederick Bruckman says: To be able to pass in datadir or localedir to
    configure would be nice.
+
+x  Implement case-insensitive literals in Find window.
+
+x  Implement backwards search in Find window.
+
+x  Populate Find window string from current selection on Edit->Find ?
+
