@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: help-common.mk.in,v 1.7 2001-08-28 13:54:01 gnb Exp $
+# $Id: help-common.mk.in,v 1.8 2001-09-21 05:37:17 gnb Exp $
 #
 
 TOPDIR=		../../..
@@ -24,7 +24,7 @@ prefix=		@prefix@
 PACKAGE=	@PACKAGE@
 VERSION=	@VERSION@
 LANG=		$(notdir $(shell pwd))
-helpdir=	$(prefix)/@DATADIRNAME@/$(PACKAGE)/help/$(LANG)
+helpdir=	@datadir@/$(PACKAGE)/help/$(LANG)
 INSTALL=	@INSTALL@
 DB2HTML=	db2html
 NSGMLS=		nsgmls
