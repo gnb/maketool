@@ -1,10 +1,11 @@
 #!/bin/sh
 
 FORCE=no
-CVSUP=no
+CVSTAG=
 BUILDHOST=
 LOCALHOST=$(uname -n|cut -d. -f1)
 RPMDEST=
+COPYTARBALL=no
 # This file is both controlled and also emitted as part of the build,
 # which is probably a bad idea, but regardless it needs to be ignored
 # when checking for modified files.
@@ -37,10 +38,12 @@ while [ $# -gt 0 ]; do
     --force=*) boolopt FORCE $1 ;;
     -h|--build-host) BUILDHOST=$2 ; shift ;;
     --build-host=*) BUILDHOST=${1#*=} ;;
-    -u|--cvs-update) boolopt CVSUP yes ;;
-    --cvs-update=*) boolopt CVSUP $1 ;;
+    -u|--cvs-update) CVSTAG=HEAD ;;
+    --cvs-update=*) CVSTAG=${1#*=} ;;
     -d|--rpm-destination) RPMDEST=$2 ; shift ;;
     --rpm-destination=*) RPMDEST=${1#*=} ;;
+    -t|--copy-tarball) boolopt COPYTARBALL yes ; shift ;;
+    --copy-tarball=*) boolopt COPYTARBALL $1 ;;
     *) usage ;;
     esac
     shift
@@ -48,14 +51,22 @@ done
 
 # echo FORCE=$FORCE
 # echo BUILDHOST=$BUILDHOST
-# echo CVSUP=$CVSUP
+# echo CVSTAG=$CVSTAG
 # echo RPMDEST=$RPMDEST
 # exit
 
 case "$BUILDHOST" in
 ""|"$LOCALHOST"|localhost)
     echo "Building on local host ($LOCALHOST)"
-    exec 2>&1 | tee build.$LOCALHOST.log
+    if [ -z "$__BUILDRPM_LOGGED" ]; then
+	export __BUILDRPM_LOGGED=yes
+	exec ./buildrpm \
+	    	--cvs-update=$CVSTAG \
+		--force=$FORCE \
+		--rpm-destination=$RPMDEST \
+		--copy-tarball=$COPYTARBALL \
+		 2>&1 | tee build.$LOCALHOST.log
+    fi
     ;;
 *)
     echo "Building on remote host \"$BUILDHOST\""
@@ -63,9 +74,10 @@ case "$BUILDHOST" in
 	set -x
 	ssh $BUILDHOST "cd $PWD && \
     	    ./buildrpm \
-	    	--cvs-update=$CVSUP \
+	    	--cvs-update=$CVSTAG \
 		--force=$FORCE \
-		--rpm-destination=${RPMDEST:-$LOCALHOST:$PWD}"
+		--rpm-destination=${RPMDEST:-$LOCALHOST:$PWD} \
+		--copy-tarball=$COPYTARBALL"
     ) 2>&1 | tee build.$BUILDHOST.log
     exit
     ;;
@@ -114,8 +126,11 @@ fi
 #echo FORCE=$FORCE
 #exit 1
 
-
-if [ $CVSUP = yes ]; then
+case "$CVSTAG" in
+"")
+    # Do nothing
+    ;;
+HEAD)
     echo "Checking for locally changed files"
 
     CVSIGNORES_RE=$(echo $CVSIGNORES | sed -e 's/^[ \t]*/^(/g'  -e 's/[ \t]*$/)$/g' -e 's/[ \t][ \t]*/|/g')
@@ -128,7 +143,24 @@ if [ $CVSUP = yes ]; then
     	set -x
     	cvs -q up || exit 1
     ) || exit 1
-fi
+    ;;
+*)
+    echo "Checking out a new directory with tag $CVSTAG"
+
+    BUILDDIR=build.d
+    [ -d $BUILDDIR ] && rm -rf $BUILDDIR
+    ROOT=$(cat CVS/Root)
+    REPOS=$(cat CVS/Repository)
+
+    echo "Updating files from CVS"
+    (
+    	set -x
+	cvs -d $ROOT co -r$CVSTAG -d $BUILDDIR $REPOS || exit 1
+    ) || fatal "Can't check out from CVS"
+    [ -z "$RPMDEST" ] && RPMDEST=$(/bin/pwd)
+    cd $BUILDDIR || fatal "Checkout succeeded but no directory"
+    ;;
+esac
 
 if [ $FORCE = yes ]; then
     echo "Removing files to force rebuild"
@@ -176,15 +208,35 @@ echo "Building RPMs"
 	$SPECFILE || exit 1
 )
 
+copyfile ()
+{
+    local from=$1
+    local to=$1
+
+    case "$RPMDEST" in
+    "")
+	echo "Moving $from -> $to"
+	mv $from $f2 || exit 1
+    	;;
+    *:*)
+	echo "Copying $from -> $RPMDEST/$to"
+	scp $from $RPMDEST/$to || exit 1
+    	;;
+    *)
+	echo "Moving $from -> $RPMDEST/$to"
+	mv $from $RPMDEST/$to || exit 1
+    	;;
+    esac
+}
+
+if [ $COPYTARBALL = yes -a ! -z "$RPMDEST" ] ; then
+    echo "Copying tarball to destination"
+    copyfile $TARBALL $TARBALL
+fi
+
 echo "Copying RPMs to destination"
 for f in $(find $RPMDIR/RPMS -type f -name \*.rpm) ; do
     f2=$(echo $(basename $f) | sed -e 's|^\([a-z-]\+-\)|\1'${DISTRO}${DISTRO:+-}'|')
-    if [ -z "$RPMDEST" ]; then
-	echo "Moving $f -> $f2"
-	mv $f $f2 || exit 1
-    else
-	echo "Copying $f -> $RPMDEST/$f2"
-	scp $f $RPMDEST/$f2 || exit 1
-    fi
+    copyfile $f $f2
 done
 
