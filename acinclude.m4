@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl 
-dnl $Id: acinclude.m4,v 1.2 2003-08-10 06:00:40 gnb Exp $
+dnl $Id: acinclude.m4,v 1.3 2003-09-28 10:42:52 gnb Exp $
 dnl
 
 dnl For gcc, ensure that the given flags are in $CFLAGS
@@ -68,8 +68,17 @@ dnl ===============================
 dnl
 dnl Test for BSD vs SysV signal semantics
 dnl
-AC_DEFUN([AC_HAVE_SYSV_SIGNAL],[
-AC_MSG_CHECKING(for signal semantics)
+AC_DEFUN([AC_SIGNAL_SEMANTICS],[
+AC_CACHE_CHECK(for signal semantics,ac_cv_signal_semantics,[
+
+
+HAVE_BSD_SIGNAL=unknown
+HAVE_BSD_SIGACTION=unknown
+HAVE_BSD_SIGVEC=unknown
+
+dnl First, test for BSD vs SysV signal semantics
+dnl with the old-fashioned signal(3).
+
 AC_TRY_RUN([
 #include <signal.h>
 
@@ -86,32 +95,133 @@ main(int argc, char **argv)
 {
     int i;
     
-
-#ifdef SIGCHLD
-    signal(SIGCHLD, handler);
-#else
     signal(SIGCLD, handler);
-#endif
     for (i=0 ; i<5 ; i++)
 	kill(getpid(), SIGCLD);
 
     switch (ncaught)
     {
-    case 1: /* SysV signal semantics */
-    	return 0;
     case 5: /* BSD signal semantics */
+    	return 0;
+    case 1: /* SysV signal semantics */
     	return 1;
     default: /* something is awry */
     	return 2;
     }
 }
-],AC_DEFINE(HAVE_SYSV_SIGNAL,,[
-Whether SysV signal semantics apply (handler is 
-deregistered at delivery).  Note that you can
-have different semantics depending on the compiler
-flags as well as platform; on Linux you get BSD
-semantics with gcc and SysV with gcc -ansi.
-]) AC_MSG_RESULT(sysv),
-AC_MSG_RESULT(bsd),
-AC_MSG_RESULT(assuming bsd))
-])dnl
+],
+HAVE_BSD_SIGNAL=yes,
+HAVE_BSD_SIGNAL=no,
+AC_MSG_ERROR(cannot handle cross-compilation, sorry))
+
+if test $HAVE_BSD_SIGNAL = no ; then
+dnl For SysV semantics, check if we can force the OS
+dnl to implement BSD semantics with sigaction(2).
+dnl This helps on OSes which don't automatically
+dnl re-register but can't handle the app re-registering
+dnl in the signal handler, e.g. Solaris 2.5.1.
+AC_TRY_RUN([
+#include <signal.h>
+
+static int ncaught;
+
+static void
+handler(int sig)
+{
+    ncaught++;
+}
+
+struct sigaction act;
+
+int
+main(int argc, char **argv)
+{
+    int i;
+    
+    act.sa_handler = handler;
+#ifdef SA_RESTART    
+    act.sa_flags |= SA_RESTART;
+#endif
+    
+    sigaction(SIGCLD, &act, 0);
+    for (i=0 ; i<5 ; i++)
+	kill(getpid(), SIGCLD);
+
+    switch (ncaught)
+    {
+    case 5: /* BSD signal semantics */
+     	return 0;
+    case 1: /* SysV signal semantics */
+    	return 1;
+    default: /* something is awry */
+    	return 2;
+    }
+}
+],
+HAVE_BSD_SIGACTION=yes,
+HAVE_BSD_SIGACTION=no,
+AC_MSG_ERROR(cannot handle cross-compilation, sorry))
+
+dnl Just in case, try with sigvec(2) as well.
+AC_TRY_RUN([
+#include <signal.h>
+
+static int ncaught;
+
+static RETSIGTYPE
+handler(int sig)
+{
+    ncaught++;
+}
+
+struct sigvec vec;
+
+int
+main(int argc, char **argv)
+{
+    int i;
+    
+    vec.sv_handler = handler;
+    
+    sigvec(SIGCLD, &vec, 0);
+    for (i=0 ; i<5 ; i++)
+	kill(getpid(), SIGCLD);
+
+    switch (ncaught)
+    {
+    case 5: /* BSD signal semantics */
+    	return 0;
+    case 1: /* SysV signal semantics */
+     	return 1;
+    default: /* something is awry */
+    	return 2;
+    }
+}
+],
+HAVE_BSD_SIGVEC=yes,
+HAVE_BSD_SIGVEC=no,
+AC_MSG_ERROR(cannot handle cross-compilation, sorry))
+
+fi
+
+case "${HAVE_BSD_SIGNAL},${HAVE_BSD_SIGACTION},${HAVE_BSD_SIGVEC}" in
+yes,*) ac_cv_signal_semantics=bsd ;;
+no,yes,*) ac_cv_signal_semantics=sigaction ;;
+no,*,yes) ac_cv_signal_semantics=sigvec ;;
+no,no,no) ac_cv_signal_semantics=sysv ;;
+esac
+])
+
+SSEM=`echo $ac_cv_signal_semantics | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
+
+AC_DEFINE_UNQUOTED(SIGNAL_SEMANTICS,SIGNAL_SEMANTICS_$SSEM,[
+ * Signal registration semantics.
+ * BSD	    	BSD style, handlers are suppressed during
+ *  	    	delivery but never unregistered so do not
+ *  	    	need to re-regiser.
+ * SIGACTION	registering using sigaction gives BSD semantics
+ * SIGVEC   	registering using sigvec gives BSD semantics
+ * SYSV     	SysV style, handler needs to be re-registered
+ *  	    	after delivery.
+])
+])

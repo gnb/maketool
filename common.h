@@ -21,9 +21,13 @@
 #define _common_h_
 
 /*
- * $Id: common.h,v 1.14 2003-08-10 06:01:55 gnb Exp $
+ * $Id: common.h,v 1.15 2003-09-28 10:42:52 gnb Exp $
  */
 
+#define SIGNAL_SEMANTICS_BSD	    0	/* BSD: handler automatically re-registered */
+#define SIGNAL_SEMANTICS_SIGACTION  1	/* sigaction() makes it look like BSD */
+#define SIGNAL_SEMANTICS_SIGVEC     2	/* sigvec() makes it look like BSD */
+#define SIGNAL_SEMANTICS_SYSV	    3	/* SysV: handler needs re-registering */
 #include <config.h>
 
 #include <sys/types.h>

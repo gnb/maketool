@@ -22,7 +22,7 @@
 #include <signal.h>
 #include <sys/poll.h>
 
-CVSID("$Id: glib_extra.c,v 1.17 2003-07-25 14:19:19 gnb Exp $");
+CVSID("$Id: glib_extra.c,v 1.18 2003-09-28 10:42:52 gnb Exp $");
 
 
 typedef struct
@@ -34,6 +34,70 @@ typedef struct
 
 static GHashTable *g_unix_piddata = 0;
 static gboolean g_unix_got_signal = FALSE;
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+/*
+ * Handle registering signals.  Ideally we want BSD signal semantics
+ * where we can register a handler once, it's suppressed during
+ * delivery so we can't get recursive delivery, and it's never
+ * automatically un-registered.  On some OSes we get that for free,
+ * on some OSes we need to perform a little dance with sigaction()
+ * or sigvec() to achieve that; on yet other OSes we only get the
+ * screwed up SysV signal semantics.  Maketool will probably cause
+ * recursive signal delivery and a stack blowout on those platforms.
+ *
+ * register_sighandler
+ *  	Called to register the signal handler the first time only
+ *
+ * reregister_sighandler
+ *  	Called in the signal handler to re-register the signal
+ *  	handler if necessary (in the ideal case this is empty).
+ */
+
+#if SIGNAL_SEMANTICS == SIGNAL_SEMANTICS_SIGACTION
+
+static void
+register_sighandler(int sig, RETSIGTYPE (*handler)(int sig))
+{
+    struct sigaction act;
+
+    memset(&act, 0, sizeof(act));
+    act.sa_handler = handler;
+#ifdef SA_RESTART    
+    act.sa_flags |= SA_RESTART;
+#endif
+    sigaction(sig, &act, 0);
+}
+#define reregister_sighandler(sig, handler)
+
+#elif SIGNAL_SEMANTICS == SIGNAL_SEMANTICS_SIGVEC
+
+static void
+register_sighandler(int sig, RETSIGTYPE (*handler)(int sig))
+{
+    struct sigvec vec;
+
+    memset(&vec, 0, sizeof(vec));
+    vec.sv_handler = handler;
+    sigvec(sig, &vec, 0);
+}
+#define reregister_sighandler(sig, handler)
+
+#elif SIGNAL_SEMANTICS == SIGNAL_SEMANTICS_SYSV
+
+#define register_sighandler(sig, handler) \
+	signal(sig, handler)
+#define reregister_sighandler(sig, handler) \
+    	register_sighandler(sig, handler)
+
+#elif SIGNAL_SEMANTICS == SIGNAL_SEMANTICS_BSD
+
+#define register_sighandler(sig, handler) \
+	signal(sig, handler)
+#define reregister_sighandler(sig, handler)
+
+#endif /* SIGNAL_SEMANTICS_BSD */
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -96,9 +160,7 @@ g_unix_signal_handler(int sig)
 #endif
     g_unix_got_signal = TRUE;
 
-#if HAVE_SYSV_SIGNAL
-    signal(SIGCHLD, g_unix_signal_handler);
-#endif
+    reregister_sighandler(SIGCHLD, g_unix_signal_handler);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -206,7 +268,7 @@ g_unix_reap_init(void)
 #endif
 
     	first = FALSE;
-	signal(SIGCHLD, g_unix_signal_handler);
+	register_sighandler(SIGCHLD, g_unix_signal_handler);
     	g_unix_piddata = g_hash_table_new(g_direct_hash, g_direct_equal);
 #if GLIB2
     	source = g_source_new(&reaper_source_funcs, sizeof(GSource));
