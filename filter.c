@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.25 2001-07-25 08:35:22 gnb Exp $");
+CVSID("$Id: filter.c,v 1.26 2001-09-02 11:58:49 gnb Exp $");
 
 typedef struct
 {
@@ -316,6 +316,25 @@ filter_load(void)
 	"Building library \\1",		/* summary */
     	"Archive library link line");	/* comment */
     /* TODO: support for libtool */	
+    filter_add(
+    	"",				/* state */
+	"^creating ([^ \t]+)$",	    	/* regexp */
+	FR_INFORMATION,			/* code */
+	"\\1",				/* file */
+	"",				/* line */
+	"",				/* col */
+	0,		    	    	/* summary */
+    	"configure script output file 1"); /* comment */
+    filter_add(
+    	"",				/* state */
+	"^([^ \t]+) is unchanged$",  	/* regexp */
+	FR_INFORMATION,			/* code */
+	"\\1",				/* file */
+	"",				/* line */
+	"",				/* col */
+	0,		    	    	/* summary */
+    	"configure script output file 2"); /* comment */
+
 
 #if ENABLE_MWOS
     /*

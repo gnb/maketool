@@ -138,6 +138,8 @@ typedef enum
     GR_NEVER,	    	/* never active */
     GR_PRINT_PRINTER,
     GR_PRINT_FILE,
+    GR_AUTOCONF,
+    GR_CONFIGURE,
 
     NUM_SETS
 } Groups;
@@ -194,6 +196,12 @@ void preferences_set_dryrun(gboolean d);
 void preferences_add_variable(const char *name, const char *value, int type);
 void edit_preferences_cb(GtkWidget *, gpointer);
 void print_page_setup_cb(GtkWidget *, gpointer);
+/* autoconf.c */
+void build_configure_cb(GtkWidget *w, gpointer data);
+void build_autoconf_cb(GtkWidget *w, gpointer data);
+gboolean check_for_configure_in(void);
+gboolean check_for_configure(void);
+
 
 #define g_list_find_str(l, s) \
 	g_list_find_custom((l), (s), (GCompareFunc)strcmp)

@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.75 2001-08-02 08:28:00 gnb Exp $");
+CVSID("$Id: main.c,v 1.76 2001-09-02 11:58:49 gnb Exp $");
 
 
 /*
@@ -67,6 +67,9 @@ char  	    	*clipboard_text = 0;
 GtkWidget   	*clipboard_widget;
 
 GtkWidget   	*dir_previous_menu;
+
+gboolean    	has_configure_in;
+gboolean    	has_configure;
 
 /*
  * These are the targets specifically mentioned in the
@@ -157,6 +160,8 @@ grey_menu_items(void)
     ui_group_set_sensitive(GR_ALL, all);
     ui_group_set_sensitive(GR_CLEAN, clean);
     ui_group_set_sensitive(GR_FIND_AGAIN, !empty && find_can_find_again());
+    ui_group_set_sensitive(GR_AUTOCONF, !running && has_configure_in);
+    ui_group_set_sensitive(GR_CONFIGURE, !running && has_configure);
     ui_group_set_sensitive(GR_NEVER, FALSE);
 }
 
@@ -313,6 +318,7 @@ work_ended(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+#if 0
 static void
 make_makefile_start(Task *task)
 {
@@ -349,6 +355,47 @@ make_makefile_task(void)
 	prefs.var_environment,
 	&make_makefile_ops);
 }
+#endif
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+logged_task_start(Task *task)
+{
+    log_start_build(task->command);
+}
+
+static void
+logged_task_input(Task *task, int len, const char *buf)
+{
+    handle_input(len, buf);
+}
+
+static void
+logged_task_reap(Task *task)
+{
+    handle_input(0, 0);
+    log_end_build(task->command);
+}
+
+static TaskOps logged_task_ops =
+{
+logged_task_start,  	   	/* start */
+logged_task_input,	    	/* input */
+logged_task_reap, 	    	/* reap */
+0   	    	    	    	/* destroy */
+};
+
+Task *
+logged_task(char *command)
+{
+    return task_create(
+    	(Task *)g_new(Task, 1),
+	command,
+	prefs.var_environment,
+	&logged_task_ops);
+}
+
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -543,8 +590,10 @@ list_targets_task(void)
 static void
 list_targets(void)
 {
+#if 0
     if (prefs.enable_make_makefile)
 	task_enqueue(make_makefile_task());
+#endif
     task_enqueue(list_targets_task());
     task_start();
 }
@@ -861,8 +910,10 @@ void
 build_start(const char *target)
 {
     first_error = TRUE;
+#if 0
     if (prefs.enable_make_makefile)
 	task_enqueue(make_makefile_task());
+#endif
     task_enqueue(make_task(target));
     task_start();
 }
@@ -1046,6 +1097,9 @@ change_directory(const char *dir)
     	    construct_dir_previous_menu();
     }
 	
+    /* Check for presence of autoconf-related files */
+    has_configure_in = check_for_configure_in();
+    has_configure = check_for_configure();
 	
     /* update UI for new dir */
     
@@ -1058,7 +1112,7 @@ change_directory(const char *dir)
 	message("Directory %s", curr);
 	g_free(curr);
     }
-	
+
     if (build_menu != 0)
     	list_targets();
     
@@ -1419,6 +1473,9 @@ construct_build_menu_basic_items(void)
     ui_add_button(build_menu, _("_Stop"), 0, build_stop_cb, 0, GR_RUNNING);
     ui_add_toggle(build_menu, _("_Dryrun Only"), "<Ctrl>D", build_dryrun_cb, 0,
     	0, prefs.dryrun);
+    ui_add_separator(build_menu);
+    ui_add_button(build_menu, _("Run a_utoconf..."), 0, build_autoconf_cb, 0, GR_AUTOCONF);
+    ui_add_button(build_menu, _("Run _configure..."), 0, build_configure_cb, 0, GR_CONFIGURE);
     ui_add_separator(build_menu);
 }
 
@@ -1906,6 +1963,10 @@ parse_args(int argc, char **argv)
 #ifdef ARGSTEST
     original_dir = g_get_current_dir();
 #endif
+
+    /* Check for presence of autoconf-related files */
+    has_configure_in = check_for_configure_in();
+    has_configure = check_for_configure();
 
     argv0 = argv[0];
     cmd_targets = g_new(char*, argc);

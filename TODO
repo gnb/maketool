@@ -7,10 +7,6 @@ x  Allow the Makefile to be built on-demand, with an entry in the
 x  Use config.status if it exists and is not newer than configure
    or configure.in.
    
-x  When running configure, pop up a dialog which requests arguments
-   for configure (just a text box initially).  Default value is the
-   last arguments used (from config.status, then from preferences).
-
 x  Help: make the browser command configuruable in preferences.
 
 x  Help: organise smart way to generate index at least semi-automatically.
@@ -117,8 +113,6 @@ x  Keyboard navigation: Check for std accelerators to collapse,
    expand, collapse all, expand all, navigate up & down, select,
    unselect.
 
-x  Add a GUI for setting CONFIGUREFLAGS based on ./configure --help
-
 x  Printing: figure out default printer for combo box, from preferences
    else named "ps".
 
@@ -183,7 +177,16 @@ x  Bug where make variable overrides specified on command line are
    ignored until Preferences dialog OK is pressed.
    
 x  "make -n dist" fails.
-     
+
+x  Checks for configure.in and configure used to grey menu items
+   can be fooled as the check is only done at startup and change-
+   directory time (this is really the same problem as with targets).
+   
+x  The --no-create option to configure is not preserved, and probably
+   can't be.
+   
+x  Need a function to remove config.cache.
+
 --- closed ---
 
 x  DONE: `Variables' tab in Preferences window needs to shrink.
@@ -415,3 +418,9 @@ x  DONE: A.T. Hofkamp says: when extract_targets is not found, the failure
    not
    found
    
+x  DONE: When running configure, pop up a dialog which requests arguments
+   for configure (just a text box initially).  Default value is the
+   last arguments used (from config.status, then from preferences).
+
+x  DONE: Add a GUI for setting CONFIGUREFLAGS based on ./configure --help
+
