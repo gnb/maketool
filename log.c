@@ -22,7 +22,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: log.c,v 1.17 1999-09-05 11:39:31 gnb Exp $");
+CVSID("$Id: log.c,v 1.18 1999-10-17 14:03:04 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -121,6 +121,7 @@ log_add_rec(const char *line, const FilterResult *res)
     LogRec *lr;
     
     lr = g_new(LogRec, 1);
+    memset(lr, 0, sizeof(LogRec));
     lr->res = *res;
     if (lr->res.file == 0 || *lr->res.file == '\0')
     	lr->res.file = 0;
@@ -436,7 +437,8 @@ log_selected(void)
 void
 log_set_selected(LogRec *lr)
 {
-    gtk_ctree_select(GTK_CTREE(logwin), lr->node);
+    if (lr->node != 0)
+	gtk_ctree_select(GTK_CTREE(logwin), lr->node);
 }
 
 
