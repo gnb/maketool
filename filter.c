@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.35 2003-10-05 09:03:54 gnb Exp $");
+CVSID("$Id: filter.c,v 1.36 2003-10-10 09:30:49 gnb Exp $");
 
 typedef struct
 {
@@ -304,6 +304,21 @@ filter_load(void)
 
 #if ENABLE_FILTER_MIPSPRO
     filter_set_start(_("IRIX MIPSpro compilers"));
+    
+    /*
+     * IRIX smake in parallel mode emits lines like these before every
+     * line of output, but because they list only the target and not the
+     * source or directory they're nearly useless to us.
+     */
+    filter_add(
+    	"",			    	/* state */
+	"^--- [^ \t:]+ ---$",	    	/* regexp */
+	FR_INFORMATION,	    	    	/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	"",	    	    	    	/* summary */
+    	"smake target name");   	/* comment */
 
     /* old style MIPSpro errors and warnings */
     filter_add(
