@@ -71,7 +71,7 @@ case "$BUILDHOST" in
 		--rpm-destination=$RPMDEST \
 		--copy-tarball=$COPYTARBALL \
 		 2>&1 | tee build.$LOCALHOST.log
-	message "Got where I didnt expect!!"
+	exit
     fi
     message "Building on local host ($LOCALHOST)"
     ;;
