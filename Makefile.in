@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.13 1999-10-17 08:53:26 gnb Exp $
+# $Id: Makefile.in,v 1.14 1999-11-02 08:56:23 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -79,6 +79,19 @@ $(BINDIR)/extract_targets: extract_targets
 	
 uninstall::
 	$(RM) $(BINDIR)/extract_targets
+	
+###
+
+# make_makefile shell script
+
+install:: $(BINDIR)/make_makefile
+
+$(BINDIR)/make_makefile: make_makefile
+	test -d $(@D) || $(INSTALL) -m 755 -d $(@D)
+	$(INSTALL) -m 755 $< $@
+	
+uninstall::
+	$(RM) $(BINDIR)/make_makefile
 	
 ###
 

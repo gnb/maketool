@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.38 1999-09-05 11:39:31 gnb Exp $");
+CVSID("$Id: main.c,v 1.39 1999-11-02 08:56:23 gnb Exp $");
 
 typedef enum
 {
@@ -83,6 +83,8 @@ static const char *standard_targets[] = {
 #define PASTE3(x,y,z) x##y##z
 
 static void build_cb(GtkWidget *w, gpointer data);
+static void handle_input(int len, const char *buf, gpointer data);
+static void handle_line(const char *line);
 
 #define g_list_find_str(l, s) \
 	g_list_find_custom((l), (s), (GCompareFunc)strcmp)
@@ -233,6 +235,93 @@ anim_start(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+/*
+ * This clunky concept is necessary because the `make_makefiles'
+ * program needs to be run before, and in series with, other
+ * tasks like `list_targets' and `make' itself.
+ */
+ 
+typedef struct _Task
+{
+    void (*start)(void *);
+    void *arg;
+} Task;
+
+static GList *all_tasks = 0;
+
+static void
+task_add(void (*start)(void*), void *arg)
+{
+    Task *task = g_new(Task, 1);
+    task->start = start;
+    task->arg = arg;
+    all_tasks = g_list_append(all_tasks, task);
+}
+
+static void
+task_next(void)
+{
+    Task *task;
+    
+    if (all_tasks == 0)
+    	return;
+    task = (Task *)all_tasks->data;
+    all_tasks = g_list_remove_link(all_tasks, all_tasks);
+    
+    (*task->start)(task->arg);
+    
+    g_free(task);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+reap_make_makefile(pid_t pid, int status, struct rusage *usg, gpointer user_data)
+{
+    if (!(WIFEXITED(status) || WIFSIGNALED(status)))
+    	return;
+	
+#if DEBUG
+    fprintf(stderr, "reaped make makefile, pid=%d\n", (int)pid);
+#endif
+    /*
+     * Handle case where last line of child process'
+     * output has no terminating '\n'. Beware - 
+     * this last line may contain an error or warning,
+     * which affects log_num_{errors,warnings}().
+     */
+    if (leftover.length > 0)
+	handle_line(leftover.data);
+    estring_free(&leftover);
+    
+    task_next();
+}
+
+static void
+input_make_makefile(int len, const char *buf, gpointer data)
+{
+    handle_input(len, buf, data);
+}
+
+
+static void
+start_make_makefile(void *arg)
+{
+    char *prog;
+    pid_t pid;
+    
+    prog = expand_prog(prefs.prog_make_makefile, 0, 0, 0);
+    
+    pid = spawn_with_output(prog, reap_make_makefile, input_make_makefile, (gpointer)0,
+    	prefs.var_environment);
+#if DEBUG
+    fprintf(stderr, "spawned \"%s\", pid = %d\n", prog, (int)pid);
+#endif
+    g_free(prog);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 static void
 append_build_menu_items(GList *list)
 {
@@ -273,7 +362,7 @@ reap_list(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     	return;
 	
 #if DEBUG
-    fprintf(stderr, "reaped list target\n");
+    fprintf(stderr, "reaped list target, pid=%d\n", (int)pid);
 #endif
     /* 
      * Parse the output of the program into whitespace-separated
@@ -315,7 +404,10 @@ reap_list(pid_t pid, int status, struct rusage *usg, gpointer user_data)
      */
     available_targets = g_list_concat(std, available_targets);
 
+    anim_stop();
     grey_menu_items();
+    
+    task_next();
 }
 
 static void
@@ -327,7 +419,7 @@ input_list(int len, const char *buf, gpointer data)
 }
 
 static void
-list_targets(void)
+start_list(void *arg)
 {
     char *prog;
     pid_t pid;
@@ -345,7 +437,21 @@ list_targets(void)
     	/* TODO: remove old menu items when Change Directory implemented */
     }
 #endif
+#if DEBUG
+    fprintf(stderr, "spawned \"%s\", pid = %d\n", prog, (int)pid);
+#endif
     g_free(prog);
+}
+
+static void
+list_targets(void)
+{
+    log_start_build("Extracting make targets");
+    anim_start();
+
+    task_add(start_make_makefile, 0);
+    task_add(start_list, 0);
+    task_next();
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -398,6 +504,9 @@ reap_make(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 {
     char *target = (char *)user_data;
     
+#if DEBUG
+    fprintf(stderr, "reaped make, pid=%d\n", (int)pid);
+#endif
     if (WIFEXITED(status) || WIFSIGNALED(status))
     {
     	char *err_str = 0, *warn_str = 0, *int_str = 0;
@@ -437,6 +546,7 @@ reap_make(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	log_end_build(target);
 	anim_stop();
 	grey_menu_items();
+	task_next();
     }
 }
 
@@ -473,9 +583,10 @@ handle_input(int len, const char *buf, gpointer data)
     }
 }
 
-void
-build_start(const char *target)
+static void
+start_build(void *arg)
 {
+    const char *target = (const char *)arg;
     char *prog;
     
     /*
@@ -491,30 +602,50 @@ build_start(const char *target)
     
     current_pid = spawn_with_output(prog, reap_make, handle_input, (gpointer)target,
     	prefs.var_environment);
+#if DEBUG
+    fprintf(stderr, "spawned \"%s\", pid = %d\n", prog, (int)current_pid);
+#endif
+#if 0
     if (current_pid > 0)
     {
-	message(_("Making %s"), target);
-	
-	switch (prefs.start_action)
-	{
-	case START_NOTHING:
-	    break;
-	case START_CLEAR:
-	    log_clear();
-	    break;
-	case START_COLLAPSE:
-	    log_collapse_all();
-	    break;
-	}
-	
-	last_target = target;
-	interrupted = FALSE;
-	first_error = TRUE;
-	log_start_build(prog);
-	anim_start();
-	grey_menu_items();
     }
+#endif
     g_free(prog);
+}
+
+void
+build_start(const char *target)
+{
+    message(_("Making %s"), target);
+
+    switch (prefs.start_action)
+    {
+    case START_NOTHING:
+	break;
+    case START_CLEAR:
+	log_clear();
+	break;
+    case START_COLLAPSE:
+	log_collapse_all();
+	break;
+    }
+
+    last_target = target;
+    interrupted = FALSE;
+    first_error = TRUE;
+    {
+    	/* TODO: duh, this now needs to be expanded twice. Fmeh */
+	char *prog = expand_prog(prefs.prog_make, 0, 0, target);
+	log_start_build(prog);
+	g_free(prog);
+    }
+    anim_start();
+    grey_menu_items();
+
+
+    task_add(start_make_makefile, 0);
+    task_add(start_build, (void*)target);
+    task_next();
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

@@ -88,6 +88,7 @@ typedef struct
     char *prog_list_targets;
     char *prog_list_version;
     char *prog_edit_source;
+    char *prog_make_makefile;
     
     int win_width;		/* size of main window */
     int win_height;

@@ -21,7 +21,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: preferences.c,v 1.23 1999-10-16 16:36:56 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.24 1999-11-02 08:56:23 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -34,6 +34,7 @@ static GtkWidget	*prog_make_entry;
 static GtkWidget	*prog_targets_entry;
 static GtkWidget	*prog_version_entry;
 static GtkWidget	*prog_edit_entry;
+static GtkWidget	*prog_make_makefile_entry;
 static GtkWidget	*start_action_combo;
 static GtkWidget	*makefile_entry;
 static GtkWidget	*var_clist;
@@ -278,6 +279,7 @@ preferences_load(void)
     prefs.prog_list_targets = ui_config_get_string("prog_list_targets", "extract_targets %m %v");
     prefs.prog_list_version = ui_config_get_string("prog_list_version", GMAKE " --version");
     prefs.prog_edit_source = ui_config_get_string("prog_edit_source", "nc -noask %{l:+-line %l} %f");
+    prefs.prog_make_makefile = ui_config_get_string("prog_make_makefile", "make_makefile %m");
 
     prefs.win_width = ui_config_get_int("win_width", 300);
     prefs.win_height = ui_config_get_int("win_height", 500);
@@ -315,6 +317,7 @@ preferences_save(void)
     ui_config_set_string("prog_list_targets", prefs.prog_list_targets);
     ui_config_set_string("prog_list_version", prefs.prog_list_version);
     ui_config_set_string("prog_edit_source", prefs.prog_edit_source);
+    ui_config_set_string("prog_make_makefile", prefs.prog_make_makefile);
 
     ui_config_set_int("win_width", prefs.win_width);
     ui_config_set_int("win_height", prefs.win_height);
@@ -391,6 +394,9 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     
     g_free(prefs.prog_edit_source);
     prefs.prog_edit_source = g_strdup(gtk_entry_get_text(GTK_ENTRY(prog_edit_entry)));
+    
+    g_free(prefs.prog_make_makefile);
+    prefs.prog_make_makefile = g_strdup(gtk_entry_get_text(GTK_ENTRY(prog_make_makefile_entry)));
     
     prefs.start_action = ui_combo_get_current(start_action_combo);
     
@@ -940,7 +946,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     GList *list;
     int row = 0;
     
-    table = gtk_table_new(4, 2, FALSE);
+    table = gtk_table_new(6, 2, FALSE);
     gtk_container_border_width(GTK_CONTAINER(table), SPACING);
     gtk_table_set_row_spacings(GTK_TABLE(table), SPACING);
     gtk_widget_show(table);
@@ -1019,6 +1025,22 @@ prefs_create_programs_page(GtkWidget *toplevel)
     row++;
     
     /*
+     * Makefile updater
+     */
+    label = gtk_label_new(_("Build makefile:"));
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
+    gtk_widget_show(label);
+    
+    entry = gtk_entry_new();
+    gtk_signal_connect(GTK_OBJECT(entry), "changed", 
+    	GTK_SIGNAL_FUNC(changed_cb), 0);
+    gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    gtk_widget_show(entry);
+    prog_make_makefile_entry = entry;
+    row++;
+
+    /*
      * Key
      */
     label = gtk_label_new(programs_key);
@@ -1036,6 +1058,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     gtk_entry_set_text(GTK_ENTRY(prog_targets_entry), prefs.prog_list_targets);
     gtk_entry_set_text(GTK_ENTRY(prog_version_entry), prefs.prog_list_version);
     gtk_entry_set_text(GTK_ENTRY(prog_edit_entry), prefs.prog_edit_source);
+    gtk_entry_set_text(GTK_ENTRY(prog_make_makefile_entry), prefs.prog_make_makefile);
 
 
     return table;

@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
-dnl $Id: configure.in,v 1.12 1999-10-17 08:53:26 gnb Exp $
+dnl $Id: configure.in,v 1.13 1999-11-02 08:56:23 gnb Exp $
 dnl
 
 AC_INIT(main.c)
@@ -101,4 +101,4 @@ AC_DEFINE_UNQUOTED(GMAKE, "$GMAKE")
 AC_DEFINE_UNQUOTED(GMAKEBASE, "$GMAKEBASE")
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
-AC_OUTPUT(Makefile extract_targets maketool.spec intl/Makefile po/Makefile.in icons/Makefile)
+AC_OUTPUT(Makefile extract_targets make_makefile maketool.spec intl/Makefile po/Makefile.in icons/Makefile)

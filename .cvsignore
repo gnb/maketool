@@ -13,3 +13,4 @@ extract_targets
 maketool.spec
 maketool-*.rpm
 licence.c
+make_makefile
