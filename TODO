@@ -82,3 +82,11 @@ x  Accelerators etc for menu items.
 x  Allow user to configure error & warning colours & icons in Preferences.
 
 x  Doco.
+
+x  Remove line length limitation in handleInput().
+
+x  Remove line length limitation in filter_apply_one().
+
+x  Add check for buffer overflow in uiCreateTools().
+
+x  Use getopt?
