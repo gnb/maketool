@@ -49,8 +49,8 @@ I have received reports of maketool running on these platforms:
 </UL>
 <P>
 If you port maketool to a new platform, please EMAILME(mail me) the
-patches. I will try to incorporate them into the next release.  I'm
-also interested in translations into new languages.
+patches (unified diff `format' preferred). I will try to incorporate them
+into the next release.  I'm also interested in translations into new languages.
 </P>
 
 
@@ -64,6 +64,7 @@ THANKS(Alistair Crooks,Solaris port)
 THANKS(Francesco Lamonica,bug report)
 THANKS(Albert Hofkamp,`bugs, suggestions')
 THANKS(Vaclav Slavik,`bugs, suggestions')
+THANKS(David T Bath,Solaris patch)
 ENDTHANKS
 
 ENDBODY
