@@ -9,44 +9,65 @@ include(version.m4)
 
 <!-- TODO: mention in the features page that it's released under GPL -->
 <!-- TODO: news... ? -->
-<P>
-The latest version available is <B>VERSION</B>.
-</P>
+<p>
+The latest version available is <b>VERSION</b>.
+</p>
 
-<P>
+<p>
 Due to space limitations I am unable to provide downloads of any older
 versions on this website; EMAILME(contact me)
 if you really need an older version.
-</P>
+</p>
 
 BEGINDOWNLOAD
 define(DOWNLOADABLE,`DOWNLOAD($1,$2)')
 include(downloadables.m4)
 ENDDOWNLOAD
 
-<P>
-Maketool has also been ported to NetBSD, you can
-<A HREF="ftp://ftp.netbsd.org/pub/NetBSD/packages/pkgsrc/devel/maketool/README.html" TARGET="_top">get the packages here</A>.
-<B>Disclaimer:</B> I don't control that site, please don't complain to me if anything goes wrong.
-</P>
+<h2>Status of maketool ports</h2>
 
-<P>
-Maketool has also been ported to FreeBSD, see
-<A HREF="http://www.freebsd.org/cgi/ports.cgi?query=maketool&stype=name&release=5.1-CURRENT%2Fi386" TARGET="_top">here</A>.
-<B>Disclaimer:</B> I don't control that site, please don't complain to me if anything goes wrong.
-</P>
+<p>
+<b>Disclaimer:</b> I don't control the sites linked to below, please don't
+complain to me if anything goes wrong.
+</p>
 
-<P>
-There used to be a link to Debian packages here, but that page
-seems to have disappeared.  I'd be happy to hear about anyone
-creating Debian packages for maketool.
-</P>
+<table width="80%" border="0" cellpadding="5">
 
-<P>
-I have personally ported a version of maketool to Solaris, but as I
-have no regular access to a Solaris machine, I am
-unable to point to any binaries (sorry). The latest source includes Solaris
-port patches.
-</P>
+  <tr>
+    <td valign="top"><b>NetBSD</b></td>
+    <td>
+    Get the packages 
+    <a href="ftp://ftp.netbsd.org/pub/NetBSD/packages/pkgsrc/devel/maketool/README.html" target="_top">here</a>
+    </td>
+  </tr>
+
+  <tr>
+    <td valign="top"><b>FreeBSD</b></td>
+    <td>
+    Port information is
+    <a href="http://www.freebsd.org/cgi/ports.cgi?query=maketool&amp;stype=name&amp;release=5.1-CURRENT%2Fi386" target="_top">here</a>
+    </td>
+  </tr>
+
+  <tr>
+    <td valign="top"><b>Debian</b></td>
+    <td>
+    There used to be a link to Debian packages here, but that page
+    seems to have disappeared.  I'd be happy to hear about anyone
+    creating Debian packages for maketool.
+    </td>
+  </tr>
+
+  <tr>
+    <td valign="top"><b>Solaris</b></td>
+    <td>
+    I have personally ported a version of maketool to Solaris, but as I
+    have no regular access to a Solaris machine, I am
+    unable to point to any binaries (sorry). The latest source includes
+    Solaris port patches.
+    </td>
+  </tr>
+
+</table>
 
 ENDBODY

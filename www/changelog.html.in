@@ -5,30 +5,30 @@ include(_styles.html)
 ENDHEAD
 BEGINBODY
 
-<P>
+<p>
 This listing is also available as the file CHANGES in the source tarball
 and SRPM.
-</P>
+</p>
 
-<P>
+<p>
 I have started using a system of classifying the changes in each
 version, to give you a better idea of how maketool development is progressing.
 Starting with 0.7, the classifications are listed at the start of
 each line item, as one of the following codes:
-</P>
+</p>
 
-<DL>
+<dl>
 
-  <DT><B>[FEA]</B>
-  <DD>added or significantly reworked a <B>FEA</B>ture.
+  <dt><b>[FEA]</b>
+  <dd>added or significantly reworked a <b>FEA</b>ture.
 
-  <DT><B>[BUG]</B>
-  <DD>fixed a <B>BUG</B>.
+  <dt><b>[BUG]</b>
+  <dd>fixed a <b>BUG</b>.
 
-  <DT><B>[NVC]</B>
-  <DD>code improvements with <B>N</B>o <B>V</B>isible <B>C</B>hange.
+  <dt><b>[NVC]</b>
+  <dd>code improvements with <b>N</b>o <b>V</b>isible <b>C</b>hange.
 
-</DL>
+</dl>
 
 
 include(_changelist.html)
