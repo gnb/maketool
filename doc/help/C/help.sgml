@@ -4,7 +4,7 @@
 ]>
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.11 2001-09-23 08:19:54 gnb Exp $"
+         revision="$Id: help.sgml,v 1.12 2001-09-23 13:16:20 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool</title>
@@ -12,7 +12,7 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2001-09-23 08:19:54 $</pubdate>
+  <pubdate role="cvs">$Date: 2001-09-23 13:16:20 $</pubdate>
   <releaseinfo>This is version &version;</releaseinfo>
   <copyright>
     <year>2000</year>
@@ -1871,145 +1871,206 @@ the following commands appear in the <xref linkend="build-menu">.
 <section id="standard-targets" xreflabel="Standard Targets">
 <title>Standard Targets</title>
 
+<para>
+This section describes the standard Makefile targets which are
+known by Maketool.  This information is derived from the
+<ulink url="info:standards#Standard_Targets">GNU Makefile Standards</ulink>
+document, which goes into more detail.
+</para>
+
+<para>
+Quick Tip: usually the only targets you need to know are
+<command>all</command>, <command>install</command>, and
+<command>clean</command> (and use them in that order).
+</para>
+
 <variablelist>
 
   <varlistentry>
-    <term>all</term>
+    <term><command>all</command></term>
     <listitem>
       <para>
+      Compile any programs and libraries.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>check</term>
+    <term><command>check</command></term>
     <listitem>
       <para>
+      Perform self-tests; to be used between using <command>all</command>
+      and <command>install</command>.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>clean</term>
+    <term><command>clean</command></term>
     <listitem>
       <para>
+      Delete all files which are normally created by <command>all</command>.
+      e.g. object files, programs, and libraries.  Usually used to
+      save disk space or prepare for a complete rebuild.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>dist</term>
+    <term><command>dist</command></term>
     <listitem>
       <para>
+      Create a source tarball for distribution, e.g.
+      <filename>maketool-0.6.2-src.tar.gz</filename>.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>distclean</term>
+    <term><command>distclean</command></term>
     <listitem>
       <para>
+      Like <command>all</command> but also removes any files created
+      since the source distribution was unpacked.  Usually used to
+      prepare for rebuilding with a new configuration.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>dvi</term>
+    <term><command>dvi</command></term>
     <listitem>
       <para>
+      Used when dealing with Texinfo documentation.  Free software is
+      gradually transitioning from Texinfo to DocBook SGML.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>info</term>
+    <term><command>info</command></term>
     <listitem>
       <para>
+      Used when dealing with Texinfo documentation.  Free software is
+      gradually transitioning from Texinfo to DocBook SGML.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>install</term>
+    <term><command>install</command></term>
     <listitem>
       <para>
+      Compile any programs and libraries and copy them into their installation
+      directories (e.g. <filename>/usr/local/bin</filename>).  Some
+      poorly-written Makefiles require you to use <command>all</command>
+      first.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>installcheck</term>
+    <term><command>installcheck</command></term>
     <listitem>
       <para>
+      Perform self-tests; to be used after using <command>install</command>.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>installdirs</term>
+    <term><command>installdirs</command></term>
     <listitem>
       <para>
+      Create the installation diretories (e.g.
+      <filename>/usr/local/bin</filename>) if they don't exist.  Usually
+      happens as a side effect of <command>install</command> anyway.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>install-strip</term>
+    <term><command>install-strip</command></term>
     <listitem>
       <para>
+      Like <command>install</command> but also strip programs of debugging
+      symbols after installation.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>maintainer-clean</term>
+    <term><command>maintainer-clean</command></term>
     <listitem>
       <para>
+      Like <command>distclean</command> but cleans even more files.
+      After a <command>maintainer-clean</command>, you can still build
+      the software but may require all sorts of development tools that
+      you might not have installed, such as <command>gperf</command>,
+      <command>automake</command> etc.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>mostlyclean</term>
+    <term><command>mostlyclean</command></term>
     <listitem>
       <para>
+      Slightly weaker version of <command>clean</command>.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>reallyclean</term>
+    <term><command>reallyclean</command></term>
     <listitem>
       <para>
+      Older name for <command>maintainer-clean</command>.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>TAGS</term>
+    <term><command>TAGS</command></term>
     <listitem>
       <para>
+      Update the <filename>TAGS</filename> file used by the
+      <command>emacs</command> editor.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>tags</term>
+    <term><command>tags</command></term>
     <listitem>
       <para>
+      Update the <filename>tags</filename> file used by the
+      <command>vi</command> editor.
       </para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term>uninstall</term>
+    <term><command>uninstall</command></term>
     <listitem>
       <para>
+      Delete the installed copies from installation directories
+      (e.g. <filename>/usr/local/bin</filename>).
       </para>
     </listitem>
   </varlistentry>
 
 </variablelist>
+
+<para>
+Note that the family of "clean" targets form a strict sequence,
+with each target deleting progressively more files:
+<command>mostlyclean</command>,
+<command>clean</command>,
+<command>distclean</command>,
+<command>maintainer-clean</command> (aka
+<command>reallyclean</command>),
+</para>
 
 
 </section>
