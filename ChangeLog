@@ -1,3 +1,16 @@
+Mon Oct  6 10:19:52 2003  Greg Banks <gnb@alphalink.com.au>
+	* [FEA] Added a progress indicator for loading and saving log files.
+	* [FEA] During builds, provide a summary in the statusbar of the number
+	of errors and warnings encountered.
+	* [FEA] Added warning recognition regexp for gas warnings on
+	standard input.
+	* [BUG] Double-clicking on errors in the output of parallel recursion
+	by gmake -jN gets the right filename.
+	* [BUG] Fixed a number of minor memleaks associated with changing
+	directories.
+	* [NVC] Centralise several includes of <sys/stat.h>, and protect
+	with the standard autoconf define.
+
 Tue Sep 30 03:00:40 2003  Greg Banks <gnb@alphalink.com.au>
 	* Release 0.8
 
