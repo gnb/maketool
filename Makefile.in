@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.47 2003-05-04 06:29:20 gnb Exp $
+# $Id: Makefile.in,v 1.48 2003-05-06 15:12:34 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -101,7 +101,20 @@ uninstall::
 	
 clean::
 	$(RM) maketool_client
-		
+
+###
+
+# Build the list of non-gnu Makes to be included into the
+# specfile.  Only built when making from the specfile.
+non-gnu-makes.list:
+	-$(RM) $@
+	for exe in $(NON_GNU_MAKES) ; do \
+	    echo $(pkglibexecdir)/`basename $$exe` >> $@ ;\
+	done
+
+clean::
+	-$(RM) non-gnu-makes.list
+
 ###
 
 # make wrappers
@@ -178,13 +191,13 @@ clean::
 
 ###
 # Making a distribution
-distdir=	$(top_builddir)/$(PACKAGE)-$(VERSION)
-DISTTAR=	$(PACKAGE)-$(VERSION)-src.tar.gz
+distdir=	$(PACKAGE)-$(VERSION)
+DISTTAR=	$(PACKAGE)-$(VERSION).tar
 DISTFILES=	\
 		ABOUT-NLS COPYING COPYRIGHT TODO CHANGES maketool.spec.in \
 		\
-		configure.in config.guess config.sub install-sh \
-		configure Makefile.in config.h.in mkinstalldirs \
+		configure.in config.guess config.sub install-sh aclocal.m4 \
+		configure Makefile.in config.h.in mkinstalldirs makewrap.in \
 		\
 		$(SOURCES) $(HEADERS) \
 		$(CLIENT_SOURCES) $(CLIENT_HEADERS)
@@ -195,25 +208,31 @@ dist:
 	mkdir $(distdir)
 	chmod 777 $(distdir)
 	for file in $(DISTFILES); do \
-	  ln $$file $(distdir) 2>/dev/null || cp -p $$file $(distdir) 2>/dev/null; \
+	  test -f $(distdir)/$$file || \
+	    ln $$file $(distdir) 2>/dev/null || \
+	    cp -p $$file $(distdir) 2>/dev/null; \
 	done
 	for subdir in $(SUBDIRS); do \
 	  mkdir $(distdir)/$$subdir || exit 1; \
 	  chmod 777 $(distdir)/$$subdir; \
 	  ( cd $$subdir ; $(MAKE) $@ ) || exit 1; \
 	done
-	tar chozf $(DISTTAR) $(distdir)
+	tar chof $(DISTTAR) $(distdir)
+	-$(RM) $(DISTTAR).bz2
+	bzip2 $(DISTTAR)
 	$(RM) -r $(distdir)
 
 
-RPMFLAGS=	--define "_sourcedir $$PWD" \
-		--define "_builddir $$PWD/BUILD" \
-		--define "_rpmdir $$PWD"
+RPMFLAGS=	--define "_topdir $$PWD/rpm.d" \
+		--define "_sourcedir $$PWD"
+
 rpm: dist
-	-$(RM) -r BUILD
-	mkdir BUILD
+	-$(RM) -r rpm.d
+	mkdir rpm.d rpm.d/BUILD rpm.d/RPMS
 	rpm $(RPMFLAGS) -bb --clean maketool.spec
-		
+	mv -f rpm.d/RPMS/*/*.rpm .
+	-$(RM) -r rpm.d
+	
 ##
 # deps
 	
