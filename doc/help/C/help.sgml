@@ -6,7 +6,7 @@
 ]>
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.17 2003-09-28 11:37:36 gnb Exp $"
+         revision="$Id: help.sgml,v 1.18 2003-09-28 11:52:59 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool</title>
@@ -14,7 +14,7 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2003-09-28 11:37:36 $</pubdate>
+  <pubdate role="cvs">$Date: 2003-09-28 11:52:59 $</pubdate>
   <releaseinfo>This is version &version;</releaseinfo>
   <copyright>
     <year>2000</year>
@@ -2113,11 +2113,27 @@ and two new panes appear:
 
 <para>
 This window shows information about Maketool's version, who owns
-the copyright, what kinds of warranty you don't have.  The
+the copyright, what kinds of warranty you don't have.  
+The <guibutton>Options...</guibutton> button shows the 
+<xref linkend="compile-options-window">.  The
 <guibutton>Licence...</guibutton> button shows the 
 <xref linkend="licence-window">.
 </para>
 
+
+</section>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<section id="compile-options-window" xreflabel="Compile options window">
+<title>Compile options window</title>
+
+<graphic format="GIF" fileref="compile-options-window.gif"></graphic>
+
+<para>
+This window shows a listing of all the error filters, makefile
+systems, and make programs for which support is compiled into
+the maketool executable.
+</para>
 
 </section>
 
