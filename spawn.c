@@ -25,7 +25,7 @@
 #endif
 #include <gtk/gtk.h>
 
-CVSID("$Id: spawn.c,v 1.7 1999-05-30 11:24:40 gnb Exp $");
+CVSID("$Id: spawn.c,v 1.8 1999-10-16 15:51:31 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -84,6 +84,11 @@ spawn_output_reaper(pid_t pid, int status, struct rusage *usg, gpointer data)
     	g_free(so);
     }
 }
+
+#if defined(__sun__) && defined(__svr4__)
+/* for FIONREAD on Solaris */
+#include <sys/filio.h>
+#endif
 
 static void
 spawn_output_input(gpointer data, gint source, GdkInputCondition condition)
