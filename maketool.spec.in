@@ -4,7 +4,7 @@ Version: @VERSION@
 Release: 1
 Copyright: GPL
 Group: Development/Building
-Source: http://www.alphalink.com.au/~gnb/%{name}/%{name}-%{version}-src.tar.gz
+Source: http://www.alphalink.com.au/~gnb/%{name}/%{name}-%{version}.tar.bz2
 BuildRoot: /var/tmp/%{name}-root
 Vendor: Greg Banks <gnb@alphalink.com.au>
 Requires: make
@@ -18,12 +18,10 @@ Double-clicking on an error message starts an editor.
 %prep
 %setup -q
 
-autoconf
-
 %build
 @MAKE_ONLINE_HELP@EOH="--enable-online-help"
 CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr $EOH
-make
+make all non-gnu-makes.list
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -32,7 +30,7 @@ make install prefix=$RPM_BUILD_ROOT/usr
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%files
+%files -f non-gnu-makes.list
 %defattr(-,root,root)
 /usr/bin/maketool
 /usr/libexec/maketool/maketool_client
@@ -42,7 +40,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/maketool/help
 /usr/share/locale/*/LC_MESSAGES/maketool.mo
 %docdir /usr/man/man1
-/usr/man/man1/maketool.1
+/usr/man/man1/maketool.1*
 
 %changelog
 * Fri Feb 15 2002 Greg Banks <gnb@alphalink.com.au>
