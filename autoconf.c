@@ -21,8 +21,10 @@
 #include "ui.h"
 #include "util.h"
 #include "task.h"
+#include "log.h"
 
-Task *logged_task(char *command);
+extern Task *logged_task(char *command);
+extern void handle_input(int len, const char *buf);
 
 #define strassign(x, s) \
     do { \
@@ -168,6 +170,9 @@ static GtkWidget *preview_page;
 static GtkWidget *preview_text;
 static GtkTooltips *tooltips;
 static gboolean advanced = FALSE;
+static gboolean from_client;
+static gboolean finished;
+static long result;
 
 
 
@@ -471,7 +476,7 @@ parse_option_line(void)
 }
 
 static void
-handle_line(const char *line)
+ac_handle_line(const char *line)
 {
 #if DEBUG
     fprintf(stderr, "==> \"%s\"\n", line);
@@ -538,7 +543,7 @@ handle_line(const char *line)
 
 
 static void
-handle_input(int len, const char *buf)
+ac_handle_input(int len, const char *buf)
 {
     static estring leftover = ESTRING_STATIC_INIT;
     
@@ -552,7 +557,7 @@ handle_input(int len, const char *buf)
 	 * which affects log_num_{errors,warnings}().
 	 */
 	if (leftover.length > 0)
-	    handle_line(leftover.data);
+	    ac_handle_line(leftover.data);
 	/*
 	 * Free'ing and reinitialising seems a bit extreme,
 	 * but it allows the program to give back to malloc()
@@ -577,7 +582,7 @@ handle_input(int len, const char *buf)
 	*p = '\0';
 	estring_append_string(&leftover, buf);
 
-    	handle_line(leftover.length > 0 ? leftover.data : "");
+    	ac_handle_line(leftover.length > 0 ? leftover.data : "");
 	
 	estring_truncate(&leftover);
 	len -= (p - buf);
@@ -587,18 +592,17 @@ handle_input(int len, const char *buf)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-
 static void
 configure_help_input(Task *task, int len, const char *buf)
 {
-    handle_input(len, buf);
+    ac_handle_input(len, buf);
 }
 
 static void
 configure_help_reap(Task *task)
 {
     
-    handle_input(0, 0);     /* deal with possibly unterminated last line */
+    ac_handle_input(0, 0);     /* deal with possibly unterminated last line */
     
     /* parse last option */
     if (optline.length > 0)
@@ -625,9 +629,6 @@ configure_help_reap, 	    	/* reap */
 static void
 read_configure_options(void)
 {
-    Task *task;
-    
-    
     /* Delete all previously read options */
     while (all_options != 0)
     {
@@ -635,16 +636,11 @@ read_configure_options(void)
 	all_options = g_list_remove_link(all_options, all_options);
     }
     
-    task = task_create(
+    task_run(task_create(
     	(Task *)g_new(Task, 1),
 	g_strdup("./configure --help"),
 	/*env*/0,
-	&configure_help_ops);
-    task_enqueue(task);     /* TODO: wrong */
-    task_start();
-    
-    while (task_is_running())
-    	g_main_iteration(/*block*/TRUE);
+	&configure_help_ops));
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -803,6 +799,65 @@ update_preview(void)
     g_free(cmd);
 }
 
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+configure_start(Task *task)
+{
+    if (!from_client)
+	log_start_build(task->command);
+    else
+    	log_add_line(task->command);
+}
+
+static void
+configure_input(Task *task, int len, const char *buf)
+{
+    handle_input(len, buf);
+}
+
+static void
+configure_reap(Task *task)
+{
+    handle_input(0, 0);
+    if (!from_client)
+	log_end_build(task->command);
+    finished = TRUE;
+    result = task_is_successful(task) ? 0 : 1;
+}
+
+static TaskOps configure_ops =
+{
+configure_start,  	   	/* start */
+configure_input,	    	/* input */
+configure_reap, 	    	/* reap */
+0   	    	    	    	/* destroy */
+};
+
+static Task *
+configure_task(char *command)
+{
+    return task_create(
+    	(Task *)g_new(Task, 1),
+	command,
+	prefs.var_environment,
+	&configure_ops);
+}
+
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+/* Hide the dialog window, and wait until it goes away */    
+
+static void
+hide_configure_window(void)
+{
+    gtk_widget_hide(autoconf_shell);
+    while (g_main_pending())
+    	g_main_iteration(/*may_block*/FALSE);
+}
+
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
@@ -810,7 +865,9 @@ autoconf_cancel_cb(GtkWidget *w, gpointer data)
 {
 /*    DPRINTF("autoconf_cancel_cb\n"); */
     
-    gtk_widget_hide(autoconf_shell);
+    hide_configure_window();
+    finished = TRUE;
+    result = 1;
 }
 
 static void
@@ -832,13 +889,9 @@ autoconf_ok_cb(GtkWidget *w, gpointer data)
     
 /*    DPRINTF("autoconf_ok_cb\n"); */
 
-    /* Hide the dialog window, and wait until it goes away */    
-    gtk_widget_hide(autoconf_shell);
-    while (g_main_pending())
-    	g_main_iteration(/*may_block*/FALSE);
+    hide_configure_window();
 
-    task_enqueue(logged_task(build_configure_command()));
-    task_start();
+    task_spawn(configure_task(build_configure_command()));
 }
 
 
@@ -930,7 +983,6 @@ create_option_widgets(void)
     int cat;
     GList *options;
     int row;
-    GtkWidget *label;
     
     for (cat = 1 ; cat <NUM_CATEGORIES ; cat++)
     {
@@ -1004,6 +1056,7 @@ create_autoconf_shell(void)
     int cat;
     
     autoconf_shell = ui_create_dialog(toplevel,  _("Maketool: Configure Options"));
+    gtk_window_set_modal(GTK_WINDOW(autoconf_shell), TRUE);
     ui_set_help_name(autoconf_shell, "configure-window");
     
 /*    gtk_container_border_width(GTK_CONTAINER(autoconf_shell), SPACING); */
@@ -1087,9 +1140,11 @@ create_autoconf_shell(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-void
-build_configure_cb(GtkWidget *w, gpointer data)
+long
+show_configure_window(gboolean fc)
 {
+    from_client = fc;
+    
     read_configure_options();
     parse_config_status();
     if (autoconf_shell == 0)
@@ -1097,6 +1152,23 @@ build_configure_cb(GtkWidget *w, gpointer data)
     create_option_widgets();
     update_preview();
     gtk_widget_show(autoconf_shell);
+    
+    if (from_client)
+    {
+    	/* block waiting for user to cancel or configure task to finish */
+    	finished = FALSE;
+    	do
+	    gtk_main_iteration();
+	while (!finished);
+    }
+    
+    return result;
+}
+
+void
+build_configure_cb(GtkWidget *w, gpointer data)
+{
+    show_configure_window(/*from_client*/FALSE);
 }
 
 void
@@ -1112,14 +1184,7 @@ build_autoconf_cb(GtkWidget *w, gpointer data)
 gboolean
 check_for_configure_in(void)
 {
-    FILE *fp;
-    
-    fp = fopen("configure.in", "r");
-    if (fp == 0)
-    	return FALSE;
-	
-    fclose(fp);
-    return TRUE;
+    return file_exists("configure.in");
 }
 
 gboolean
@@ -1161,16 +1226,9 @@ check_for_configure(void)
 	    break;
 	}
     }
-    if (!gotmagic)
-    {
-    	fclose(fp);
-    	return FALSE;
-    }
-    
-    /* well it seems ok */
-	
+
     fclose(fp);
-    return TRUE;
+    return gotmagic;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

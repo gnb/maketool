@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.37 2001-09-02 11:58:49 gnb Exp $
+# $Id: Makefile.in,v 1.38 2001-09-21 04:33:04 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -25,7 +25,8 @@ BINDIR=		@bindir@
 INSTALL=	@INSTALL@
 PACKAGE=	@PACKAGE@
 VERSION=	@VERSION@
-localedir=	$(prefix)/@DATADIRNAME@/locale
+localedir=	@datadir@/locale
+datadir=	@datadir@/$(PACKAGE)
 libexecdir=	@libexecdir@/$(PACKAGE)
 helpdir=	$(prefix)/@DATADIRNAME@/$(PACKAGE)/help
 
@@ -34,19 +35,19 @@ CC=		@CC@
 CFLAGS=		@CFLAGS@
 CPPFLAGS=	@GTK_CFLAGS@ -I. -Iicons -Iintl \
 		-DLOCALEDIR=\"$(localedir)\" -DLIBEXECDIR=\"$(libexecdir)\" \
-		-DHELPDIR=\"$(helpdir)\" \
+		-DHELPDIR=\"$(helpdir)\" -DDATADIR=\"$(datadir)\" \
 		@CPPFLAGS@ $(TESTCPPFLAGS)
 LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 
 SOURCES=	main.c filter.c help.c preferences.c log.c print.c ps.c \
-		find.c autoconf.c ui.c task.c util.c glib_extra.c
+		find.c autoconf.c ui.c task.c util.c glib_extra.c mqueue.c
 HEADERS=	maketool.h filter.h common.h log.h ui.h \
 		util.h glib_extra.h ps.h task.h
 OBJECTS=	$(SOURCES:.c=.o)
 
 top_srcdir=	.
 top_builddir=	.
-SUBDIRS=	icons intl po #test
+SUBDIRS=	icons intl po makesys #test
 ifeq (@ENABLE_ONLINE_HELP@,yes)
 SUBDIRS+=	doc
 endif
@@ -54,6 +55,7 @@ endif
 ###
 
 ifneq ($(DEBUG),)
+	CFLAGS= -g -Wall
 	CPPFLAGS += -DDEBUG=$(DEBUG)
 endif
 
@@ -78,6 +80,30 @@ clean::
 		
 ###
 
+# maketool_client program
+
+all:: maketool_client
+
+CLIENT_SOURCES=	client.c mqueue.c util.c
+CLIENT_OBJECTS=	$(CLIENT_SOURCES:.c=.o)
+
+maketool_client: $(CLIENT_OBJECTS) _libintl
+	$(_PURIFY) $(LINK.c) -o $@ $(CLIENT_OBJECTS) $(LDLIBS)
+	
+install:: $(libexecdir)/maketool_client
+
+$(libexecdir)/maketool_client: maketool_client
+	test -d $(@D) || $(INSTALL) -m 755 -d $(@D)
+	$(INSTALL) -m 755 $< $@
+	
+uninstall::
+	$(RM) $(libexecdir)/maketool_client
+	
+clean::
+	$(RM) maketool_client
+		
+###
+
 # extract_targets shell script
 
 install:: $(libexecdir)/extract_targets
@@ -91,17 +117,6 @@ uninstall::
 	
 ###
 
-# make_makefile shell script
-
-install:: $(libexecdir)/make_makefile
-
-$(libexecdir)/make_makefile: make_makefile
-	test -d $(@D) || $(INSTALL) -m 755 -d $(@D)
-	$(INSTALL) -m 755 $< $@
-	
-uninstall::
-	$(RM) $(libexecdir)/make_makefile
-	
 # Assumes $PURIFY_HOME and $PUREOPTIONS are set in the environment
 export PUREOPTIONS = -cache-dir=/home/gregoryb/.cache \
 	-chain-length=20
@@ -166,7 +181,7 @@ DISTFILES=	\
 		configure Makefile.in config.h.in mkinstalldirs \
 		\
 		$(SOURCES) $(HEADERS) \
-		extract_targets.in make_makefile.in
+		extract_targets.in
 
 
 dist:

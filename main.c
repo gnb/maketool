@@ -21,6 +21,7 @@
 #include <stdarg.h>
 #include "maketool.h"
 #include "ui.h"
+#include <gdk/gdkx.h>
 #include "log.h"
 #include "util.h"
 #include <ctype.h>
@@ -28,8 +29,11 @@
 #if HAVE_SIGNAL_H
 #include <signal.h>
 #endif
+#include <sys/stat.h>
+#include <errno.h>
+#include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.76 2001-09-02 11:58:49 gnb Exp $");
+CVSID("$Id: main.c,v 1.77 2001-09-21 04:33:04 gnb Exp $");
 
 
 /*
@@ -71,6 +75,8 @@ GtkWidget   	*dir_previous_menu;
 gboolean    	has_configure_in;
 gboolean    	has_configure;
 
+const MakeSystem    *makesys;
+
 /*
  * These are the targets specifically mentioned in the
  * current GNU makefile standards (except `mostlyclean'
@@ -91,7 +97,7 @@ static const char *standard_targets[] = {
 #define PASTE3(x,y,z) x##y##z
 
 static void build_cb(GtkWidget *w, gpointer data);
-static void handle_input(int len, const char *buf);
+void handle_input(int len, const char *buf);
 static void handle_line(const char *line);
 static void set_main_title(void);
 static void construct_build_menu_basic_items(void);
@@ -227,6 +233,9 @@ expand_prog(
     
     if (prefs.dryrun)
 	expands['n'] = "-n";
+
+    expands['D'] = DATADIR;
+    expands['S'] = makesys->name;
     
     out = expand_string(prog, expands);
     
@@ -318,47 +327,6 @@ work_ended(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-#if 0
-static void
-make_makefile_start(Task *task)
-{
-    log_start_build(task->command);
-}
-
-static void
-make_makefile_input(Task *task, int len, const char *buf)
-{
-    handle_input(len, buf);
-}
-
-static void
-make_makefile_reap(Task *task)
-{
-    handle_input(0, 0);
-    log_end_build(task->command);
-}
-
-static TaskOps make_makefile_ops =
-{
-make_makefile_start,  	   	/* start */
-make_makefile_input,	    	/* input */
-make_makefile_reap, 	    	/* reap */
-0   	    	    	    	/* destroy */
-};
-
-static Task *
-make_makefile_task(void)
-{
-    return task_create(
-    	(Task *)g_new(Task, 1),
-	expand_prog(prefs.prog_make_makefile, 0, 0, 0),
-	prefs.var_environment,
-	&make_makefile_ops);
-}
-#endif
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
 static void
 logged_task_start(Task *task)
 {
@@ -396,6 +364,126 @@ logged_task(char *command)
 	&logged_task_ops);
 }
 
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static const MakeSystem makesys_plain = 
+{
+    "plain",
+    FALSE,
+    {0}
+};
+static const MakeSystem makesys_automake = 
+{
+    "automake",
+    TRUE,
+    {"Makefile.am", "Makefile.in", "config.status", "configure", "configure.in", 0}
+};
+static const MakeSystem makesys_autoconf_dist = 
+{
+    "autoconf-dist",
+    TRUE,
+    {"Makefile.in", "config.status", "configure", 0}
+};
+static const MakeSystem makesys_autoconf_maint = 
+{
+    "autoconf-maint",
+    TRUE,
+    {"Makefile.in", "config.status", "configure", "configure.in", 0}
+};
+static const MakeSystem makesys_imake = 
+{
+    "imake",
+    TRUE,
+    {"Imakefile", 0}
+};
+
+static const MakeSystem *
+intuit_makesystem(void)
+{
+    has_configure_in = check_for_configure_in();
+    has_configure = check_for_configure();
+    
+    if (file_exists("Makefile.am"))
+    	return &makesys_automake;
+    if (has_configure_in)
+    	return &makesys_autoconf_maint;
+    if (has_configure)
+    	return &makesys_autoconf_dist;
+    
+    /*
+     * This check is after the autoconf check on the assumption
+     * that Imake projects get converted into autoconf projects
+     * and not vice versa, so if both are present autoconf is
+     * likely to be the correct choice.
+     */
+    if (file_exists("Imakefile"))
+    	return &makesys_imake;
+    
+    /* return (file_exists("Makefile") ? &makesys_plain : &makesys_unknown); */
+    return &makesys_plain;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+/*
+ * Check to see if we can and should update
+ * the Makefile from other files.
+ *
+ * Note assumption that the makefile is called
+ * Makefile and not makefile or GNUmakefile,
+ * which happens to be true for all the make
+ * systems handled so far.
+ */
+
+static gboolean
+makefile_needs_update(void)
+{
+    int i;
+    struct stat sb;
+    time_t mf_mtime;
+
+    if (!makesys->automatic)
+    	return FALSE;	    /* nothing useful to do */
+	
+    /*
+     * Get Makefile's mod time.  If it doesn't
+     * exist, we can update.
+     */
+    if (stat("Makefile", &sb) < 0)
+    	return (errno == ENOENT);
+    mf_mtime = sb.st_mtime;
+
+    /*
+     * Check if any of the dependencies are missing or newer.
+     */
+    for (i = 0 ; makesys->deps[i] != 0 ; i++)
+    {
+    	if (stat(makesys->deps[i], &sb) <= 0)
+	    if (errno == ENOENT)
+	    	return TRUE;
+	if (sb.st_mtime > mf_mtime)
+	    return TRUE;
+    }
+
+    /* ok, everything seems in order, don't update */
+    return FALSE;
+}
+
+
+static void
+make_makefile(void)
+{
+#if DEBUG
+    fprintf(stderr, "make_makefile: makesys=%s\n", makesys->name);
+#endif
+
+    if (makefile_needs_update())
+    {
+	char *cmd = expand_prog(prefs.prog_make_makefile, 0, 0, 0);
+	task_enqueue(logged_task(cmd));
+    }
+}
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -590,10 +678,8 @@ list_targets_task(void)
 static void
 list_targets(void)
 {
-#if 0
     if (prefs.enable_make_makefile)
-	task_enqueue(make_makefile_task());
-#endif
+	make_makefile();
     task_enqueue(list_targets_task());
     task_start();
 }
@@ -631,6 +717,16 @@ start_edit(LogRec *lr)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static long
+handle_message(const char *message)
+{
+    if (!strcmp(message, "configure"))
+    	return show_configure_window(/*from_client*/TRUE);
+    return 1;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 static void
 handle_line(const char *line)
 {
@@ -664,7 +760,7 @@ handle_line(const char *line)
  * process has been reaped.
  */
  
-static void
+void
 handle_input(int len, const char *buf)
 {
     static estring leftover = ESTRING_STATIC_INIT;
@@ -910,10 +1006,8 @@ void
 build_start(const char *target)
 {
     first_error = TRUE;
-#if 0
     if (prefs.enable_make_makefile)
-	task_enqueue(make_makefile_task());
-#endif
+	make_makefile();
     task_enqueue(make_task(target));
     task_start();
 }
@@ -944,6 +1038,40 @@ toplevel_resize_cb(GtkWidget *w, GdkEvent *ev, gpointer data)
     
     curr_width = width;
     curr_height = height;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static gboolean
+toplevel_property_notify_cb(GtkWidget *w, GdkEvent *event)
+{
+    Message *msg;
+    long code;
+    
+#if DEBUG
+    fprintf(stderr, "toplevel_property_notify_cb\n");
+#endif
+
+    if (!mq_message_event(event))
+    {
+	/* prevent default signal handler possibly getting confused */    
+	gtk_signal_emit_stop_by_name(GTK_OBJECT(w), "property_notify_event");
+    	return TRUE;
+    }
+    
+    while ((msg = mq_receive()) != 0)
+    {
+	/* interpret value */
+#if DEBUG
+	fprintf(stderr, "toplevel_property_notify_cb: body=\"%s\"\n",
+    	    msg->body.data);
+#endif
+	code = handle_message(msg->body.data);
+	mq_reply(msg, code);
+	mq_msg_delete(msg);
+    }
+    
+    return TRUE;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -1098,8 +1226,7 @@ change_directory(const char *dir)
     }
 	
     /* Check for presence of autoconf-related files */
-    has_configure_in = check_for_configure_in();
-    has_configure = check_for_configure();
+    makesys = intuit_makesystem();
 	
     /* update UI for new dir */
     
@@ -1768,6 +1895,8 @@ ui_create(void)
     	GTK_SIGNAL_FUNC(file_exit_cb), NULL);
     gtk_signal_connect(GTK_OBJECT(toplevel), "configure_event", 
     	GTK_SIGNAL_FUNC(toplevel_resize_cb), NULL);
+    gtk_signal_connect(GTK_OBJECT(toplevel), "property_notify_event", 
+    	GTK_SIGNAL_FUNC(toplevel_property_notify_cb), NULL);
     gtk_container_border_width(GTK_CONTAINER(toplevel), 0);
     ui_set_help_name(toplevel, "main-window");
     gtk_widget_show(GTK_WIDGET(toplevel));
@@ -1870,10 +1999,31 @@ ui_create(void)
     gtk_box_pack_start(GTK_BOX(messagebox), anim, FALSE, FALSE, 0);   
     gtk_widget_show(anim);
 
+    /*
+     * Setup the environment variable which tells descendant
+     * maketool_client processes which window to talk to.
+     *
+     * TODO: isolate dep on gdkx.h
+     */
+#if HAVE_PUTENV
+    putenv(g_strdup_printf("MAKETOOL_WINDOWID=0x%lx", GDK_WINDOW_XWINDOW(toplevel->window)));
+#endif
+
+    /*
+     * Ensure we get PropertyNotify events on our own window,
+     * so maketool_client can send us stuff.
+     */
+    gdk_window_set_events(toplevel->window,
+    	    gdk_window_get_events(toplevel->window)|GDK_PROPERTY_CHANGE_MASK);
+#if DEBUG
+    fprintf(stderr, "toplevel GDK event mask: 0x%08x\n",
+    	    	    gdk_window_get_events(toplevel->window));
+#endif
+    mq_init(toplevel->window);
+
     list_targets();
 
     gtk_widget_show(GTK_WIDGET(table));
-    
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -1964,9 +2114,8 @@ parse_args(int argc, char **argv)
     original_dir = g_get_current_dir();
 #endif
 
-    /* Check for presence of autoconf-related files */
-    has_configure_in = check_for_configure_in();
-    has_configure = check_for_configure();
+    /* Check for presence of autoconf-related etc files */
+    makesys = intuit_makesystem();
 
     argv0 = argv[0];
     cmd_targets = g_new(char*, argc);

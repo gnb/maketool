@@ -1,5 +1,37 @@
 --- open ---
 
+x  Strongly limit the inclusion of gdkx.h.
+
+x  Add a Build->Makefile menu item to allow the user to manually start
+   the Makefile-build process.
+   
+x  Change the Build->Run autoconf etc menu items to be dependent on
+   the directory's makesystem.
+
+x  Change maketool_client to be public and its default mode to take
+   make-style args (options targets and variable overrides) and pass
+   them to a discovered maketool for interpretation.  automake.mk etc
+   will need to use a new --message opion.
+
+x  Limit the sizes of target names in the Build menu, especially
+   when a pair of them is used as a range for a submenu.
+
+x  Fix Makefile.in to use pkglibexecdir instead of libexecdir
+
+x  Rationalise use of handle_input()
+
+x  Create dummy N_() macros to seed the PO files with common autoconf
+   help strings.
+   
+x  When the user cancels a ./configure run from the GUI, this should
+   show in the log window instead of "*** [config.status] Error 1".
+   
+x  Change spec file to make the RPM depend on make.
+
+x  Add email address to Vendor: in spec file.
+
+x  Reduce use of @PACKAGE@ etc in spec file.
+
 x  Allow the Makefile to be built on-demand, with an entry in the
    first part of the Build menu.  Turn off automatically building
    by default.

@@ -121,6 +121,13 @@ typedef struct
 
 } Preferences;
 
+typedef struct
+{
+    char *name;
+    gboolean automatic;     /* can do useful automatic update */
+    char *deps[32]; 	    /* all filenames on which Makefile depends */
+} MakeSystem;
+
 typedef enum
 {
     GR_NONE=-1,
@@ -143,7 +150,6 @@ typedef enum
 
     NUM_SETS
 } Groups;
-
 
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -197,6 +203,7 @@ void preferences_add_variable(const char *name, const char *value, int type);
 void edit_preferences_cb(GtkWidget *, gpointer);
 void print_page_setup_cb(GtkWidget *, gpointer);
 /* autoconf.c */
+long show_configure_window(gboolean from_client);
 void build_configure_cb(GtkWidget *w, gpointer data);
 void build_autoconf_cb(GtkWidget *w, gpointer data);
 gboolean check_for_configure_in(void);

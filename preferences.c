@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.48 2001-09-02 12:56:35 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.49 2001-09-21 04:33:04 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -325,7 +325,7 @@ preferences_load(void)
     prefs.prog_list_targets = ui_config_get_string("prog_list_targets", "extract_targets %m %v");
     prefs.prog_list_version = ui_config_get_string("prog_list_version", GMAKE " --version");
     prefs.prog_edit_source = ui_config_get_string("prog_edit_source", "nc -noask %{l:+-line %l} %f");
-    prefs.prog_make_makefile = ui_config_get_string("prog_make_makefile", "make_makefile %m");
+    prefs.prog_make_makefile = ui_config_get_string("prog_make_makefile2", GMAKE " %n %v -f %D/%S.mk Makefile");
     prefs.prog_finish = ui_config_get_string("prog_finish", "");
 
     prefs.win_width = ui_config_get_int("win_width", 300);
@@ -398,7 +398,7 @@ preferences_save(void)
     ui_config_set_string("prog_list_targets", prefs.prog_list_targets);
     ui_config_set_string("prog_list_version", prefs.prog_list_version);
     ui_config_set_string("prog_edit_source", prefs.prog_edit_source);
-    ui_config_set_string("prog_make_makefile", prefs.prog_make_makefile);
+    ui_config_set_string("prog_make_makefile2", prefs.prog_make_makefile);
     ui_config_set_string("prog_finish", prefs.prog_finish);
 
     ui_config_set_int("win_width", prefs.win_width);
@@ -1128,6 +1128,8 @@ Key\n\
 %v              make variable overrides\n\
 %t              make target\n\
 %{x:+y}         y if %x is not empty\n\
+%D  	        maketool data directory\n\
+%S  	    	makesystem name\n\
 ");
 
 

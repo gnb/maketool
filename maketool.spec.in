@@ -36,7 +36,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 /usr/bin/maketool
 /usr/libexec/maketool/extract_targets
-/usr/libexec/maketool/make_makefile
+/usr/share/maketool/*.mk
 %doc COPYING COPYRIGHT TODO CHANGES
 %docdir /usr/share/@PACKAGE@/help
 /usr/share/@PACKAGE@/help
@@ -44,6 +44,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/locale/cs/LC_MESSAGES/maketool.mo
 
 %changelog
+* Mon Sep 17 2001 Greg Banks <gnb@alphalink.com.au>
+- Make_makefile is replaced.
 * Mon Dec 11 2000 Greg Banks <gnb@alphalink.com.au>
 - Czech translation
 * Fri Dec 1 2000 Greg Banks <gnb@alphalink.com.au>
