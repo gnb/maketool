@@ -21,7 +21,7 @@
 #define _config_h_ 1
 
 /*
- * $Id: config.h.in,v 1.8 1999-12-19 15:13:44 gnb Exp $
+ * $Id: config.h.in,v 1.9 2000-01-03 14:47:14 gnb Exp $
  */
 
 /*
@@ -67,6 +67,9 @@
  * Full pathname to the lpstat program if it exists.
  */
 #define LPSTAT_COMMAND ""
+
+/* Whether a usable wait3(2) is defined */
+#define HAVE_WAIT3 0
 
 /* Various standard autoconf defines */
 #define HAVE_MALLOC_H 0

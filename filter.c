@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.16 1999-11-04 04:45:25 gnb Exp $");
+CVSID("$Id: filter.c,v 1.17 2000-01-03 14:47:14 gnb Exp $");
 
 typedef struct
 {
@@ -345,7 +345,7 @@ filter_apply(const char *line, FilterResult *result)
 	filter_apply_one(f, line, result);
 #if DEBUG
 	fprintf(stderr, "filter [%s] on \"%s\" -> %d (%s)\n",
-		f->comment, line, (int)result->code, result->summary);
+		f->comment, line, (int)result->code, safe_str(result->summary));
 #endif
 	if (result->code != FR_UNDEFINED)
 	    return;

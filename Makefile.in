@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.17 1999-12-19 15:13:44 gnb Exp $
+# $Id: Makefile.in,v 1.18 2000-01-03 14:47:14 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -57,7 +57,7 @@ SUBDIRS=	icons intl po #test
 all:: maketool
 
 maketool: $(OBJECTS) _libintl
-	$(LINK.c) -o $@ $(OBJECTS) $(LDLIBS)
+	$(_PURIFY) $(LINK.c) -o $@ $(OBJECTS) $(LDLIBS)
 	
 install:: $(BINDIR)/maketool
 
@@ -110,6 +110,15 @@ $O/.stamp:
 
 clean::
 	$(RM) -r $O
+
+# Assumes $PURIFY_HOME and $PUREOPTIONS are set in the environment
+export PUREOPTIONS = -cache-dir=/home/gregoryb/.cache \
+	-chain-length=20
+PURIFY= purify
+
+pure:
+	$(MAKE) _PURIFY="$(PURIFY)" all
+        
 ###
 
 # Subdirectories

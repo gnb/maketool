@@ -22,7 +22,7 @@
 #include <signal.h>
 #include <sys/poll.h>
 
-CVSID("$Id: glib_extra.c,v 1.10 2000-01-03 12:25:17 gnb Exp $");
+CVSID("$Id: glib_extra.c,v 1.11 2000-01-03 14:47:14 gnb Exp $");
 
 
 typedef struct
@@ -90,6 +90,10 @@ g_unix_dispatch_reapers(void)
 static RETSIGTYPE
 g_unix_signal_handler(int sig)
 {
+#if DEBUG > 50
+    static const char msg[] = "g_unix_signal_handler(): called\n";
+    write(2, msg, sizeof(msg)-1);
+#endif
     g_unix_got_signal = TRUE;
 }
 

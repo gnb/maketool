@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.25 1999-12-19 15:13:44 gnb Exp $");
+CVSID("$Id: log.c,v 1.26 2000-01-03 14:47:14 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -395,7 +395,7 @@ log_add_line(const char *line)
     filter_apply(line, &res);
 #if DEBUG
     fprintf(stderr, "filter_apply: \"%s\" -> %d \"%s\" %d\n",
-    	line, (int)res.code, res.file, res.line);
+    	line, (int)res.code, safe_str(res.file), res.line);
 #endif
 
     if (res.file != 0 && *res.file == '\0')
