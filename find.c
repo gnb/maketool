@@ -24,7 +24,7 @@
 #include <regex.h>	/* POSIX regular expression fns */
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: find.c,v 1.3 2000-04-16 09:46:57 gnb Exp $");
+CVSID("$Id: find.c,v 1.4 2000-06-13 13:54:11 gnb Exp $");
 
 static GtkWidget	*find_shell = 0;
 typedef enum { FD_FORWARDS, FD_BACKWARDS, FD_MAX_DIRECTIONS } FindDirections;
@@ -38,7 +38,6 @@ typedef enum
 static GtkWidget    	*dirn_radio[FD_MAX_DIRECTIONS];
 static GtkWidget    	*type_radio[FT_MAX_TYPES];
 static GtkWidget    	*string_entry;
-static FindDirections	direction = FD_FORWARDS;
 
 typedef struct 
 {
@@ -190,12 +189,13 @@ find_state_next(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static gboolean found = FALSE;
+
 /* returns FALSE to stop iteration */
 static gboolean
 find_apply_func(LogRec *lr, gpointer user_data)
 {
     FindState *state = (FindState *)user_data;
-    gboolean found = FALSE;
     
     switch (state->type)
     {
@@ -216,6 +216,29 @@ find_apply_func(LogRec *lr, gpointer user_data)
     return !found;
 }
 
+/* do the actual search -- common between find & find-again */
+static void
+do_find_aux(const FindState *state, gboolean first)
+{
+    FindDirections direction;
+    
+    /* get current direction */
+    direction = (gtk_toggle_button_get_active(
+    	GTK_TOGGLE_BUTTON(dirn_radio[FD_FORWARDS])) ?
+    	FD_FORWARDS : FD_BACKWARDS);
+
+    found = FALSE;
+    log_apply_after(
+    	find_apply_func,
+	(direction == FD_FORWARDS),
+	(first ? (LogRec*)0 : log_selected()),
+	(gpointer)state);
+    if (!found)
+    {
+    	gdk_beep();
+    	message(_("Pattern not found."));
+    }
+}
 
 static void
 do_find(void)
@@ -248,17 +271,8 @@ do_find(void)
 	find_state_push(state);
     }
     
-    /* get current direction */
-    direction = (gtk_toggle_button_get_active(
-    	GTK_TOGGLE_BUTTON(dirn_radio[FD_FORWARDS])) ?
-    	FD_FORWARDS : FD_BACKWARDS);
-
-    /* do the actual search */    
-    log_apply_after(
-    	find_apply_func,
-	(direction == FD_FORWARDS),
-	log_selected(),
-	(gpointer)state);
+    /* do the actual search */
+    do_find_aux(state, /*first*/TRUE);
     
     /* The Find Again menu item is now available */
     grey_menu_items();
@@ -273,14 +287,8 @@ do_find_again(void)
     assert(find_state_stack != 0);
     state = (FindState *)find_state_stack->data;
 
-    /* use previous direction */
-    
-    /* do the actual search */    
-    log_apply_after(
-    	find_apply_func,
-	(direction == FD_FORWARDS),
-	log_selected(),
-	(gpointer)state);
+    /* do the actual search */
+    do_find_aux(state, /*first*/FALSE);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -289,6 +297,12 @@ static void
 find_find_cb(GtkWidget *w, gpointer data)
 {
     do_find();
+}
+
+static void
+find_find_again_cb(GtkWidget *w, gpointer data)
+{
+    do_find_again();
 }
 
 static void
@@ -400,6 +414,8 @@ create_find_shell(void)
     
     ui_dialog_create_button(find_shell, _("Find"),
     	find_find_cb, (gpointer)0);
+    ui_dialog_create_button(find_shell, _("Find Again"),
+    	find_find_again_cb, (gpointer)0);
     ui_dialog_create_button(find_shell, _("Cancel"),
     	find_cancel_cb, (gpointer)0);
 }
