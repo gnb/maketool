@@ -26,13 +26,13 @@ x  DONE: Implement setting environment from Variables.
 x  DONE: Change the `Type' field in the Variables tab in the
    Preferences window to a combo box.
    
-x  I18N.
+x  DONE: I18N.
 
 x  Provide filters for other compilers than gcc.
 
 x  Make filters configurable in Preferences GUI.
 
-x  Save & load preferences.
+x  Save & load preferences, window geom etc.
 
 x  Override preferences with -f -j -k and -l options from commandline.
 
@@ -71,8 +71,14 @@ x  Improve glib_extra.c so it doesn't require need to care
 
 x  DONE: Add patchlevel.h
 
-x  Add autoconf support.
+x  DONE: Add autoconf support.
 
 x  Implement the FR_PENDING filter result.
 
-x  Install extract_targets.sh
+x  DONE: Install extract_targets.sh
+
+x  Accelerators etc for menu items.
+
+x  Allow user to configure error & warning colours & icons in Preferences.
+
+x  Doco.
