@@ -1,3 +1,55 @@
+* 0.6.99  (22 Sep 2001)
+x  [FEA] There is now a GUI for choosing options to ./configure scripts when
+   building a Makefile in directories which use autoconf.
+x  [FEA] Added support for automake.
+x  [FEA] Added a menu item to allow the user to manually rebuild the Makefile
+   when using autoconf, automake or imake.
+x  [FEA] Added menu items to run configure, run autoconf, etc.
+x  [FEA] Added filters to recognise configure script's "creating" lines, so the user
+   can double-click on those lines.
+x  [FEA] The make_makefile program has been replaced, partly with in-process
+   code, partly with several fixed Makefile fragments.  Automatically
+   building the Makefile is now much cleaner and more reliable.
+x  [FEA] In summarise mode, summarised lines are shown in a configurable colour,
+   which defaults to a very light grey.  This shows where the "Compiling"
+   etc lines are when there is lots of un-summarisable rubbish.
+x  [FEA] Added support for summaries of cross-compilation and cross-linking.
+x  [FEA] Japanese translation, thanks to SATO Satoru of the Japan GNOME Users Group.
+x  [FEA] Added Czech translation (thanks to Vaclav Slavik).
+x  [FEA] No longer depends on BSD signal semantics; instead BSD and SysV semantics
+   are checked for at configure time.
+x  [FEA] The binary RPM now depends on make.
+x  [FEA] Add email address to Vendor: in spec file.
+x  [FEA] Correct GNOME-like appearance and behaviour of buttons in dialogs.
+x  [FEA] Considerable work on the documentation, which is not released yet.
+x  [BUG] Widgets update (e.g. mouse-over animations) during help click-on sequence.
+x  [BUG] Fixed bug which broke summaries of some compile lines.
+x  [BUG] Improved failure mode when extract_targets is not found: a single
+   insensitive menu entry is added, and the error output is shown to
+   the user in the message bar.
+x  [BUG] Work around problem with mouse-over highlights of toolbar "all" & "clean".
+x  [BUG] Typing `=' in variable name entry in Preferences window advances
+   to the value entry.  This avoids the user accidentally typing `='
+   in variable names.
+x  [NVC] Got rid of stupid autonull hack.  Dialogs are now not destroyed when the
+   user closes them with WM_DELETE.
+x  [NVC] Source now also compiles with "gcc -ansi".
+x  [NVC] Don't try to distribute aclocal.m4 which doesn't exist anymore.
+x  [NVC] Maketool's own Makefiles now have GNU standard usage of $top_srcdir,
+   $top_builddir, $pkgdatadir and $pkglibexecdir.
+x  [NVC] Reduce use of @PACKAGE@ etc in spec file.
+x  [NVC] Removed some RH-specific $OS stuff in spec file.
+x  [NVC] Building maketool with DEBUG=n now adds -Wall and removes -O2 from $CFLAGS.
+x  Building maketool RPMs no longer uses the system /usr/src/RPM directory,
+   instead using --define to do everything in the local directory.  This
+   enables someone without root privilege to build an RPM.
+x  [NVC] Removed "Latin" translation -- have real ones to test now!
+x  [NVC] Various small tweaks found by -Wall.
+x  [NVC] Various code rationalisations, notably in starting child processes
+   and handling their output.
+x  [NVC] No longer use an objs/ directory for object files.
+
+
 * 0.6.2  (26 Nov 2000)
 x  Added an option to disable make_makefile.
 x  Added an option to scroll to end on make child output.
