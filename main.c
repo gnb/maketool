@@ -6,6 +6,8 @@
 #include <sys/time.h>
 #include <stdarg.h>
 #include <string.h>
+#include <errno.h>
+#include <signal.h>
 #include <sys/ioctl.h>
 #include "spawn.h"
 #include "filter.h"
@@ -13,9 +15,8 @@
 
 typedef struct
 {
-#if 0
-    char *text[2];	/* 2 verbosity levels */
-#endif
+    /* TODO: 2 verbosity levels */
+    char *line;
     FilterResult res;
     GtkCTreeNode *node;
 } LogRec;
@@ -25,6 +26,8 @@ typedef enum
     SET_NOTEMPTY,
     SET_NOTRUNNING,
     SET_RUNNING,
+    SET_SELECTED,
+    SET_AGAIN,
 
     NUM_SETS
 } WidgetSet;
@@ -38,11 +41,14 @@ const char	*argv0;
 char		**targets;
 int		numTargets;
 int		currentTarget;
+const char	*lastTarget = 0;
 GtkWidget	*toplevel;
 GtkWidget	*toolbar, *messagebox;
 GtkWidget	*logwin, *messageent;
+gboolean	showWarnings = TRUE, showErrors = TRUE, showInfo = TRUE;
 GList		*widgets[NUM_SETS];
 pid_t		currentPid = -1;
+gboolean	interrupted = FALSE;
 gint		currentInput;
 int		currentFd;
 int		numErrors;
@@ -62,28 +68,9 @@ GdkColor	warningBackground, errorBackground;
 
 #define PASTE3(x,y,z) x##y##z
 
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+static LogRec *logSelected(void);
+static void handleLine(char *line);
 
-static LogRec *
-lr_new(const char *line, const FilterResult *res)
-{
-    LogRec *lr;
-    
-    lr = g_new(LogRec, 1);
-    lr->res = *res;
-    if (lr->res.file != 0)
-	lr->res.file = g_strdup(lr->res.file);	/* TODO: hashtable */
-
-    return lr;
-}
-
-static void
-lr_delete(LogRec *lr)
-{
-    if (lr->res.file != 0)
-    	g_free(lr->res.file);
-    g_free(lr);
-}
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -122,10 +109,14 @@ grey_menu_items(void)
 {
     gboolean running = (currentPid > 0);
     gboolean empty = GTK_CTREE_IS_EMPTY(logwin);
+    gboolean selected = (logSelected() != 0);
+    gboolean again = (lastTarget != 0 && !running);
 
     widgets_set_sensitive(SET_NOTRUNNING, !running);
     widgets_set_sensitive(SET_RUNNING, running);
     widgets_set_sensitive(SET_NOTEMPTY, !empty);
+    widgets_set_sensitive(SET_SELECTED, selected);
+    widgets_set_sensitive(SET_AGAIN, again);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -164,6 +155,245 @@ anim_start(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static LogRec *
+lr_new(const char *line, const FilterResult *res)
+{
+    LogRec *lr;
+    
+    lr = g_new(LogRec, 1);
+    lr->res = *res;
+    if (lr->res.file != 0)
+	lr->res.file = g_strdup(lr->res.file);	/* TODO: hashtable */
+    lr->line = g_strdup(line);
+
+    switch (lr->res.code)
+    {
+    case FR_WARNING:
+	numWarnings++;
+    	break;
+    case FR_ERROR:
+	numErrors++;
+    	break;
+    default:
+    	break;
+    }
+
+    return lr;
+}
+
+static void
+lr_delete(LogRec *lr)
+{
+    if (lr->res.file != 0)
+    	g_free(lr->res.file);
+    g_free(lr->line);
+    g_free(lr);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+logAddLine(LogRec *lr)
+{
+    gboolean was_empty = GTK_CTREE_IS_EMPTY(logwin);
+    GdkFont *font = 0;
+    GdkColor *fore = 0;
+    GdkColor *back = 0;
+
+    switch (lr->res.code)
+    {
+    case FR_UNDEFINED:		/* same as INFORMATION */
+    case FR_INFORMATION:
+    	/* use default font, fgnd, bgnd */
+	if (!showInfo)
+	    return;
+    	break;
+    case FR_WARNING:
+    	font = warningFont;
+	fore = &warningForeground;
+	back = &warningBackground;
+	if (!showWarnings)
+	    return;
+    	break;
+    case FR_ERROR:
+    	font = errorFont;
+	fore = &errorForeground;
+	back = &errorBackground;
+	if (!showErrors)
+	    return;
+    	break;
+    case FR_CHANGEDIR:
+    	/* TODO: */
+    	break;
+    case FR_PUSHDIR:
+    	/* TODO: */
+    	break;
+    case FR_POPDIR:
+    	/* TODO: */
+    	break;
+    case FR_PENDING:
+    	/* TODO: */
+    	break;
+    }
+
+    /* TODO: freeze & thaw if it redraws the wrong colour 1st */
+    lr->node = gtk_ctree_insert_node(GTK_CTREE(logwin),
+    	(GtkCTreeNode*)0,			/* parent */
+	(GtkCTreeNode*)0,			/* sibling */
+	&lr->line,					/* text[] */
+	0,					/* spacing */
+	(GdkPixmap *)0, (GdkBitmap *)0,		/* pixmap_closed,mask_closed */
+	(GdkPixmap *)0, (GdkBitmap *)0,		/* pixmap_opened,mask_opened */
+	TRUE,					/* is_leaf */
+	TRUE);					/* expanded */
+    gtk_ctree_node_set_row_data(GTK_CTREE(logwin), lr->node, (gpointer)lr);
+    if (fore != 0)
+	gtk_ctree_node_set_foreground(GTK_CTREE(logwin), lr->node, fore);
+    if (back != 0)
+    	gtk_ctree_node_set_background(GTK_CTREE(logwin), lr->node, back);
+    
+    if (was_empty)
+    	grey_menu_items();	/* log window just became non-empty */
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+logClear(void)
+{
+    /* delete all LogRecs */
+    while (log != 0)
+    {
+    	lr_delete((LogRec *)log->data);
+	log = g_list_remove_link(log, log);
+    }
+
+    /* clear the log window */
+    gtk_clist_clear(GTK_CLIST(logwin));
+
+    /* update sensitivity of menu items */        
+    grey_menu_items();
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+logRepopulate(void)
+{
+    GList *list;
+    
+    gtk_clist_freeze(GTK_CLIST(logwin));
+    gtk_clist_clear(GTK_CLIST(logwin));
+    for (list=log ; list!=0 ; list=list->next)
+	logAddLine((LogRec *)list->data);    	
+    gtk_clist_thaw(GTK_CLIST(logwin));
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+logSave(const char *file)
+{
+    GList *list;
+    FILE *fp;
+    
+    if ((fp = fopen(file, "w")) == 0)
+    {
+    	message("%s: %s", file, strerror(errno));
+	return;
+    }
+    
+    for (list=log ; list!=0 ; list=list->next)
+    {
+    	LogRec *lr = (LogRec *)list->data;
+	
+	fputs(lr->line, fp);
+	fputc('\n', fp);
+    }
+    
+    fclose(fp);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+logOpen(const char *file)
+{
+    FILE *fp;
+    char buf[2048];
+    
+    if ((fp = fopen(file, "r")) == 0)
+    {
+    	message("%s: %s", file, strerror(errno));
+	return;
+    }
+    
+    while (fgets(buf, sizeof(buf), fp) != 0)
+    {
+    	char *x;
+	if ((x = strchr(buf, '\n')) != 0)
+	    *x = '\0';
+	if ((x = strchr(buf, '\r')) != 0)
+	    *x = '\0';
+    	handleLine(buf);
+    }
+    
+    fclose(fp);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static LogRec *
+logSelected(void)
+{
+    if (GTK_CLIST(logwin)->selection == 0)
+    	return 0;
+	
+    return (LogRec *)gtk_ctree_node_get_row_data(GTK_CTREE(logwin), 
+    		GTK_CTREE_NODE(GTK_CLIST(logwin)->selection->data));
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+reapEdit(pid_t pid, int status, struct rusage *usg, gpointer user_data)
+{
+    if (WIFEXITED(status) || WIFSIGNALED(status))
+    	fprintf(stderr, "Reaping editor pid %d\n", (int)pid);
+}
+
+static void
+startEdit(LogRec *lr)
+{
+    pid_t pid;
+    char buf[2048];
+    
+    if (lr->res.file == 0 || lr->res.file[0] == '\0')
+    	return;
+	
+    sprintf(buf, "nc -noask -line %d %s", lr->res.line, lr->res.file);
+    
+    if ((pid = fork()) < 0)
+    {
+    	/* error */
+    	perror("fork");
+    }
+    else if (pid == 0)
+    {
+    	/* child */
+	execlp("/bin/sh", "/bin/sh", "-c", buf, 0);
+	perror("execlp");
+    }
+    else
+    {
+    	/* parent */
+	message("Editing %s (line %d)", lr->res.file, lr->res.line);
+	spawn_add_reap_func(pid, reapEdit, (gpointer)0);
+    }
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 static void
 reapMake(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 {
@@ -173,6 +403,7 @@ reapMake(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     {
     	char errStr[256];
     	char warnStr[256];
+	char intStr[256];
 	
 	if (numErrors > 0)
 	    sprintf(errStr, ", %d errors", numErrors);
@@ -183,8 +414,13 @@ reapMake(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	    sprintf(warnStr, ", %d warnings", numWarnings);
 	else
 	    warnStr[0] = '\0';
+
+	if (interrupted)
+	    strcpy(intStr, " (interrupted)");
+	else
+	    intStr[0] = '\0';
 	    
-	message("Finished making %s%s%s", target, errStr, warnStr);
+	message("Finished making %s%s%s%s", target, errStr, warnStr, intStr);
 	
 	if (currentPid == pid)
 	    currentPid = -1;
@@ -203,10 +439,6 @@ static GList *directoryStack = 0;
 static void
 handleLine(char *line)
 {
-    gboolean was_empty = GTK_CTREE_IS_EMPTY(logwin);
-    GdkFont *font = 0;
-    GdkColor *fore = 0;
-    GdkColor *back = 0;
     FilterResult res;
     LogRec *lr;
 
@@ -218,60 +450,11 @@ handleLine(char *line)
     fprintf(stderr, "filter_apply: \"%s\" -> %d \"%s\" %d\n",
     	line, (int)res.code, res.file, res.line);
 #endif
-    switch (res.code)
-    {
-    case FR_UNDEFINED:		/* same as INFORMATION */
-    case FR_INFORMATION:
+    if (res.code == FR_UNDEFINED)
     	res.code = FR_INFORMATION;
-    	/* use default font, fgnd, bgnd */
-    	break;
-    case FR_WARNING:
-    	font = warningFont;
-	fore = &warningForeground;
-	back = &warningBackground;
-	numWarnings++;
-    	break;
-    case FR_ERROR:
-    	font = errorFont;
-	fore = &errorForeground;
-	back = &errorBackground;
-	numErrors++;
-    	break;
-    case FR_CHANGEDIR:
-    	/* TODO: */
-    	break;
-    case FR_PUSHDIR:
-    	/* TODO: */
-    	break;
-    case FR_POPDIR:
-    	/* TODO: */
-    	break;
-    case FR_PENDING:
-    	/* TODO: */
-    	break;
-    }
-
     lr = lr_new(line, &res);
     log = g_list_append(log, lr);		/* TODO: fix O(N^2) */
-
-    /* TODO: freeze & thaw if it redraws the wrong colour 1st */
-    lr->node = gtk_ctree_insert_node(GTK_CTREE(logwin),
-    	(GtkCTreeNode*)0,			/* parent */
-	(GtkCTreeNode*)0,			/* sibling */
-	&line,					/* text[] */
-	0,					/* spacing */
-	(GdkPixmap *)0, (GdkBitmap *)0,		/* pixmap_closed,mask_closed */
-	(GdkPixmap *)0, (GdkBitmap *)0,		/* pixmap_opened,mask_opened */
-	TRUE,					/* is_leaf */
-	TRUE);					/* expanded */
-    gtk_ctree_node_set_row_data(GTK_CTREE(logwin), lr->node, (gpointer)lr);
-    if (fore != 0)
-	gtk_ctree_node_set_foreground(GTK_CTREE(logwin), lr->node, fore);
-    if (back != 0)
-    	gtk_ctree_node_set_background(GTK_CTREE(logwin), lr->node, back);
-    
-    if (was_empty)
-    	grey_menu_items();	/* log window just became non-empty */
+    logAddLine(lr);
 }
 
 
@@ -373,8 +556,10 @@ buildStart(const char *target)
     {
     	/* parent */
 	message("Making %s", target);
+	lastTarget = target;
 	spawn_add_reap_func(pid, reapMake, (gpointer)target);
 	currentPid = pid;
+	interrupted = FALSE;
 	currentFd = pipefds[READ];
 	close(pipefds[WRITE]);
 	filter_init();
@@ -401,6 +586,93 @@ file_exit_cb(GtkWidget *w, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+#define FILESEL_CALLBACK_DATA "uiCallback"
+
+static void
+uiFileSelOkCb(GtkWidget *w, gpointer data)
+{
+    GtkWidget *filesel = GTK_WIDGET(data);
+    void (*callback)(const char *filename);
+    
+    callback = gtk_object_get_data(GTK_OBJECT(filesel), FILESEL_CALLBACK_DATA);
+    (*callback)(gtk_file_selection_get_filename(GTK_FILE_SELECTION(filesel)));
+    gtk_widget_hide(filesel);
+}
+
+static GtkWidget *
+uiCreateFileSel(
+    const char *title,
+    void (*callback)(const char *filename),
+    const char *filename)
+{
+    GtkWidget *filesel;
+    
+    filesel = gtk_file_selection_new(title);
+    gtk_signal_connect(
+	    GTK_OBJECT(GTK_FILE_SELECTION(filesel)->ok_button),
+            "clicked", uiFileSelOkCb,
+	    (gpointer)filesel);
+    gtk_signal_connect_object(
+	    GTK_OBJECT(GTK_FILE_SELECTION(filesel)->cancel_button),
+            "clicked", (GtkSignalFunc) gtk_widget_hide,
+	    GTK_OBJECT(filesel));
+    gtk_object_set_data(GTK_OBJECT(filesel), FILESEL_CALLBACK_DATA,
+    	(gpointer)callback);
+    if (filename != 0)
+	gtk_file_selection_set_filename(GTK_FILE_SELECTION(filesel), filename);
+
+    return filesel;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+file_open_cb(GtkWidget *w, gpointer data)
+{
+    static GtkWidget *filesel = 0;
+    
+    if (filesel == 0)
+    	filesel = uiCreateFileSel("Open Log File", logOpen, "make.log");
+
+    gtk_widget_show(filesel);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+file_save_cb(GtkWidget *w, gpointer data)
+{
+    static GtkWidget *filesel = 0;
+    
+    if (filesel == 0)
+    	filesel = uiCreateFileSel("Save Log File", logSave, "make.log");
+
+    gtk_widget_show(filesel);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+build_again_cb(GtkWidget *w, gpointer data)
+{
+    if (lastTarget != 0 && currentPid < 0)
+    	buildStart(lastTarget);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+build_stop_cb(GtkWidget *w, gpointer data)
+{
+    if (currentPid > 0)
+    {
+    	interrupted = TRUE;
+    	kill(currentPid, SIGKILL);
+    }
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 static void
 build_cb(GtkWidget *w, gpointer data)
 {
@@ -410,7 +682,7 @@ build_cb(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-show_widget_cb(GtkWidget *w, gpointer data)
+view_widget_cb(GtkWidget *w, gpointer data)
 {
     GtkWidget **wp = (GtkWidget **)data;
     
@@ -423,20 +695,31 @@ show_widget_cb(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-clear_log_cb(GtkWidget *w, gpointer data)
+view_flags_cb(GtkWidget *w, gpointer data)
 {
-    /* delete all LogRecs */
-    while (log != 0)
-    {
-    	lr_delete((LogRec *)log->data);
-	log = g_list_remove_link(log, log);
-    }
+    gboolean *flagp = (gboolean *)data;
+    
+    *flagp = GTK_CHECK_MENU_ITEM(w)->active;
+    logRepopulate();
+}
 
-    /* clear the log window */
-    gtk_clist_clear(GTK_CLIST(logwin));
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-    /* update sensitivity of menu items */        
-    grey_menu_items();
+static void
+view_clear_cb(GtkWidget *w, gpointer data)
+{
+    logClear();
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+view_edit_cb(GtkWidget *w, gpointer data)
+{
+    LogRec *lr = logSelected();
+
+    if (lr != 0)    
+	startEdit(lr);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -448,6 +731,25 @@ log_click_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gint column, gpointer data)
     
     fprintf(stderr, "log_click_cb: code=%d file=\"%s\" line=%d\n",
     	lr->res.code, lr->res.file, lr->res.line);
+    grey_menu_items();
+}
+
+static void
+log_doubleclick_cb(GtkWidget *w, GdkEvent *event, gpointer data)
+{
+    LogRec *lr;
+    
+    if (event->type == GDK_2BUTTON_PRESS) 
+    {
+	lr = logSelected();
+
+	if (lr != 0)
+	{
+	    fprintf(stderr, "log_doubleclick_cb: code=%d file=\"%s\" line=%d\n",
+    		lr->res.code, lr->res.file, lr->res.line);
+	    startEdit(lr);
+	}
+    }
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -511,6 +813,17 @@ uiAddButton(
     return item;
 }
 
+static GtkWidget *
+uiAddTearoff(GtkWidget *menu)
+{
+    GtkWidget *item;
+
+    item = gtk_tearoff_menu_item_new();
+    gtk_menu_append(GTK_MENU(menu), item);
+    gtk_widget_show(item);
+    return item;
+}
+
 GtkWidget *
 uiAddToggle(
     GtkWidget *menu,
@@ -562,8 +875,10 @@ uiCreateMenus(GtkWidget *menubar)
     GtkWidget *item;
     
     menu = uiAddMenu(menubar, "File");
-    uiAddButton(menu, "Open Log...", unimplemented, 0);
-    uiAddButton(menu, "Save Log...", unimplemented, 0);
+    uiAddTearoff(menu);
+    uiAddButton(menu, "Open Log...", file_open_cb, 0);
+    item = uiAddButton(menu, "Save Log...", file_save_cb, 0);
+    widgets_add(SET_NOTEMPTY, item);
     uiAddSeparator(menu);
     item = uiAddButton(menu, "Change Makefile...", unimplemented, 0);
     widgets_add(SET_NOTRUNNING, item);
@@ -577,9 +892,10 @@ uiCreateMenus(GtkWidget *menubar)
     uiAddButton(menu, "Exit", file_exit_cb, 0);
     
     menu = uiAddMenu(menubar, "Build");
-    item = uiAddButton(menu, "Again", unimplemented, 0);
-    widgets_add(SET_NOTRUNNING, item);
-    item = uiAddButton(menu, "Stop", unimplemented, 0);
+    uiAddTearoff(menu);
+    item = uiAddButton(menu, "Again", build_again_cb, 0);
+    widgets_add(SET_AGAIN, item);
+    item = uiAddButton(menu, "Stop", build_stop_cb, 0);
     widgets_add(SET_RUNNING, item);
     uiAddSeparator(menu);
     item = uiAddButton(menu, "all", build_cb, "all");
@@ -599,19 +915,27 @@ uiCreateMenus(GtkWidget *menubar)
 #endif
     
     menu = uiAddMenu(menubar, "View");
-    item = uiAddButton(menu, "Clear Log", clear_log_cb, 0);
+    uiAddTearoff(menu);
+    item = uiAddButton(menu, "Clear Log", view_clear_cb, 0);
     widgets_add(SET_NOTEMPTY, item);
+    item = uiAddButton(menu, "Edit", view_edit_cb, 0);
+    widgets_add(SET_SELECTED, item);
     item = uiAddButton(menu, "Edit Next Error", unimplemented, 0);
     widgets_add(SET_NOTEMPTY, item);
     item = uiAddButton(menu, "Edit Prev Error", unimplemented, 0);
     widgets_add(SET_NOTEMPTY, item);
     uiAddSeparator(menu);
-    uiAddToggle(menu, "Toolbar", show_widget_cb, (gpointer)&toolbar, 0, TRUE);
-    uiAddToggle(menu, "Messages", show_widget_cb, (gpointer)&messagebox, 0, TRUE);
+    uiAddToggle(menu, "Toolbar", view_widget_cb, (gpointer)&toolbar, 0, TRUE);
+    uiAddToggle(menu, "Messages", view_widget_cb, (gpointer)&messagebox, 0, TRUE);
+    uiAddSeparator(menu);
+    uiAddToggle(menu, "Errors", view_flags_cb, (gpointer)&showErrors, 0, showErrors);
+    uiAddToggle(menu, "Warnings", view_flags_cb, (gpointer)&showWarnings, 0, showWarnings);
+    uiAddToggle(menu, "Information", view_flags_cb, (gpointer)&showInfo, 0, showInfo);
     uiAddSeparator(menu);
     uiAddButton(menu, "Preferences", unimplemented, 0);
     
     menu = uiAddMenuRight(menubar, "Help");
+    uiAddTearoff(menu);
     uiAddButton(menu, "About Maketool...", unimplemented, 0);
     uiAddButton(menu, "About make...", unimplemented, 0);
     uiAddSeparator(menu);
@@ -624,21 +948,71 @@ uiCreateMenus(GtkWidget *menubar)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static GtkWidget *
+uiToolCreate(
+    GtkWidget *toolbar,
+    const char *name,
+    const char *tooltip,
+    char **pixmap_xpm,
+    GtkSignalFunc callback,
+    gpointer user_data)
+{
+    GdkPixmap *pm = 0;
+    GdkBitmap *mask = 0;
+
+    pm = gdk_pixmap_create_from_xpm_d(toplevel->window, &mask, 0, pixmap_xpm);
+    return gtk_toolbar_append_item(
+    	GTK_TOOLBAR(toolbar),
+    	name,
+	tooltip,
+	0,				/* tooltip_private_text */
+    	gtk_pixmap_new(pm, mask),
+	callback,
+	user_data);
+}
+
+static void
+uiToolAddSpace(GtkWidget *toolbar)
+{
+    gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 #include "new.xpm"
 
 static void
 uiCreateTools()
 {
-    GtkToolbar *tb = GTK_TOOLBAR(toolbar);
-    GdkPixmap *pm;
-    GdkBitmap *mask;
+    GtkWidget *item;
+    
+    item = uiToolCreate(toolbar, "Again", "Build last target again",
+    	new_xpm, build_again_cb, 0);
+    widgets_add(SET_AGAIN, item);
+    
+    uiToolAddSpace(toolbar);
 
-    pm = gdk_pixmap_create_from_xpm_d(toplevel->window,
-    	&mask, 0, new_xpm);
-    gtk_toolbar_append_item(tb,
-    	"New", "Create a new file", 0,
-    	gtk_pixmap_new(pm, mask), unimplemented, 0);
-    gtk_toolbar_append_space(tb);
+    item = uiToolCreate(toolbar, "all", "Build `all'",
+    	new_xpm, build_cb, "all");
+    widgets_add(SET_NOTRUNNING, item);
+    item = uiToolCreate(toolbar, "clean", "Build `clean'",
+    	new_xpm, build_cb, "clean");
+    widgets_add(SET_NOTRUNNING, item);
+    
+    uiToolAddSpace(toolbar);
+    
+    item = uiToolCreate(toolbar, "Clear", "Clear log of messages",
+    	new_xpm, view_clear_cb, 0);
+    widgets_add(SET_NOTEMPTY, item);
+    item = uiToolCreate(toolbar, "Next", "Edit next error or warning",
+    	new_xpm, unimplemented, 0);
+    widgets_add(SET_NOTEMPTY, item);
+    
+    uiToolAddSpace(toolbar);
+    
+    item = uiToolCreate(toolbar, "Print", "Print messages",
+    	new_xpm, unimplemented, 0);
+    widgets_add(SET_NOTEMPTY, item);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -703,7 +1077,7 @@ uiCreate(void)
     GtkWidget *mainvbox, *vbox; /* need 2 for correct spacing */
     GtkWidget *menubar;
     GtkTooltips *tooltips;
-    GtkWidget *sb, *sw;
+    GtkWidget *sw;
     static char *titles[1] = { "Log" };
     
     toplevel = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -751,6 +1125,8 @@ uiCreate(void)
     gtk_clist_set_column_auto_resize(GTK_CLIST(logwin), 0, TRUE);
     gtk_signal_connect(GTK_OBJECT(logwin), "tree-select-row", 
     	GTK_SIGNAL_FUNC(log_click_cb), 0);
+    gtk_signal_connect(GTK_OBJECT(logwin), "button_press_event", 
+    	GTK_SIGNAL_FUNC(log_doubleclick_cb), 0);
     gtk_container_add(GTK_CONTAINER(sw), logwin);
     gtk_scrolled_window_set_hadjustment(GTK_SCROLLED_WINDOW(sw),
     	GTK_CLIST(logwin)->hadjustment);
