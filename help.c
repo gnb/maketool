@@ -23,7 +23,7 @@
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.32 2001-08-02 08:28:00 gnb Exp $");
+CVSID("$Id: help.c,v 1.33 2001-09-22 02:20:58 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -202,7 +202,8 @@ make_version_task(void)
     	(Task *)g_new(Task, 1),
 	expand_prog(prefs.prog_list_version, 0, 0, 0),
 	prefs.var_environment,
-	&make_version_ops);
+	&make_version_ops,
+	0);
 }
 
 void
@@ -265,7 +266,8 @@ help_browser_task(const char *url)
 	/*expand_prog(prefs.prog_list_version, 0, 0, 0),*/
 	command,
 	/*environment*/0,
-	&help_browser_ops);
+	&help_browser_ops,
+	0);
 }
 
 static void

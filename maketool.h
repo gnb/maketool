@@ -21,6 +21,7 @@
 #define _MAKETOOL_H_
 
 #include "common.h"
+#include "task.h"
 #include <gtk/gtk.h>
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -180,6 +181,7 @@ EXTERN GtkWidget *toplevel;
 void message(const char *fmt, ...);
 void grey_menu_items(void);
 char *expand_prog(const char *prog, const char *file, int line, const char *target);
+void handle_line(Task *task, int len, const char *line);
 /* print.c */ 
 void file_print_cb(GtkWidget *, gpointer);
 /* help.c */ 

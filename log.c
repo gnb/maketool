@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.38 2001-09-21 04:20:56 gnb Exp $");
+CVSID("$Id: log.c,v 1.39 2001-09-22 02:20:58 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -601,10 +601,6 @@ log_open(const char *file)
     g_free(startstr);
 
 
-    /*
-     * TODO: reuse commonality between this code
-     * and handle_input() in main.c.
-     */
     estring_init(&leftover);
     while ((len = fread(buf, 1, sizeof(buf)-1, fp)) > 0)
     {
@@ -622,7 +618,7 @@ log_open(const char *file)
 	    }
 	    else
 	    {
-    		/* got an end-of-line - isolate the line & feed it to handle_line() */
+    		/* got an end-of-line - isolate the line & feed it to log_add_line() */
 		*end = '\0';
 		estring_append_string(&leftover, start);
 

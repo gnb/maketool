@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.79 2001-09-21 06:20:23 gnb Exp $");
+CVSID("$Id: main.c,v 1.80 2001-09-22 02:20:58 gnb Exp $");
 
 
 /*
@@ -96,8 +96,6 @@ static const char *standard_targets[] = {
 #define PASTE3(x,y,z) x##y##z
 
 static void build_cb(GtkWidget *w, gpointer data);
-void handle_input(int len, const char *buf);
-static void handle_line(const char *line);
 static void set_main_title(void);
 static void construct_build_menu_basic_items(void);
 static void dir_previous_cb(GtkWidget *w, gpointer data);
@@ -333,22 +331,15 @@ logged_task_start(Task *task)
 }
 
 static void
-logged_task_input(Task *task, int len, const char *buf)
-{
-    handle_input(len, buf);
-}
-
-static void
 logged_task_reap(Task *task)
 {
-    handle_input(0, 0);
     log_end_build(task->command);
 }
 
 static TaskOps logged_task_ops =
 {
 logged_task_start,  	   	/* start */
-logged_task_input,	    	/* input */
+handle_line,	    	    	/* input */
 logged_task_reap, 	    	/* reap */
 0   	    	    	    	/* destroy */
 };
@@ -360,7 +351,8 @@ logged_task(char *command)
     	(Task *)g_new(Task, 1),
 	command,
 	prefs.var_environment,
-	&logged_task_ops);
+	&logged_task_ops,
+	TASK_LINEMODE);
 }
 
 
@@ -669,7 +661,8 @@ list_targets_task(void)
     	(Task *)ltt,
 	expand_prog(prefs.prog_list_targets, 0, 0, 0),
 	prefs.var_environment,
-	&list_targets_ops);
+	&list_targets_ops,
+	0);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -700,7 +693,8 @@ editor_task(const char *file, int line)
     	(Task *)g_new(Task, 1),
 	expand_prog(prefs.prog_edit_source, file, line, 0),
 	0/*env*/,
-	&editor_ops);
+	&editor_ops,
+	0);
 }
 
 
@@ -726,8 +720,9 @@ handle_message(const char *message)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-static void
-handle_line(const char *line)
+/* Use this as the input function for linemode tasks */
+void
+handle_line(Task *task, int len, const char *line)
 {
     LogRec *lr;
 
@@ -750,63 +745,6 @@ handle_line(const char *line)
     }
 }
 
-
-/*
- * Call when input has been received from a child process.
- * Handles splitting the input into lines, and calls
- * handle_line() to do what needs to be done per-line.
- * Should be called once with `len'=0 when the child
- * process has been reaped.
- */
- 
-void
-handle_input(int len, const char *buf)
-{
-    static estring leftover = ESTRING_STATIC_INIT;
-    
-    if (len == 0)
-    {
-    	/* end of input */
-	/*
-	 * Handle case where last line of child process'
-	 * output has no terminating '\n'. Beware - 
-	 * this last line may contain an error or warning,
-	 * which affects log_num_{errors,warnings}().
-	 */
-	if (leftover.length > 0)
-	    handle_line(leftover.data);
-	/*
-	 * Free'ing and reinitialising seems a bit extreme,
-	 * but it allows the program to give back to malloc()
-	 * a large line buffer allocated for a single unusual
-	 * very long line.
-	 */
-	estring_free(&leftover);
-	estring_init(&leftover);
-	return;
-    }
-    
-    while (len > 0 && *buf)
-    {
-	char *p = strchr(buf, '\n');
-	if (p == 0)
-	{
-    	    /* only a part of a line left - append to leftover */
-	    estring_append_string(&leftover, buf);
-	    return;
-	}
-    	/* got an end-of-line - isolate the line & feed it to handle_line() */
-	*p = '\0';
-	estring_append_string(&leftover, buf);
-
-    	handle_line(leftover.length > 0 ? leftover.data : "");
-	
-	estring_truncate(&leftover);
-	len -= (p - buf);
-	buf = ++p;
-    }
-}
-
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static TaskOps finish_prog_ops =
@@ -826,7 +764,8 @@ finish_prog_task(const char *target)
     	fpt,
 	expand_prog(prefs.prog_finish, 0, 0, target),
 	prefs.var_environment,
-	&finish_prog_ops);
+	&finish_prog_ops,
+	0);
 }
 
 
@@ -924,20 +863,11 @@ make_start(Task *task)
 }
 
 static void
-make_input(Task *task, int len, const char *buf)
-{
-    handle_input(len, buf);
-}
-
-
-static void
 make_reap(Task *task)
 {
     MakeTask *mt = (MakeTask *)task;
     char *err_str = 0, *warn_str = 0, *int_str = 0;
     
-    handle_input(0, 0);     /* deal with possibly unterminated last line */
-
     if (log_num_errors() > 0)
 	err_str = g_strdup_printf(_(", %d errors"), log_num_errors());
 
@@ -982,7 +912,7 @@ make_reap(Task *task)
 static TaskOps make_ops =
 {
 make_start,        	/* start */
-make_input,	    	/* input */
+handle_line,	    	/* input */
 make_reap, 	    	/* reap */
 0	    	    	/* destroy */
 };
@@ -997,7 +927,8 @@ make_task(const char *target)
     	(Task *)mt,
 	expand_prog(prefs.prog_make, 0, 0, target),
 	prefs.var_environment,
-	&make_ops);
+	&make_ops,
+	TASK_LINEMODE);
 }
 
 
@@ -1584,11 +1515,13 @@ log_doubleclick_cb(GtkWidget *w, GdkEvent *event, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+#if 0
 static void
 unimplemented(GtkWidget *w, gpointer data)
 {
     fprintf(stderr, "Unimplemented\n");
 }
+#endif
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 

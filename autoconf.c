@@ -24,7 +24,6 @@
 #include "log.h"
 
 extern Task *logged_task(char *command);
-extern void handle_input(int len, const char *buf);
 
 #define strassign(x, s) \
     do { \
@@ -476,7 +475,7 @@ parse_option_line(void)
 }
 
 static void
-ac_handle_line(const char *line)
+configure_help_input(Task *task, int len, const char *line)
 {
 #if DEBUG
     fprintf(stderr, "==> \"%s\"\n", line);
@@ -547,69 +546,9 @@ ac_handle_line(const char *line)
     }
 }
 
-
-static void
-ac_handle_input(int len, const char *buf)
-{
-    static estring leftover = ESTRING_STATIC_INIT;
-    
-    if (len == 0)
-    {
-    	/* end of input */
-	/*
-	 * Handle case where last line of child process'
-	 * output has no terminating '\n'. Beware - 
-	 * this last line may contain an error or warning,
-	 * which affects log_num_{errors,warnings}().
-	 */
-	if (leftover.length > 0)
-	    ac_handle_line(leftover.data);
-	/*
-	 * Free'ing and reinitialising seems a bit extreme,
-	 * but it allows the program to give back to malloc()
-	 * a large line buffer allocated for a single unusual
-	 * very long line.
-	 */
-	estring_free(&leftover);
-	estring_init(&leftover);
-	return;
-    }
-    
-    while (len > 0 && *buf)
-    {
-	char *p = strchr(buf, '\n');
-	if (p == 0)
-	{
-    	    /* only a part of a line left - append to leftover */
-	    estring_append_string(&leftover, buf);
-	    return;
-	}
-    	/* got an end-of-line - isolate the line & feed it to handle_line() */
-	*p = '\0';
-	estring_append_string(&leftover, buf);
-
-    	ac_handle_line(leftover.length > 0 ? leftover.data : "");
-	
-	estring_truncate(&leftover);
-	len -= (p - buf);
-	buf = ++p;
-    }
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static void
-configure_help_input(Task *task, int len, const char *buf)
-{
-    ac_handle_input(len, buf);
-}
-
 static void
 configure_help_reap(Task *task)
 {
-    
-    ac_handle_input(0, 0);     /* deal with possibly unterminated last line */
-    
     /* parse last option */
     if (optline.length > 0)
     	parse_option_line();
@@ -646,7 +585,8 @@ read_configure_options(void)
     	(Task *)g_new(Task, 1),
 	g_strdup("./configure --help"),
 	/*env*/0,
-	&configure_help_ops));
+	&configure_help_ops,
+	TASK_LINEMODE));
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -818,15 +758,8 @@ configure_start(Task *task)
 }
 
 static void
-configure_input(Task *task, int len, const char *buf)
-{
-    handle_input(len, buf);
-}
-
-static void
 configure_reap(Task *task)
 {
-    handle_input(0, 0);
     if (!from_client)
 	log_end_build(task->command);
     finished = TRUE;
@@ -836,7 +769,7 @@ configure_reap(Task *task)
 static TaskOps configure_ops =
 {
 configure_start,  	   	/* start */
-configure_input,	    	/* input */
+handle_line,	    	    	/* input */
 configure_reap, 	    	/* reap */
 0   	    	    	    	/* destroy */
 };
@@ -848,7 +781,8 @@ configure_task(char *command)
     	(Task *)g_new(Task, 1),
 	command,
 	prefs.var_environment,
-	&configure_ops);
+	&configure_ops,
+	TASK_LINEMODE);
 }
 
 

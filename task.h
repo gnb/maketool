@@ -21,6 +21,7 @@
 #define _TASK_H_
 
 #include "common.h"
+#include "util.h"
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -37,7 +38,13 @@ struct _Task
     gboolean enqueued;
     TaskOps *ops;
     int status; /* wait3 status */
+    int flags;
+    estring linebuf;
 };
+
+/* Possible Task flags */
+#define TASK_GROUPLEADER    (1<<0)  /* is process group leader */
+#define TASK_LINEMODE	    (1<<1)  /* input is split into lines, no newline */
 
 struct _TaskOps
 {    
@@ -65,7 +72,7 @@ void task_init(
  * `command' is assumed to be a new string which is g_free()d later.
  * `env' is *not* g_free()d -- WARNING.
  */
-Task *task_create(Task *, char *command, char **env, TaskOps *);
+Task *task_create(Task *, char *command, char **env, TaskOps *, int flags);
 
 /*
  * Enqueue the task for execution *after* all currently enqueued tasks.

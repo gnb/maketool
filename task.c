@@ -31,8 +31,14 @@
 #include <sys/filio.h>
 #endif
 
-CVSID("$Id: task.c,v 1.9 2001-09-21 04:32:36 gnb Exp $");
+CVSID("$Id: task.c,v 1.10 2001-09-22 02:20:58 gnb Exp $");
 
+/*
+ * TODO: GDK is used only for the gdk_input_*() functions, which
+ * are not immensely complicated and could be reproduced in here
+ * if this library were to be submitted to the glib maintainers.
+ */
+ 
 static GList *task_all = 0;
 static void (*task_work_start_cb)(void) = 0;
 static void (*task_work_end_cb)(void) = 0;
@@ -54,7 +60,7 @@ task_init(
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 Task *
-task_create(Task *task, char *command, char **env, TaskOps *ops)
+task_create(Task *task, char *command, char **env, TaskOps *ops, int flags)
 {
     task->pid = -1;
     task->command = command;
@@ -63,6 +69,8 @@ task_create(Task *task, char *command, char **env, TaskOps *ops)
     task->input_tag = 0;
     task->enqueued = FALSE;
     task->ops = ops;
+    task->flags = flags;
+    estring_init(&task->linebuf);
     return task;
 }
 
@@ -82,11 +90,60 @@ task_destroy(Task *task)
     if (task->fd != -1)
     {
     	close(task->fd);
-	gtk_input_remove(task->input_tag);
+	gdk_input_remove(task->input_tag);
     }
     if (task->ops->destroy != 0)
 	(*task->ops->destroy)(task);
+    estring_free(&task->linebuf);
     g_free(task);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+/*
+ * This used to be main.c:handle_input().  It splits input
+ * from the child process's stderr/stderr into lines and
+ * feeds individual lines to the task input function.
+ */
+static void
+task_linemode_input(Task *task, int len, const char *buf)
+{
+    if (len == 0)
+    {
+    	/* end of input */
+	/*
+	 * Handle case where last line of child process'
+	 * output has no terminating '\n'. Beware - 
+	 * this last line may contain an error or warning,
+	 * which affects log_num_{errors,warnings}().
+	 */
+	if (task->linebuf.length > 0)
+	    (*task->ops->input)(task, task->linebuf.length, task->linebuf.data);
+	return;
+    }
+    
+    while (len > 0 && *buf)
+    {
+	char *p = strchr(buf, '\n');
+	if (p == 0)
+	{
+    	    /* only a part of a line left - append to task->linebuf */
+	    estring_append_string(&task->linebuf, buf);
+	    return;
+	}
+    	/* got an end-of-line - isolate the line & feed it to input handler */
+	*p = '\0';
+	estring_append_string(&task->linebuf, buf);
+
+    	if (task->linebuf.length > 0)
+	    (*task->ops->input)(task, task->linebuf.length, task->linebuf.data);
+    	else
+	    (*task->ops->input)(task, 0, "");
+	
+	estring_truncate(&task->linebuf);
+	len -= (p - buf);
+	buf = ++p;
+    }
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -118,6 +175,9 @@ task_reap_func(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     task_all = g_list_remove(task_all, task);
     
     task->status = status;
+    /* flush any pending lines or part-lines */
+    if (task->flags & TASK_LINEMODE)
+    	task_linemode_input(task, 0, 0);
     if (task->ops->reap != 0)
 	(*task->ops->reap)(task);
     task_destroy(task);
@@ -171,7 +231,10 @@ task_input_func(gpointer user_data, gint source, GdkInputCondition condition)
 	fprintf(stderr, "\"\n");
 #endif    
 
-	(*task->ops->input)(task, n, buf);
+    	if (task->flags & TASK_LINEMODE)
+	    task_linemode_input(task, n, buf);
+	else
+	    (*task->ops->input)(task, n, buf);
     }
 }
 
@@ -214,6 +277,10 @@ task_spawn_simple(Task *task)
     {
     	/* child */
 	task_override_env(task);
+
+	/* Possibly become process group leader */
+	if (task->flags & TASK_GROUPLEADER)
+	    setpgid(0, 0);
 
 	execlp("/bin/sh", "/bin/sh", "-c", task->command, 0);
 	perror("execlp");
@@ -260,6 +327,10 @@ task_spawn_with_input(Task *task)
 	close(pipefds[WRITE]);
 	
 	task_override_env(task);
+
+	/* Possibly become process group leader */
+	if (task->flags & TASK_GROUPLEADER)
+	    setpgid(0, 0);
 
 	execl("/bin/sh", "/bin/sh", "-c", task->command, 0);
 	perror("execl");
