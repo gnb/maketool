@@ -22,7 +22,7 @@
 #include <signal.h>
 #include <sys/poll.h>
 
-CVSID("$Id: glib_extra.c,v 1.18 2003-09-28 10:42:52 gnb Exp $");
+CVSID("$Id: glib_extra.c,v 1.19 2003-10-03 00:12:01 gnb Exp $");
 
 
 typedef struct
@@ -144,7 +144,10 @@ g_unix_dispatch_reapers(void)
 	{
 	    (*pd->reaper)(pid, status, &usage, pd->user_data);
 	    if (WIFEXITED(status) || WIFSIGNALED(status))
+	    {
 	    	g_hash_table_remove(g_unix_piddata, GINT_TO_POINTER(pid));
+		g_free(pd);
+	    }
 	}
     }
 }

@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.99 2003-10-02 01:12:19 gnb Exp $");
+CVSID("$Id: main.c,v 1.100 2003-10-03 00:12:01 gnb Exp $");
 
 
 /*
@@ -572,13 +572,16 @@ set_targets(unsigned int ntargs, char **targs)
 	t = targs[i];
 	
 	if (g_hash_table_lookup(unique, t) != 0)
+	{
+	    g_free(t);
 	    continue;
+	}
 	g_hash_table_insert(unique, t, t);
 	
 	if (ms_is_standard_target(makesys, t))
 	{
 #if DEBUG
-    	    fprintf(stderr, "reap_list adding standard target \"%s\"\n", t);
+    	    fprintf(stderr, "set_targets: adding standard target \"%s\"\n", t);
 #endif
     	    std = g_list_prepend(std, t);
 	}
@@ -592,6 +595,7 @@ set_targets(unsigned int ntargs, char **targs)
     }
     if (targs != 0)
 	g_free(targs);
+    g_hash_table_destroy(unique);
     std = g_list_sort(std, compare_strings);
     available_targets = g_list_sort(available_targets, compare_strings);
     
@@ -1121,6 +1125,7 @@ change_directory(const char *dir)
     {
 	if (messageent != 0)
 	    message("%s: %s", dir, strerror(errno));
+	g_free(olddir);
     	return FALSE;
     }
 
