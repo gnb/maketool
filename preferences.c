@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.54 2003-02-14 14:31:32 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.55 2003-04-28 11:47:31 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -302,6 +302,7 @@ preferences_load(void)
     int i;
 
     ui_config_init("maketool");
+    prefs.upgraded = FALSE;
     prefs.run_how = ui_config_get_enum("run_how", RUN_SERIES, run_how_enum_def);
     prefs.run_processes = ui_config_get_int("run_processes", 2);
     prefs.run_load = ui_config_get_int("run_load", 20);
@@ -324,7 +325,19 @@ preferences_load(void)
     prefs_set_var_make_flags();
     
     prefs.prog_make = ui_config_get_string("prog_make", GMAKE " %n %m %k %p %v %t");
-    prefs.prog_list_targets = ui_config_get_string("prog_list_targets", GMAKE " %m %v %q %t");
+
+    prefs.prog_list_targets = ui_config_get_string("prog_list_targets", 0);
+    /* Detect and handle upgrade 0.7 -> 0.8 */
+    if (prefs.prog_list_targets != 0 &&
+    	strstr(prefs.prog_list_targets, "extract_targets") != 0)
+    {
+    	prefs.upgraded = TRUE;
+    	g_free(prefs.prog_list_targets);
+	prefs.prog_list_targets = 0;
+    }
+    if (prefs.prog_list_targets == 0)
+    	prefs.prog_list_targets = g_strdup(GMAKE " %m %v %q %t");
+
     prefs.prog_list_version = ui_config_get_string("prog_list_version", GMAKE " --version");
     prefs.prog_edit_source = ui_config_get_string("prog_edit_source", "nc -noask %{l:+-line %l} %f");
     prefs.prog_make_makefile = ui_config_get_string("prog_make_makefile2", GMAKE " %n %v -f %D/%S.mk %t");
@@ -370,6 +383,9 @@ preferences_load(void)
 	    continue;
 	prefs.dir_history = g_list_append(prefs.dir_history, g_strdup(val));
     }
+    
+    if (prefs.upgraded)
+    	preferences_save();
 }
 
 void
@@ -378,6 +394,8 @@ preferences_save(void)
     int i;
     GList *list;
     
+    ui_config_set_string("maketool_version", VERSION);
+
     ui_config_set_enum("run_how", prefs.run_how, run_how_enum_def);
     ui_config_set_int("run_processes", prefs.run_processes);
     ui_config_set_int("run_load", prefs.run_load);

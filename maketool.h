@@ -73,6 +73,8 @@ typedef enum
 
 typedef struct
 {
+    gboolean upgraded;	    /* loaded old prefs, upgraded */
+
     enum { RUN_SERIES, RUN_PARALLEL_PROC, RUN_PARALLEL_LOAD } run_how;
     int run_processes;
     int run_load;	/* load*10 */
