@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.52 2001-09-22 03:33:36 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.53 2003-02-09 05:03:05 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -308,7 +308,7 @@ preferences_load(void)
         
     prefs.edit_first_error = ui_config_get_boolean("edit_first_error", FALSE);
     prefs.edit_warnings = ui_config_get_boolean("edit_warnings", TRUE);
-    prefs.ignore_failures = ui_config_get_boolean("ignore_failures", FALSE);
+    prefs.keep_going = ui_config_get_boolean("ignore_failures", FALSE);
     prefs.enable_make_makefile = ui_config_get_boolean("enable_make_makefile", TRUE);
     prefs.scroll_on_output = ui_config_get_boolean("scroll_on_output", FALSE);
     
@@ -384,7 +384,7 @@ preferences_save(void)
         
     ui_config_set_boolean("edit_first_error", prefs.edit_first_error);
     ui_config_set_boolean("edit_warnings", prefs.edit_warnings);
-    ui_config_set_boolean("ignore_failures", prefs.ignore_failures);
+    ui_config_set_boolean("ignore_failures", prefs.keep_going);
     ui_config_set_boolean("enable_make_makefile", prefs.enable_make_makefile);
     ui_config_set_boolean("scroll_on_output", prefs.scroll_on_output);
 
@@ -490,7 +490,7 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     
     prefs.edit_first_error = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(edit1_check));
     prefs.edit_warnings = !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(editw_check));
-    prefs.ignore_failures = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fail_check));
+    prefs.keep_going = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fail_check));
     prefs.enable_make_makefile = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(emm_check));
     prefs.scroll_on_output = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(soo_check));
 
@@ -1889,7 +1889,7 @@ prefs_show(void)
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(run_load_sb), (gfloat)prefs.run_load / 10.0);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(edit1_check), prefs.edit_first_error);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(editw_check), !prefs.edit_warnings);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fail_check), prefs.ignore_failures);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fail_check), prefs.keep_going);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(emm_check), prefs.enable_make_makefile);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(soo_check), prefs.scroll_on_output);
     gtk_entry_set_text(GTK_ENTRY(makefile_entry), (prefs.makefile == 0 ? "" : prefs.makefile));
