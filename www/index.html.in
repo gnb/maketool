@@ -6,66 +6,67 @@ ENDHEAD
 BEGINBODY
 
 
-<P>
+<p>
 Maketool is a simple GTK+ based GUI front end for GNU make and
 other make programs.  It is released under the
 <a href="http://www.gnu.org/licenses/gpl.html">GNU General Public License</a>
-with <B>no warranty</B>.
-</P>
+with <b>no warranty</b>.
+</p>
 
-<P>
+<p>
 Maketool's features include:
-</P>
+</p>
 
-<UL>
-  <LI>Figures out what targets are available and presents them in a menu.
-  <LI>Runs make and detects compiler errors and warnings in the output.
-  <LI>Double-clicking on errors starts an editor with that file and line.
-  <LI>Works with any makefile system that uses GNU make.
-  <LI>Automatically updates Makefile if project uses automake, autoconf or imake.
-  <LI>GUI for selecting configure options for automake and autoconf.
-  <LI>Special handling for standard GNU targets such as <I>all</I>,
-      <I>install</I>, <I>clean</I> etc.
-  <LI>Save and reload logs of make runs.
-  <LI>Summarise make logs to reduce visual clutter.
-  <LI>With recursive make, expand or collapse each directory separately
-  <LI>Override values of make and environment variables.
-  <LI>Make in series or in parallel, (using make's -j and -l flags).
-  <LI>Dryrun mode (using make's -n flag).
-  <LI>Implements many of make's command-line options.
-  <LI>Configure foreground &amp; background colours of error &amp; warnings lines.
-  <LI>Now also supports Solaris make, IRIX smake, and BSD pmake.
-</UL>
+<ul>
+  <li>Figures out what targets are available and presents them in a menu.
+  <li>Runs make and detects compiler errors and warnings in the output.
+  <li>Double-clicking on errors starts an editor with that file and line.
+  <li>Works with any makefile system that uses GNU make.
+  <li>Automatically updates Makefile if project uses automake, autoconf or imake.
+  <li>GUI for selecting configure options for automake and autoconf.
+  <li>Special handling for standard GNU targets such as <i>all</i>,
+      <i>install</i>, <i>clean</i> etc.
+  <li>Save and reload logs of make runs.
+  <li>Summarise make logs to reduce visual clutter.
+  <li>With recursive make, expand or collapse each directory separately
+  <li>Override values of make and environment variables.
+  <li>Make in series or in parallel, (using make's -j and -l flags).
+  <li>Dryrun mode (using make's -n flag).
+  <li>Implements many of make's command-line options.
+  <li>Configure foreground &amp; background colours of error &amp; warnings lines.
+  <li>Now also supports Solaris make, IRIX smake, and BSD pmake.
+</ul>
 
-<P>
+<p>
 I personally test maketool on these platforms:
-</P>
-<UL>
-  <LI>RedHat Linux 7.3 on i386
-  <LI>RedHat Linux 9 on i386
-  <LI>IRIX on MIPS
-  <LI>SGI ProPack Linux on ia64
-</UL>
-<P>
+</p>
+<ul>
+  <li>RedHat Linux 7.3 on i386
+  <li>RedHat Linux 9 on i386
+  <li>IRIX 6.5.x on MIPS
+  <li>SGI ProPack Linux on ia64
+</ul>
+<p>
 I have received reports of maketool running on these platforms:
-</P>
-<UL>
-  <LI>Debian Linux
-  <LI>Slackware Linux 3.5
-  <LI>NetBSD
-  <LI>Solaris
-</UL>
-<P>
+</p>
+<ul>
+  <li>Debian Linux
+  <li>Mandrake Linux 9.2
+  <li>Slackware Linux 3.5
+  <li>NetBSD
+  <li>FreeBSD
+  <li>Solaris
+</ul>
+<p>
 If you port maketool to a new platform, please EMAILME(mail me) the
 patches (unified diff `format' preferred). I will try to incorporate them
 into the next release.  I'm also interested in translations into new languages.
-</P>
+</p>
 
 
-<P>
+<p>
 Thanks to the following people who have contributed to maketool.
-</P>
-include(_thanks.m4)
+</p>
 BEGINTHANKS
 THANKS(Frederick Bruckman,`NetBSD port, bugfixes')
 THANKS(Alistair Crooks,Solaris port)
