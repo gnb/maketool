@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.4 2001-09-21 06:20:26 gnb Exp $
+# $Id: Makefile.in,v 1.5 2003-05-04 06:29:30 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -25,6 +25,7 @@ VERSION=	@VERSION@
 datadir=	@datadir@
 pkgdatadir=	$(datadir)/$(PACKAGE)
 INSTALL=	@INSTALL@
+RM=		/bin/rm -f
 
 top_builddir=	..
 

@@ -1,6 +1,6 @@
 #
 # Maketool - GTK-based front end for gmake
-# Copyright (c) 1999-2001 Greg Banks
+# Copyright (c) 1999-2003 Greg Banks
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,23 +16,24 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: help-common.mk.in,v 1.10 2001-09-23 08:07:10 gnb Exp $
+# $Id: help-common.mk.in,v 1.11 2003-05-04 06:29:24 gnb Exp $
 #
 
 prefix=		@prefix@
 PACKAGE=	@PACKAGE@
 VERSION=	@VERSION@
-LANG=		$(notdir $(shell pwd))
+# We expect the including Makefile to set LANG
 helpdir=	@datadir@/$(PACKAGE)/help/$(LANG)
 INSTALL=	@INSTALL@
 DB2HTML=	db2html
 NSGMLS=		nsgmls
 OUTDIR=		help
-HTML_FILES=	$(wildcard $(OUTDIR)/*.html)
-IMAGES=		$(wildcard *.gif)
+HTML_FILES=	`ls $(OUTDIR)/*.html`
+IMAGES=		`ls *.gif`
 INSTALLABLES=	$(HTML_FILES) $(IMAGES)
 HTML4DTD=	/usr/share/doc/openjade-1.3/pubtext/HTML4.dtd
-HELPBASE=	$(dir $(shell /bin/pwd))
+HELPBASE=	..
+RM=		/bin/rm -f
 
 top_builddir=	../../..
 
@@ -44,7 +45,7 @@ all:: html
 html: maketool.html
 
 maketool.html: help.sgml entities.sgml
-	$(DB2HTML) --dsl $(HELPBASE)/help.dsl $<
+	$(DB2HTML) --dsl $(HELPBASE)/help.dsl help.sgml
 #	$(JADE) -t sgml -i html -d ../help.dsl $(SGMLDIR)/style/dsssl/docbook/docbook.dcl help.sgml
 
 at=@
@@ -54,7 +55,7 @@ entities.sgml: $(HELPBASE)/entities.sgml.in
 	    -e 's|${at}osname${at}|$(shell uname -s)|g' \
 	    -e 's|${at}LANG${at}|$(LANG)|g' \
 	    -e 's|${at}VERSION${at}|$(VERSION)|g' \
-	    < $< > $@
+	    < $(HELPBASE)/entities.sgml.in > $@
 
 clean::
 	$(RM) entities.sgml

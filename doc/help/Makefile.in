@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.6 2001-09-21 05:52:52 gnb Exp $
+# $Id: Makefile.in,v 1.7 2003-05-04 06:29:24 gnb Exp $
 #
 
 PACKAGE=	@PACKAGE@
@@ -31,7 +31,7 @@ top_builddir=	../..
 all clean install uninstall::
 	for subdir in $(SUBDIRS) ; do \
 	  test -d $$subdir || continue ;\
-	  $(MAKE) -C $$subdir $@ ;\
+	  ( cd $$subdir ; $(MAKE) $@ ) || exit 1 ;\
 	done
 		
 ###
@@ -48,6 +48,6 @@ dist:
 	  test -d $$subdir || continue; \
 	  mkdir $(distdir)/$$subdir || exit 1; \
 	  chmod 777 $(distdir)/$$subdir; \
-	  $(MAKE) -C $$subdir $@ || exit 1; \
+	  ( cd $$subdir ; $(MAKE) $@ ) || exit 1 ;\
 	done
 	

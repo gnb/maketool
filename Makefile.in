@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.46 2003-05-04 05:37:15 gnb Exp $
+# $Id: Makefile.in,v 1.47 2003-05-04 06:29:20 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -32,6 +32,7 @@ libexecdir=	@libexecdir@
 pkglibexecdir=	$(libexecdir)/$(PACKAGE)
 helpdir=	$(pkgdatadir)/help
 NON_GNU_MAKES=	@NON_GNU_MAKES@
+RM=		/bin/rm -f
 
 CC=		@CC@
 #CC=		gcc -Wall

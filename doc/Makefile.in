@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.4 2002-02-15 03:49:30 gnb Exp $
+# $Id: Makefile.in,v 1.5 2003-05-04 06:29:22 gnb Exp $
 #
 
 top_builddir=	..
@@ -26,6 +26,7 @@ VERSION=	@VERSION@
 SUBDIRS=	help
 mandir=		@mandir@
 INSTALL=	@INSTALL@
+RM=		/bin/rm -f
 
 ###
 # manpage
@@ -36,7 +37,7 @@ install:: $(mandir)/man1/$(MANPAGE)
 
 $(mandir)/man1/$(MANPAGE): $(MANPAGE)
 	test -d $(@D) || $(INSTALL) -m 755 -d $(@D)
-	$(INSTALL) -m 644 $< $@
+	$(INSTALL) -m 644 $(MANPAGE) $@
 
 uninstall::
 	$(RM) $(mandir)/$(MANPAGE)
@@ -45,7 +46,7 @@ uninstall::
 
 all clean install uninstall::
 	for subdir in $(SUBDIRS) ; do \
-	  $(MAKE) -C $$subdir $@ ;\
+	  ( cd $$subdir ; $(MAKE) $@ ) || exit 1 ;\
 	done
 		
 ###
@@ -61,6 +62,6 @@ dist:
 	for subdir in $(SUBDIRS); do \
 	  mkdir $(distdir)/$$subdir || exit 1; \
 	  chmod 777 $(distdir)/$$subdir; \
-	  $(MAKE) -C $$subdir $@ || exit 1; \
+	  ( cd $$subdir ; $(MAKE) $@ ) || exit 1; \
 	done
 	
