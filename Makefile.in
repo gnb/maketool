@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.51 2003-07-25 15:38:31 gnb Exp $
+# $Id: Makefile.in,v 1.52 2003-08-10 05:59:47 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -56,8 +56,7 @@ OBJECTS=	$(SOURCES:.c=.o)
 top_srcdir=	.
 top_builddir=	.
 
-@MAKE_ONLINE_HELP@HELP_SUBDIR=	doc
-SUBDIRS=	icons intl po makesys $(HELP_SUBDIR)
+SUBDIRS=	icons intl po makesys doc
 
 ###
 
@@ -229,17 +228,6 @@ dist:
 	bzip2 $(DISTTAR)
 	$(RM) -r $(distdir)
 
-
-RPMFLAGS=	--define "_topdir $$PWD/rpm.d" \
-		--define "_sourcedir $$PWD"
-
-rpm: dist
-	-$(RM) -r rpm.d
-	mkdir rpm.d rpm.d/BUILD rpm.d/RPMS
-	@RPMBUILD@ $(RPMFLAGS) -bb --clean maketool.spec
-	mv -f rpm.d/RPMS/*/*.rpm .
-	-$(RM) -r rpm.d
-	
 ##
 # deps
 	
