@@ -30,3 +30,4 @@ build.*.log
 rpm.d
 version.m4
 vg*.log
+autom4te.cache
