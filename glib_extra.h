@@ -26,6 +26,8 @@
 typedef void (*GUnixReapFunc)(pid_t, int status, struct rusage *, gpointer);
 
 void
+g_unix_reap_init(void);
+void
 g_unix_add_reap_func(
     pid_t pid,
     GUnixReapFunc reaper,	/* may be 0 -- uses default internal func */

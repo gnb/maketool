@@ -25,7 +25,7 @@
 #endif
 #include <gtk/gtk.h>
 
-CVSID("$Id: spawn.c,v 1.8 1999-10-16 15:51:31 gnb Exp $");
+CVSID("$Id: spawn.c,v 1.9 1999-11-14 01:23:07 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -37,6 +37,8 @@ spawn_simple(
 {
     pid_t pid;
     
+    g_unix_reap_init();
+
     if ((pid = fork()) < 0)
     {
     	/* error */
@@ -131,6 +133,8 @@ spawn_with_output(
     pid_t pid;
     int pipefds[2];
     SpawnData *so;
+    
+    g_unix_reap_init();
     
     if (pipe(pipefds) < 0)
     {

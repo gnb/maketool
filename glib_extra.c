@@ -22,7 +22,7 @@
 #include <signal.h>
 #include <sys/poll.h>
 
-CVSID("$Id: glib_extra.c,v 1.8 1999-11-04 07:20:38 gnb Exp $");
+CVSID("$Id: glib_extra.c,v 1.9 1999-11-14 01:23:07 gnb Exp $");
 
 
 typedef struct
@@ -153,15 +153,10 @@ g_unix_source_dispatch,
 g_unix_source_destroy
 };
 
-/*TODO:return a gint tag for removal*/
 
 void
-g_unix_add_reap_func(
-    pid_t pid,
-    GUnixReapFunc reaper,
-    gpointer user_data)
+g_unix_reap_init(void)
 {
-    GPidData *pd;
     static gboolean first = TRUE;
     
     if (first)
@@ -177,6 +172,18 @@ g_unix_add_reap_func(
     	g_unix_piddata = g_hash_table_new(g_direct_hash, g_direct_equal);
 	signal(SIGCHLD, g_unix_signal_handler);
     }
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+/*TODO:return a gint tag for removal*/
+
+void
+g_unix_add_reap_func(
+    pid_t pid,
+    GUnixReapFunc reaper,
+    gpointer user_data)
+{
+    GPidData *pd;
     
     if (reaper == 0)
     	reaper = g_unix_default_reaper;
