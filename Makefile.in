@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.29 2000-08-06 10:46:45 gnb Exp $
+# $Id: Makefile.in,v 1.30 2000-11-26 06:39:54 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -51,7 +51,10 @@ OBJECTS=	$(SOURCES:%.c=$O/%.o)
 
 top_srcdir=	.
 top_builddir=	.
-SUBDIRS=	icons intl po doc #test
+SUBDIRS=	icons intl po #test
+ifeq (@ENABLE_ONLINE_HELP@,yes)
+SUBDIRS+=	doc
+endif
 
 ###
 

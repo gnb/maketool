@@ -23,7 +23,7 @@
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.25 2000-11-26 05:52:10 gnb Exp $");
+CVSID("$Id: help.c,v 1.26 2000-11-26 06:39:54 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -227,6 +227,8 @@ help_about_make_cb(GtkWidget *w, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+#if ENABLE_ONLINE_HELP /* { */
+
 static TaskOps help_browser_ops =
 {
 0,  	    	    	    	/* start */
@@ -428,6 +430,8 @@ help_on_cb(GtkWidget *w, void *user_data)
     
     gdk_pointer_ungrab(GDK_CURRENT_TIME);
 }
+
+#endif /* } ENABLE_ONLINE_HELP*/
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 /*END*/

@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.68 2000-10-21 06:39:21 gnb Exp $");
+CVSID("$Id: main.c,v 1.69 2000-11-26 06:39:54 gnb Exp $");
 
 
 /*
@@ -1462,12 +1462,14 @@ ui_create_menus(GtkWidget *menubar)
     ui_add_tearoff(menu);
     ui_add_button(menu, _("_About Maketool..."), 0, help_about_cb, 0, GR_NONE);
     ui_add_button(menu, _("About _make..."), 0, help_about_make_cb, 0, GR_NONE);
+#if ENABLE_ONLINE_HELP
     ui_add_separator(menu);
     ui_add_button(menu, _("_Help on..."), "F1", help_on_cb, 0, GR_NONE);
     ui_add_separator(menu);
     ui_add_button(menu, _("_Tutorial..."), 0, help_goto_helpname_cb, "tutorial", GR_NONE);
     ui_add_button(menu, _("Index..."), 0, help_goto_helpname_cb, "index", GR_NONE);
     ui_add_button(menu, _("_Home Page..."), 0, help_goto_url_cb, HOMEPAGE, GR_NONE);
+#endif
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
