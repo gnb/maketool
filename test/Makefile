@@ -16,20 +16,28 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile,v 1.2 1999-08-10 15:45:02 gnb Exp $
+# $Id: Makefile,v 1.3 1999-11-02 08:49:42 gnb Exp $
 #
 
 
 CC=		gcc -Wall
 CFLAGS=		-g
 
-all:: random targets delay recurse longline unendedline
+all:: errors targets delay recurse longline unendedline
+
+errors: error1 error2 error3
 
 clean::
 	@echo Nothing to see here
 
-random:
-	gcc -ansi -Wall -c -o crud.o crud.c
+error1:
+	gcc -ansi -Wall -c crud.c
+
+error2:
+	gcc -ansi -Wall -c fred.c
+	
+error3:
+	gcc -ansi -Wall -c jane.c
 	
 targets:
 	yes ' ' | head -20 | awk '{print NR}'
