@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.16 1999-11-04 07:22:36 gnb Exp $");
+CVSID("$Id: ui.c,v 1.17 2000-01-24 11:04:58 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -445,6 +445,7 @@ ui_create_ok_dialog(
     
     dialog = gtk_dialog_new();
     gtk_window_set_title(GTK_WINDOW(dialog), title);
+    gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
     
     ui_dialog_create_button(dialog, _("OK"), ui_dialog_ok_cb, (gpointer)dialog);
     
