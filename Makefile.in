@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.44 2002-09-24 14:23:34 gnb Exp $
+# $Id: Makefile.in,v 1.45 2003-02-09 04:48:42 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -42,8 +42,10 @@ CPPFLAGS=	@GTK_CFLAGS@ -I$(top_srcdir) -Iicons -Iintl \
 		@CPPFLAGS@ $(TESTCPPFLAGS)
 LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 
-SOURCES=	main.c filter.c help.c preferences.c log.c print.c ps.c \
-		find.c autoconf.c ui.c uix.c task.c util.c glib_extra.c mqueue.c
+SOURCES=	main.c filter.c help.c preferences.c log.c print.c ps.c find.c \
+		makesys.c autoconf.c imake.c @OS_MAKESYS_SOURCE@ \
+		makeprog.c gmake.c pmake.c @OS_MAKEPROG_SOURCE@ \
+		ui.c uix.c task.c util.c glib_extra.c mqueue.c
 HEADERS=	maketool.h filter.h common.h log.h ui.h \
 		util.h glib_extra.h ps.h maketool_task.h mqueue.h autoconf_strs.c
 OBJECTS=	$(SOURCES:.c=.o)
@@ -105,19 +107,6 @@ uninstall::
 clean::
 	$(RM) maketool_client
 		
-###
-
-# extract_targets shell script
-
-install:: $(pkglibexecdir)/extract_targets
-
-$(pkglibexecdir)/extract_targets: extract_targets
-	test -d $(@D) || $(INSTALL) -m 755 -d $(@D)
-	$(INSTALL) -m 755 $< $@
-	
-uninstall::
-	$(RM) $(pkglibexecdir)/extract_targets
-	
 ###
 
 # make wrappers
