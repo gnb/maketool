@@ -127,10 +127,11 @@ x  Provide filters for other compilers than gcc.
 x  Make filters configurable in Preferences GUI. This implies making
    the changes persistent too!
 
-x  GNOME integration: drag'n'drop. Dragging in directory changes to
-   that directory. Dragging in file or string makes it if it's a known
-   target. Otherwise, if the MIMEtype indicates its text, open it as 
-   a log file. Dragging out a log line is a filename or file+line.
+x  GNOME integration: drag'n'drop.  If the MIMEtype indicates its text,
+   open it as a log file.
+
+x  GNOME integration: drag'n'drop.  Dragging out a log line is a
+   filename or file+line.
 
 x  GNOME integration: session management. Save directory & last target
    and state of errs/warnings/info toggles. Load again when started
@@ -286,6 +287,10 @@ x  When ./configure is run from make_makefile(), config.status is also
    run afterward, redundantly.
 
 --- closed ---
+
+x  GNOME integration: drag'n'drop. Dragging in directory changes to
+   that directory. Dragging in file or string makes it if it's a known
+   target.
 
 x  In all the info compile line filters, replace regexp portions like
    (|/[^ \t:#]+/) with (/[^ \t:#]+/)*  to avoid regcomp() errors on

@@ -32,7 +32,7 @@
 #include "mqueue.h"
 #include "progress.h"
 
-CVSID("$Id: main.c,v 1.110 2003-10-30 14:19:44 gnb Exp $");
+CVSID("$Id: main.c,v 1.111 2004-11-07 02:33:37 gnb Exp $");
 
 
 /*
@@ -47,6 +47,8 @@ typedef enum
     SEL_TARGET_COMPOUND_TEXT
 } SelectionTargets;
 
+/* Define this to 1 to enable debugging of DnD targets from sources */
+#define DEBUG_DND_TARGETS 0
 
 char		**cmd_targets;		/* targets on commandline */
 int 	    	cmd_num_targets;
@@ -815,7 +817,7 @@ list_targets_error(const char *errmsg)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-list_targets(void)
+list_targets(gboolean foreground)
 {
     char *command;
     Task *task;
@@ -832,8 +834,15 @@ list_targets(void)
 
     command = expand_prog(prefs.prog_list_targets, 0, 0, "_no_such_target_");
     task = (*makeprog->list_targets_task)(command);
-    task_enqueue(task);
-    task_start();
+    if (foreground)
+    {
+    	task_run(task);
+    }
+    else
+    {
+	task_enqueue(task);
+	task_start();
+    }
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -989,7 +998,7 @@ finished_dialog(const char *target)
 typedef struct
 {
     Task task;
-    const char *target;
+    char *target;
 } MakeTask;
 
 static void
@@ -1061,6 +1070,7 @@ make_reap(Task *task)
     	    break;
 	}
     }
+    g_free(mt->target);
 }
 
 static TaskOps make_ops =
@@ -1081,7 +1091,7 @@ make_task(const char *target)
     flags |= TASK_GROUPLEADER;
 #endif
 
-    mt->target = target;
+    mt->target = g_strdup(target);
     return task_create(
     	(Task *)mt,
 	expand_prog(prefs.prog_make, 0, 0, target),
@@ -1292,7 +1302,7 @@ construct_dir_previous_menu(void)
 
 
 static gboolean
-change_directory(const char *dir)
+change_directory(const char *dir, gboolean foreground)
 {
     char *olddir;
 
@@ -1352,7 +1362,7 @@ change_directory(const char *dir)
 	message("Directory %s", file_current());
 
     if (build_menu != 0)
-    	list_targets();
+    	list_targets(foreground);
     
     return TRUE;
 }
@@ -1360,13 +1370,13 @@ change_directory(const char *dir)
 static void
 dir_previous_cb(GtkWidget *w, gpointer data)
 {
-    change_directory((char*)data);
+    change_directory((char*)data, /*foreground*/FALSE);
 }
 
 static void
 file_change_dir_func(const char *filename)
 {
-    change_directory(filename);
+    change_directory(filename, /*foreground*/FALSE);
 }
 
 static void
@@ -1395,6 +1405,46 @@ file_change_dir_cb(GtkWidget *w, gpointer data)
     g_free(fakefile);
     
     gtk_widget_show(filesel);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+typedef struct
+{
+    Task task;
+    char *directory;
+} ChangeDirectoryTask;
+
+static void
+change_directory_start(Task *task)
+{
+    ChangeDirectoryTask *cdt = (ChangeDirectoryTask *)task;
+
+    if (!change_directory(cdt->directory, /*foreground*/TRUE))
+    	task_abort_queue();
+    g_free(cdt->directory);
+}
+
+static TaskOps change_directory_ops =
+{
+change_directory_start, /* start */
+0,	    	    	/* input */
+0, 	    	    	/* reap */
+0	    	    	/* destroy */
+};
+
+static Task *
+change_directory_task(const char *directory)
+{
+    ChangeDirectoryTask *cdt = g_new(ChangeDirectoryTask, 1);
+    
+    cdt->directory = g_strdup(directory);
+    return task_create(
+    	(Task *)cdt,
+	NULL,
+	NULL,
+	&change_directory_ops,
+	0);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -2053,6 +2103,208 @@ clipboard_init(GtkWidget *w)
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static char *
+dnd_data_as_text(void *data, unsigned int length)
+{
+    char *text;
+
+    text = g_new(char, length+1);
+    memcpy(text, data, length);
+    text[length] = '\0';
+
+    return text;
+}
+
+/*
+ * Handle a URI list.  Files are treated as targets to be made.
+ * A single directory is made the new current directory.
+ */
+static void
+dnd_handle_uri_list(void *data, unsigned int length)
+{
+    char *text;
+    char **uris;
+    char *path;
+    int i;
+    struct stat sb;
+    int nfiles = 0;
+    const char *lastdir = file_current(); /* tracks current dir across files */
+    char *adir = NULL;	    	    /* for case where only dirs dragged */
+
+    text = dnd_data_as_text(data, length);
+    if (text == NULL)
+    	return;
+#if DEBUG
+    fprintf(stderr, "dnd uri-list = \"%s\"\n", text);
+#endif
+
+    uris = g_strsplit(text, "\r\n", 1024);
+    g_free(text);
+
+    if (uris == NULL)
+    	return;
+
+    for (i = 0 ; uris[i] ; i++)
+    {
+#if DEBUG
+	fprintf(stderr, "    handling \"%s\"\n", uris[i]);
+#endif
+    	if (strncmp(uris[i], "file:", 5))
+	    continue;
+	path = uris[i]+5;
+
+    	if (stat(path, &sb) < 0)
+	    continue;	/* shouldn't happen; can't DnD nonexisting files */
+
+	if (S_ISDIR(sb.st_mode))
+	{
+#if DEBUG
+	    fprintf(stderr, "    is directory\n");
+#endif
+	    if (adir == NULL)
+	    	adir = path;
+	}
+	else if (S_ISREG(sb.st_mode))
+	{
+	    char *tail = strrchr(path, '/');
+    	    char *dir = (tail == path ? "/" : path);
+
+#if DEBUG
+	    fprintf(stderr, "    is file\n");
+#endif
+	    if (tail == NULL)
+	    	continue;   /* shouldn't happen, expect absolute pathnames */
+	    *tail++ = '\0';
+	    
+	    if (strcmp(dir, lastdir))
+	    {
+#if DEBUG
+		fprintf(stderr, "    new directory \"%s\"\n", dir);
+#endif
+	    	task_enqueue(change_directory_task(dir));
+	    	lastdir = dir;
+	    }
+	    task_enqueue(make_task(tail));
+	    nfiles++;
+	}
+    }
+
+    if (nfiles)
+	task_start();
+    else if (adir != NULL && strcmp(adir, file_current()))
+	change_directory(adir, /*foreground*/FALSE);
+
+    g_strfreev(uris);
+}
+
+/*
+ * Experiment shows that Nautilus on RH7.3 supports the following targets:
+ * 
+ * x-special/gnome-icon-list
+ *  	some kind of (?) binary formatted list of URLs and other
+ *  	icon-related information which doesn't matter.
+ * text/uri-list
+ *  	list of URLs one per line.
+ * _NETSCAPE_URL
+ *  	single URL (no matter how many files are actually dragged).
+ *
+ * So we support text/uri-list because it's both simple and works.
+ */
+#define URI_LIST     	    2
+static const GtkTargetEntry dnd_targets[] = 
+{
+    {"text/uri-list", 0, URI_LIST}
+};
+
+static void
+dnd_drag_data_received(
+    GtkWidget *widget,
+    GdkDragContext *drag_context,
+    gint x,
+    gint y,
+    GtkSelectionData *data,
+    guint info,
+    guint time,
+    gpointer user_data)
+{
+#if DEBUG
+    {
+	char *selection_str = gdk_atom_name(data->selection);
+	char *target_str = gdk_atom_name(data->target);
+	char *type_str = gdk_atom_name(data->type);
+	fprintf(stderr, "dnd_drag_data_received: info=%d, "
+			"data={selection=%s target=%s type=%s "
+			"data=0x%p length=%d format=%d}\n",
+			info,
+			selection_str, target_str, type_str,
+			data->data, data->length, data->format);
+	g_free(selection_str);
+	g_free(target_str);
+	g_free(type_str);
+    }
+#endif
+
+    switch (info)
+    {
+    case URI_LIST:
+	dnd_handle_uri_list(data->data, data->length);
+	break;
+    }
+}
+
+#if DEBUG_DND_TARGETS
+static gboolean
+dnd_drag_motion(
+    GtkWidget *widget,
+    GdkDragContext *drag_context,
+    gint x,
+    gint y,
+    guint time,
+    gpointer user_data)
+{
+    GList *iter;
+    
+    fprintf(stderr, "dnd_drag_motion: x=%d y=%d targets={", x, y);
+
+    for (iter = drag_context->targets ; iter != 0 ; iter = iter->next)
+    {
+	gchar *name = gdk_atom_name((GdkAtom)GPOINTER_TO_INT(iter->data));
+	fprintf(stderr, "\"%s\"%s", name, (iter->next == 0 ? "" : ", "));
+	g_free (name);
+    }
+    fprintf(stderr, "}\n");
+    
+    gdk_drag_status(drag_context, GDK_ACTION_COPY, GDK_CURRENT_TIME);
+
+    return TRUE;
+}
+#endif /* DEBUG_DND_TARGETS */
+
+
+static void
+dnd_setup(GtkWidget *w)
+{
+    GtkDestDefaults defaults = GTK_DEST_DEFAULT_ALL;
+    
+#if DEBUG_DND_TARGETS
+    defaults &= ~GTK_DEST_DEFAULT_MOTION;
+#endif
+
+    gtk_drag_dest_set(w, defaults,
+    	    	      dnd_targets, sizeof(dnd_targets)/sizeof(dnd_targets[0]),
+		      GDK_ACTION_COPY);
+
+#if DEBUG_DND_TARGETS
+    gtk_signal_connect(GTK_OBJECT(w), "drag_motion",
+	    GTK_SIGNAL_FUNC(dnd_drag_motion), 0);
+#endif /* DEBUG_DND_TARGETS */
+
+    gtk_signal_connect(GTK_OBJECT(w), "drag-data-received",
+	    GTK_SIGNAL_FUNC(dnd_drag_data_received), 0);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 /*
  * Set the title of the main window to
  * reflect maketool's current directory.
@@ -2260,9 +2512,11 @@ ui_create(void)
 #endif
     mq_init(toplevel->window);
 
-    list_targets();
+    list_targets(FALSE);
 
     gtk_widget_show(GTK_WIDGET(table));
+    
+    dnd_setup(toplevel);
 
 
     if (prefs.upgraded && prefs.found_old)
@@ -2339,7 +2593,7 @@ set_makefile(const char *mf)
 static void
 set_directory(const char *dir)
 {
-    if (!change_directory(dir))
+    if (!change_directory(dir, /*foreground*/FALSE))
     {
     	perror(dir);
     	exit(1);
