@@ -23,7 +23,7 @@
 #include "maketool_task.h"
 #include "log.h"
 
-CVSID("$Id: autoconf.c,v 1.13 2003-05-24 05:48:20 gnb Exp $");
+CVSID("$Id: autoconf.c,v 1.14 2003-07-25 14:18:41 gnb Exp $");
 
 #define strassign(x, s) \
     do { \
@@ -251,7 +251,7 @@ build_configure_command(void)
     for (list = all_options ; list != 0 ; list = list->next)
     {
     	option_t *opt = (option_t *)list->data;
-	char *val;
+	char *val = 0;
 	
 	if (!(opt->flags & OPT_PRESENT))
 	    continue;

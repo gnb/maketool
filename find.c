@@ -24,7 +24,7 @@
 #include <regex.h>	/* POSIX regular expression fns */
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: find.c,v 1.17 2003-05-24 05:48:20 gnb Exp $");
+CVSID("$Id: find.c,v 1.18 2003-07-25 14:19:05 gnb Exp $");
 
 #define FINDCASE 0  	/* TODO: implement case-insensitive literals */
 
@@ -119,7 +119,7 @@ find_state_get(FindState *state)
     	return FALSE;
     
     /* TODO: separately reinit these */
-    state->string = gtk_entry_get_text(GTK_ENTRY(string_entry));
+    state->string = (char *)gtk_entry_get_text(GTK_ENTRY(string_entry));
     if (state->type == FT_REGEXP)
     {
     	guint err;

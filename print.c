@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: print.c,v 1.13 2003-05-24 05:48:21 gnb Exp $");
+CVSID("$Id: print.c,v 1.14 2003-07-25 14:20:07 gnb Exp $");
 
 static GtkWidget	*print_shell = 0;
 typedef enum { D_PRINTER, D_FILE, D_NUM_DESTS } DEST;
@@ -211,7 +211,8 @@ static void
 print_ok_cb(GtkWidget *w, gpointer data)
 {
     FILE *fp;
-    char *printer, *file;
+    const char *printer;
+    const char *file;
     DEST dest = print_get_dest();
     
     switch (dest)

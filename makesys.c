@@ -21,7 +21,7 @@
 #include "util.h"
 #include <sys/stat.h>
 
-CVSID("$Id: makesys.c,v 1.2 2003-05-24 05:48:21 gnb Exp $");
+CVSID("$Id: makesys.c,v 1.3 2003-07-25 14:19:44 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -94,7 +94,7 @@ static const char * const gnu_standard_targets[] = {
 gboolean
 ms_is_standard_target(const MakeSystem *ms, const char *targ)
 {
-    const char * const *tp;
+    const char * const *tp = 0;
     
     for ( ; ms != 0 ; ms = ms->parent)
     {
