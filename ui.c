@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.34 2003-07-25 15:21:20 gnb Exp $");
+CVSID("$Id: ui.c,v 1.35 2003-09-24 10:28:46 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -78,7 +78,7 @@ static GPtrArray *ui_groups = 0;
 static void
 ui_group_destroy_cb(GtkWidget *w, gpointer user_data)
 {
-    gint group = (gint)user_data;
+    gint group = GPOINTER_TO_INT(user_data);
     
     g_ptr_array_index(ui_groups, group) = 
     	g_list_remove(g_ptr_array_index(ui_groups, group), w);
@@ -97,7 +97,7 @@ ui_group_add(guint group, GtkWidget *w)
     	g_list_prepend(g_ptr_array_index(ui_groups, group), w);
 	
     gtk_signal_connect(GTK_OBJECT(w), "destroy",
-    	    GTK_SIGNAL_FUNC(ui_group_destroy_cb), (gpointer)group);
+    	    GTK_SIGNAL_FUNC(ui_group_destroy_cb), GINT_TO_POINTER(group));
 }
 
 void

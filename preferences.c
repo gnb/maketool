@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.61 2003-08-20 15:39:40 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.62 2003-09-24 10:28:46 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -1453,7 +1453,7 @@ color_dialog_set_color(const char *color_name)
 static void
 color_entry_changed_cb(GtkWidget *w, gpointer data)
 {
-    int index = (int)data;
+    int index = GPOINTER_TO_INT(data);
     
     if (creating)
     	return;
@@ -1512,7 +1512,7 @@ color_choose_cb(GtkWidget *w, gpointer data)
     if (color_current_index >= 0)
 	gtk_entry_select_region(GTK_ENTRY(color_entries[color_current_index]), 0, 0);
 
-    color_current_index = (int)data;
+    color_current_index = GPOINTER_TO_INT(data);
 
     title = g_strdup_printf(_("Maketool: %s Choose Color"),
     	color_labels[color_current_index]);
@@ -1552,7 +1552,7 @@ prefs_create_color_row(
     
     entry = gtk_entry_new();
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
-    	GTK_SIGNAL_FUNC(color_entry_changed_cb), (gpointer)color_num);
+    	GTK_SIGNAL_FUNC(color_entry_changed_cb), GINT_TO_POINTER(color_num));
     gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row+1,
 		       (GtkAttachOptions)(GTK_FILL|GTK_EXPAND), (GtkAttachOptions)0,
 		       0, 0);
@@ -1560,7 +1560,7 @@ prefs_create_color_row(
     
     button = gtk_button_new_with_label(_("Choose..."));
     gtk_signal_connect(GTK_OBJECT(button), "clicked", 
-    	GTK_SIGNAL_FUNC(color_choose_cb), (gpointer)color_num);
+    	GTK_SIGNAL_FUNC(color_choose_cb), GINT_TO_POINTER(color_num));
     gtk_table_attach(GTK_TABLE(table), button, 2, 3, row, row+1,
 		       (GtkAttachOptions)0, (GtkAttachOptions)0, SPACING, 0);
     gtk_widget_show(button);
