@@ -18,12 +18,12 @@
  */
 
 #include "maketool.h"
-#include "task.h"
+#include "maketool_task.h"
 #include "ui.h"
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.33 2001-09-22 02:20:58 gnb Exp $");
+CVSID("$Id: help.c,v 1.34 2002-09-24 14:13:28 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;

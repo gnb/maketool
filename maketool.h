@@ -21,7 +21,7 @@
 #define _MAKETOOL_H_
 
 #include "common.h"
-#include "task.h"
+#include "maketool_task.h"
 #include <gtk/gtk.h>
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

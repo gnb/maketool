@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "task.h"
+#include "maketool_task.h"
 #include <signal.h>
 #include <gdk/gdk.h>
 #include "glib_extra.h"
@@ -31,7 +31,7 @@
 #include <sys/filio.h>
 #endif
 
-CVSID("$Id: task.c,v 1.10 2001-09-22 02:20:58 gnb Exp $");
+CVSID("$Id: task.c,v 1.11 2002-09-24 14:16:28 gnb Exp $");
 
 /*
  * TODO: GDK is used only for the gdk_input_*() functions, which

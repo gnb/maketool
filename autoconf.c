@@ -20,7 +20,7 @@
 #include "maketool.h"
 #include "ui.h"
 #include "util.h"
-#include "task.h"
+#include "maketool_task.h"
 #include "log.h"
 
 extern Task *logged_task(char *command);
