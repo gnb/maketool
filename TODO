@@ -1,5 +1,7 @@
 --- open ---
 
+x  Investigate performance of regexec() in IRIX libc vs glibc.
+
 x  Provide a progress indicator during the open of large log files.
 
 x  Help->Help On reports "main-window" if clicked on the background of
