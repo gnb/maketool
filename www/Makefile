@@ -52,17 +52,21 @@ clean::
 ############################################################
 
 INSTALL=	install -c
-INSTALLDIR=	$(HOME)/public_html/alphalink/maketool
+htmldir=	$(HOME)/public_html/alphalink/maketool
+uploaddir=	shell.alphalink.com.au:public_html
 
-install:: $(addprefix $(INSTALLDIR)/,$(notdir $(DELIVERABLES)))
+install:: installdirs $(addprefix $(htmldir)/,$(notdir $(DELIVERABLES)))
 
-$(INSTALLDIR)/%: %
+installdirs:
+	test -d $(htmldir) || $(INSTALL) -d $(htmldir)
+	
+$(htmldir)/%: %
 	$(INSTALL) -m 644 $< $@
 
-#$(INSTALLDIR)/%: ../%
+#$(htmldir)/%: ../%
 #	$(INSTALL) -m 644 $< $@
 
 ############################################################
 
 upload:
-	weex maketool
+	rsync -v -r -e ssh --rsync-path=/home/g/gnb/inst/bin/rsync $(htmldir) $(uploaddir)
