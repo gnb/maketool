@@ -1,2 +1,2 @@
-define(LATEST_VERSION,0.6)
+define(LATEST_VERSION,0.6.1)
 define(PREVIOUS_VERSION,0.5.1)
