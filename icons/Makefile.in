@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.5 2000-07-21 06:12:08 gnb Exp $
+# $Id: Makefile.in,v 1.6 2000-08-06 11:21:02 gnb Exp $
 #
 
 # TODO: gtk flags should come from `configure'
@@ -30,7 +30,8 @@ PIXMAPS=	\
 		clean.xpm clear.xpm error.xpm info.xpm \
 		maketool.xpm maketool_l.xpm next.xpm \
 		print.xpm warning.xpm stop.xpm \
-		babygnu_l.xpm
+		babygnu_l.xpm file_next.xpm \
+		help_cursor.xbm help_cursor_mask.xbm
 ###
 
 # Nothing to do here except package up source for distribution.
