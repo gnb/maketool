@@ -175,9 +175,6 @@ x  The directory /usr/src/redhat/SOURCES is RH-specific.  Mandrake
    uses the more vendor-neutral /usr/src/RPM/SOURCES which needs
    to be accomodated.
    
-x  Bug where maketool crashes if first line of make output is empty,
-   e.g. the XFree86 build.
-   
 x  When the make child is generating lots of output very quickly, the
    GTK library is starved of CPU and does not repaint the window (which
    is slightly annoying) or allow the user to press Stop (which is
@@ -190,8 +187,6 @@ x  Add the ability for the user to configure his own toolbar icons,
 x  Bug where make variable overrides specified on command line are
    ignored until Preferences dialog OK is pressed.
    
-x  Tweak icon to look good when scaled down for taskbar by modern GNOME.
-
 x  "make -n dist" fails.
      
 --- closed ---
@@ -399,4 +394,10 @@ x  DONE: Provide a Preferences setting to control what happens when a make
 x  DONE: configure-time check for /usr/doc is insufficient. Need to use /usr/doc
    on Linux only, $(prefix)/share/$(PACKAGE) on NetBSD.
    Now those files are handled by RPM using a %doc directive.
+   
+x  DONE: Tweak icon to look good when scaled down for taskbar by modern GNOME.
+
+x  DONE: Bug where maketool crashes if first line of make output is empty,
+   e.g. the XFree86 build.
+   This has been fixed but unreleased for a while.
    
