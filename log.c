@@ -22,7 +22,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: log.c,v 1.18 1999-10-17 14:03:04 gnb Exp $");
+CVSID("$Id: log.c,v 1.19 1999-11-02 11:10:38 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -376,6 +376,7 @@ log_open(const char *file)
 	return;
     }
     
+    gtk_clist_freeze(GTK_CLIST(logwin));
     startstr = g_strdup_printf(_("Log file %s"), file);
     log_start_build(startstr);
     g_free(startstr);
@@ -420,6 +421,7 @@ log_open(const char *file)
     
     estring_free(&leftover);
     fclose(fp);
+    gtk_clist_thaw(GTK_CLIST(logwin));
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -438,7 +440,11 @@ void
 log_set_selected(LogRec *lr)
 {
     if (lr->node != 0)
+    {
 	gtk_ctree_select(GTK_CTREE(logwin), lr->node);
+    	if (gtk_ctree_node_is_visible(GTK_CTREE(logwin), lr->node) != GTK_VISIBILITY_FULL)
+	    gtk_ctree_node_moveto(GTK_CTREE(logwin), lr->node, 0, 0.5, 0.0);
+    }
 }
 
 

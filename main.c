@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.39 1999-11-02 08:56:23 gnb Exp $");
+CVSID("$Id: main.c,v 1.40 1999-11-02 11:10:38 gnb Exp $");
 
 typedef enum
 {
@@ -105,6 +105,19 @@ message(const char *fmt, ...)
     
     gtk_entry_set_text(GTK_ENTRY(messageent), msg);
     g_free(msg);
+}
+
+/*
+ * Force the last changed message to appear
+ * immediately instead of delaying until the
+ * next dip into the main loop. Useful when
+ * a long-blocking action is about to be done.
+ */
+void
+message_flush(void)
+{
+    while (g_main_pending())
+    	g_main_iteration(/*may_block*/FALSE);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -687,12 +700,20 @@ file_exit_cb(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
+file_open_file_func(const char *filename)
+{
+    message("Opening log file %s", filename);
+    message_flush();
+    log_open(filename);
+}
+
+static void
 file_open_cb(GtkWidget *w, gpointer data)
 {
     static GtkWidget *filesel = 0;
     
     if (filesel == 0)
-    	filesel = ui_create_file_sel(_("Maketool: Open Log File"), log_open, "make.log");
+    	filesel = ui_create_file_sel(_("Maketool: Open Log File"), file_open_file_func, "make.log");
 
     gtk_widget_show(filesel);
 }
@@ -700,12 +721,20 @@ file_open_cb(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
+file_save_file_func(const char *filename)
+{
+    message("Saving log file %s", filename);
+    message_flush();
+    log_save(filename);
+}
+
+static void
 file_save_cb(GtkWidget *w, gpointer data)
 {
     static GtkWidget *filesel = 0;
     
     if (filesel == 0)
-    	filesel = ui_create_file_sel(_("Maketool: Save Log File"), log_save, "make.log");
+    	filesel = ui_create_file_sel(_("Maketool: Save Log File"), file_save_file_func, "make.log");
 
     gtk_widget_show(filesel);
 }

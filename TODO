@@ -1,7 +1,7 @@
 
 x  DONE: `Variables' tab in Preferences window needs to shrink.
 
-x  When user presses `Edit Next' the new selected error
+x  DONE: When user presses `Edit Next' the new selected error
    should become visible even if its currently in a collapsed
    build or it has scrolled out of sight.
    
@@ -130,3 +130,41 @@ x  Change the preferences so that the actual make executable used is
 x  Allow setting of make variables using VAR=val syntax on command line.
 
 x  Make the default text editor configurable, figured out in configure.
+
+x  DONE: Loading a large make log does way too much updating of the scrollbar.
+
+x  DONE: use a GNU logo in the `Help->About make' dialog.
+
+x  When loading log file, should report number of errors & warnings.
+
+x  DONE: Edit Next Error command should make the newly line visible by scrolling.
+
+x  In summary mode, need to highlight the `Compiling' lines visually to
+   separate them from the usual make clutter.
+
+x  Should be able to drag & drop {filename, linenumber, message} or text.
+
+x  For the editing program, should be able to specify a %sequence which
+   contains the quoted error message, for integration with IDEs.
+
+x  An error message which specifies an absolute pathname /abs/path tries
+   to open file /curr/dir/abs/path instead of /abs/path
+   
+x  Add ability to delete individual make runs from view window
+
+x  Add ability to view multi-directory logs as either flat or
+   organised hierarchically by directory.
+
+x  Work out some way to handle the huge number of targets available
+   in the Linux kernel toplevel makefile without overflowing the screen.
+
+x  Add option to map directory level to tree indent level
+
+x  Add a feature to watch an existing log file as it grows.
+
+x  When clicking on errrors from a loaded log file, pathnames should
+   be interpreted relative to the log file's directory.
+
+x  Provide a small ctree with 3 rows to preview colour changes in
+   Preferences window.
+   
