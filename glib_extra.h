@@ -23,6 +23,12 @@
 #include "common.h"
 #include <sys/resource.h>
 
+#if GLIB_CHECK_VERSION(2,0,0)
+#define GLIB2 1
+#else
+#define GLIB2 0
+#endif
+
 typedef void (*GUnixReapFunc)(pid_t, int status, struct rusage *, gpointer);
 
 void

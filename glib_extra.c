@@ -22,7 +22,7 @@
 #include <signal.h>
 #include <sys/poll.h>
 
-CVSID("$Id: glib_extra.c,v 1.16 2003-05-24 05:48:20 gnb Exp $");
+CVSID("$Id: glib_extra.c,v 1.17 2003-07-25 14:19:19 gnb Exp $");
 
 
 typedef struct
@@ -106,10 +106,16 @@ g_unix_signal_handler(int sig)
 
 static gboolean
 g_unix_source_prepare(
+#if GLIB2
+    GSource *source,
+    gint *timeout
+#else
     gpointer source_data, 
     GTimeVal *current_time,
     gint *timeout,
-    gpointer user_data)
+    gpointer user_data
+#endif
+    )
 {
 #if DEBUG > 5
     fprintf(stderr, "g_unix_source_prepare(): returning %d\n", (int)g_unix_got_signal);
@@ -119,9 +125,14 @@ g_unix_source_prepare(
     
 static gboolean
 g_unix_source_check(
+#if GLIB2
+    GSource *source
+#else
     gpointer source_data,
     GTimeVal *current_time,
-    gpointer user_data)
+    gpointer user_data
+#endif
+    )
 {
 #if DEBUG > 5
     fprintf(stderr, "g_unix_source_check(): returning %d\n", (int)g_unix_got_signal);
@@ -131,9 +142,16 @@ g_unix_source_check(
     
 static gboolean
 g_unix_source_dispatch(
+#if GLIB2
+    GSource *source,
+    GSourceFunc callback,
+    gpointer user_data
+#else
     gpointer source_data, 
     GTimeVal *current_time,
-    gpointer user_data)
+    gpointer user_data
+#endif
+    )
 {
 #if DEBUG > 5
     fprintf(stderr, "g_unix_source_dispatch(): called\n");
@@ -144,7 +162,13 @@ g_unix_source_dispatch(
 }
     
 static void
-g_unix_source_destroy(gpointer data)
+g_unix_source_destroy(
+#if GLIB2
+    GSource *source
+#else
+    gpointer data
+#endif
+    )
 {
 #if DEBUG
     fprintf(stderr, "g_unix_source_destroy(): called\n");
@@ -177,9 +201,19 @@ g_unix_reap_init(void)
     
     if (first)
     {
+#if GLIB2
+	GSource *source;
+#endif
+
     	first = FALSE;
 	signal(SIGCHLD, g_unix_signal_handler);
     	g_unix_piddata = g_hash_table_new(g_direct_hash, g_direct_equal);
+#if GLIB2
+    	source = g_source_new(&reaper_source_funcs, sizeof(GSource));
+	g_source_set_can_recurse(source, TRUE);
+    	g_source_set_priority(source, G_UNIX_REAP_PRIORITY);
+	g_source_attach(source, g_main_context_default());
+#else
 	g_source_add(
 		G_UNIX_REAP_PRIORITY,	/* priority */
 		TRUE,			/* can_recurse */
@@ -187,6 +221,7 @@ g_unix_reap_init(void)
 		(gpointer)0,		/* source_data */
 		(gpointer)0,		/* user_data */
 		(GDestroyNotify)0);
+#endif
     }
 }
 

@@ -23,6 +23,18 @@
 #include "common.h"
 #include <gtk/gtk.h>
 
+#if GTK_CHECK_VERSION(2,0,0)
+#define GTK2 1
+#else
+#define GTK2 0
+#endif
+
+#if GTK2
+typedef void (*ui_callback_t)(GtkWidget *w, gpointer data);
+#else
+typedef GtkSignalFunc ui_callback_t;
+#endif
+
 void ui_widget_set_visible(GtkWidget *w, gboolean b);
 
 int ui_combo_get_current(GtkWidget *);
@@ -47,7 +59,7 @@ GtkWidget *ui_tool_create(
     const char *name,
     const char *tooltip,
     char **pixmap_xpm,
-    GtkSignalFunc callback,
+    ui_callback_t callback,
     gpointer user_data,
     gint group,
     const char *helpname);
@@ -96,7 +108,7 @@ GtkWidget *ui_create_ok_dialog(
 GtkWidget *ui_create_apply_dialog(
     GtkWidget *parent,
     const char *title,
-    GtkSignalFunc apply_cb,
+    ui_callback_t apply_cb,
     gpointer data);
 GtkWidget *ui_create_dialog(
     GtkWidget *parent,
@@ -104,7 +116,7 @@ GtkWidget *ui_create_dialog(
 GtkWidget *ui_dialog_create_button(
     GtkWidget *dialog,
     const char *label,
-    GtkSignalFunc callback,
+    ui_callback_t callback,
     gpointer user_data);
 void ui_dialog_changed(GtkWidget *dialog);    
 

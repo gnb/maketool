@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.32 2003-05-24 05:48:21 gnb Exp $");
+CVSID("$Id: ui.c,v 1.33 2003-07-25 14:20:19 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -96,8 +96,8 @@ ui_group_add(guint group, GtkWidget *w)
     g_ptr_array_index(ui_groups, group) = 
     	g_list_prepend(g_ptr_array_index(ui_groups, group), w);
 	
-    gtk_signal_connect(GTK_OBJECT(w), "destroy", ui_group_destroy_cb,
-	    (gpointer)group);
+    gtk_signal_connect(GTK_OBJECT(w), "destroy",
+    	    GTK_SIGNAL_FUNC(ui_group_destroy_cb), (gpointer)group);
 }
 
 void
@@ -142,11 +142,11 @@ ui_create_file_sel(
     	    GTK_WINDOW(parent));
     gtk_signal_connect(
 	    GTK_OBJECT(GTK_FILE_SELECTION(filesel)->ok_button),
-            "clicked", ui_file_sel_ok_cb,
+            "clicked", GTK_SIGNAL_FUNC(ui_file_sel_ok_cb),
 	    (gpointer)filesel);
     gtk_signal_connect_object(
 	    GTK_OBJECT(GTK_FILE_SELECTION(filesel)->cancel_button),
-            "clicked", (GtkSignalFunc) gtk_widget_hide,
+            "clicked", GTK_SIGNAL_FUNC(gtk_widget_hide),
 	    GTK_OBJECT(filesel));
     gtk_object_set_data(GTK_OBJECT(filesel), FILESEL_CALLBACK_DATA,
     	(gpointer)callback);
@@ -203,7 +203,7 @@ _ui_add_menu_aux(
     gtk_widget_show(item);
     
     if (douline && uline_key != 0)
-	gtk_widget_add_accelerator(item, "activate_item", 
+	gtk_widget_add_accelerator(item, "activate", 
 				ui_accel_group, uline_key, GDK_MOD1_MASK, 0);
 
     menu = gtk_menu_new();
@@ -267,11 +267,15 @@ _ui_add_menu_accel(
     {
 	menu_accel_grp = gtk_accel_group_new();
 	menu_shell = gtk_widget_get_ancestor(menu, gtk_menu_shell_get_type());
+#if GTK2
+	_gtk_accel_group_attach(menu_accel_grp, GTK_OBJECT(menu_shell));
+#else
 	gtk_accel_group_attach(menu_accel_grp, GTK_OBJECT(menu_shell));
+#endif
 	gtk_object_set_data(GTK_OBJECT(menu), UI_MENU_ACCEL_GROUP,
 	    	   	     menu_accel_grp);
     }
-    gtk_widget_add_accelerator(item, "activate_item", 
+    gtk_widget_add_accelerator(item, "activate", 
 			    menu_accel_grp, uline_key, 0, 0);
 }
 
@@ -289,7 +293,7 @@ _ui_add_accel(
     	return;
 
     gtk_accelerator_parse(accel, &key, &mods);
-    gtk_widget_add_accelerator(item, "activate_item", 
+    gtk_widget_add_accelerator(item, "activate", 
 			    ui_accel_group, key, mods, GTK_ACCEL_VISIBLE);
 #if 0
     gtk_accel_group_add(ui_accel_group,
@@ -462,7 +466,7 @@ ui_tool_create(
     const char *name,
     const char *tooltip,
     char **pixmap_xpm,
-    GtkSignalFunc callback,
+    ui_callback_t callback,
     gpointer user_data,
     gint group,
     const char *helpname)
@@ -536,7 +540,7 @@ GtkWidget *
 ui_dialog_create_button(
     GtkWidget *dialog,
     const char *label,
-    GtkSignalFunc callback,
+    ui_callback_t callback,
     gpointer user_data)
 {
     GtkWidget *button, *bbox;
@@ -546,7 +550,8 @@ ui_dialog_create_button(
     bbox = ((GtkBoxChild *)GTK_BOX(GTK_DIALOG(dialog)->action_area)->children->data)->widget;
     gtk_box_pack_start(GTK_BOX(bbox), button,
     	    	      /*expand*/FALSE, /*fill*/TRUE, /*padding*/0);
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",  callback, user_data);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked", 
+    	    	       GTK_SIGNAL_FUNC(callback), user_data);
     gtk_widget_show(button);
 
     return button;
@@ -580,7 +585,7 @@ ui_create_ok_dialog(
 typedef struct
 {
     GtkWidget *dialog;
-    GtkSignalFunc apply_cb;
+    ui_callback_t apply_cb;
     GtkWidget *ok_btn;
     GtkWidget *apply_btn;
     gpointer user_data;
@@ -617,7 +622,7 @@ GtkWidget *
 ui_create_apply_dialog(
     GtkWidget *parent,
     const char *title,
-    GtkSignalFunc apply_cb,
+    ui_callback_t apply_cb,
     gpointer data)
 {
     ApplyDialog *ad;
@@ -676,7 +681,7 @@ ui_message_dialog(GtkWidget *parent, const char *title, const char *msg)
 
     shell = ui_create_ok_dialog(parent, title);
     gtk_signal_connect(GTK_OBJECT(shell), "hide",
-    	    	       ui_message_dialog_hide_cb, shell);
+    	    	       GTK_SIGNAL_FUNC(ui_message_dialog_hide_cb), shell);
 
     hbox = gtk_hbox_new(FALSE, 5);
     gtk_container_border_width(GTK_CONTAINER(hbox), 4);

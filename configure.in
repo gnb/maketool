@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
-dnl $Id: configure.in,v 1.47 2003-05-24 07:07:22 gnb Exp $
+dnl $Id: configure.in,v 1.48 2003-07-25 14:18:54 gnb Exp $
 dnl
 
 AC_INIT(main.c)
@@ -168,8 +168,21 @@ AC_MSG_RESULT($NON_GNU_MAKES)
 dnl ===============================
 
 
-dnl GTK
-AM_PATH_GTK(1.2.0)
+dnl Use the latest version of gtk which actually is complete and works.
+dnl Should result in: gtk 1.2 on RedHat 7.3, gtk 2 on RedHat 8 & greater.
+
+PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.0.3, [gtk2=yes],[gtk2=no])
+if test $gtk2 = yes ; then
+    # Need GTK_ENABLE_BROKEN to get GtkText at least until this
+    # code is ported to GtkTextView.
+    GTK_CFLAGS="$GTK_CFLAGS -DGTK_ENABLE_BROKEN"
+else
+    # fall back to gtk 1.2
+    AM_PATH_GTK(1.2.0,,AC_MSG_ERROR(ggcov requires the GTK+ library))
+fi
+AC_SUBST(GTK_CFLAGS)
+AC_SUBST(GTK_LIBS)
+
 
 dnl ===============================
 dnl A bunch of warning options for gcc.  Note that we add 

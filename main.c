@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.91 2003-05-24 05:48:20 gnb Exp $");
+CVSID("$Id: main.c,v 1.92 2003-07-25 14:19:33 gnb Exp $");
 
 
 /*
@@ -1902,10 +1902,15 @@ ui_create(void)
     gtk_widget_show(handlebox);
     toolbar_hb = handlebox;
 
+#if GTK2
+    toolbar = gtk_toolbar_new();
+/*    gtk_toolbar_set_orientation(GTK_TOOLBAR(toolbar), GTK_ORIENTATION_HORIZONTAL); */
+#else
     toolbar = gtk_toolbar_new(GTK_ORIENTATION_HORIZONTAL, GTK_TOOLBAR_BOTH);
     gtk_toolbar_set_button_relief(GTK_TOOLBAR(toolbar), GTK_RELIEF_NONE);
     gtk_toolbar_set_space_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_SPACE_LINE);
     gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_ICONS);
+#endif
     gtk_container_add(GTK_CONTAINER(handlebox), toolbar);
     gtk_widget_show(toolbar);
     ui_create_tools(toolbar);
