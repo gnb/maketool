@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.82 2001-09-23 08:05:37 gnb Exp $");
+CVSID("$Id: main.c,v 1.83 2002-09-24 13:45:07 gnb Exp $");
 
 
 /*
@@ -525,6 +525,16 @@ make_makefile(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static const char *
+get_target_accelerator(const char *targ)
+{
+    if (!strcmp(targ, "all"))
+    	return "<Alt>A";
+    if (!strcmp(targ, "clean"))
+    	return "<Alt>C";
+    return 0;
+}
+
 static void
 append_build_menu_items(GList *list)
 {
@@ -567,8 +577,11 @@ append_build_menu_items(GList *list)
     	if (!strcmp(targ, "-"))
 	    ui_add_separator(menu);
 	else
-	    ui_add_button_2(menu, targ, FALSE, 0, build_cb, targ,
+	{
+	    const char *accel = get_target_accelerator(targ);
+	    ui_add_button_2(menu, targ, FALSE, accel, build_cb, targ,
 	    			GR_NOTRUNNING);
+	}
     }
 }
 
