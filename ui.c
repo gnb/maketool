@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.28 2002-09-24 14:06:31 gnb Exp $");
+CVSID("$Id: ui.c,v 1.29 2003-04-28 11:46:40 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -638,6 +638,82 @@ ui_dialog_changed(GtkWidget *dialog)
     gtk_widget_set_sensitive(ad->ok_btn, TRUE);
     gtk_widget_set_sensitive(ad->apply_btn, TRUE);
     gtk_window_set_default(GTK_WINDOW(ad->dialog), ad->ok_btn);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+#include "gnome-info.xpm"
+
+static void
+ui_message_dialog_hide_cb(GtkWidget *w, gpointer data)
+{
+    gtk_widget_destroy(GTK_WIDGET(data));
+}
+
+GtkWidget *
+ui_message_dialog(GtkWidget *parent, const char *title, const char *msg)
+{
+    GtkWidget *shell;
+    GtkWidget *hbox;
+    GtkWidget *icon;
+    GtkWidget *label;
+    static GdkPixmap *pm;
+    static GdkBitmap *mask;
+
+    shell = ui_create_ok_dialog(parent, title);
+    gtk_signal_connect(GTK_OBJECT(shell), "hide",
+    	    	       ui_message_dialog_hide_cb, shell);
+
+    hbox = gtk_hbox_new(FALSE, 5);
+    gtk_container_border_width(GTK_CONTAINER(hbox), 4);
+    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(shell)->vbox), hbox);
+    gtk_widget_show(hbox);
+
+    if (pm == 0)
+    {
+	pm = gdk_pixmap_create_from_xpm_d(parent->window,
+    		    &mask, 0, gnome_info_xpm);
+    }
+    icon = gtk_pixmap_new(pm, mask);
+    gtk_container_add(GTK_CONTAINER(hbox), icon);
+    gtk_widget_show(icon);
+
+    label = gtk_label_new(msg);
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_container_add(GTK_CONTAINER(hbox), label);
+    gtk_widget_show(label);
+    
+    return shell;
+}
+
+GtkWidget *
+ui_message_dialog_f(GtkWidget *parent, const char *title, const char *fmt, ...)
+{
+    va_list args;
+    char *msg;
+    GtkWidget *w;
+    
+    va_start(args, fmt);
+    msg = g_strdup_vprintf(fmt, args);
+    va_end(args);
+
+    w = ui_message_dialog(parent, title, msg);
+    
+    g_free(msg);
+
+    return w;
+}
+
+void
+ui_message_wait(GtkWidget *w)
+{
+    gtk_widget_show(w);
+    
+    do
+    {
+    	gtk_main_iteration();
+    }
+    while (GTK_WIDGET_VISIBLE(w));
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

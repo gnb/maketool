@@ -107,6 +107,19 @@ GtkWidget *ui_dialog_create_button(
     gpointer user_data);
 void ui_dialog_changed(GtkWidget *dialog);    
 
+/* Returns a new unshown()n widget which deletes itself on user pressing OK */
+GtkWidget *ui_message_dialog(GtkWidget *parent, const char *title,
+    	    	    	     const char *msg);
+GtkWidget *ui_message_dialog_f(GtkWidget *parent, const char *title,
+    	    	    	     const char *fmt, ...)
+#ifdef __GNUC__
+__attribute__(( format(printf, 3, 4) ));
+#endif
+;
+/* Show the given message dialog and wait until the user presses OK */
+void ui_message_wait(GtkWidget *);
+
+
 void ui_set_help_name(GtkWidget *w, const char *str);
 const char *ui_get_help_name(GtkWidget *w);
   
