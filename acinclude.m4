@@ -18,8 +18,6 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl 
-dnl $Id: acinclude.m4,v 1.3 2003-09-28 10:42:52 gnb Exp $
-dnl
 
 dnl For gcc, ensure that the given flags are in $CFLAGS
 AC_DEFUN([AC_GCC_ADD_CFLAGS],[
