@@ -4,7 +4,7 @@
 #include "spawn.h"
 #include "ui.h"
 
-CVSID("$Id");
+CVSID("$Id: help.c,v 1.8 1999-05-25 08:02:48 gnb Exp $");
 
 static GtkWidget	*about_shell = 0;
 static GtkWidget	*about_make_shell = 0;

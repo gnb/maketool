@@ -5,7 +5,7 @@
 #include <signal.h>
 #include <sys/poll.h>
 
-CVSID("$Id");
+CVSID("$Id: glib_extra.c,v 1.5 1999-05-25 08:02:47 gnb Exp $");
 
 
 typedef struct

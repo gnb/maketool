@@ -2,7 +2,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id");
+CVSID("$Id: preferences.c,v 1.8 1999-05-25 08:02:48 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;

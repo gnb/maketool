@@ -2,7 +2,7 @@
 #include "filter.h"
 #include "log.h"
 
-CVSID("$Id");
+CVSID("$Id: log.c,v 1.8 1999-05-25 08:02:48 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \

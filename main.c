@@ -8,7 +8,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id");
+CVSID("$Id: main.c,v 1.14 1999-05-25 08:02:48 gnb Exp $");
 
 typedef enum
 {

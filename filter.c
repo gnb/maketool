@@ -1,7 +1,7 @@
 #include "filter.h"
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id");
+CVSID("$Id: filter.c,v 1.6 1999-05-25 08:02:47 gnb Exp $");
 
 typedef struct
 {
