@@ -24,22 +24,26 @@
 #include <regex.h>	/* POSIX regular expression fns */
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: find.c,v 1.6 2000-07-21 06:12:03 gnb Exp $");
+CVSID("$Id: find.c,v 1.7 2000-07-23 11:44:33 gnb Exp $");
+
+#define FINDCASE 0  	/* TODO: implement case-insensitive literals */
 
 static GtkWidget	*find_shell = 0;
 typedef enum { FD_FORWARDS, FD_BACKWARDS, FD_MAX_DIRECTIONS } FindDirections;
 typedef enum
 {
     FT_LITERAL,     	/* case-INsensitive literal */
+#if FINDCASE
     FT_CASE_LITERAL,	/* case-sensitive literal */
+#endif
     FT_REGEXP,	    	/* regular expression */
     FT_MAX_TYPES
 } FindTypes;
 static GtkWidget    	*dirn_radio[FD_MAX_DIRECTIONS];
 static GtkWidget    	*type_radio[FT_MAX_TYPES];
 static GtkWidget    	*string_entry;
+static GtkWidget    	*wrap_check;
 
-#define FINDCASE 0  	/* TODO: implement case-insensitive literals */
 
 typedef struct 
 {
@@ -50,6 +54,8 @@ typedef struct
 
 static GList *find_state_stack = 0;
 static GList *find_state_current = 0;
+FindDirections direction = FD_FORWARDS;
+gboolean wrap = TRUE;
 
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -67,9 +73,11 @@ find_state_print(FILE *fp, const FindState *s)
     case FT_LITERAL:     	/* case-INsensitive literal */
     	type_str = "insensitive-literal";
 	break;
+#if FINDCASE
     case FT_CASE_LITERAL:	/* case-sensitive literal */
     	type_str = "sensitive-literal";
 	break;
+#endif
     case FT_REGEXP:	    	/* regular expression */
     	type_str = "regexp";
 	break;
@@ -205,9 +213,11 @@ find_apply_func(LogRec *lr, gpointer user_data)
     	/* TODO: implement this properly */
     	found = (strstr(log_get_text(lr), state->string) != 0);
 	break;
+#if FINDCASE
     case FT_CASE_LITERAL:   /* case-sensitive literal */
     	found = (strstr(log_get_text(lr), state->string) != 0);
 	break;
+#endif
     case FT_REGEXP: 	    /* regular expression */
         found = !regexec(&state->regexp, log_get_text(lr), 0, 0, 0);
 	break;
@@ -218,29 +228,6 @@ find_apply_func(LogRec *lr, gpointer user_data)
     return !found;
 }
 
-/* do the actual search -- common between find & find-again */
-static void
-do_find_aux(const FindState *state, gboolean first)
-{
-    FindDirections direction;
-    
-    /* get current direction */
-    direction = (gtk_toggle_button_get_active(
-    	GTK_TOGGLE_BUTTON(dirn_radio[FD_FORWARDS])) ?
-    	FD_FORWARDS : FD_BACKWARDS);
-
-    found = FALSE;
-    log_apply_after(
-    	find_apply_func,
-	(direction == FD_FORWARDS),
-	(first ? (LogRec*)0 : log_selected()),
-	(gpointer)state);
-    if (!found)
-    {
-    	gdk_beep();
-    	message(_("Pattern not found."));
-    }
-}
 
 static void
 do_find(void)
@@ -274,23 +261,31 @@ do_find(void)
     }
     
     /* do the actual search */
-    do_find_aux(state, /*first*/TRUE);
+    
+    found = FALSE;
+    log_apply_after(
+    	find_apply_func,
+	(direction == FD_FORWARDS),
+	log_selected(),
+	(gpointer)state);
+    /* TODO: ask if user wants to wrap around from start/end of file */
+    if (!found && wrap)
+    {
+    	/* try again from the other end */
+	log_apply_after(
+    	    find_apply_func,
+	    (direction == FD_FORWARDS),
+	    0,
+	    (gpointer)state);
+    }
+    if (!found)
+    {
+    	gdk_beep();
+    	message(_("Pattern not found."));
+    }
     
     /* The Find Again menu item is now available */
     grey_menu_items();
-}
-
-static void
-do_find_again(void)
-{
-    FindState *state;
-
-    /* TODO: implement finding backwards */
-    assert(find_state_stack != 0);
-    state = (FindState *)find_state_stack->data;
-
-    /* do the actual search */
-    do_find_aux(state, /*first*/FALSE);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -302,13 +297,7 @@ find_find_cb(GtkWidget *w, gpointer data)
 }
 
 static void
-find_find_again_cb(GtkWidget *w, gpointer data)
-{
-    do_find_again();
-}
-
-static void
-find_cancel_cb(GtkWidget *w, gpointer data)
+find_close_cb(GtkWidget *w, gpointer data)
 {
     gtk_widget_hide(find_shell);
 }
@@ -345,25 +334,61 @@ find_keypress_cb(GtkWidget *w, GdkEvent *event, gpointer user_data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
+find_wrap_cb(GtkWidget *w, void *user_data)
+{
+    wrap = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w));
+}
+
+static void
+find_direction_cb(GtkWidget *w, void *user_data)
+{
+    direction = (gtk_toggle_button_get_active(
+    	GTK_TOGGLE_BUTTON(dirn_radio[FD_FORWARDS])) ?
+    	FD_FORWARDS : FD_BACKWARDS);
+}
+
+static void
+find_destroy_cb(GtkWidget *w, void *user_data)
+{
+    find_shell = 0;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
 create_find_shell(void)
 {
     GtkWidget *label;
     GtkWidget *hbox;
     GtkWidget *radio;
+    GtkWidget *check;
     GtkWidget *entry;
     int row = 0;
 
     find_shell = ui_create_dialog(toplevel, _("Maketool: Find"));
+    gtk_signal_connect(GTK_OBJECT(find_shell), "destroy", 
+    	GTK_SIGNAL_FUNC(find_destroy_cb), NULL);
+
 
     gtk_container_border_width(GTK_CONTAINER(GTK_DIALOG(find_shell)->vbox), SPACING);
 
+    label = gtk_label_new(_("Use PageUp/PageDown to recall earlier searches."));
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(find_shell)->vbox), label, FALSE, TRUE, 0);
+    gtk_widget_show(label);
+
+
     hbox = gtk_hbox_new(FALSE, 0);
     /*gtk_container_border_width(GTK_CONTAINER(hbox), SPACING);*/
+    gtk_box_set_spacing(GTK_BOX(hbox), 4);
+
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(find_shell)->vbox), hbox, TRUE, TRUE, 0);
     gtk_widget_show(hbox);
 
     label = gtk_label_new(_("Search for:"));    /* TODO: better label */
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 0);
     gtk_widget_show(label);
     
@@ -408,20 +433,32 @@ create_find_shell(void)
 
     radio = gtk_radio_button_new_with_label_from_widget(0, _("Search Forwards"));
     gtk_box_pack_start(GTK_BOX(hbox), radio, FALSE, TRUE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio), direction == FD_FORWARDS);
+    gtk_signal_connect(GTK_OBJECT(radio), "toggled", 
+    	GTK_SIGNAL_FUNC(find_direction_cb), 0);
     gtk_widget_show(radio);
     dirn_radio[FD_FORWARDS] = radio;
     
     radio = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radio), _("Search Backwards"));
     gtk_box_pack_start(GTK_BOX(hbox), radio, FALSE, TRUE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio), direction == FD_BACKWARDS);
+    gtk_signal_connect(GTK_OBJECT(radio), "toggled", 
+    	GTK_SIGNAL_FUNC(find_direction_cb), 0);
     gtk_widget_show(radio);
     dirn_radio[FD_BACKWARDS] = radio;
     
+    check = gtk_check_button_new_with_label(_("Wrap"));
+    gtk_box_pack_start(GTK_BOX(hbox), check, FALSE, TRUE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), wrap);
+    gtk_signal_connect(GTK_OBJECT(check), "toggled", 
+    	GTK_SIGNAL_FUNC(find_wrap_cb), 0);
+    gtk_widget_show(check);
+    wrap_check = check;
+
     ui_dialog_create_button(find_shell, _("Find"),
     	find_find_cb, (gpointer)0);
-    ui_dialog_create_button(find_shell, _("Find Again"),
-    	find_find_again_cb, (gpointer)0);
-    ui_dialog_create_button(find_shell, _("Cancel"),
-    	find_cancel_cb, (gpointer)0);
+    ui_dialog_create_button(find_shell, _("Close"),
+    	find_close_cb, (gpointer)0);
 }
 
 /* TODO: grey out Find button in Find dialog when no string entered
@@ -436,13 +473,15 @@ edit_find_cb(GtkWidget *w, gpointer data)
     if (find_shell == 0)
     	create_find_shell();
     /* TODO: populate entry widget with current selection */
+    gtk_widget_grab_focus(string_entry);
+    gtk_entry_select_region(GTK_ENTRY(string_entry), 0, -1);
     gtk_widget_show(find_shell);
 }
 
 void
 edit_find_again_cb(GtkWidget *w, gpointer data)
 {
-    do_find_again();
+    do_find();
 }
 
 gboolean

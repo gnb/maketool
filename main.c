@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.59 2000-07-22 12:48:21 gnb Exp $");
+CVSID("$Id: main.c,v 1.60 2000-07-23 11:44:34 gnb Exp $");
 
 typedef enum
 {
@@ -1298,7 +1298,7 @@ ui_create_menus(GtkWidget *menubar)
     ui_add_separator(menu);
     ui_add_button(menu, _("_Copy"), "<Ctrl>C", edit_copy_cb, 0, GR_SELECTED);
     ui_add_separator(menu);
-    ui_add_button(menu, _("_Find"), "<Ctrl>F", edit_find_cb, 0, GR_NOTEMPTY);
+    ui_add_button(menu, _("_Find..."), "<Ctrl>F", edit_find_cb, 0, GR_NOTEMPTY);
     ui_add_button(menu, _("Find _Again"), "<Ctrl>G", edit_find_again_cb, 0, GR_FIND_AGAIN);
     ui_add_separator(menu);
     ui_add_button(menu, _("Pre_ferences..."), 0, edit_preferences_cb, 0, GR_NONE);

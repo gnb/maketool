@@ -312,7 +312,7 @@ x  A.T. Hofkamp says: when extract_targets is not found, the failure
    not
    found
    
-x  A.T. Hofkamp says about the Find window:  
+x  DONE: A.T. Hofkamp says about the Find window:  
 >   The buttons seem to do something else than they say.
 >   - 'Search forwards' seems to mean 'Search top-to-bottom'
 >   - 'Find' seems to mean 'Find first match in log'
@@ -324,7 +324,7 @@ x  A.T. Hofkamp says about the Find window:
 >   - 'Find' meant to me 'go' (thus, 'search downwards, relative from current position')
 >   - 'Find again' meant to me 'try again, from current position'.   
 
-x  A.T. Hofkamp says about the Find window:  
+x  DONE: A.T. Hofkamp says about the Find window:  
 >   I hit the enter key, and got
 > 
 >   Gtk-WARNING **: invalid cast from (NULL) pointer to `GtkToggleButton'
