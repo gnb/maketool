@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.53 2003-09-01 13:21:39 gnb Exp $
+# $Id: Makefile.in,v 1.54 2003-09-01 13:41:50 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -113,7 +113,7 @@ non-gnu-makes.list:
 	    echo $(pkglibexecdir)/`basename $$exe` >> $@ ;\
 	done
 
-clean::
+distclean::
 	-$(RM) non-gnu-makes.list
 
 ###
@@ -152,7 +152,7 @@ install::
 	$(INSTALL) -d $(helpdir)
 
 
-all install uninstall clean::
+all install uninstall clean maintainer-clean distclean::
 	for subdir in $(SUBDIRS); do \
 	  ( cd $$subdir ; $(MAKE) $@ ) || exit 1; \
 	done
@@ -182,10 +182,13 @@ licence.c: COPYING
 		-e 's/"/\\"/g' -e 's/^\(.*\)$$/"\1\\n"/' \
 		< COPYING > $@
 
-clean::
+distclean::
 	$(RM) licence.c
 	
 ###
+
+maintainer-clean:: distclean
+distclean:: clean
 
 .c.o:
 	$(COMPILE.c) -c $<

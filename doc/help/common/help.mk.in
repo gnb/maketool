@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: help.mk.in,v 1.2 2003-09-01 13:17:03 gnb Exp $
+# $Id: help.mk.in,v 1.3 2003-09-01 13:41:55 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -55,9 +55,9 @@ entities.sgml: $(HELPCOMMON)/entities.sgml.in
 	    -e 's|${at}VERSION${at}|$(VERSION)|g' \
 	    < $(HELPCOMMON)/entities.sgml.in > $@
 
-clean::
+maintainer-clean::
 	$(RM) entities.sgml
-
+	
 # install
 install:: installdirs
 
@@ -104,10 +104,17 @@ checksgml:
 	$(NSGMLS) -sv help.sgml
 	
 #clean
+maintainer-clean::
+	-$(RM) -r $(OUTDIR)
+
 clean::
-	-$(RM) -r $(OUTDIR) $(OUTDIR).junk
-		
+	-$(RM) -r $(OUTDIR).junk
+
 ###
+
+maintainer-clean:: distclean
+
+distclean:: clean
 
 # Making a distribution
 distdir=	$(top_builddir)/$(PACKAGE)-$(VERSION)/doc/help/$(LANG)

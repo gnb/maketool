@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.9 2003-08-20 15:39:59 gnb Exp $
+# $Id: Makefile.in,v 1.10 2003-09-01 13:41:52 gnb Exp $
 #
 
 top_builddir=	..
@@ -44,11 +44,11 @@ uninstall::
 
 ###
 
-all clean install uninstall::
+all clean maintainer-clean distclean install uninstall::
 	for subdir in $(SUBDIRS) ; do \
 	  ( cd $$subdir ; $(MAKE) $@ ) || exit 1 ;\
 	done
-		
+
 ###
 
 # Making a distribution
