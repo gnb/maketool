@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: print.c,v 1.10 2001-07-25 12:02:44 gnb Exp $");
+CVSID("$Id: print.c,v 1.11 2001-08-02 08:28:00 gnb Exp $");
 
 static GtkWidget	*print_shell = 0;
 typedef enum { D_PRINTER, D_FILE, D_NUM_DESTS } DEST;
@@ -308,6 +308,7 @@ create_print_shell(void)
     lpr_init();
     
     print_shell = ui_create_dialog(toplevel, _("Maketool: Print"));
+    ui_set_help_name(print_shell, "print-window");
 
     gtk_container_border_width(GTK_CONTAINER(GTK_DIALOG(print_shell)->vbox), SPACING);
 

@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.74 2001-07-26 16:51:48 gnb Exp $");
+CVSID("$Id: main.c,v 1.75 2001-08-02 08:28:00 gnb Exp $");
 
 
 /*
@@ -925,6 +925,7 @@ file_open_cb(GtkWidget *w, gpointer data)
 	    _("Maketool: Open Log File"),
 	    file_open_file_func,
 	    "make.log");
+	ui_set_help_name(filesel, "open-log-file-window");
     }
 
     gtk_widget_show(filesel);
@@ -952,6 +953,7 @@ file_save_cb(GtkWidget *w, gpointer data)
 	    _("Maketool: Save Log File"),
 	    file_save_file_func,
 	    "make.log");
+	ui_set_help_name(filesel, "save-log-file-window");
     }
 
     gtk_widget_show(filesel);
@@ -1088,6 +1090,7 @@ file_change_dir_cb(GtkWidget *w, gpointer data)
 	    _("Maketool: Change Directory"),
 	    file_change_dir_func,
 	    ".");
+	ui_set_help_name(filesel, "change-directory-window");
     }
 
     /*
@@ -1515,38 +1518,38 @@ ui_create_tools(GtkWidget *toolbar)
     char *tooltip;
     
     again_tool_item = ui_tool_create(toolbar, _("Again"), _("Build last target again"),
-    	again_xpm, build_again_cb, 0, GR_AGAIN, "tools-again");
+    	again_xpm, build_again_cb, 0, GR_AGAIN, "again-tool");
 
     ui_tool_create(toolbar, _("Stop"), _("Stop current build"),
-    	stop_xpm, build_stop_cb, 0, GR_RUNNING, "tools-stop");
+    	stop_xpm, build_stop_cb, 0, GR_RUNNING, "stop-tool");
     
     ui_tool_add_space(toolbar);
 
     tooltip = g_strdup_printf(_("Build `%s'"), "all");
     ui_tool_create(toolbar, "all", tooltip,
-    	all_xpm, delayed_build_cb, "all", GR_ALL, "tools-all");
+    	all_xpm, delayed_build_cb, "all", GR_ALL, "all-tool");
     g_free(tooltip);
     
     tooltip = g_strdup_printf(_("Build `%s'"), "clean");
     ui_tool_create(toolbar, "clean", tooltip,
-    	clean_xpm, delayed_build_cb, "clean", GR_CLEAN, "tools-clean");
+    	clean_xpm, delayed_build_cb, "clean", GR_CLEAN, "clean-tool");
     g_free(tooltip);
     
     ui_tool_add_space(toolbar);
     
     ui_tool_create(toolbar, _("Clear"), _("Clear log"),
-    	clear_xpm, view_clear_cb, 0, GR_CLEAR_LOG, "tools-clear-log");
+    	clear_xpm, view_clear_cb, 0, GR_CLEAR_LOG, "clear-tool");
     ui_tool_create(toolbar, _("Next"), _("Edit next error or warning"),
     	next_xpm, edit_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY,
-	"tools-edit-next");
+	"edit-next-tool");
     ui_tool_create(toolbar, _("File Next"), _("Edit first error or warning in next file"),
     	file_next_xpm, edit_file_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY,
-	"tools-edit-file-next");
+	"edit-file-next-tool");
     
     ui_tool_add_space(toolbar);
     
     ui_tool_create(toolbar, _("Print"), _("Print log"),
-    	print_xpm, file_print_cb, 0, GR_NOTEMPTY, "tools-print");
+    	print_xpm, file_print_cb, 0, GR_NOTEMPTY, "print-tool");
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -1709,7 +1712,7 @@ ui_create(void)
     gtk_signal_connect(GTK_OBJECT(toplevel), "configure_event", 
     	GTK_SIGNAL_FUNC(toplevel_resize_cb), NULL);
     gtk_container_border_width(GTK_CONTAINER(toplevel), 0);
-    ui_set_help_name(toplevel, "maketool");
+    ui_set_help_name(toplevel, "main-window");
     gtk_widget_show(GTK_WIDGET(toplevel));
 
     /* gtk_widget_realize(toplevel); */

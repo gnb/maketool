@@ -24,7 +24,7 @@
 #include <regex.h>	/* POSIX regular expression fns */
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: find.c,v 1.11 2001-07-25 12:02:44 gnb Exp $");
+CVSID("$Id: find.c,v 1.12 2001-08-02 08:28:00 gnb Exp $");
 
 #define FINDCASE 0  	/* TODO: implement case-insensitive literals */
 
@@ -358,6 +358,7 @@ create_find_shell(void)
     int row = 0;
 
     find_shell = ui_create_dialog(toplevel, _("Maketool: Find"));
+    ui_set_help_name(find_shell, "find-window");
 
     gtk_container_border_width(GTK_CONTAINER(GTK_DIALOG(find_shell)->vbox), SPACING);
 
