@@ -16,19 +16,22 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.4 1999-06-01 14:04:15 gnb Exp $
+# $Id: Makefile.in,v 1.5 1999-06-06 16:10:42 gnb Exp $
 #
 
 prefix=		@prefix@
+run_prefix=	$(prefix)
 exec_prefix=	@exec_prefix@
 BINDIR=		@bindir@
 INSTALL=	@INSTALL@
 PACKAGE=	@PACKAGE@
 VERSION=	@VERSION@
+DOCDIR=		$(prefix)/doc/$(PACKAGE)-$(VERSION)
+LICENCE=	$(run_prefix)/doc/$(PACKAGE)-$(VERSION)/COPYING
 
 CC=		@CC@
 CFLAGS=		@CFLAGS@
-CPPFLAGS=	@GTK_CFLAGS@ -D_USE_BSD -I. -Iicons -Iintl
+CPPFLAGS=	@GTK_CFLAGS@ -D_USE_BSD -I. -Iicons -Iintl -DLICENCE="\"$(LICENCE)\""
 LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 O=		objs
 
@@ -109,7 +112,6 @@ all install uninstall clean::
 
 # doco. Such as it is...
 
-DOCDIR=		$(prefix)/doc/$(PACKAGE)-$(VERSION)
 install::
 	test -d $(DOCDIR) || $(INSTALL) -m 755 -d $(DOCDIR)
 	$(INSTALL) -m 755 COPYING $(DOCDIR)/COPYING

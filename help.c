@@ -22,8 +22,9 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: help.c,v 1.11 1999-06-01 11:17:31 gnb Exp $");
+CVSID("$Id: help.c,v 1.12 1999-06-06 16:10:42 gnb Exp $");
 
+static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
 static GtkWidget	*about_make_shell = 0;
 
@@ -33,7 +34,41 @@ static GtkWidget	*about_make_shell = 0;
 static void
 licence_cb(GtkWidget *w, gpointer data)
 {
-    fprintf(stderr, "Show licence...\n");
+    if (licence_shell == 0)
+    {
+	GtkWidget *hbox, *text, *sb;
+	FILE *fp;
+	int n;
+	char buf[1024];
+
+	licence_shell = uiCreateOkDialog(toplevel, _("Maketool: Licence"));
+	gtk_widget_set_usize(licence_shell, 450, 300);
+
+	hbox = gtk_hbox_new(FALSE, SPACING);
+	gtk_container_border_width(GTK_CONTAINER(hbox), SPACING);
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(licence_shell)->vbox), hbox);
+	gtk_widget_show(hbox);
+
+	text = gtk_text_new(0, 0);
+	gtk_text_set_editable(GTK_TEXT(text), FALSE);
+	gtk_box_pack_start(GTK_BOX(hbox), text, TRUE, TRUE, 0);   
+	gtk_widget_show(text);
+
+	sb = gtk_vscrollbar_new(GTK_TEXT(text)->vadj);
+	gtk_box_pack_start(GTK_BOX(hbox), sb, FALSE, FALSE, 0);   
+	gtk_widget_show(sb);
+
+	if ((fp = fopen(LICENCE, "r")) == 0)
+	{
+    	    perror(LICENCE);
+    	    return;
+	}
+	while ((n = fread(buf, 1, sizeof(buf), fp)) > 0)
+	    gtk_text_insert(GTK_TEXT(text), 0, 0, 0, buf, n);
+	fclose(fp);
+    }
+
+    gtk_widget_show(licence_shell);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -66,7 +101,7 @@ help_about_cb(GtkWidget *w, gpointer data)
 	GdkPixmap *pm;
 	GdkBitmap *mask;
 
-	about_shell = uiCreateOkDialog(toplevel, _("About Maketool"));
+	about_shell = uiCreateOkDialog(toplevel, _("Maketool: About"));
 	
 	hbox = gtk_hbox_new(FALSE, 5);
 	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_shell)->vbox), hbox);
@@ -108,10 +143,9 @@ make_version_reap(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	
     if (about_make_shell == 0)
     {
-        GtkWidget *toplevel = GTK_WIDGET(user_data);
 	GtkWidget *label;
 
-	about_make_shell = uiCreateOkDialog(toplevel, _("About Make"));
+	about_make_shell = uiCreateOkDialog(toplevel, _("Maketool: About Make"));
 
 	/* TODO: logo */
 	label = gtk_label_new(make_version.data);
@@ -144,7 +178,7 @@ help_about_make_cb(GtkWidget *w, gpointer data)
 	char *prog;
 	prog = expand_prog(prefs.prog_list_version, 0, 0, 0);
 	spawn_with_output(prog, make_version_reap,
-		make_version_input, (gpointer)toplevel, 0);
+		make_version_input, 0, 0);
 	g_free(prog);
     }
     else if (about_make_shell != 0)

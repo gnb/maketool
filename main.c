@@ -28,7 +28,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.24 1999-06-01 13:28:49 gnb Exp $");
+CVSID("$Id: main.c,v 1.25 1999-06-06 16:10:42 gnb Exp $");
 
 typedef enum
 {
@@ -461,7 +461,7 @@ file_open_cb(GtkWidget *w, gpointer data)
     static GtkWidget *filesel = 0;
     
     if (filesel == 0)
-    	filesel = uiCreateFileSel(_("Open Log File"), logOpen, "make.log");
+    	filesel = uiCreateFileSel(_("Maketool: Open Log File"), logOpen, "make.log");
 
     gtk_widget_show(filesel);
 }
@@ -474,7 +474,7 @@ file_save_cb(GtkWidget *w, gpointer data)
     static GtkWidget *filesel = 0;
     
     if (filesel == 0)
-    	filesel = uiCreateFileSel(_("Save Log File"), logSave, "make.log");
+    	filesel = uiCreateFileSel(_("Maketool: Save Log File"), logSave, "make.log");
 
     gtk_widget_show(filesel);
 }
@@ -928,6 +928,18 @@ parseArgs(int argc, char **argv)
     {
     	if (argv[i][0] == '-')
 	{
+	    if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version"))
+	    {
+	    	printf(
+"Maketool %s\n\
+(c) 1999 Greg Banks <gnb@alphalink.com.au>\n\
+Maketool comes with ABSOLUTELY NO WARRANTY.\n\
+You may redistribute copies of this software\n\
+under the terms of the GNU General Public\n\
+Licence; see the file COPYING.\n",
+		VERSION);
+	    	exit(0);
+	    }
 	    /* TODO: options */
 	    usage();
 	}
