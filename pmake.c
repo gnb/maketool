@@ -25,7 +25,7 @@
 #error Why are you even bothering to compile with POSIX regular expressions?
 #endif
 
-CVSID("$Id: pmake.c,v 1.2 2003-05-04 04:21:49 gnb Exp $");
+CVSID("$Id: pmake.c,v 1.3 2003-05-13 01:18:20 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -73,7 +73,7 @@ pmake_dryrun_flags(estring *e)
  * a version string, let alone a copyright/authorship message.
  * So we do the best we can.
  */
-static const char version_hack[] = 
+static const char pmake_version_hack[] = 
 "-n _no_such_target_ > /dev/null 2>&1 ;"
 "echo \"BSD Pmake\" ;"
 "echo \"by the NetBSD Project\" ;"
@@ -83,8 +83,30 @@ static const char version_hack[] =
 static void
 pmake_version_flags(estring *e)
 {
-    estring_append_string(e, version_hack);
+    estring_append_string(e, pmake_version_hack);
 }
+
+#if HAVE_IRIX_SMAKE
+/*
+ * Same hack as pmake...different string.
+ * TODO: showprods to get version
+ */
+static const char smake_version_hack[] = 
+"-n _no_such_target_ > /dev/null 2>&1 ;"
+"echo \"IRIX smake\" ;"
+"echo \"(c) Silicon Graphics Inc\" ;"
+"echo \"http://www.sgi.com/\" ;"
+"echo \"derived from BSD 4.4. pmake\" ;"
+"echo \"by the NetBSD Project\" ;"
+"echo \"http://www.netbsd.org/\" ;"
+;
+
+static void
+smake_version_flags(estring *e)
+{
+    estring_append_string(e, smake_version_hack);
+}
+#endif
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -212,7 +234,7 @@ pmake_list_targets_destroy(Task *task)
 
     if (ltt->targets != 0)
     {
-    	int i;
+    	unsigned int i;
 	
 	for (i = 0 ; i < ltt->targets->len ; i++)
 	    g_free(ltt->targets->pdata[i]);
@@ -293,7 +315,7 @@ MakeProgram makeprog_irix_smake =
     pmake_parallel_flags,
     pmake_keep_going_flags,
     pmake_dryrun_flags,
-    pmake_version_flags,
+    smake_version_flags,
     irix_smake_list_targets_flags,
     pmake_list_targets_task
 };
