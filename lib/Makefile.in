@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.1 2003-10-25 10:56:00 gnb Exp $
+# $Id: Makefile.in,v 1.2 2003-10-25 12:30:38 gnb Exp $
 #
 
 top_builddir=	..
@@ -24,7 +24,10 @@ prefix=		@prefix@
 PACKAGE=	@PACKAGE@
 VERSION=	@VERSION@
 
+# The "all" etc targets only recurse into one gtk*
+# directory, but all of them need to be distributed.
 SUBDIRS=	@GTK_LIBSRC@
+EXTRA_DIST=	gtk1.2 gtk2
 
 ###
 
@@ -43,7 +46,9 @@ dist:
 	for file in $(DISTFILES); do \
 	  ln $$file $(distdir) 2>/dev/null || cp -p $$file $(distdir) 2>/dev/null; \
 	done
-	for subdir in $(SUBDIRS); do \
+	for subdir in $(SUBDIRS) $(EXTRA_DIST); do \
+	  [ ! -d $$subdir ] && continue ;\
+	  [ -d $(distdir)/$$subdir ] && continue ;\
 	  mkdir $(distdir)/$$subdir || exit 1; \
 	  chmod 777 $(distdir)/$$subdir; \
 	  ( cd $$subdir ; $(MAKE) $@ ) || exit 1; \

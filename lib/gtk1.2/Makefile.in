@@ -16,15 +16,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.1 2003-10-25 10:56:02 gnb Exp $
+# $Id: Makefile.in,v 1.2 2003-10-25 12:30:40 gnb Exp $
 #
 
-top_builddir=	..
+top_builddir=	../..
 prefix=		@prefix@
 PACKAGE=	@PACKAGE@
 VERSION=	@VERSION@
 
 SUBDIRS=	gtk
+EXTRA_DIST=	ctree.patch
 
 ###
 
@@ -37,7 +38,7 @@ all clean maintainer-clean distclean install uninstall::
 
 # Making a distribution
 distdir=	$(top_builddir)/$(PACKAGE)-$(VERSION)/lib/gtk1.2
-DISTFILES=	Makefile.in
+DISTFILES=	Makefile.in COPYING README $(EXTRA_DIST)
 
 dist:
 	for file in $(DISTFILES); do \
