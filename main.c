@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.55 2000-07-11 05:48:25 gnb Exp $");
+CVSID("$Id: main.c,v 1.56 2000-07-21 05:54:57 gnb Exp $");
 
 typedef enum
 {
@@ -550,7 +550,8 @@ list_targets_task(void)
 static void
 list_targets(void)
 {
-    task_enqueue(make_makefile_task());
+    if (prefs.enable_make_makefile)
+	task_enqueue(make_makefile_task());
     task_enqueue(list_targets_task());
     task_start();
 }
@@ -762,7 +763,8 @@ void
 build_start(const char *target)
 {
     first_error = TRUE;
-    task_enqueue(make_makefile_task());
+    if (prefs.enable_make_makefile)
+	task_enqueue(make_makefile_task());
     task_enqueue(make_task(target));
     task_start();
 }

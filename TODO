@@ -339,7 +339,7 @@ x  A.T. Hofkamp says about the Find window:   I still feel that tasks like
    /91.*blo/
    (but I am a strongly keyboard-oriented guy).
 
-x  Add an option to disable make_makefile
+x  DONE: Add an option to disable make_makefile
 
 x  Add an editor choice for "gvim +%l %f"
 

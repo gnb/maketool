@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.33 2000-04-16 09:46:57 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.34 2000-07-21 05:54:57 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -31,6 +31,7 @@ static GtkWidget	*run_load_sb;
 static GtkWidget	*edit1_check;
 static GtkWidget	*editw_check;
 static GtkWidget	*fail_check;
+static GtkWidget	*emm_check;
 static GtkWidget	*run_radio[3];
 static GtkWidget	*prog_make_entry;
 static GtkWidget	*prog_targets_entry;
@@ -286,6 +287,7 @@ preferences_load(void)
     prefs.edit_first_error = ui_config_get_boolean("edit_first_error", FALSE);
     prefs.edit_warnings = ui_config_get_boolean("edit_warnings", TRUE);
     prefs.ignore_failures = ui_config_get_boolean("ignore_failures", FALSE);
+    prefs.enable_make_makefile = ui_config_get_boolean("enable_make_makefile", TRUE);
     
     prefs.start_action = ui_config_get_enum("start_action", START_COLLAPSE,
     				start_action_enum_def);
@@ -335,6 +337,7 @@ preferences_save(void)
     ui_config_set_boolean("edit_first_error", prefs.edit_first_error);
     ui_config_set_boolean("edit_warnings", prefs.edit_warnings);
     ui_config_set_boolean("ignore_failures", prefs.ignore_failures);
+    ui_config_set_boolean("enable_make_makefile", prefs.enable_make_makefile);
     
     ui_config_set_enum("start_action", prefs.start_action,
     				start_action_enum_def);
@@ -424,6 +427,7 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     prefs.edit_first_error = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(edit1_check));
     prefs.edit_warnings = !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(editw_check));
     prefs.ignore_failures = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fail_check));
+    prefs.enable_make_makefile = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(emm_check));
 
     g_free(prefs.prog_make);
     prefs.prog_make = g_strdup(gtk_entry_get_text(GTK_ENTRY(prog_make_entry)));
@@ -632,6 +636,16 @@ prefs_create_general_page(GtkWidget *toplevel)
     row++;
 
     /*
+     * enable make_makefiles script
+     */
+    emm_check = gtk_check_button_new_with_label(_("Build Makefile from Imakefile or Makefile.in"));
+    gtk_signal_connect(GTK_OBJECT(emm_check), "toggled", 
+    	GTK_SIGNAL_FUNC(changed_cb), 0);
+    gtk_table_attach_defaults(GTK_TABLE(table), emm_check, 0, 3, row, row+1);
+    gtk_widget_show(emm_check);
+    row++;
+
+    /*
      * Action on starting build.
      */
     label = gtk_label_new(_("On starting each build: "));
@@ -704,6 +718,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(edit1_check), prefs.edit_first_error);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(editw_check), !prefs.edit_warnings);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fail_check), prefs.ignore_failures);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(emm_check), prefs.enable_make_makefile);
     gtk_entry_set_text(GTK_ENTRY(makefile_entry), (prefs.makefile == 0 ? "" : prefs.makefile));
     ui_combo_set_current(start_action_combo, prefs.start_action);
 
