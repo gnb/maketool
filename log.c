@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.52 2003-10-04 00:50:38 gnb Exp $");
+CVSID("$Id: log.c,v 1.53 2003-10-12 22:52:33 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -941,6 +941,7 @@ log_open(const char *file, Progress *p)
     estring_free(&leftover);
     fclose(fp);
     gtk_clist_thaw(GTK_CLIST(logwin));
+    filter_post();
     progress_end(p);
 }
 
@@ -1267,6 +1268,7 @@ log_start_build(const char *message)
 void
 log_end_build(const char *target)
 {
+    filter_post();
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

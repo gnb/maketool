@@ -22,13 +22,19 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.41 2003-10-10 09:37:21 gnb Exp $");
+CVSID("$Id: filter.c,v 1.42 2003-10-12 22:52:33 gnb Exp $");
 
 typedef struct
 {
     char *name;
     GList *filters; 	/* list of Filter's */
 } FilterSet;
+
+typedef struct
+{
+    int nmatches;
+    int ntries;
+} FilterStats;
 
 typedef struct
 {
@@ -42,15 +48,193 @@ typedef struct
     FilterCode code;
     char *comment;
     FilterSet *set;
+    FilterStats stats;
 } Filter;
 
 static GList *filters;
+static GList *filters_by_lead[256]; 	/* organised by leading character */
 static GList *filter_sets;  /* in order encountered */
 static FilterSet *curr_filter_set;
 const char *filter_state = "";
 extern const char *argv0;
+#define ENABLE_LEADS_HACK 1
+#if ENABLE_LEADS_HACK
+gboolean enable_leads = FALSE;
+#endif
+static FilterStats total_stats;
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+/*
+ * Calculate and display the set of possible characters
+ * with which lines matching this regexp could start.
+ * Assumes the regexp is well formed, does little syntax
+ * checking.
+ */
+#define DEBUG 6
+static void
+filter_calc_leads(const char *regexp, unsigned char suitable[256])
+{
+    const char *r = regexp;
+    int i;
+#if DEBUG > 5
+#define suits(i, b, c) \
+    { \
+    	int _i = (i); \
+	int _b = (b); \
+	fprintf(stderr, "filter_calc_leads: suitable[%d] = %d (%s)\n", _i, _b, (c)); \
+	suitable[_i] = _b; \
+    }
+#define suitall(b, c) \
+    { \
+	int _b = (b); \
+	fprintf(stderr, "filter_calc_leads: suitable[*] = %d (%s)\n", _b, (c)); \
+    	memset(suitable, _b, 256); \
+    }
+#define dmsg1(fmt, a1) \
+    fprintf(stderr, "filter_calc_leads: "fmt"\n", (a1))
+#else
+#define suits(i, b, c) \
+    	suitable[(i)] = (b);
+#define suitall(b, c) \
+    	memset(suitable, (b), 256);
+#define dmsg1(fmt, a1)
+#endif
+
+    dmsg1("[%s]...", regexp);
+
+    if (*r != '^')
+    {
+	suitall(TRUE, "not anchored");
+	return;
+    }
+    r++;	/* skip leading '^' */
+    suitall(FALSE, "initial values");
+
+    if (*r == '\\')
+    {
+    	suits((int)r[1], TRUE, "escaped char must be a literal");
+    }    
+    else if (*r == '$' && r[1] == '\0')
+    {
+    	suits(0, TRUE, "only an empty string matches");
+    }
+    else
+    {
+    	for (;;)
+	{
+    	    gboolean ingroup = FALSE;
+	    int nbranches = 0;
+	    gboolean negbracket = FALSE;
+	    gboolean nullbranch = FALSE;
+
+	    if (*r == '(')
+	    {
+		dmsg1("starting group \"%s\"", r);
+		ingroup = TRUE;
+    		r++;   /* skip grouping operator */
+	    }
+
+    	    for (;;)
+	    {    	
+		if (*r == '[')
+		{
+		    /* handle bracket expressions [xyz] [^xyz] [x-z] [^x-z] */
+    		    const char *brstart;
+		    gboolean b = TRUE;
+
+		    dmsg1("bracket expression \"%s\"", r);
+		    r++;
+		    if (*r == '^')
+		    {
+			suitall(TRUE, "negative bracket expression");
+			b = FALSE;
+			r++;
+			negbracket = TRUE;
+		    }
+    		    brstart = r;
+    		    for ( ; *r && *r != ']' ; r++)
+		    {
+			if (*r == '-' && r != brstart && r[1] != ']')
+			{
+	    		    for (i = r[-1] ; i <= r[1] ; i++)
+				suits(i, b, "bracket expression range");
+			}
+			else
+			    suits((int)*r, b, "bracket expression atom");
+		    }
+		}
+		else if (ingroup && *r == '|')
+		{
+		    dmsg1("null branch \"%s\"", r);
+		    nullbranch = TRUE;
+		}
+		else
+		{
+    		    suits((int)*r, TRUE, "literal");
+    	    	}
+
+		nbranches++;
+		if (ingroup)
+		{
+	    	    /* advance to next branch or end */
+		    for ( ; *r && *r != '|' && *r != ')' ; r++)
+			;
+		    if (*r == '|')
+		    {
+			r++;
+			dmsg1("next branch \"%s\"", r);
+			continue;
+		    }
+		    dmsg1("group ends before \"%s\"", r+1);
+		}
+		r++;
+		break;
+	    }
+	    /*
+	     * This code doesn't handle the case ^(foo|[^f]) because a negative
+	     * bracket expression in a branch incorrectly overwrites all the other
+	     * branches' results.  Happily we don't have any such expressions to
+	     * deal with.  But just in case, assert it didn't happen.
+	     */
+	    assert(!ingroup || nbranches == 1 || !negbracket);
+	    
+	    /*
+	     * Previous expression can occur zero times, so the first
+	     * character might match the next expression.  Keep going.
+	     * Example: "^[ \t]*(|[^ \t:#]+/)[-/a-z0-9]+..."
+	     */
+	    if (nullbranch)
+	    {
+		dmsg1("expression may be null, continuing with \"%s\"", r);
+		continue;
+	    }
+	    if (*r == '*')
+	    {
+		r++;
+		dmsg1("expression may be null, continuing with \"%s\"", r);
+		continue;
+	    }
+	    break;
+    	}
+    }
+    
+#if DEBUG
+    fprintf(stderr, "filter_calc_leads: [%s] -> \n\t\t\"", regexp);
+    for (i = 0 ; i < 256 ; i++)
+    {
+    	if (suitable[i])
+	{
+	    if (isprint(i))
+	    	fputc(i, stderr);
+	    else
+	    	fprintf(stderr, "\\%03o", i);
+	}
+    }
+    fprintf(stderr, "\"\n");
+#endif
+}
+#define DEBUG 0
 
 static Filter *
 filter_add(
@@ -65,6 +249,8 @@ filter_add(
 {
     Filter *f = g_new(Filter, 1);
     guint err;
+    int i;
+    unsigned char leads[256];
     
     if ((err = regcomp(&f->regexp, regexp, REG_EXTENDED)) != 0)
     {
@@ -91,12 +277,20 @@ filter_add(
     f->col_str = g_strdup(col_str);
     f->summary_str = g_strdup(summary_str);
     f->comment = g_strdup(comment);
+    memset(&f->stats, 0, sizeof(f->stats));
 
     if ((f->set = curr_filter_set) != 0)
     	f->set->filters = g_list_append(f->set->filters, f);
     
-    /* TODO: this is O(N^2) - try prepending then reversing O(N) */
     filters = g_list_append(filters, f);
+
+    filter_calc_leads(regexp, leads);
+    for (i = 0 ; i < 256 ; i++)
+    {
+    	if (leads[i])
+	    filters_by_lead[i] = g_list_append(filters_by_lead[i], f);
+    }
+
     return f;
 }    
 
@@ -133,27 +327,35 @@ filter_set_start(const char *name)
 void
 filter_load(void)
 {
+#if ENABLE_LEADS_HACK
+    {
+    	const char *v = getenv("ENABLE_LEADS");
+	if (v != 0 && !strcmp(v, "yes"))
+	    enable_leads = 1;
+    }
+#endif
+
     filter_set_start(_("GNU make directory messages"));
 
     filter_add(
     	"",				/* state */
-	"^[a-zA-Z0-9_-]+\\[([0-9]+)\\]: Entering directory `([^']+)'", /* regexp */
+	"^(gmake|make|smake|pmake)\\[([0-9]+)\\]: Entering directory `([^']+)'", /* regexp */
 	FR_PUSHDIR,			/* code */
-	"\\2",				/* file */
-	"\\1",				/* line */
+	"\\3",				/* file */
+	"\\2",				/* line */
 	"",				/* col */
 	"",		    	    	/* summary */
-    	"gmake recursion - push");	/* comment */
+    	"make recursion - push");	/* comment */
 
     filter_add(
     	"",				/* state */
-	"^[a-zA-Z0-9_-]+\\[([0-9]+)\\]: Leaving directory `([^']+)'", /* regexp */
+	"^(gmake|make|smake|pmake)\\[([0-9]+)\\]: Leaving directory `([^']+)'", /* regexp */
 	FR_POPDIR,			/* code */
-	"\\2",				/* file */
-	"\\1",				/* line */
+	"\\3",				/* file */
+	"\\2",				/* line */
 	"",				/* col */
 	"",				/* summary */
-    	"gmake recursion - pop");	/* comment */
+    	"make recursion - pop");	/* comment */
 
     filter_set_start(_("GNU Compiler Collection"));
 
@@ -556,7 +758,7 @@ filter_load(void)
     filter_set_start(_("Generic UNIX C compiler"));
     filter_add(
     	"",				/* state */
-	"^[ \t]*(|[^ \t:#]+/)(cc|c89|gcc|CC|c\\+\\+|g\\+\\+)([ \t]|[ \t].*[ \t])-c([ \t]|[ \t].*[ \t])([^ \t]*\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
+	"^[ \t]*(|/[^ \t:#]+/)(cc|c89|gcc|CC|c\\+\\+|g\\+\\+)([ \t]|[ \t].*[ \t])-c([ \t]|[ \t].*[ \t])([^ \t]*\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
 	FR_INFORMATION,			/* code */
 	"\\5\\6",			/* file */
 	"",				/* line */
@@ -850,10 +1052,23 @@ filter_apply(const char *line, FilterResult *result)
 {
     GList *fl;
     gboolean matched;
+    
+#if ENABLE_LEADS_HACK
+    if (enable_leads)
+    	fl = filters_by_lead[(int)line[0]];
+    else
+    	fl = filters;
+#else
+    fl = filters_by_lead[(int)line[0]];
+#endif
 
-    for (fl=filters ; fl != 0 ; fl=fl->next)
+    for ( ; fl != 0 ; fl=fl->next)
     {
 	Filter *f = (Filter*)fl->data;
+
+	f->stats.ntries++;
+	total_stats.ntries++;
+
 	matched = filter_apply_one(f, line, result);
 #if DEBUG > 2
 	fprintf(stderr, "filter [%s] on \"%s\" -> %s %d (%s) state=\"%s\"\n",
@@ -877,6 +1092,8 @@ filter_apply(const char *line, FilterResult *result)
 	    default:
 	    }
 #endif
+	    f->stats.nmatches++;
+	    total_stats.nmatches++;
 	    return;
 	}
     }
@@ -884,6 +1101,41 @@ filter_apply(const char *line, FilterResult *result)
     filter_state = "";
 }
 
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+#define DEBUG 1
+
+#if DEBUG
+static void
+filter_post_one(const char *name, FilterStats *fs)
+{
+    fprintf(stderr, "[%s] %d / %d = %g%%\n",
+    	name,
+	fs->nmatches,
+    	fs->ntries,
+	(100.0 * (double)fs->nmatches / (double)fs->ntries));
+    memset(fs, 0, sizeof(*fs));
+}
+#endif
+
+void
+filter_post(void)
+{
+#if DEBUG
+    GList *iter;
+        
+    fprintf(stderr, "filter_post: stats\n");
+    
+    for (iter = filters ; iter != 0 ; iter = iter->next)
+    {
+    	Filter *fl = (Filter *)iter->data;
+
+	filter_post_one(fl->comment, &fl->stats);
+    }
+    filter_post_one("TOTAL", &total_stats);
+#endif
+}
+
+#define DEBUG 0
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 void

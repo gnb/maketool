@@ -56,5 +56,6 @@ void filter_load(void);
 void filter_init(void);
 void filter_apply(const char *line, FilterResult *result);
 void filter_describe_all(estring *e, int lod, const char *indent);
+void filter_post(void);
 
 #endif /* _FILTER_H_ */
