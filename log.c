@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.46 2003-09-27 04:15:37 gnb Exp $");
+CVSID("$Id: log.c,v 1.47 2003-09-27 13:35:03 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -454,6 +454,7 @@ log_add_line(const char *line)
 	    fprintf(stderr, "filename: \"%s\" -> \"%s\"\n", 
 	    	    	    res.file, fullpath.data);
 #endif
+    	    g_free(res.file);
 	    res.file = fullpath.data;
 	    fullpath.data = 0;
 	}
