@@ -16,14 +16,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.7 2003-05-24 05:48:59 gnb Exp $
+# $Id: Makefile.in,v 1.8 2003-08-10 06:17:50 gnb Exp $
 #
 
 top_builddir=	..
 prefix=		@prefix@
 PACKAGE=	@PACKAGE@
 VERSION=	@VERSION@
-SUBDIRS=	help
+@MAKE_ONLINE_HELP@SUBDIRS=	help
 mandir=		@mandir@
 INSTALL=	@INSTALL@
 RM=		/bin/rm -f
