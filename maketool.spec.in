@@ -35,15 +35,17 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 /usr/bin/maketool
+/usr/libexec/maketool/maketool_client
 /usr/libexec/maketool/extract_targets
 /usr/share/maketool/*.mk
 %doc COPYING COPYRIGHT TODO CHANGES
 %docdir /usr/share/maketool/help
 /usr/share/maketool/help
-/usr/share/locale/ja/LC_MESSAGES/maketool.mo
-/usr/share/locale/cs/LC_MESSAGES/maketool.mo
+/usr/share/locale/*/LC_MESSAGES/maketool.mo
 
 %changelog
+* Sun Oct 21 2001 Greg Banks <gnb@alphalink.com.au>
+- maketool_client added to rpm
 * Fri Sep 21 2001 Greg Banks <gnb@alphalink.com.au>
 - Reduced use of autoconf subs; removed RH-specific OS stuff; added email to Vendor.
 * Mon Sep 17 2001 Greg Banks <gnb@alphalink.com.au>
