@@ -295,7 +295,7 @@ x  DONE: Bug: clicking Clear Log while build in progress coredumps
 
 x  DONE: Bug: Stop button no longer ungreys when running!
 
-x  Add filters to support MWOS cross-compiler (see sample mwos.errs)
+x  DONE: Add filters to support MWOS cross-compiler (see sample mwos.errs)
 
 x  Option to always scroll to end on make output
 

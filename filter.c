@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.18 2000-01-12 11:30:12 gnb Exp $");
+CVSID("$Id: filter.c,v 1.19 2000-04-16 11:18:47 gnb Exp $");
 
 typedef struct
 {
@@ -277,6 +277,21 @@ filter_load(void)
 	"",				/* col */
 	"\\3",				/* summary */
     	"MWOS xcc warnings");	    	/* comment */
+    /*
+     * Support for summarising Microware xcc compile lines.
+     * Note that xcc does not use the POSIX standard compile options,
+     * using e.g. -v=DIR instead of -IDIR.  In particular,
+     * POSIX' -c is xcc' -r.
+     */
+    filter_add(
+    	"",				/* state */
+	"^xcc.*[ \t]-r[ \t].*[ \t]([^ \t]*\\.)(c)", /* regexp */
+	FR_INFORMATION,			/* code */
+	"\\1\\2",			/* file */
+	"",				/* line */
+	"",				/* col */
+	"Compiling \\1\\2",		/* summary */
+    	"xcc C compile line");		/* comment */
 #endif
 
 }
