@@ -189,4 +189,23 @@ x  Fix bug where build start line, updated to reflect number of errors,
    is displayed at wrong horizontal position (as if it had lost an indent).
    This seems to be a GTK display bug.
    
+x  The feature whereby targets are specified on the commandline should be
+   modified to use the new task_*() routines. Check that this behaves
+   correctly with autoconf support.
+   
+x  Handle files & line numbers in Java exception report.
+
+x  Handle column in Java errors.
+
+x  Fix bug where unsaved edits in various parts of Pereferences
+   window are not reverted when the window is popped up again.
+
+x  Handle files & line numbers in Java exception report.
+
+x  Handle column in Java errors.
+
+x  ability to recursively delete a node from the log window
+
+x  tooltip for `again' icon, and possibly menu item, should mention
+   what the actual last target is.
    
