@@ -70,4 +70,4 @@ $(htmldir)/%: %
 ############################################################
 
 upload:
-	rsync -v -r -e ssh --rsync-path=/home/g/gnb/inst/bin/rsync $(htmldir) $(uploaddir)
+	rsync -v -r --delete -e ssh --rsync-path=/home/g/gnb/inst/bin/rsync $(htmldir) $(uploaddir)
