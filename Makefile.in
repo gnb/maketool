@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.22 2000-04-16 10:11:33 gnb Exp $
+# $Id: Makefile.in,v 1.23 2000-07-11 05:46:36 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -51,6 +51,10 @@ top_builddir=	.
 SUBDIRS=	icons intl po #test
 
 ###
+
+ifneq ($(DEBUG),)
+	CPPFLAGS += -DDEBUG=$(DEBUG)
+endif
 
 # maketool program
 
