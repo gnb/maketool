@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: help.mk.in,v 1.5 2003-09-29 01:07:22 gnb Exp $
+# $Id: help.mk.in,v 1.6 2003-09-30 12:16:10 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -123,7 +123,7 @@ distclean:: clean
 distdir=	$(top_builddir)/$(PACKAGE)-$(VERSION)/doc/help/$(LANG)
 DISTFILES=	Makefile help.sgml entities.sgml $(INSTALLABLES) $(HTML_MANIFEST)
 
-dist: html entities.sgml
+dist: html entities.sgml index.dat
 	for file in $(DISTFILES); do \
 	  dir=`dirname $$file` ;\
 	  if [ $dir = "." ]; then dir= ; else dir=/$$dir ; fi ;\
