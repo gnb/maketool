@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.92 2003-07-25 14:19:33 gnb Exp $");
+CVSID("$Id: main.c,v 1.93 2003-08-20 15:36:09 gnb Exp $");
 
 
 /*
@@ -1641,15 +1641,11 @@ ui_create_menus(GtkWidget *menubar)
     about_make_menu_item = ui_add_button(menu, label, 0,
     	help_about_make_cb, 0, GR_NONE);
     g_free(label);
-#if ENABLE_ONLINE_HELP
     ui_add_separator(menu);
     ui_add_button(menu, _("_Help on..."), "F1", help_on_cb, 0, GR_NONE);
     ui_add_separator(menu);
-    ui_add_button(menu, _("_Tutorial..."), 0, help_goto_helpname_cb, "tutorial", GR_NONE);
     ui_add_button(menu, _("Table of _Contents..."), 0, help_goto_helpname_cb, "maketool", GR_NONE);
-    ui_add_button(menu, _("Index..."), 0, help_goto_helpname_cb, "index", GR_NONE);
     ui_add_button(menu, _("Web Page..."), 0, help_goto_url_cb, HOMEPAGE, GR_NONE);
-#endif
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
