@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.87 2003-04-28 11:47:03 gnb Exp $");
+CVSID("$Id: main.c,v 1.88 2003-05-04 04:16:50 gnb Exp $");
 
 
 /*
@@ -66,6 +66,9 @@ GtkWidget   	*toolbar;
 GtkWidget   	*again_menu_item, *again_tool_item;
 const char * const again_menu_label[2] = { N_("_Again"), N_("_Again (%s)") };
 const char * const again_tool_tooltip[2] = { N_("Build last target again"), N_("Build `%s' again") };
+gint	    	about_make_position;
+GtkWidget   	*about_make_menu_item;
+GtkWidget   	*about_make_menu;
 
 GdkAtom     	clipboard_atom = GDK_NONE;
 char  	    	*clipboard_text = 0;
@@ -215,6 +218,7 @@ expand_prog(
     expands['n'] = nflag.data;
     
     expands['D'] = PKGDATADIR;
+    expands['M'] = makeprog->executable;
     expands['S'] = makesys->name;
     
     out = expand_string(prog, expands);
@@ -485,7 +489,7 @@ append_build_menu_items(GList *list)
 	    const char *accel = get_target_accelerator(targ);
 	    label = abbreviate_target(targ, BUILD_MENU_WIDTH_THRESHOLD);
 	    ui_add_button_2(menu, label, FALSE, accel, build_cb, targ,
-	    			GR_NOTRUNNING);
+	    			GR_NOTRUNNING, -1);
     	    g_free(label);
 	}
     }
@@ -555,7 +559,7 @@ set_targets(unsigned int ntargs, char **targs)
     	GtkWidget *errorw;
 	
 	errorw = ui_add_button_2(build_menu, _("No targets found"), FALSE, 0, 0,
-	    	    	         0, GR_NEVER);
+	    	    	         0, GR_NEVER, -1);
 	grey_menu_items();
 	if (targs != 0)
 	    g_free(targs);
@@ -1024,6 +1028,25 @@ file_save_cb(GtkWidget *w, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+void
+set_makeprog(const char *name)
+{
+    if ((makeprog = mp_find(name)) == 0)
+    	makeprog = makeprograms[0];
+    
+    if (about_make_menu_item != 0)
+    {
+        char *label;
+
+	label = g_strdup_printf(_("About %s..."), makeprog->label);
+	gtk_widget_destroy(about_make_menu_item);
+	about_make_menu_item = ui_add_button_2(about_make_menu, label,
+	    /*douline*/TRUE, /*accel*/0, help_about_make_cb, 0,
+	    GR_NONE, about_make_position);
+	g_free(label);
+    }
+}
+
 #if 0
 static void
 dump_dir_history(const char *str)
@@ -1056,7 +1079,7 @@ construct_dir_previous_menu(void)
 	if (i < 9)
 	    g_snprintf(accelbuf, sizeof(accelbuf), "<Ctrl>%c", (i+'1'));
 	ui_add_button_2(dir_previous_menu, dir, FALSE, (i<9 ? accelbuf : 0),
-	    	dir_previous_cb, dir, GR_NOTRUNNING);
+	    	dir_previous_cb, dir, GR_NOTRUNNING, -1);
     }
     
     if (prefs.dir_history == 0)
@@ -1110,7 +1133,7 @@ change_directory(const char *dir)
     }
 	
     /* Check for presence of autoconf-related files */
-    makeprog = makeprograms[0];
+    set_makeprog(prefs.makeprog);
     makesys = ms_probe();
 	
     /* update UI for new dir */
@@ -1554,6 +1577,7 @@ ui_create_menus(GtkWidget *menubar)
 {
     GtkWidget *menu;
     GtkAccelGroup *ag;
+    char *label;
     
     ag = gtk_accel_group_new();
     gtk_window_add_accel_group(GTK_WINDOW(toplevel), ag);
@@ -1616,7 +1640,13 @@ ui_create_menus(GtkWidget *menubar)
     menu = ui_add_menu_right(menubar, _("_Help"));
     ui_add_tearoff(menu);
     ui_add_button(menu, _("_About Maketool..."), 0, help_about_cb, 0, GR_NONE);
-    ui_add_button(menu, _("About _make..."), 0, help_about_make_cb, 0, GR_NONE);
+
+    about_make_menu = menu;
+    about_make_position = ui_container_num_visible_children(GTK_CONTAINER(menu));
+    label = g_strdup_printf(_("About %s..."), makeprog->label);
+    about_make_menu_item = ui_add_button(menu, label, 0,
+    	help_about_make_cb, 0, GR_NONE);
+    g_free(label);
 #if ENABLE_ONLINE_HELP
     ui_add_separator(menu);
     ui_add_button(menu, _("_Help on..."), "F1", help_on_cb, 0, GR_NONE);
@@ -2070,7 +2100,7 @@ parse_args(int argc, char **argv)
 #endif
 
     /* Check for presence of autoconf-related etc files */
-    makeprog = makeprograms[0];
+    set_makeprog(prefs.makeprog);
     makesys = ms_probe();
 
     argv0 = argv[0];
