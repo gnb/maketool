@@ -1,8 +1,24 @@
 
-To build maketool on IRIX, follow these steps.
+In theory, maketool has the code to handle either BSD style signal() or
+SysV style signal().  In practice, something is wrong with the SysV code
+when used on IRIX which results in a coredump when the first SIGCHLD is
+received, i.e. less than a second after the program starts.  I haven't
+the time or inclination to figure out why.  So when building maketool you
+will need to supply the magic incantation which turns IRIX' default
+behaviour to BSD.
+
+CFLAGS="-D_BSD_SIGNALS" ./configure
+make
+make install
+
+If you build maketool with the MIPSpro compiler, you might want to follow
+this recipe:
 
 unset ROOT
 unset TOOLROOT
-CC="cc" CFLAGS="-xansi -n32 -mips4 -woff 1185 -D_BSD_SIGNALS" ./configure --prefix=$HOME/inst
-gmake
-gmake install
+CC="cc" CFLAGS="-xansi -n32 -mips4 -woff 1185 -D_BSD_SIGNALS" ./configure
+make
+make install
+
+
+Greg.
