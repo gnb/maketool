@@ -20,8 +20,9 @@
 #include "maketool.h"
 #include "ps.h"
 #include "util.h"
+#include <time.h>
 
-CVSID("$Id: ps.c,v 1.2 2000-01-04 12:01:46 gnb Exp $");
+CVSID("$Id: ps.c,v 1.3 2000-01-08 04:26:56 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -40,6 +41,7 @@ struct _PsDocument
 {
     FILE *fp;
     gboolean in_page;
+    char *title;
     int page_num;
     int num_pages;
     int line;
@@ -65,11 +67,8 @@ ps_begin(FILE *fp)
     memset(ps, 0, sizeof(PsDocument));
     
     ps->fp = fp;
-    fprintf(ps->fp, "%%!PS-Adobe-2.0\n");
-    fprintf(ps->fp, "%%%%Creator: Greg Banks' Maketool %s\n", VERSION); 
-    fprintf(ps->fp, "%%%%Pages: atend\n"); 
     ps->in_page = FALSE;
-    ps->page_num = 1;
+    ps->page_num = 0;
     ps->num_pages = 0;
     ps->line = 0;
     ps->font_size = 10;
@@ -77,9 +76,9 @@ ps_begin(FILE *fp)
     ps->styles = 0;
     
     ps->default_foreground.defined = TRUE;
-    ps->default_foreground.red = 0;
-    ps->default_foreground.green = 0;
-    ps->default_foreground.blue = 0;
+    ps->default_foreground.red = 0.0;
+    ps->default_foreground.green = 0.0;
+    ps->default_foreground.blue = 0.0;
     
     ps->lines_per_page = ((prefs.paper_height - prefs.margin_top - prefs.margin_bottom)
     	    	      / (ps->font_size + LINE_SPACING));
@@ -96,7 +95,15 @@ ps_begin(FILE *fp)
 void
 ps_title(PsDocument *ps, const char *title)
 {
-    fprintf(ps->fp, "%%%%Title: %s\n", title); 
+    if (ps->title != 0)
+    	g_free(ps->title);
+    ps->title = g_strdup(title);
+}
+
+void
+ps_num_lines(PsDocument *ps, int n)
+{
+    ps->num_pages = (n + ps->lines_per_page - 1) / ps->lines_per_page;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -109,6 +116,7 @@ ps_expand_styles(PsDocument *ps, int n)
     	PsStyle *old = ps->styles;
 	
 	ps->styles = g_new(PsStyle, n);
+	memset(ps->styles, 0, sizeof(PsStyle)*n);
 	if (old != 0)
 	{
 	    memcpy(ps->styles, old, sizeof(PsStyle)*ps->num_styles);
@@ -131,14 +139,6 @@ ps_foreground(PsDocument *ps, int style, float r, float g, float b)
     s->foreground.blue = b;
 }
 
-static PsColor *
-ps_get_foreground(PsDocument *ps, int style)
-{
-    return (style < ps->num_styles &&
-    	    ps->styles[style].foreground.defined ?
-	    &ps->styles[style].foreground : 0);
-}
-
 void
 ps_background(PsDocument *ps, int style, float r, float g, float b)
 {
@@ -152,33 +152,50 @@ ps_background(PsDocument *ps, int style, float r, float g, float b)
     s->background.blue = b;
 }
 
-static PsColor *
-ps_get_background(PsDocument *ps, int style)
-{
-    return (style < ps->num_styles &&
-    	    ps->styles[style].background.defined ?
-	    &ps->styles[style].background : 0);
-}
-
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static char *
+ps_date_string(void)
+{
+    char *datebuf;
+    time_t clock;
+
+    time(&clock);
+    datebuf = ctime(&clock);
+    datebuf[24] = '\0';
+    return g_strdup_printf("%s (%s)",
+    	datebuf,
+	safe_str(tzname[0]));
+}
 
 static const char prologue[] = "\
 %%EndComments\n\
+%%BeginProlog\n\
 /MaketoolDict 100 dict def\n\
 MaketoolDict begin\n\
 /Helvetica-Roman findfont 10 scalefont /_f exch def\n\
 /bd{bind def}bind def\n\
 /m{moveto}bd\n\
 /l{lineto}bd\n\
-/c{setrgbcolor}bd\n\
 /b{4 dict begin\n\
  /h exch def /w exch def /y exch def /x exch def\n\
  x y moveto x w add y lineto x w add y h add lineto x y h add lineto\n\
  closepath\n\
  end}bd\n\
+/pb{4 copy b s b clip}bd\n\
 /s{stroke}bd\n\
 /f{fill}bd\n\
 /t{show}bd\n\
+/SN{/_N exch def\n\
+ /_fg _N array def\n\
+ /_bg _N array def\n\
+ 0 1 _N 1 sub{_fg exch [0 0 0] put}for\n\
+ 0 1 _N 1 sub{_bg exch [1 1 1] put}for\n\
+}bd\n\
+/SF{3 array astore _fg 3 1 roll put}bd\n\
+/SB{3 array astore _bg 3 1 roll put}bd\n\
+/F{_fg exch get aload pop setrgbcolor}bd\n\
+/B{_bg exch get aload pop setrgbcolor}bd\n\
 /bp{_f setfont 0 0 0 setrgbcolor 1 setlinewidth}bd\n\
 /ep{showpage}bd\n\
 end\n\
@@ -188,7 +205,40 @@ end\n\
 void
 ps_prologue(PsDocument *ps)
 {
+    int i;
+    char *date;
+    
+    fprintf(ps->fp, "%%!PS-Adobe-2.0\n");
+    fprintf(ps->fp, "%%%%Creator: Maketool %s, Copyright (c) 1999-2000 Greg Banks. All Rights Reserved.\n", VERSION); 
+    assert(ps->num_pages > 0);
+    fprintf(ps->fp, "%%%%Pages: %d\n", ps->num_pages); 
+    fprintf(ps->fp, "%%%%Title: %s\n", ps->title);
+    date = ps_date_string();
+    fprintf(ps->fp, "%%%%CreationDate: %s\n", date); 
+    g_free(date);
     fputs(prologue, ps->fp);
+    
+    
+    fprintf(ps->fp, "%%%%BeginSetup\n");
+    fprintf(ps->fp, "MaketoolDict begin\n");
+    fprintf(ps->fp, "%d SN\n", ps->num_styles);
+    for (i=0 ; i<ps->num_styles ; i++)
+    {
+    	if (ps->styles[i].foreground.defined)
+	    fprintf(ps->fp, "%d %.3g %.3g %.3g SF\n",
+	    	i,
+	    	ps->styles[i].foreground.red,
+	    	ps->styles[i].foreground.green,
+	    	ps->styles[i].foreground.blue);
+    	if (ps->styles[i].background.defined)
+	    fprintf(ps->fp, "%d %.3g %.3g %.3g SB\n",
+	    	i,
+	    	ps->styles[i].background.red,
+	    	ps->styles[i].background.green,
+	    	ps->styles[i].background.blue);
+    }
+    fprintf(ps->fp, "end %MaketoolDict\n");
+    fprintf(ps->fp, "%%%%EndSetup\n");
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -219,20 +269,20 @@ ps_end_page(PsDocument *ps)
 static void
 ps_begin_page(PsDocument *ps, int n)
 {
-    fprintf(ps->fp, "%%Page %d %d\n", n, n);
+    fprintf(ps->fp, "%%%%Page: %d %d\n", n, n);
     fputs(page_setup, ps->fp);
     
-    /* Draw a box around the usable area */
-    fprintf(ps->fp, "%d %d %d %d b s\n",
+    /* TODO: draw page/numpages outside usable area */
+    
+    /* Draw a box around the usable area & clip to it */
+    fprintf(ps->fp, "%d %d %d %d pb\n",
     	prefs.margin_left,
 	prefs.margin_top,
 	prefs.paper_width - prefs.margin_left - prefs.margin_right,
 	prefs.paper_height - prefs.margin_top - prefs.margin_bottom);
 
     ps->page_num = n;
-    ps->num_pages++;
     ps->in_page = TRUE;
-
 }
 
 static void
@@ -259,14 +309,6 @@ ps_put_escaped_string(PsDocument *ps, const char *text)
     }
 }
 
-static void
-ps_color(PsDocument *ps, const PsColor *col)
-{
-    if (col != 0)
-	fprintf(ps->fp, "%.3g %.3g %.3g c\n",
-    	    col->red, col->green, col->blue);
-}
-
 void
 ps_line(
     PsDocument *ps,
@@ -275,11 +317,10 @@ ps_line(
     int indent_level)
 {
     double x, y;
-    PsColor *f, *b;
     
-    f = ps_get_foreground(ps, style);
-    b = ps_get_background(ps, style);
-    
+    if (style < 0 || style >= ps->num_styles)
+    	style = 0;  	/* default style */
+	
     if (ps->line == 0)
     	ps_next_page(ps);
 
@@ -287,19 +328,20 @@ ps_line(
     	    	    (ps->line+1) * (ps->font_size + LINE_SPACING);
     x = prefs.margin_left + indent_level * INDENT;
 
-    if (b != 0)
+    if (ps->styles[style].background.defined)
     {
-    	/* set to background colour */
-	ps_color(ps, b);
-    	/* box around line */
+	/* set to background colour */
+	fprintf(ps->fp, "%d B\n", style);
+	/* box around line */
 	fprintf(ps->fp, "%d %d %d %d b f\n",
     	    prefs.margin_left,
 	    (int)y-LINE_SPACING/2-(int)(0.3 * ps->font_size),  /* hack for descenders */
 	    prefs.paper_width - prefs.margin_left - prefs.margin_right,
 	    ps->font_size + LINE_SPACING);
-	/* set the colour back */
     }
-    ps_color(ps, (f == 0 ? &ps->default_foreground : f));
+    
+    /* set to foreground colour */
+    fprintf(ps->fp, "%d F\n", style);
     fprintf(ps->fp, "%g %g m\n", x, y);
     fprintf(ps->fp, "(");
     ps_put_escaped_string(ps, text);
@@ -313,18 +355,19 @@ ps_line(
 
 /* TODO: save& restore stuff */
 static const char trailer[] = "\
-%%%%Trailer\n\
-%%%%Pages: %d\n\
-%%%%EOF\n\
+%%Trailer\n\
+%%EOF\n\
 ";
 
 void    
 ps_end(PsDocument *ps)
 {
     ps_end_page(ps);
-    fprintf(ps->fp, trailer, ps->num_pages);
+    fputs(trailer, ps->fp);
     fflush(ps->fp);
-    
+
+    if (ps->title != 0)
+    	g_free(ps->title);    
     g_free(ps);
 }
 

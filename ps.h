@@ -29,6 +29,7 @@ typedef struct _PsDocument PsDocument;
 PsDocument *ps_begin(FILE *fp);
 void ps_title(PsDocument *ps, const char *title);
 void ps_prologue(PsDocument *ps);
+void ps_num_lines(PsDocument *ps, int n);
 void ps_foreground(PsDocument *ps, int style, float r, float g, float b);
 void ps_background(PsDocument *ps, int style, float r, float g, float b);
 void ps_line(PsDocument *ps, const char *text, int style, int indent_level);

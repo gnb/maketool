@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: print.c,v 1.2 2000-01-05 14:08:34 gnb Exp $");
+CVSID("$Id: print.c,v 1.3 2000-01-08 04:26:56 gnb Exp $");
 
 static GtkWidget	*print_shell = 0;
 typedef enum { D_PRINTER, D_FILE, D_NUM_DESTS } DEST;
@@ -169,6 +169,7 @@ lpr_job_begin(const char *printer)
     char *cmd;
     
     cmd = _lpr_job_command(printer);
+    message("Printing using: %s", cmd);
     fp = popen(cmd, "w");
     g_free(cmd);
     
@@ -221,6 +222,7 @@ print_ok_cb(GtkWidget *w, gpointer data)
     case D_FILE:
     	/* TODO: check filename */
 	file = gtk_entry_get_text(GTK_ENTRY(file_entry));
+	message("Printing to file %s", file);
 	fp = fopen(file, "w");
 	log_print(fp);
 	fclose(fp);
