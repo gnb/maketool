@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
-dnl $Id: configure.in,v 1.41 2003-05-04 04:10:40 gnb Exp $
+dnl $Id: configure.in,v 1.42 2003-05-04 05:37:29 gnb Exp $
 dnl
 
 AC_INIT(main.c)
@@ -214,8 +214,11 @@ ENABLE_ONLINE_HELP=$enableval,ENABLE_ONLINE_HELP=no)
 AC_MSG_RESULT($ENABLE_ONLINE_HELP)
 if test "$ENABLE_ONLINE_HELP" = "yes"; then
     AC_DEFINE(ENABLE_ONLINE_HELP)
+    MAKE_ONLINE_HELP=
+else
+    MAKE_ONLINE_HELP="#"
 fi
-AC_SUBST(ENABLE_ONLINE_HELP)
+AC_SUBST(MAKE_ONLINE_HELP)
 
 
 

@@ -21,7 +21,7 @@ Double-clicking on an error message starts an editor.
 autoconf
 
 %build
-[ "@ENABLE_ONLINE_HELP@" = yes ] && EOH="--enable-online-help"
+@MAKE_ONLINE_HELP@EOH="--enable-online-help"
 CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr $EOH
 make
 
