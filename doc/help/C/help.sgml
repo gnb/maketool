@@ -4,7 +4,7 @@
 ]>
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.7 2001-08-28 13:54:03 gnb Exp $"
+         revision="$Id: help.sgml,v 1.8 2001-08-28 14:57:49 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool online help</title>
@@ -12,7 +12,7 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2001-08-28 13:54:03 $</pubdate>
+  <pubdate role="cvs">$Date: 2001-08-28 14:57:49 $</pubdate>
   <releaseinfo>This is version &version;</releaseinfo>
   <copyright>
     <year>2000</year>
@@ -1031,7 +1031,10 @@ However, like any powerful tool, unless you know what you're doing
 you can have some very unpleasant experiences with metacharacters.
 So unless you know exactly what you're doing, it's wise to avoid using
 metacharacters in filenames and other data used in
-<command>maketool</command>.
+<command>maketool</command>.  Here be dragons!
+</para>
+
+<para>
 Usually, metacharacters are the odd punctuation characters
 around the edge of your keyboard, such as $ * or &amp;.  If you
 stick to using letters, numbers, and the / (slash) - (dash)
@@ -1405,6 +1408,11 @@ Makefile:10: *** missing separator.  Stop.
 
 </variablelist>
 
+
+<para>
+If you're still not frightened of metacharacters, go buy a good book on
+the UNIX shell and read it.  You will learn a powerful and useful tool.
+</para>
 
 
 <para>
