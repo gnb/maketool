@@ -22,7 +22,13 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.27 2002-09-24 14:29:07 gnb Exp $");
+CVSID("$Id: filter.c,v 1.28 2003-02-09 04:57:59 gnb Exp $");
+
+typedef struct
+{
+    char *name;
+    GList *filters; 	/* list of Filter's */
+} FilterSet;
 
 typedef struct
 {
@@ -35,10 +41,12 @@ typedef struct
     char *summary_str;
     FilterCode code;
     char *comment;
+    FilterSet *set;
 } Filter;
 
-
 static GList *filters;
+static GList *filter_sets;  /* in order encountered */
+static FilterSet *curr_filter_set;
 const char *filter_state = "";
 extern const char *argv0;
 
@@ -83,6 +91,9 @@ filter_add(
     f->col_str = g_strdup(col_str);
     f->summary_str = g_strdup(summary_str);
     f->comment = g_strdup(comment);
+
+    if ((f->set = curr_filter_set) != 0)
+    	f->set->filters = g_list_append(f->set->filters, f);
     
     /* TODO: this is O(N^2) - try prepending then reversing O(N) */
     filters = g_list_append(filters, f);
@@ -92,8 +103,38 @@ filter_add(
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 void
+filter_set_start(const char *name)
+{
+    GList *iter;
+    FilterSet *fs;
+
+    /* Try to find an existing set of the same name */    
+    for (iter = filter_sets ; iter != 0 ; iter = iter->next)
+    {
+    	fs = (FilterSet *)iter->data;
+
+    	if (!strcmp(name, fs->name))
+	{
+	    curr_filter_set = fs;
+	    return;
+	}
+    }
+    
+    fs = g_new(FilterSet, 1);
+    fs->name = g_strdup(name);
+    fs->filters = 0;
+    
+    filter_sets = g_list_append(filter_sets, fs);
+    curr_filter_set = fs;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+void
 filter_load(void)
 {
+    filter_set_start(_("GNU make directory messages"));
+
     filter_add(
     	"",				/* state */
 	"^[a-zA-Z0-9_-]+\\[[0-9]+\\]: Entering directory `([^']+)'", /* regexp */
@@ -113,6 +154,8 @@ filter_load(void)
 	"",				/* col */
 	"",				/* summary */
     	"gmake recursion - pop");	/* comment */
+
+    filter_set_start(_("GNU Compiler Collection"));
 
     filter_add(
     	"",				/* state */
@@ -186,6 +229,27 @@ filter_load(void)
 
     filter_add(
     	"",				/* state */
+	"^In file included from ([^: \t]+):([0-9]+)[,:]$",	/* regexp */
+	FR_INFORMATION,			/* code */
+	"\\1",				/* file */
+	"\\2",				/* line */
+	"",				/* col */
+	"Included from \\1:\\2",	/* summary */
+    	"gcc inclusion trace 1");	/* comment */
+    filter_add(
+    	"",				/* state */
+	"^[ \t]+from +([^: \t]+):([0-9]+)[,:]$",	/* regexp */
+	FR_INFORMATION,			/* code */
+	"\\1",				/* file */
+	"\\2",				/* line */
+	"",				/* col */
+	"Included from \\1:\\2",	/* summary */
+    	"gcc inclusion trace 2");	/* comment */
+
+    filter_set_start(_("Bison & Flex"));
+
+    filter_add(
+    	"",				/* state */
 	"^\\(\"([^\"]+)\", line ([0-9]+)\\) error: (.*)$",	/* regexp */
 	FR_ERROR,			/* code */
 	"\\1",				/* file */
@@ -204,26 +268,9 @@ filter_load(void)
 	"\\3",				/* summary */
     	"flex errors");	    		/* comment */
 
-    filter_add(
-    	"",				/* state */
-	"^In file included from ([^: \t]+):([0-9]+)[,:]$",	/* regexp */
-	FR_INFORMATION,			/* code */
-	"\\1",				/* file */
-	"\\2",				/* line */
-	"",				/* col */
-	"Included from \\1:\\2",	/* summary */
-    	"gcc inclusion trace 1");	/* comment */
-    filter_add(
-    	"",				/* state */
-	"^[ \t]+from +([^: \t]+):([0-9]+)[,:]$",	/* regexp */
-	FR_INFORMATION,			/* code */
-	"\\1",				/* file */
-	"\\2",				/* line */
-	"",				/* col */
-	"Included from \\1:\\2",	/* summary */
-    	"gcc inclusion trace 2");	/* comment */
+#if ENABLE_FILTER_HPUX
+    filter_set_start(_("HP-UX compilers"));
 
-#ifdef __hpux
     filter_add(
     	"",				/* state */
 	"(CC|cpp): \"([^\"]*)\", line ([0-9]+): error(.*)$", /* regexp */
@@ -243,9 +290,11 @@ filter_load(void)
 	"",				/* col */
 	"\\4",				/* summary */
     	"HP-UX old CC/cpp warning");	/* comment */
-#endif
+#endif /* ENABLE_FILTER_HPUX */
 
-#ifdef __sgi
+#if ENABLE_FILTER_MIPSPRO
+    filter_set_start(_("IRIX MIPSpro compilers"));
+
     /* old style MIPSpro errors and warnings */
     filter_add(
     	":mipspro1",			/* state */
@@ -399,11 +448,14 @@ filter_load(void)
 	"",				/* col */
 	"\\3",	    	    	    	/* summary */
     	"new MIPSpro as warning");	/* comment */
-#endif
+#endif /* ENABLE_FILTER_MIPSPRO */
 
-#ifdef __sun
+#if ENABLE_FILTER_SUN
+    filter_set_start(_("Solaris compilers (unimplemented)");
     /*TODO: Solaris compilers*/
-#endif
+#endif /* ENABLE_FILTER_SUN */
+
+    filter_set_start(_("Oracle Pro/C"));
 
     filter_add(
     	"",				/* state */
@@ -425,6 +477,7 @@ filter_load(void)
      * string of 1 or more chars starting and ending
      * with whitespace.
      */
+    filter_set_start(_("Generic UNIX C compiler"));
     filter_add(
     	"",				/* state */
 	"^[ \t]*(|[^ \t:#]+/)(cc|c89|gcc|CC|c\\+\\+|g\\+\\+)([ \t]|[ \t].*[ \t])-c([ \t]|[ \t].*[ \t])([^ \t]*\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
@@ -434,6 +487,8 @@ filter_load(void)
 	"",				/* col */
 	"Compiling \\5\\6",		/* summary */
     	"C/C++ compile line");		/* comment */
+
+    filter_set_start(_("GNU cross-compilers"));
     filter_add(
     	"",				/* state */
 	"^[ \t]*(|[^ \t:#]+/)[-/a-z0-9]+-(cc|gcc|c\\+\\+|g\\+\\+).*[ \t]-c([ \t]|[ \t].*[ \t])([^ \t]+\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
@@ -443,15 +498,8 @@ filter_load(void)
 	"",				/* col */
 	"Cross-compiling \\4\\5",   	/* summary */
     	"GNU C/C++ cross-compile line"); /* comment */
-    filter_add(
-    	"",				/* state */
-	"^javac[ \t].*[ \t]([A-Za-z_*][A-Za-z0-3_*]*).java", /* regexp */
-	FR_INFORMATION,			/* code */
-	"\\1.java",			/* file */
-	"",				/* line */
-	"",				/* col */
-	"Compiling \\1.java",		/* summary */
-    	"Java compile line");		/* comment */
+
+    filter_set_start(_("Generic UNIX C compiler"));
     filter_add(
     	"",				/* state */
 	"^[ \t]*(|[^ \t:#]+/)(cc|c89|gcc|CC|c\\+\\+|g\\+\\+|ld).*[ \t]+-o[ \t]+([^ \t]+)", /* regexp */
@@ -461,6 +509,8 @@ filter_load(void)
 	"",				/* col */
 	"Linking \\3",			/* summary */
     	"C/C++ link line");		/* comment */
+
+    filter_set_start(_("GNU cross-compilers"));
     filter_add(
     	"",				/* state */
 	"^[ \t]*(|[^ \t:#]+/)[-/a-z0-9]+-(cc|gcc|c\\+\\+|g\\+\\+|ld).*[ \t]+-o[ \t]+([^ \t]+)", /* regexp */
@@ -470,6 +520,8 @@ filter_load(void)
 	"",				/* col */
 	"Cross-linking \\3",		/* summary */
     	"GNU C/C++ cross-link line");	/* comment */
+
+    filter_set_start(_("Generic UNIX C compiler"));
     filter_add(
     	"",				/* state */
 	"^[ \t]*(|[^ \t:#]+/)ar[ \t][ \t]*[rc][a-z]*[ \t][ \t]*(lib[^ \t]*.a)", /* regexp */
@@ -480,6 +532,8 @@ filter_load(void)
 	"Building library \\2",		/* summary */
     	"Archive library link line");	/* comment */
     /* TODO: support for libtool */	
+
+    filter_set_start(_("GNU autoconf messages"));
     filter_add(
     	"",				/* state */
 	"^creating ([^ \t]+)$",	    	/* regexp */
@@ -499,12 +553,25 @@ filter_load(void)
 	0,		    	    	/* summary */
     	"configure script output file 2"); /* comment */
 
+    filter_set_start(_("Sun Java"));
+    filter_add(
+   	"",				/* state */
+	"^javac[ \t].*[ \t]([A-Za-z_*][A-Za-z0-3_*]*).java", /* regexp */
+	FR_INFORMATION,			/* code */
+	"\\1.java",			/* file */
+	"",				/* line */
+	"",				/* col */
+	"Compiling \\1.java",		/* summary */
+    	"Java compile line");		/* comment */
 
-#if ENABLE_MWOS
+
+#if ENABLE_FILTER_MWOS
     /*
      * Support for errors generated by cross-compiling
      * for Microware OS-9 using Microware's xcc compiler.
      */
+    filter_set_start(_("Microware OS-9 cross-compilers"));
+
     filter_add(
     	"",				/* state */
 	"^\"([^\" \t]+)\", line ([0-9]+): error:(.*)$",	/* regexp */
@@ -539,7 +606,7 @@ filter_load(void)
 	"",				/* col */
 	"Compiling \\1\\2",		/* summary */
     	"xcc C compile line");		/* comment */
-#endif
+#endif /* ENABLE_FILTER_MWOS */
 
 }
 
@@ -659,6 +726,33 @@ filter_apply(const char *line, FilterResult *result)
 	    return;
     }
     result->code = FR_UNDEFINED;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+void
+filter_describe_all(estring *e, int lod, const char *indent)
+{
+    GList *iter1, *iter2;
+    
+    estring_append_string(e, "Filters:\n");
+
+    for (iter1 = filter_sets ; iter1 != 0 ; iter1 = iter1->next)
+    {
+    	FilterSet *fs = (FilterSet *)iter1->data;
+
+	estring_append_printf(e, "%s%s\n", indent, fs->name);
+
+    	if (lod > 0)
+	{
+    	    for (iter2 = fs->filters ; iter2 != 0 ; iter2 = iter2->next)
+	    {
+		Filter *f = (Filter *)iter2->data;
+		
+		estring_append_printf(e, "%s%s%s\n", indent, indent, f->comment);
+	    }
+	}
+    }
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
