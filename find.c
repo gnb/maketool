@@ -24,7 +24,7 @@
 #include <regex.h>	/* POSIX regular expression fns */
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: find.c,v 1.14 2001-09-22 02:18:07 gnb Exp $");
+CVSID("$Id: find.c,v 1.15 2002-09-24 14:12:10 gnb Exp $");
 
 #define FINDCASE 0  	/* TODO: implement case-insensitive literals */
 
@@ -42,8 +42,6 @@ typedef enum
 static GtkWidget    	*dirn_radio[FD_MAX_DIRECTIONS];
 static GtkWidget    	*type_radio[FT_MAX_TYPES];
 static GtkWidget    	*string_entry;
-static GtkWidget    	*wrap_check;
-
 
 typedef struct 
 {
@@ -442,7 +440,6 @@ create_find_shell(void)
     gtk_signal_connect(GTK_OBJECT(check), "toggled", 
     	GTK_SIGNAL_FUNC(find_wrap_cb), 0);
     gtk_widget_show(check);
-    wrap_check = check;
 
     ui_dialog_create_button(find_shell, _("Find"),
     	find_find_cb, (gpointer)0);

@@ -20,7 +20,7 @@
 #include "mqueue.h"
 #include <gdk/gdkx.h>
 
-CVSID("$Id: mqueue.c,v 1.1 2001-09-21 04:33:04 gnb Exp $");
+CVSID("$Id: mqueue.c,v 1.2 2002-09-24 14:13:52 gnb Exp $");
 
 typedef struct
 {
@@ -91,7 +91,7 @@ mq_send(GdkWindow *to, Message *msg)
 			message_atom,
 			/*format*/8,
 			GDK_PROP_MODE_APPEND,
-			bits.data, bits.length);
+			(guchar *)bits.data, bits.length);
 			
     estring_free(&bits);
 }
@@ -165,7 +165,7 @@ mq_message_event(GdkEvent *event)
     	memcpy(&hdr, data+offset, sizeof(hdr));
 	offset += sizeof(hdr);
 	
-	msg = mq_msg_new_d(data+offset, hdr.length);
+	msg = mq_msg_new_d((const char *)data+offset, hdr.length);
     	msg->msgid = hdr.msgid;
 	msg->from = lookup_window(hdr.from);
 		
