@@ -1,47 +1,52 @@
 
 define(NAVLINK,
-<TR>
-  <TD>
-    <B>`ifelse($1,HTMLFILE,$2,<A HREF="$1">$2</A>)'</B><BR>
-  </TD>
-</TR>
+<tr>
+  <td>
+    <b>`ifelse($1,HTMLFILE,$2,<a href="$1">$2</a>)'</b><br>
+  </td>
+</tr>
 )
 
-<TABLE BORDER=0 BACKGROUND="tocbg.gif" CELLSPACING=0 CELLPADDING=4>
-  <TR>
-    <TD>
-      <FONT COLOR="#ffffff" SIZE="+2"><B>maketool</B></FONT>
-    </TD>
-  </TR>
-  <TR>
-    <TD>
-      <TABLE WIDTH="100%" BORDER=0 BACKGROUND="" BGCOLOR="#ffffff" CELLSPACING=0 CELLPADDING=5>
+<table class="toc1" cellspacing="0" cellpadding="8">
+  <tr>
+    <td class="tochdr">
+      maketool
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table width="100%" class="toc2" cellspacing="0" cellpadding="5">
 	NAVLINK(index.html,Features)
 	NAVLINK(download.html,Download)
 	NAVLINK(screenshots.html,Screenshots)
 	NAVLINK(changelog.html,Change Log)
-      </TABLE>
-      <TABLE WIDTH="100%" BORDER=0 CELLSPACING=0 CELLPADDING=2>
-	<TR>
-	  <TD>
-	  </TD>
-	</TR>
-      </TABLE>
-      <TABLE WIDTH="100%" BORDER=0 BACKGROUND="" BGCOLOR="#ffffff" CELLSPACING=0 CELLPADDING=5>
-	<TR>
-	  <TD>
-	    Watch for new<BR>releases on:<BR>
-	    <A HREF="http://www.freshmeat.net/"><IMG WIDTH=90 HEIGHT=36 SRC="fm.mini.jpg" ALT="freshmeat" BORDER=0></A>
-	  </TD>
-	</TR>
-	<TR>
-	  <TD>
-	    <A HREF="http://www.gimp.org/"><IMG WIDTH=90 HEIGHT=36 BORDER=0 SRC="gimp.gif" ALT="[gimp]"></A>
-	  </TD>
-	</TR>
+      </table>
+      <table width="100%" border="0" cellspacing="0" cellpadding="4">
+	<tr>
+	  <td>
+	  </td>
+	</tr>
+      </table>
+      <table width="100%" class="toc2" cellspacing="0" cellpadding="5">
+	<tr>
+	  <td>
+	    Watch for new<br>releases on:<br>
+	    <a href="http://www.freshmeat.net/projects/maketool/"><img width="90" height="36" src="fm.mini.jpg" alt="freshmeat" border="0"></a>
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    <a href="http://www.gimp.org/"><img width="90" height="36" border="0" src="gimp.gif" alt="[gimp]"></a>
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    <a href="http://validator.w3.org/check/referer"><img width="88" height="31" border="0" src="valid-html40.gif" alt="Valid HTML 4.0"></a>
+	  </td>
+	</tr>
 	
-      </TABLE>
-    </TD>
-  </TR>
-</TABLE>
+      </table>
+    </td>
+  </tr>
+</table>
 
