@@ -162,7 +162,7 @@ x  Add option to map directory level to tree indent level
 
 x  Add a feature to watch an existing log file as it grows.
 
-x  When clicking on errrors from a loaded log file, pathnames should
+x  DONE: When clicking on errrors from a loaded log file, pathnames should
    be interpreted relative to the log file's directory.
 
 x  DONE: Provide a small ctree with 3 rows to preview colour changes in

@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
-dnl $Id: configure.in,v 1.13 1999-11-02 08:56:23 gnb Exp $
+dnl $Id: configure.in,v 1.14 1999-11-04 04:45:25 gnb Exp $
 dnl
 
 AC_INIT(main.c)
@@ -49,11 +49,6 @@ if test -z "$GMAKE"; then
 AC_CHECK_PROGS(GMAKE, gmake make, make)
 fi
 
-
-dnl Generate basename part of GMAKE for filters
-changequote(,)dnl
-GMAKEBASE=`echo "$GMAKE" | sed -e 's:^[^     ]*/::' -e 's:[ 	].*$::'`
-changequote([,])dnl
 
 dnl Test for existance of /usr/doc/ directory (e.g. on RedHat Linux)
 dnl Note we don't test for $prefix/doc because that may not exist
@@ -98,7 +93,6 @@ AM_PATH_GTK(1.2.0)
 AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE")
 AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
 AC_DEFINE_UNQUOTED(GMAKE, "$GMAKE")
-AC_DEFINE_UNQUOTED(GMAKEBASE, "$GMAKEBASE")
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 AC_OUTPUT(Makefile extract_targets make_makefile maketool.spec intl/Makefile po/Makefile.in icons/Makefile)
