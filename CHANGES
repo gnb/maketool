@@ -1,3 +1,30 @@
+* 0.4  (11 Sep 1999)
+x  Added the ability to summarise lines in the make log, e.g.
+   a long compile line becomes `Compiling fred.c'. Handles
+   compiling C/C++, compiling Java, linking C/C++, and building
+   an archive library. Error & warning lines have their initial
+   part (filename & line number) removed. Also gcc-produced
+   lines which are spurious in the maketool context are removed entirely.
+x  Added a dryrun option.
+x  Log flags are saved to preferences.
+x  Preferences now include foreground and background colors for
+   info, error, and warning lines. Saved into ~/.maketoolrc.
+x  Fixed bug where Variables list in Preferences window got confused
+   after user sets the same variable to two different values.
+x  Fixed estring bug which caused Purify error if estring
+   is used after estring_free().
+x  Fixed bug which mis-handled the last line of a child process'
+   output or a logfile if the line wasn't terminated with \n.
+x  Fixed bug which leaked the key of a config string which
+   was set for the 2nd or subsequent time.
+x  Made a debugging print properly conditional.
+x  Made the sinclude()s in configure.in use full path names so that
+   autoconf does not need to be invoked with any arguments. Now I
+   don't need the special configure: make target.
+x  Rationalised code which puts version number into about string.
+x  Removed as many line length/buffer overflow conditions as
+   I could find. Tested with a line longer than 1024 chars.
+
 
 * 0.3  (14 Jul 1999)
 x  The Licence button now pops up a window which
