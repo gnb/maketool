@@ -16,10 +16,6 @@ BEGIN {
 }
 /^[^#: \t\/][^#: \t\/]*:/ {
     if (isFile && isTarget)
-        targets[substr($0, 0, index($0, ":")-1)] = 1
+    	print substr($0, 0, index($0, ":")-1)
     isTarget = 1
-}
-END {
-    for (i in targets)
-    	print i
-}'
+}' | sort -u
