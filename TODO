@@ -178,10 +178,6 @@ x  Add an editor choice for "gvim +%l %f"
 x  Fix the page name and page orientation combos in the Preferences
    window to behave correctly and actually be used.
 
-x  The directory /usr/src/redhat/SOURCES is RH-specific.  Mandrake
-   uses the more vendor-neutral /usr/src/RPM/SOURCES which needs
-   to be accomodated.
-   
 x  When the make child is generating lots of output very quickly, the
    GTK library is starved of CPU and does not repaint the window (which
    is slightly annoying) or allow the user to press Stop (which is
@@ -414,4 +410,8 @@ x  DONE: In summary mode, need to highlight the `Compiling' lines visually to
 x  DONE: Detect (at configure time) whether BSD or SysV signal semantics are
    in place. Note that on Linux you get SysV semantics with `gcc -ansi'
    regardless of whether you also request -D_USE_BSD.
+   
+x  DONE: The directory /usr/src/redhat/SOURCES is RH-specific.  Mandrake
+   uses the more vendor-neutral /usr/src/RPM/SOURCES which needs
+   to be accomodated.
    
