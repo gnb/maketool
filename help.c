@@ -18,11 +18,11 @@
  */
 
 #include "maketool.h"
-#include "spawn.h"
+#include "task.h"
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: help.c,v 1.19 2000-01-24 11:09:49 gnb Exp $");
+CVSID("$Id: help.c,v 1.20 2000-04-16 08:31:31 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -135,11 +135,19 @@ help_about_cb(GtkWidget *w, gpointer data)
 static estring make_version = ESTRING_STATIC_INIT;
 
 static void
-make_version_reap(pid_t pid, int status, struct rusage *usg, gpointer user_data)
+make_version_input(Task *task, int len, const char *buf)
 {
-    if (!(WIFEXITED(status) || WIFSIGNALED(status)))
-    	return;
-	
+    estring_append_chars(&make_version, buf, len);
+    
+#if DEBUG
+    fprintf(stderr, "make_version_input(): make_version=\"%s\"\n",
+    	make_version.data);
+#endif
+}
+
+static void
+make_version_reap(Task *task)
+{
     if (about_make_shell == 0)
     {
 	GtkWidget *label;
@@ -147,12 +155,6 @@ make_version_reap(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	GtkWidget *hbox;
 	GdkPixmap *pm;
 	GdkBitmap *mask;
-
-    	/* Hack to cause any pending input from the pipe to
-	 * be processed before we try to use it.
-	 */
-    	while (g_main_pending())
-    	    g_main_iteration(/*may_block*/FALSE);
 
 	about_make_shell = ui_create_ok_dialog(toplevel, _("Maketool: About Make"));
 
@@ -174,18 +176,23 @@ make_version_reap(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     gtk_widget_show(about_make_shell);
 }
 
-static void
-make_version_input(int len, const char *buf, gpointer data)
+static TaskOps make_version_ops =
 {
-    estring_append_chars(&make_version, buf, len);
-    
-#if DEBUG
-    fprintf(stderr, "make_version_input(): make_version=\"%s\"\n",
-    	make_version.data);
-#endif
+0,  	    	    	    	/* start */
+make_version_input,	    	/* input */
+make_version_reap, 	    	/* reap */
+0   	    		    	/* destroy */
+};
+
+static Task *
+make_version_task(void)
+{
+    return task_create(
+    	(Task *)g_new(Task, 1),
+	expand_prog(prefs.prog_list_version, 0, 0, 0),
+	prefs.var_environment,
+	&make_version_ops);
 }
-
-
 
 void
 help_about_make_cb(GtkWidget *w, gpointer data)
@@ -194,11 +201,7 @@ help_about_make_cb(GtkWidget *w, gpointer data)
 
     if (make_version.data == 0)
     {
-	char *prog;
-	prog = expand_prog(prefs.prog_list_version, 0, 0, 0);
-	spawn_with_output(prog, make_version_reap,
-		make_version_input, 0, 0);
-	g_free(prog);
+    	task_spawn(make_version_task());
     }
     else if (about_make_shell != 0)
     	gtk_widget_show(about_make_shell);
