@@ -1,6 +1,4 @@
 
-Procedure to update the Change Log web page on new release.
-
 Description of release procedure for maketool
 ------------------------------------------
 
@@ -32,10 +30,10 @@ Description of release procedure for maketool
     cvs tag MAKETOOL_0_5 ChangeLog
 
 9.  Build a new RH7.3 tarball and RPM
-    ./buildrpm --cvs-update=MAKETOOL_0_8_1 --copy-tarball
+    ./buildrpm  --copy-tarball --cvs-update=MAKETOOL_0_8_1
 
 10. Build a new RH9 RPM on gozer
-    ./buildrpm --cvs-update=MAKETOOL_0_8_1 --build-host=gozer
+    ./buildrpm  --build-host=gozer --cvs-update=MAKETOOL_0_8_1
 
 11. In website directory
     cd www
