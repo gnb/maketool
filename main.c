@@ -28,7 +28,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.22 1999-06-01 13:20:56 gnb Exp $");
+CVSID("$Id: main.c,v 1.23 1999-06-01 13:21:56 gnb Exp $");
 
 typedef enum
 {
@@ -252,7 +252,7 @@ reapList(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     for (list = predefs ; list != 0 ; list = list->next)
 	uiAddButton(buildMenu, (const char*)list->data, build_cb, list->data,
 		GR_NOTRUNNING);
-    if (predefs != 0)
+    if (predefs != 0 && availableTargets != 0)
 	uiAddSeparator(buildMenu);
     for (list = availableTargets ; list != 0 ; list = list->next)
 	uiAddButton(buildMenu, (const char*)list->data, build_cb, list->data,
