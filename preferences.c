@@ -49,7 +49,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     /*
      * `Parallel' frame
      */
-    frame = gtk_frame_new("Build commands are run");
+    frame = gtk_frame_new("Make runs commands");
     gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 2, row, row+1);
     gtk_widget_show(frame);
     row++;
@@ -169,38 +169,137 @@ prefs_create_general_page(GtkWidget *toplevel)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static char *variables_titles[] = { "Name", "Value", "Type" };
+
 
 static GtkWidget *
 prefs_create_variables_page(GtkWidget *toplevel)
 {
+    GtkWidget *vbox;
+    GtkWidget *clist;
     GtkWidget *table;
     GtkWidget *label;
     GtkWidget *entry;
+    GtkWidget *hbox;
+    GtkWidget *button;
+    GtkWidget *sb;
+    char *text[3];
     int row = 0;
     
-    table = gtk_table_new(1, 2, FALSE);
-    gtk_container_border_width(GTK_CONTAINER(table), SPACING);
+    vbox = gtk_vbox_new(SPACING, FALSE);
+    gtk_container_border_width(GTK_CONTAINER(vbox), SPACING);
+    gtk_widget_show(vbox);
+    
+    hbox = gtk_hbox_new(0, FALSE);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+    gtk_widget_show(hbox);
+
+    clist = gtk_clist_new_with_titles(3, variables_titles);
+    gtk_box_pack_start(GTK_BOX(hbox), clist, TRUE, TRUE, 0);
+    gtk_widget_show(clist);
+    
+    sb = gtk_vscrollbar_new(GTK_CLIST(clist)->vadjustment);
+    gtk_box_pack_start(GTK_BOX(hbox), sb, FALSE, FALSE, 0);
+    gtk_widget_show(sb);
+    
+    
+    table = gtk_table_new(3, 2, FALSE);
+    gtk_container_border_width(GTK_CONTAINER(table), 0);
+    gtk_table_set_row_spacings(GTK_TABLE(table), SPACING);
+    gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, FALSE, 0);
     gtk_widget_show(table);
     
-    
-    label = gtk_label_new("Editor:");
+    /*
+     * Name
+     */
+    label = gtk_label_new("Name:");
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
     
     entry = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(entry), "...variables...");
     gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
     gtk_widget_show(entry);
     
     row++;
     
-    return table;
+    /*
+     * Value
+     */
+    label = gtk_label_new("Value:");
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
+    gtk_widget_show(label);
+    
+    entry = gtk_entry_new();
+    gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    gtk_widget_show(entry);
+    
+    row++;
+    
+    /*
+     * Type
+     */
+    label = gtk_label_new("Type:");
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
+    gtk_widget_show(label);
+    
+    entry = gtk_entry_new();
+    gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    gtk_widget_show(entry);
+    
+    row++;
+    
+
+    /*
+     * Set & Unset buttons
+     */
+    hbox = gtk_hbox_new(SPACING, FALSE);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+    gtk_widget_show(hbox);
+    
+    button = gtk_button_new_with_label("Set");
+    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+    gtk_widget_show(button);
+
+    button = gtk_button_new_with_label("Unset");
+    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+    gtk_widget_show(button);
+
+
+    /* TODO: do this for real in a separate fn */
+    text[0] = "VARIABLE_ONE";
+    text[1] = "The value for ONE";
+    text[2] = "make";
+    gtk_clist_append(GTK_CLIST(clist), text);
+    text[0] = "VARIABLE_TWO";
+    text[1] = "The value for TWO";
+    text[2] = "make";
+    gtk_clist_append(GTK_CLIST(clist), text);
+    text[0] = "VARIABLE_THREE";
+    text[1] = "The value for THREE";
+    text[2] = "environ";
+    gtk_clist_append(GTK_CLIST(clist), text);
+    text[0] = "VARIABLE_FOUR";
+    text[1] = "The value for FOUR";
+    text[2] = "make";
+    gtk_clist_append(GTK_CLIST(clist), text);
+    text[0] = "VARIABLE_FIVE";
+    text[1] = "The value for FIVE";
+    text[2] = "environ";
+    gtk_clist_append(GTK_CLIST(clist), text);
+    text[0] = "VARIABLE_SIX";
+    text[1] = "The value for SIX";
+    text[2] = "make";
+    gtk_clist_append(GTK_CLIST(clist), text);
+
+    return vbox;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-
+#if 0
 static GtkWidget *
 prefs_create_systems_page(GtkWidget *toplevel)
 {
@@ -228,33 +327,107 @@ prefs_create_systems_page(GtkWidget *toplevel)
     
     return table;
 }
-
+#endif
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static const char programs_key[] = "\
+Key\n\
+%f              source filename\n\
+%l              source line number\n\
+%m              -f makefile if specified\n\
+%p              parallel flags (-j or -k)\n\
+%v              make variable overrides\n\
+%t              make target\n\
+%{x:+y}         y if %x is not empty\n\
+";
 
 static GtkWidget *
-prefs_create_editor_page(GtkWidget *toplevel)
+prefs_create_programs_page(GtkWidget *toplevel)
 {
     GtkWidget *table;
     GtkWidget *label;
     GtkWidget *entry;
     int row = 0;
     
-    table = gtk_table_new(1, 2, FALSE);
+    table = gtk_table_new(4, 2, FALSE);
     gtk_container_border_width(GTK_CONTAINER(table), SPACING);
     gtk_widget_show(table);
     
-    
-    label = gtk_label_new("Editor:");
+    /*
+     * Make program
+     */
+    label = gtk_label_new("Make:");
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
     
     entry = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(entry), "nc -noask -line %d %s");
+    gtk_entry_set_text(GTK_ENTRY(entry), "make %m %p %v %t");
+    gtk_signal_connect(GTK_OBJECT(entry), "changed", 
+    	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
     gtk_widget_show(entry);
     
+    row++;
+    
+    /*
+     * Make target lister
+     */
+    label = gtk_label_new("List make targets:");
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
+    gtk_widget_show(label);
+    
+    entry = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(entry), "extract_targets %m");
+    gtk_signal_connect(GTK_OBJECT(entry), "changed", 
+    	GTK_SIGNAL_FUNC(changed_cb), 0);
+    gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    gtk_widget_show(entry);
+    
+    row++;
+
+    /*
+     * Make version lister
+     */
+    label = gtk_label_new("List make version:");
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
+    gtk_widget_show(label);
+    
+    entry = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(entry), "make --version");
+    gtk_signal_connect(GTK_OBJECT(entry), "changed", 
+    	GTK_SIGNAL_FUNC(changed_cb), 0);
+    gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    gtk_widget_show(entry);
+    
+    row++;
+
+    /*
+     * Editor
+     */
+    label = gtk_label_new("Edit source files:");
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
+    gtk_widget_show(label);
+    
+    entry = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(entry), "nc -noask %{l:+-line %l} %f");
+    gtk_signal_connect(GTK_OBJECT(entry), "changed", 
+    	GTK_SIGNAL_FUNC(changed_cb), 0);
+    gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    gtk_widget_show(entry);
+    
+    row++;
+    
+    /*
+     * Key
+     */
+    label = gtk_label_new(programs_key);
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 2, row, row+1);
+    gtk_widget_show(label);
     row++;
     
     return table;
@@ -262,7 +435,7 @@ prefs_create_editor_page(GtkWidget *toplevel)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-
+#if 0
 static GtkWidget *
 prefs_create_styles_page(GtkWidget *toplevel)
 {
@@ -290,6 +463,7 @@ prefs_create_styles_page(GtkWidget *toplevel)
     
     return table;
 }
+#endif
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -324,23 +498,24 @@ prefs_create_shell(GtkWidget *toplevel)
     				gtk_label_new("Variables"));
     gtk_widget_show(page);
 
-    
+#if 0    
     page = prefs_create_systems_page(toplevel);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), page,
     				gtk_label_new("Systems"));
     gtk_widget_show(page);
-
+#endif
     
-    page = prefs_create_editor_page(toplevel);
+    page = prefs_create_programs_page(toplevel);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), page,
-    				gtk_label_new("Editor"));
+    				gtk_label_new("Programs"));
     gtk_widget_show(page);
 
-    
+#if 0    
     page = prefs_create_styles_page(toplevel);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), page,
     				gtk_label_new("Styles"));
     gtk_widget_show(page);
+#endif
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
