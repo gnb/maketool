@@ -165,6 +165,11 @@ x  Add a feature to watch an existing log file as it grows.
 x  When clicking on errrors from a loaded log file, pathnames should
    be interpreted relative to the log file's directory.
 
-x  Provide a small ctree with 3 rows to preview colour changes in
+x  DONE: Provide a small ctree with 3 rows to preview colour changes in
    Preferences window.
    
+x  Provide a Preferences setting to control what happens when a make
+   run finishes. Nothing; Sound Bell; Flash Window; Run Program.
+   
+x  Add timestamp to log start line, either current time for normal builds
+   or file modification time for log files.

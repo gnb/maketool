@@ -22,7 +22,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: log.c,v 1.19 1999-11-02 11:10:38 gnb Exp $");
+CVSID("$Id: log.c,v 1.20 1999-11-03 02:42:27 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -645,6 +645,26 @@ LogRec *
 log_prev_error(LogRec *lr)
 {
     return log_find_error_aux(lr, FALSE);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+void
+log_get_icon(
+    LogSeverity level,
+    GdkPixmap **open_pmp,
+    GdkBitmap **open_maskp,
+    GdkPixmap **closed_pmp,
+    GdkBitmap **closed_maskp)
+{
+    if (open_pmp != 0)
+	*open_pmp = icons[level].open_pm;
+    if (open_maskp != 0)
+	*open_maskp = icons[level].open_mask;
+    if (closed_pmp != 0)
+	*closed_pmp = icons[level].closed_pm;
+    if (closed_maskp != 0)
+	*closed_maskp = icons[level].closed_mask;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

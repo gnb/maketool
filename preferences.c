@@ -20,8 +20,9 @@
 #include "ui.h"
 #include "maketool.h"
 #include "util.h"
+#include "log.h"
 
-CVSID("$Id: preferences.c,v 1.24 1999-11-02 08:56:23 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.25 1999-11-03 02:42:27 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -51,11 +52,22 @@ const char  	    	*color_labels[COL_MAX];
 static GtkWidget	*color_entries[COL_MAX];
 static int  	    	color_current_index = -1;
 static gboolean     	color_from_selector;
+static GtkWidget    	*color_sample_ctree;
+static GtkCTreeNode 	*color_sample_node[L_MAX];
 
 typedef enum
 {
     VC_NAME, VC_VALUE, VC_TYPE, VC_MAX
 } VarColumns;
+
+static void update_color_sample(void);
+
+#define DEFAULT_COL_BG_INFO	0
+#define DEFAULT_COL_BG_WARNING  "#ffffc2"
+#define DEFAULT_COL_BG_ERROR	"#ffc2c2"
+#define DEFAULT_COL_FG_INFO	0
+#define DEFAULT_COL_FG_WARNING  0
+#define DEFAULT_COL_FG_ERROR	0
 
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -288,12 +300,14 @@ preferences_load(void)
 
     prefs.dryrun = ui_config_get_boolean("dryrun", FALSE);
 
-    prefs.colors[COL_BG_INFO] = ui_config_get_string("bgcolor_info", 0);
-    prefs.colors[COL_BG_WARNING] = ui_config_get_string("bgcolor_warning", "#ffffc2");
-    prefs.colors[COL_BG_ERROR] = ui_config_get_string("bgcolor_error", "#ffc2c2");
-    prefs.colors[COL_FG_INFO] = ui_config_get_string("fgcolor_info", 0);
-    prefs.colors[COL_FG_WARNING] = ui_config_get_string("fgcolor_warning", 0);
-    prefs.colors[COL_FG_ERROR] = ui_config_get_string("fgcolor_error", 0);
+    prefs.colors[COL_BG_INFO] = ui_config_get_string("bgcolor_info", DEFAULT_COL_BG_INFO);
+    prefs.colors[COL_BG_WARNING] = ui_config_get_string("bgcolor_warning", DEFAULT_COL_BG_WARNING);
+    prefs.colors[COL_BG_ERROR] = ui_config_get_string("bgcolor_error", DEFAULT_COL_BG_ERROR);
+    prefs.colors[COL_FG_INFO] = ui_config_get_string("fgcolor_info", DEFAULT_COL_FG_INFO);
+    prefs.colors[COL_FG_WARNING] = ui_config_get_string("fgcolor_warning", DEFAULT_COL_FG_WARNING);
+    prefs.colors[COL_FG_ERROR] = ui_config_get_string("fgcolor_error", DEFAULT_COL_FG_ERROR);
+
+
 }
 
 void
@@ -485,7 +499,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     GList *list;
     int row = 0;
     
-    table = gtk_table_new(6, 2, FALSE);
+    table = gtk_table_new(6, 3, FALSE);
     gtk_container_border_width(GTK_CONTAINER(table), SPACING);
     gtk_widget_show(table);
 
@@ -494,7 +508,7 @@ prefs_create_general_page(GtkWidget *toplevel)
      * `Parallel' frame
      */
     frame = gtk_frame_new(_("Make runs commands"));
-    gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 2, row, row+1);
+    gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 3, row, row+1);
     gtk_widget_show(frame);
     
     table2 = gtk_table_new(3, 2, FALSE);
@@ -561,7 +575,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     edit1_check = gtk_check_button_new_with_label(_("Automatically edit first error"));
     gtk_signal_connect(GTK_OBJECT(edit1_check), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
-    gtk_table_attach_defaults(GTK_TABLE(table), edit1_check, 0, 2, row, row+1);
+    gtk_table_attach_defaults(GTK_TABLE(table), edit1_check, 0, 3, row, row+1);
     gtk_widget_show(edit1_check);
     row++;
     
@@ -571,7 +585,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     editw_check = gtk_check_button_new_with_label(_("Edit Next ignores warnings"));
     gtk_signal_connect(GTK_OBJECT(editw_check), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
-    gtk_table_attach_defaults(GTK_TABLE(table), editw_check, 0, 2, row, row+1);
+    gtk_table_attach_defaults(GTK_TABLE(table), editw_check, 0, 3, row, row+1);
     gtk_widget_show(editw_check);
     row++;
     
@@ -581,7 +595,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     fail_check = gtk_check_button_new_with_label(_("Continue despite failures"));
     gtk_signal_connect(GTK_OBJECT(fail_check), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
-    gtk_table_attach_defaults(GTK_TABLE(table), fail_check, 0, 2, row, row+1);
+    gtk_table_attach_defaults(GTK_TABLE(table), fail_check, 0, 3, row, row+1);
     gtk_widget_show(fail_check);
     row++;
 
@@ -603,7 +617,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_entry_set_editable(GTK_ENTRY(GTK_COMBO(combo)->entry), FALSE);
     gtk_signal_connect(GTK_OBJECT(GTK_COMBO(combo)->entry), "changed", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
-    gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 2, row, row+1);
+    gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 3, row, row+1);
     gtk_widget_show(combo);
     start_action_combo = combo;
     row++;
@@ -618,11 +632,6 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
     
-    hbox = gtk_hbox_new(FALSE, 0);
-    gtk_container_border_width(GTK_CONTAINER(hbox), 0);
-    gtk_table_attach_defaults(GTK_TABLE(table), hbox, 1, 2, row, row+1);
-    gtk_widget_show(hbox);
-
     combo = gtk_combo_new();
     list = 0;
     list = g_list_append(list, _("(default)"));
@@ -636,14 +645,16 @@ prefs_create_general_page(GtkWidget *toplevel)
 		"");
     gtk_signal_connect(GTK_OBJECT(GTK_COMBO(combo)->entry), "changed", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
-    gtk_box_pack_start(GTK_BOX(hbox), combo, TRUE, TRUE, 0);	
+    gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 2, row, row+1);
     gtk_widget_show(combo);
     makefile_entry = GTK_COMBO(combo)->entry;
 
     button = gtk_button_new_with_label(_("Browse..."));
     gtk_signal_connect(GTK_OBJECT(button), "clicked", 
     	GTK_SIGNAL_FUNC(browse_makefile_cb), 0);
-    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, SPACING);	
+    gtk_table_attach(GTK_TABLE(table), button, 2, 3, row, row+1,
+		       (GtkAttachOptions)0, (GtkAttachOptions)0,
+		       SPACING, 0);
     gtk_widget_show(button);
 
     row++;
@@ -1106,6 +1117,7 @@ color_entry_changed_cb(GtkWidget *w, gpointer data)
     }
     	
     ui_dialog_changed(prefs_shell);
+    update_color_sample();
 }
 
 static void
@@ -1123,6 +1135,7 @@ color_selection_change_cb(GtkWidget *w, gpointer data)
     gtk_entry_set_text(GTK_ENTRY(color_entries[color_current_index]), name);
     gtk_entry_select_region(GTK_ENTRY(color_entries[color_current_index]), 0, -1);
     color_from_selector = FALSE;
+    update_color_sample();
 }
 
 static void
@@ -1184,19 +1197,24 @@ prefs_create_color_row(
     
     label = gtk_label_new(color_labels[color_num]);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
-    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
+    gtk_table_attach(GTK_TABLE(table), label, 0, 1, row, row+1,
+		       (GtkAttachOptions)(GTK_FILL|GTK_EXPAND), (GtkAttachOptions)0,
+		       0, 0);
     gtk_widget_show(label);
     
     entry = gtk_entry_new();
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(color_entry_changed_cb), (gpointer)color_num);
-    gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row+1,
+		       (GtkAttachOptions)(GTK_FILL|GTK_EXPAND), (GtkAttachOptions)0,
+		       0, 0);
     gtk_widget_show(entry);
     
     button = gtk_button_new_with_label(_("Choose..."));
     gtk_signal_connect(GTK_OBJECT(button), "clicked", 
     	GTK_SIGNAL_FUNC(color_choose_cb), (gpointer)color_num);
-    gtk_table_attach_defaults(GTK_TABLE(table), button, 2, 3, row, row+1);
+    gtk_table_attach(GTK_TABLE(table), button, 2, 3, row, row+1,
+		       (GtkAttachOptions)0, (GtkAttachOptions)0, SPACING, 0);
     gtk_widget_show(button);
 
     /* 
@@ -1208,14 +1226,65 @@ prefs_create_color_row(
     return entry;
 }
 
+static void
+set_sample_colors(GtkCTreeNode *node, const char *bg, const char *fg)
+{
+    GdkColor col;
+    
+    gtk_ctree_node_set_foreground(GTK_CTREE(color_sample_ctree), node,
+    	(fg != 0 && gdk_color_parse(fg, &col) ? &col : 0));
+    gtk_ctree_node_set_background(GTK_CTREE(color_sample_ctree), node,
+	(bg != 0 && gdk_color_parse(bg, &col) ? &col : 0));
+}
+
+static void
+update_color_sample(void)
+{
+    set_sample_colors(color_sample_node[L_INFO],
+    	gtk_entry_get_text(GTK_ENTRY(color_entries[COL_BG_INFO])),
+    	gtk_entry_get_text(GTK_ENTRY(color_entries[COL_FG_INFO])));
+    set_sample_colors(color_sample_node[L_WARNING],
+    	gtk_entry_get_text(GTK_ENTRY(color_entries[COL_BG_WARNING])),
+    	gtk_entry_get_text(GTK_ENTRY(color_entries[COL_FG_WARNING])));
+    set_sample_colors(color_sample_node[L_ERROR],
+    	gtk_entry_get_text(GTK_ENTRY(color_entries[COL_BG_ERROR])),
+    	gtk_entry_get_text(GTK_ENTRY(color_entries[COL_FG_ERROR])));
+}
+
+static void
+color_reset_old_cb(GtkWidget *w, gpointer data)
+{
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_BG_INFO]), safe_str(prefs.colors[COL_BG_INFO]));
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_FG_INFO]), safe_str(prefs.colors[COL_FG_INFO]));
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_BG_WARNING]), safe_str(prefs.colors[COL_BG_WARNING]));
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_FG_WARNING]), safe_str(prefs.colors[COL_FG_WARNING]));
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_BG_ERROR]), safe_str(prefs.colors[COL_BG_ERROR]));
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_FG_ERROR]), safe_str(prefs.colors[COL_FG_ERROR]));
+    /* update_color_sample(); */
+}
+
+static void
+color_reset_defaults_cb(GtkWidget *w, gpointer data)
+{
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_BG_INFO]), safe_str(DEFAULT_COL_BG_INFO));
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_FG_INFO]), safe_str(DEFAULT_COL_FG_INFO));
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_BG_WARNING]), safe_str(DEFAULT_COL_BG_WARNING));
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_FG_WARNING]), safe_str(DEFAULT_COL_FG_WARNING));
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_BG_ERROR]), safe_str(DEFAULT_COL_BG_ERROR));
+    gtk_entry_set_text(GTK_ENTRY(color_entries[COL_FG_ERROR]), safe_str(DEFAULT_COL_FG_ERROR));
+    /* update_color_sample(); */
+}
 
 static GtkWidget *
 prefs_create_colors_page(GtkWidget *toplevel)
 {
     GtkWidget *table;
+    GtkWidget *ctree, *frame;
+    GtkWidget *hbox, *button;
     int row = 0, i;
+    static char *titles[1] = { "Log" };
     
-    table = gtk_table_new(6, 3, FALSE);
+    table = gtk_table_new(8, 3, FALSE);
     gtk_container_border_width(GTK_CONTAINER(table), SPACING);
     gtk_table_set_row_spacings(GTK_TABLE(table), SPACING);
     gtk_widget_show(table);
@@ -1229,7 +1298,86 @@ prefs_create_colors_page(GtkWidget *toplevel)
     
     for (i = 0 ; i < COL_MAX ; i++)
 	color_entries[i] = prefs_create_color_row(table, row++, i);
+	
+    frame = gtk_frame_new(_("Sample"));
+    gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 3, row, row+1);
+    gtk_widget_show(frame);
 
+    ctree = gtk_ctree_new_with_titles(1, 0, titles);
+    gtk_ctree_set_line_style(GTK_CTREE(ctree), GTK_CTREE_LINES_NONE);
+    gtk_clist_column_titles_hide(GTK_CLIST(ctree));
+    gtk_ctree_set_show_stub(GTK_CTREE(ctree), FALSE);
+    gtk_clist_set_column_width(GTK_CLIST(ctree), 0, 400);
+    gtk_clist_set_column_auto_resize(GTK_CLIST(ctree), 0, TRUE);
+    gtk_container_set_border_width(GTK_CONTAINER(ctree), SPACING);
+    gtk_container_add(GTK_CONTAINER(frame), ctree);
+    for (i=0 ; i<L_MAX ; i++)
+    {
+    	char *text = 0;
+	GtkCTreeNode *node;
+	GdkPixmap *open_pm = 0, *closed_pm = 0;
+	GdkBitmap *open_mask = 0, *closed_mask = 0;
+    	switch (i)
+	{
+	case L_INFO:
+	    text = _("information: yadda yadda yadda");
+	    break;
+	case L_WARNING:
+	    text = _("warning: danger, Will Robinson!");
+	    break;
+	case L_ERROR:
+	    text = _("error: I'm sorry Dave I can't do that");
+	    break;
+	default:
+	    continue;
+	}
+	log_get_icon((LogSeverity)i,
+	    &open_pm, &open_mask,
+	    &closed_pm, &closed_mask);
+	color_sample_node[i] = gtk_ctree_insert_node(GTK_CTREE(ctree),
+    	    (GtkCTreeNode *)0,			/* parent */
+	    (GtkCTreeNode*)0,			/* sibling */
+	    &text,				/* text[] */
+	    0,					/* spacing */
+	    /* TODO: use the correct icons */
+	    closed_pm,
+	    closed_mask,  	    	    	/* pixmap_closed,mask_closed */
+	    open_pm,
+	    open_mask,		    	    	/* pixmap_opened,mask_opened */
+	    TRUE,			    	/* is_leaf */
+	    TRUE);			    	/* expanded */
+    	gtk_ctree_node_set_selectable(GTK_CTREE(ctree), color_sample_node[i],
+	    	    	    	    	FALSE);
+    }
+    gtk_widget_show(ctree);
+    color_sample_ctree = ctree;
+    row++;
+    
+    hbox = gtk_hbox_new(FALSE, SPACING);
+    gtk_table_attach(GTK_TABLE(table), hbox, 0, 3, row, row+1,
+		       (GtkAttachOptions)(GTK_FILL|GTK_EXPAND), (GtkAttachOptions)0,
+		       0, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(hbox), 0);
+    gtk_widget_show(hbox);
+    
+    button = gtk_button_new_with_label(_("Reset to Old"));
+    gtk_signal_connect(GTK_OBJECT(button), "clicked", 
+    	GTK_SIGNAL_FUNC(color_reset_old_cb), 0);
+    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+    gtk_widget_show(button);
+    
+    button = gtk_button_new_with_label(_("Reset to Defaults"));
+    gtk_signal_connect(GTK_OBJECT(button), "clicked", 
+    	GTK_SIGNAL_FUNC(color_reset_defaults_cb), 0);
+    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+    gtk_widget_show(button);
+    
+    row++;
+    
+
+    /* Set the colours of the sample tree widget. Separable. */
+    update_color_sample();
+    
     return table;
 }
 
@@ -1287,7 +1435,6 @@ prefs_create_shell(GtkWidget *toplevel)
     gtk_container_add(GTK_CONTAINER(box), notebook);
     gtk_widget_show(notebook);
 
-    
     page = prefs_create_general_page(toplevel);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), page,
     				gtk_label_new(_("General")));
@@ -1327,6 +1474,7 @@ edit_preferences_cb(GtkWidget *w, gpointer data)
     if (prefs_shell == 0)
 	prefs_create_shell(toplevel);
 	    
+    color_reset_old_cb(0, 0);
     gtk_widget_show(prefs_shell);
 }
 
