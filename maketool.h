@@ -82,6 +82,8 @@ typedef struct
     int win_height;
     
     int log_flags;		/* bitwise OR of LF_* flags */
+    
+    gboolean dryrun;
 } Preferences;
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -119,6 +121,7 @@ void help_about_make_cb(GtkWidget *, gpointer);
 void preferences_load(void);
 void preferences_save(void);
 void preferences_resize(int width, int height);
+void preferences_set_dryrun(gboolean d);
 void edit_preferences_cb(GtkWidget *, gpointer);
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

@@ -112,3 +112,5 @@ x  Remove strict dependancy on POSIX regcomp() for older systems,
 x  Correctly handle user's upgrade from 0.3 to 0.4 by saving new
    prefs items to ~/.maketoolrc.
    
+x  Waaaaah! Need a dryrun mode!!   
+   DONE.

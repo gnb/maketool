@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.35 1999-07-18 01:46:04 gnb Exp $");
+CVSID("$Id: main.c,v 1.36 1999-08-07 15:29:41 gnb Exp $");
 
 typedef enum
 {
@@ -183,6 +183,9 @@ expand_prog(
     expands['v'] = prefs.var_make_flags;
     
     expands['t'] = target;
+    
+    if (prefs.dryrun)
+	expands['n'] = "-n";
     
     out = expand_string(prog, expands);
     
@@ -566,6 +569,14 @@ build_stop_cb(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
+build_dryrun_cb(GtkWidget *w, gpointer data)
+{
+    preferences_set_dryrun(GTK_CHECK_MENU_ITEM(w)->active);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
 build_cb(GtkWidget *w, gpointer data)
 {
     build_start((char *)data);    
@@ -744,6 +755,8 @@ ui_create_menus(GtkWidget *menubar)
     ui_add_tearoff(menu);
     ui_add_button(menu, _("_Again"), "<Ctrl>A", build_again_cb, 0, GR_AGAIN);
     ui_add_button(menu, _("_Stop"), 0, build_stop_cb, 0, GR_RUNNING);
+    ui_add_toggle(menu, _("_Dryrun Only"), "<Ctrl>D", build_dryrun_cb, 0,
+    	0, prefs.dryrun);
     ui_add_separator(menu);
 #if 0
     ui_add_button(menu, "all", 0, build_cb, "all", GR_NOTRUNNING);
@@ -1174,6 +1187,7 @@ parse_args(int argc, char **argv)
 	    	fputs(version_string, stdout);
 	    	exit(0);
 	    }
+	    /* TODO: add -n --dryrun flag */
 	    else
 	    {
 		usage(1);

@@ -21,7 +21,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: preferences.c,v 1.19 1999-07-18 01:46:04 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.20 1999-08-07 15:29:41 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -261,7 +261,7 @@ preferences_load(void)
     prefs_set_var_environment();
     prefs_set_var_make_flags();
     
-    prefs.prog_make = ui_config_get_string("prog_make", "make %m %k %p %v %t");
+    prefs.prog_make = ui_config_get_string("prog_make", "make %n %m %k %p %v %t");
     prefs.prog_list_targets = ui_config_get_string("prog_list_targets", "extract_targets %m %v");
     prefs.prog_list_version = ui_config_get_string("prog_list_version", "make --version");
     prefs.prog_edit_source = ui_config_get_string("prog_edit_source", "nc -noask %{l:+-line %l} %f");
@@ -270,6 +270,8 @@ preferences_load(void)
     prefs.win_height = ui_config_get_int("win_height", 500);
 
     prefs.log_flags = ui_config_get_int("log_flags", LF_DEFAULT_VALUE);
+
+    prefs.dryrun = ui_config_get_boolean("dryrun", FALSE);
 }
 
 void
@@ -299,6 +301,8 @@ preferences_save(void)
     
     ui_config_set_int("log_flags", prefs.log_flags);
 
+    ui_config_set_boolean("dryrun", prefs.dryrun);
+
     ui_config_sync();
 }
 
@@ -309,6 +313,14 @@ preferences_resize(int width, int height)
     prefs.win_height = height;
     ui_config_set_int("win_width", prefs.win_width);
     ui_config_set_int("win_height", prefs.win_height);
+    ui_config_sync();
+}
+
+void
+preferences_set_dryrun(gboolean d)
+{
+    prefs.dryrun = d;
+    ui_config_set_boolean("dryrun", prefs.dryrun);
     ui_config_sync();
 }
 
@@ -855,6 +867,7 @@ Key\n\
 %f              source filename\n\
 %l              source line number\n\
 %m              -f makefile if specified\n\
+%n              dryrun flag (-n) if specified\n\
 %p              parallel flags (-j or -l)\n\
 %k              continue flag (-k) if specified\n\
 %v              make variable overrides\n\
