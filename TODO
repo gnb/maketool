@@ -103,3 +103,5 @@ x  On startup, when preferences or args specify a non-existant makefile,
    
 x  Fix bug whereby run load spinbox saves wrong value to preferences.
    
+x  Add filters to summarise compile lines, and a View menu item
+   to choose between full and summarised version in log window.
