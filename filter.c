@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.30 2003-05-24 05:48:20 gnb Exp $");
+CVSID("$Id: filter.c,v 1.31 2003-09-03 12:03:19 gnb Exp $");
 
 typedef struct
 {
@@ -142,7 +142,7 @@ filter_load(void)
 	"\\1",				/* file */
 	"",				/* line */
 	"",				/* col */
-	"",		    	    	/* summary */
+	"Directory \\1",		/* summary */
     	"gmake recursion - push");	/* comment */
 
     filter_add(
@@ -678,11 +678,18 @@ filter_apply_one(
     if ((i = safe_atoi(buf.data)) > 0)
 	result->column = i;
 
-    if (f->summary_str != 0 && *f->summary_str != '\0')
+    if (f->summary_str != 0)
     {
-	filter_replace_matches(f->summary_str, &buf, line, matches);
-	if (buf.data != 0 && *buf.data != '\0')
-	    result->summary = g_strdup(buf.data);
+    	if (*f->summary_str == '\0')
+	{
+	    result->summary = g_strdup("");
+    	}
+	else
+	{
+	    filter_replace_matches(f->summary_str, &buf, line, matches);
+	    if (buf.data != 0 && *buf.data != '\0')
+		result->summary = g_strdup(buf.data);
+	}
     }
 
     filter_replace_matches(f->file_str, &buf, line, matches);
