@@ -2,7 +2,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: preferences.c,v 1.8 1999-05-25 08:02:48 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.9 1999-05-25 10:29:53 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -20,11 +20,36 @@ static GtkWidget	*makefile_entry;
 static GtkWidget	*var_clist;
 static GtkWidget	*var_name_entry;
 static GtkWidget	*var_value_entry;
-static GtkWidget	*var_type_entry;
+static GtkWidget	*var_type_combo;
 static GtkWidget	*var_set_btn;
 static GtkWidget	*var_unset_btn;
 static gboolean		creating = TRUE, setting = FALSE;
+static char		*var_type_strs[2];
 
+typedef enum
+{
+    VC_NAME, VC_VALUE, VC_TYPE, VC_MAX
+} VarColumns;
+
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static char *
+var_type_to_str(int type)
+{
+    return var_type_strs[type];
+}
+
+static int
+var_str_to_type(const char *str)
+{
+    int i;
+    
+    for (i=0 ; i<ARRAYLEN(var_type_strs) ; i++)
+	if (!strcmp(str, var_type_strs[i]))
+    	    return i;
+    return 0;
+}
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -146,7 +171,6 @@ prefs_set_var_make_flags(void)
     for (list = prefs.variables ; list != 0 ; list = list->next)
     {
     	Variable *var = (Variable *)list->data;
-	const char *p;
 	
 	if (var->type != VAR_MAKE)
 	    continue;
@@ -155,11 +179,21 @@ prefs_set_var_make_flags(void)
 	    estring_append_char(&out, ' ');
 	estring_append_string(&out, var->name);
 	estring_append_char(&out, '=');
-	for (p = var->value ; *p ; p++)
+	if (strchr(var->value, '\''))
 	{
-	    if (strchr(shell_metas, *p))
-		estring_append_char(&out, '\\');
-	    estring_append_char(&out, *p);
+	    const char *p;
+	    for (p = var->value ; *p ; p++)
+	    {
+		if (strchr(shell_metas, *p))
+		    estring_append_char(&out, '\\');
+		estring_append_char(&out, *p);
+	    }
+	}
+	else
+	{
+	    estring_append_char(&out, '\'');
+	    estring_append_string(&out, var->value);
+	    estring_append_char(&out, '\'');
 	}
     }
     
@@ -217,7 +251,7 @@ static void
 prefs_apply_cb(GtkWidget *w, gpointer data)
 {
     char *mf;
-    char *text[3];
+    char *text[VC_MAX];
     int row, nrows;
     
     fprintf(stderr, "prefs_apply_cb()\n");
@@ -261,11 +295,9 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     nrows = GTK_CLIST(var_clist)->rows;        
     for (row = 0 ; row < nrows ; row++)
     {
-	gtk_clist_get_text(GTK_CLIST(var_clist), row, 0, &text[0]);
-	gtk_clist_get_text(GTK_CLIST(var_clist), row, 1, &text[1]);
-	gtk_clist_get_text(GTK_CLIST(var_clist), row, 2, &text[2]);
-	prefs_add_variable(text[0], text[1],
-		(!strcmp(text[2], "make") ? VAR_MAKE : VAR_ENVIRON));
+    	uiCListGetStrings(var_clist, row, VC_MAX, text);
+	prefs_add_variable(text[VC_NAME], text[VC_VALUE],
+		var_str_to_type(text[VC_TYPE]));
     }
     prefs_set_var_environment();
     prefs_set_var_make_flags();
@@ -471,7 +503,7 @@ prefs_create_general_page(GtkWidget *toplevel)
 		"");
     gtk_signal_connect(GTK_OBJECT(GTK_COMBO(combo)->entry), "changed", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
-    gtk_box_pack_start(GTK_BOX(hbox), combo, FALSE, FALSE, 0);	
+    gtk_box_pack_start(GTK_BOX(hbox), combo, TRUE, TRUE, 0);	
     gtk_widget_show(combo);
     makefile_entry = GTK_COMBO(combo)->entry;
 
@@ -500,6 +532,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     return table;
 }
 
+
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
@@ -510,16 +543,14 @@ var_select_cb(
     GdkEvent *event, 
     gpointer data)
 {
-    char *text[3];
+    char *text[VC_MAX];
 
-    gtk_clist_get_text(GTK_CLIST(var_clist), row, 0, &text[0]);
-    gtk_clist_get_text(GTK_CLIST(var_clist), row, 1, &text[1]);
-    gtk_clist_get_text(GTK_CLIST(var_clist), row, 2, &text[2]);
-    
-    setting = TRUE;
-    gtk_entry_set_text(GTK_ENTRY(var_name_entry), text[0]);
-    gtk_entry_set_text(GTK_ENTRY(var_value_entry), text[1]);
-    gtk_entry_set_text(GTK_ENTRY(var_type_entry), text[2]);
+    uiCListGetStrings(var_clist, row, VC_MAX, text);
+
+    setting = TRUE;	/* don't ungrey the Apply button */
+    gtk_entry_set_text(GTK_ENTRY(var_name_entry), text[VC_NAME]);
+    gtk_entry_set_text(GTK_ENTRY(var_value_entry), text[VC_VALUE]);
+    uiComboSetCurrent(var_type_combo, var_str_to_type(text[VC_TYPE]));
     setting = FALSE;
     gtk_widget_set_sensitive(var_set_btn, FALSE);
     gtk_widget_set_sensitive(var_unset_btn, TRUE);
@@ -540,25 +571,23 @@ static void
 var_set_cb(GtkWidget *w, gpointer data)
 {
     int row;
-    char *text[3];
-    char *rtext[3];
+    char *text[VC_MAX];
+    char *rtext[VC_MAX];
     int nrows = GTK_CLIST(var_clist)->rows;
     
-    text[0] = gtk_entry_get_text(GTK_ENTRY(var_name_entry));
-    text[1] = gtk_entry_get_text(GTK_ENTRY(var_value_entry));
-    text[2] = gtk_entry_get_text(GTK_ENTRY(var_type_entry));
+    text[VC_NAME] = gtk_entry_get_text(GTK_ENTRY(var_name_entry));
+    text[VC_VALUE] = gtk_entry_get_text(GTK_ENTRY(var_value_entry));
+    text[VC_TYPE] = var_type_to_str(uiComboGetCurrent(var_type_combo));
         
     for (row = 0 ; row < nrows ; row++)
     {
-	gtk_clist_get_text(GTK_CLIST(var_clist), row, 0, &rtext[0]);
-	if (!strcmp(rtext[0], text[0]))
+    	uiCListGetStrings(var_clist, row, VC_MAX, rtext);
+	if (!strcmp(rtext[VC_NAME], text[VC_NAME]))
 	{
-	    gtk_clist_get_text(GTK_CLIST(var_clist), row, 1, &rtext[1]);
-	    gtk_clist_get_text(GTK_CLIST(var_clist), row, 2, &rtext[2]);
-	    if (!strcmp(text[1], rtext[1]) && !strcmp(text[2], rtext[2]))
+	    if (!strcmp(text[VC_VALUE], rtext[VC_VALUE]) &&
+	        !strcmp(text[VC_TYPE], rtext[VC_TYPE]))
 	    	return;	/* same variable, no change to value or type: ignore */
-	    gtk_clist_set_text(GTK_CLIST(var_clist), row, 1, text[1]);
-	    gtk_clist_set_text(GTK_CLIST(var_clist), row, 2, text[2]);
+    	    uiCListGetStrings(var_clist, row, VC_MAX, text);
 	    break;
 	}
     }
@@ -583,7 +612,7 @@ var_unset_cb(GtkWidget *w, gpointer data)
         
     for (row = 0 ; row < nrows ; row++)
     {
-	gtk_clist_get_text(GTK_CLIST(var_clist), row, 0, &rname);
+	gtk_clist_get_text(GTK_CLIST(var_clist), row, VC_NAME, &rname);
 	if (!strcmp(rname, name))
 	{
 	    gtk_clist_remove(GTK_CLIST(var_clist), row);
@@ -592,10 +621,10 @@ var_unset_cb(GtkWidget *w, gpointer data)
 	}
     }
 
-    setting = TRUE;
+    setting = TRUE; 	/* don't ungrey the Apply button */
     gtk_entry_set_text(GTK_ENTRY(var_name_entry), "");
     gtk_entry_set_text(GTK_ENTRY(var_value_entry), "");
-    gtk_entry_set_text(GTK_ENTRY(var_type_entry), "");
+    uiComboSetCurrent(var_type_combo, 0);
     setting = FALSE;
     gtk_widget_set_sensitive(var_set_btn, FALSE);
     gtk_widget_set_sensitive(var_unset_btn, FALSE);
@@ -616,10 +645,16 @@ prefs_create_variables_page(GtkWidget *toplevel)
     GtkWidget *entry;
     GtkWidget *hbox;
     GtkWidget *button;
+    GtkWidget *combo;
     GtkWidget *sb;
-    char *text[3];
+    char *text[VC_MAX];
     int row = 0;
+    GList *list;
+
     
+    var_type_strs[VAR_MAKE] = _("Make");
+    var_type_strs[VAR_ENVIRON] = _("Environ");
+
     vbox = gtk_vbox_new(FALSE, SPACING);
     gtk_container_border_width(GTK_CONTAINER(vbox), SPACING);
     gtk_widget_show(vbox);
@@ -628,15 +663,15 @@ prefs_create_variables_page(GtkWidget *toplevel)
     gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
     gtk_widget_show(hbox);
 
-    text[0] = _("Name");
-    text[1] = _("Value");
-    text[2] = _("Type");
-    clist = gtk_clist_new_with_titles(3, text);
-    gtk_clist_set_sort_column(GTK_CLIST(clist), 0);
+    text[VC_NAME] = _("Name");
+    text[VC_VALUE] = _("Value");
+    text[VC_TYPE] = _("Type");
+    clist = gtk_clist_new_with_titles(VC_MAX, text);
+    gtk_clist_set_sort_column(GTK_CLIST(clist), VC_NAME);
     gtk_clist_set_auto_sort(GTK_CLIST(clist), TRUE);
-    gtk_clist_set_column_auto_resize(GTK_CLIST(clist), 0, TRUE);
-    gtk_clist_set_column_auto_resize(GTK_CLIST(clist), 1, TRUE);
-    gtk_clist_set_column_auto_resize(GTK_CLIST(clist), 2, TRUE);
+    gtk_clist_set_column_auto_resize(GTK_CLIST(clist), VC_NAME, TRUE);
+    gtk_clist_set_column_auto_resize(GTK_CLIST(clist), VC_VALUE, TRUE);
+    gtk_clist_set_column_auto_resize(GTK_CLIST(clist), VC_TYPE, TRUE);
     gtk_box_pack_start(GTK_BOX(hbox), clist, TRUE, TRUE, 0);
     gtk_signal_connect(GTK_OBJECT(clist), "select_row", 
     	GTK_SIGNAL_FUNC(var_select_cb), 0);
@@ -696,12 +731,17 @@ prefs_create_variables_page(GtkWidget *toplevel)
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
     
-    entry = gtk_entry_new();
-    gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
-    gtk_signal_connect(GTK_OBJECT(entry), "changed", 
+    combo = gtk_combo_new();
+    list = 0;
+    list = g_list_append(list, var_type_strs[0]);
+    list = g_list_append(list, var_type_strs[1]);
+    gtk_combo_set_popdown_strings(GTK_COMBO(combo), list);
+    gtk_entry_set_editable(GTK_ENTRY(GTK_COMBO(combo)->entry), FALSE);
+    gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 2, row, row+1);
+    gtk_signal_connect(GTK_OBJECT(GTK_COMBO(combo)->entry), "changed", 
     	GTK_SIGNAL_FUNC(var_changed_cb), 0);
-    gtk_widget_show(entry);
-    var_type_entry = entry;
+    gtk_widget_show(combo);
+    var_type_combo = combo;
     
     row++;
     
@@ -729,20 +769,13 @@ prefs_create_variables_page(GtkWidget *toplevel)
     gtk_widget_show(button);
     var_unset_btn = button;
 
-
-    /* TODO: do this for real in a separate fn */
+    for (list = prefs.variables ; list != 0 ; list = list->next)
     {
-        GList *list;
-	
-	for (list = prefs.variables ; list != 0 ; list = list->next)
-	{
-	    Variable *var = (Variable *)list->data;
-	    int r;
-	    text[0] = var->name;
-	    text[1] = var->value;
-	    text[2] = (var->type == VAR_MAKE ? "make" : "environ");
-	    r = gtk_clist_append(GTK_CLIST(clist), text);
-	}
+	Variable *var = (Variable *)list->data;
+	text[VC_NAME] = var->name;
+	text[VC_VALUE] = var->value;
+	text[VC_TYPE] = var_type_to_str(var->type);
+	gtk_clist_append(GTK_CLIST(clist), text);
     }
 
     return vbox;

@@ -1,6 +1,6 @@
 #include "ui.h"
 
-CVSID("$Id: ui.c,v 1.6 1999-05-25 08:02:48 gnb Exp $");
+CVSID("$Id: ui.c,v 1.7 1999-05-25 10:29:53 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -18,6 +18,26 @@ void
 uiComboSetCurrent(GtkWidget *combo, int n)
 {
     gtk_list_select_item(GTK_LIST(GTK_COMBO(combo)->list), n);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+void
+uiCListGetStrings(GtkWidget *w, int row, int ncols, char *text[])
+{
+    int i;
+    
+    for (i=0 ; i<ncols ; i++)
+	gtk_clist_get_text(GTK_CLIST(w), row, i, &text[i]);
+}
+
+void
+uiCListSetStrings(GtkWidget *w, int row, int ncols, char *text[])
+{
+    int i;
+    
+    for (i=0 ; i<ncols ; i++)
+	gtk_clist_set_text(GTK_CLIST(w), row, i, text[i]);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

@@ -8,6 +8,9 @@
 int uiComboGetCurrent(GtkWidget *);
 void uiComboSetCurrent(GtkWidget *, int);
 
+void uiCListGetStrings(GtkWidget*, int row, int ncols, char *text[]);
+void uiCListSetStrings(GtkWidget*, int row, int ncols, char *text[]);
+
 void uiGroupAdd(gint group, GtkWidget *w);
 void uiGroupSetSensitive(gint group, gboolean b);
 
