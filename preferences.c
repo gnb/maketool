@@ -21,7 +21,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: preferences.c,v 1.20 1999-08-07 15:29:41 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.21 1999-08-10 15:55:42 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -333,7 +333,9 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     char *text[VC_MAX];
     int row, nrows;
     
+#if DEBUG
     fprintf(stderr, "prefs_apply_cb()\n");
+#endif
     
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(run_radio[RUN_PARALLEL_PROC])))
     	prefs.run_how = RUN_PARALLEL_PROC;
@@ -666,13 +668,18 @@ var_set_cb(GtkWidget *w, gpointer data)
 	    if (!strcmp(text[VC_VALUE], rtext[VC_VALUE]) &&
 	        !strcmp(text[VC_TYPE], rtext[VC_TYPE]))
 	    	return;	/* same variable, no change to value or type: ignore */
-    	    ui_clist_get_strings(var_clist, row, VC_MAX, text);
+    	    /* update list with new value */
+    	    ui_clist_set_strings(var_clist, row, VC_MAX, text);
 	    break;
 	}
     }
-    /* got here, so must not be any row with same variable name */
     
-    gtk_clist_append(GTK_CLIST(var_clist), text);
+    if (row == nrows)
+    {
+    	/* no existing row with this variable */
+	gtk_clist_append(GTK_CLIST(var_clist), text);
+    }
+    
     gtk_widget_set_sensitive(var_set_btn, FALSE);
     gtk_widget_set_sensitive(var_unset_btn, TRUE);
     ui_dialog_changed(prefs_shell);
