@@ -43,5 +43,5 @@ $(INSTALLDIR)/%: %
 
 ############################################################
 
-upload: install
+upload:
 	weex maketool
