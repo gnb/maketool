@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.49 2001-09-21 04:33:04 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.50 2001-09-21 06:38:01 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -1128,8 +1128,8 @@ Key\n\
 %v              make variable overrides\n\
 %t              make target\n\
 %{x:+y}         y if %x is not empty\n\
-%D  	        maketool data directory\n\
-%S  	    	makesystem name\n\
+%D              maketool data directory\n\
+%S              makesystem name\n\
 ");
 
 
