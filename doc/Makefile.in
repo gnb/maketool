@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.5 2003-05-04 06:29:22 gnb Exp $
+# $Id: Makefile.in,v 1.6 2003-05-06 15:14:39 gnb Exp $
 #
 
 top_builddir=	..
@@ -53,7 +53,7 @@ all clean install uninstall::
 
 # Making a distribution
 distdir=	$(top_builddir)/$(PACKAGE)-$(VERSION)/doc
-DISTFILES=	Makefile.in
+DISTFILES=	Makefile.in $(MANPAGE)
 
 dist:
 	for file in $(DISTFILES); do \
