@@ -21,7 +21,7 @@
 #define _common_h_
 
 /*
- * $Id: common.h,v 1.10 2001-07-25 08:35:22 gnb Exp $
+ * $Id: common.h,v 1.11 2001-10-02 11:13:16 gnb Exp $
  */
 
 #include <config.h>
@@ -66,6 +66,13 @@ extern char *strrchr(char *);
 #if HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
+
+#if __GLIBC__ >= 2 && __STDC__
+/* sometimes glibc is just too damn uptight */
+extern FILE *popen (const char *command, const char *modes);
+extern int pclose (FILE *stream);
+#endif
+
 
 /*
  * TODO: autoconf reckons I should check and provide
