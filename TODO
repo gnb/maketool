@@ -20,3 +20,10 @@ x  Implement extraction of targets and generating the Build menu.
 x  Implement extra stuff in the Help menu.
 
 x  ?? Implement tighter GNOME integration.
+
+x  Implement setting environment from Variables.
+
+x  Change the `Type' field in the Variables tab in the
+   Preferences window to a combo box.
+   
+x  I18N.
