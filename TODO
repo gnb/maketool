@@ -1,5 +1,9 @@
 --- open ---
 
+x  Display in the statusbar, between the message and the progress
+   indicator, running counts of number of warnings and errors found
+   since last build start.
+
 x  memleak:
 ==5761== 3074 bytes in 222 blocks are definitely lost in loss record 73 of 82
 ==5761==    at 0x40044364: malloc (vg_clientfuncs.c:100)
@@ -86,8 +90,6 @@ x  Change maketool_client to be public and its default mode to take
 x  When the user cancels a ./configure run from the GUI, this should
    show in the log window instead of "*** [config.status] Error 1".
    
-x  Help: make the browser command configuruable in preferences.
-
 x  Help: organise smart way to generate index at least semi-automatically.
 
 x  Help: figure out a way to hook up help to menu items
@@ -212,8 +214,9 @@ x  Implement case-insensitive literals in Find window.
 x  Handle configure.in/config.status being in an ancestor directory
 
 x  be able to merge multi-line MWOS error messages into 1 summary line??
+   (this is working for MIPSpro).
 
-x  generate column info from MWOS "     ^" stuff
+x  generate column info from MWOS & MIPSpro "     ^" stuff
 
 x  possibly generate token span from line before the MWOS "   ^" stuff.
 
@@ -232,7 +235,8 @@ x  Fix the page name and page orientation combos in the Preferences
 x  When the make child is generating lots of output very quickly, the
    GTK library is starved of CPU and does not repaint the window (which
    is slightly annoying) or allow the user to press Stop (which is
-   very bad).
+   very bad).  Need a "slow machine" heuristic to detect this case
+   at runtime and mitigate it somehow.
    
 x  Add the ability for the user to configure his own toolbar icons,
    including all the existing icons and new icons made up of a sequence
@@ -271,6 +275,8 @@ x  When ./configure is run from make_makefile(), config.status is also
    run afterward, redundantly.
 
 --- closed ---
+
+x  Help: make the browser command configuruable in preferences.
 
 x  Change the preferences so that the actual make executable used is
    specified in exactly one place instead of three (prog_make,
