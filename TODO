@@ -1,5 +1,31 @@
 --- open ---
 
+x  In work_ended(), check whether the makefile has been modified
+   since the last time we read the list of targets from make, and if
+   it has schedule a re-read.  Need to be careful to avoid a loop
+   as list_targets() schedules a task which will cause work_ended()
+   to be called again.
+   
+x  Add an abstraction MakeProgram, with the default being gmake but
+   another entry being IRIX smake.  Delegate the construction of the
+   following flags in expand_prog(): -f, -j/-l, -k, -n.
+   
+x  Expand the MakeSystem/MakeCommand structures to allow per-system
+   commands to specify a callback function or group which allows them
+   to be greyed out when not available, e.g.  in autoconf_maint, don't
+   show "Run configure" until configure exists.
+   
+x  Change the structure of the Build menu to move the per-makesystem
+   commands (except the "Makefile" pseudo-target) into some less
+   obtrusive place, such as a sub-menu.
+   
+x  The length of the Build menu is limited by splitting long lists
+   of targets into sub-menus.  However the width is not controlled.
+   When the menu is split into sub-menus the sub-menu labels are
+   constructed from a pair of targets separated with a dash, which
+   can get quite long, e.g. with automake you can get
+   "mostlyclean-binPROGRAMS - uninstall-binPROGRAMS".
+
 x  On website, change mailto: references to make them easier to use
    for people without Netscape or IE.
 
@@ -236,6 +262,10 @@ x  When ./configure is run from make_makefile(), config.status is also
 
 --- closed ---
 
+x  DONE: Add an abstraction MakeProgram, with the default being gmake but
+   another entry being IRIX smake.  Delegate the construction of the
+   following flags in expand_prog(): -f, -j/-l, -k, -n.
+   
 x  DONE: `Variables' tab in Preferences window needs to shrink.
 
 x  DONE: When user presses `Edit Next' the new selected error
