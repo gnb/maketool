@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: help-common.mk.in,v 1.5 2001-07-25 08:35:26 gnb Exp $
+# $Id: help-common.mk.in,v 1.6 2001-08-28 13:46:58 gnb Exp $
 #
 
 TOPDIR=		../../..
@@ -26,13 +26,14 @@ VERSION=	@VERSION@
 LANG=		$(notdir $(shell pwd))
 helpdir=	$(prefix)/@DATADIRNAME@/$(PACKAGE)/help/$(LANG)
 INSTALL=	@INSTALL@
-SGMLDIR=	/usr/local/share/sgml
-JADE=		jade
+DB2HTML=	db2html
 NSGMLS=		nsgmls
-HTML_MANIFEST=	HTML.manifest
-HTML_FILES=	$(shell cat $(HTML_MANIFEST))
+OUTDIR=		help
+HTML_FILES=	$(wildcard $(OUTDIR)/*.html)
 IMAGES=		$(wildcard *.gif)
 INSTALLABLES=	$(HTML_FILES) $(IMAGES)
+HTML4DTD=	/usr/share/doc/openjade-1.3/pubtext/HTML4.dtd
+HELPBASE=	$(dir $(shell /bin/pwd))
 
 ###
 
@@ -41,40 +42,57 @@ all:: html
 
 html: maketool.html
 
-maketool.html: help.sgml
-	$(JADE) -t sgml -i html -d ../help.dsl $(SGMLDIR)/style/dsssl/docbook/docbook.dcl help.sgml
+maketool.html: help.sgml entities.sgml
+	$(DB2HTML) --dsl $(HELPBASE)/help.dsl $<
+#	$(JADE) -t sgml -i html -d ../help.dsl $(SGMLDIR)/style/dsssl/docbook/docbook.dcl help.sgml
+
+at=@
+entities.sgml: $(HELPBASE)/entities.sgml.in
+	sed \
+	    -e 's|${at}prefix${at}|$(prefix)|g' \
+	    -e 's|${at}osname${at}|$(shell uname -s)|g' \
+	    -e 's|${at}lang${at}|$(LANG)|g' \
+	    < $< > $@
+
 
 # install
-define _install_one
-$(INSTALL) -m 644 $f $(helpdir)
+install:: installdirs
 
-endef
+installdirs::
+	test -d $(helpdir) || $(INSTALL) -d -m 755 $(helpdir)
 
 install::
-	test -d $(helpdir) || $(INSTALL) -d -m 755 $(helpdir)
-	$(foreach f,$(INSTALLABLES),$(_install_one))
+	@echo "Installing..."
+	@for file in $(INSTALLABLES) ; do \
+	    echo $$file; \
+	    $(INSTALL) -m 644 $$file $(helpdir); \
+	done
+
+uninstall::
+	@echo "Uninstalling..."
+	-@for file in $(INSTALLABLES) ; do \
+	    echo $$file; \
+	    $(RM) $(helpdir)/$$file; \
+	done
 
 # check
-define _checkhtml_one
--$(NSGMLS) -sv $(SGMLDIR)/jade/pubtext/HTML4.dcl $f
+# $(NSGMLS) -sv $(SGMLDIR)/jade/pubtext/HTML4.dcl $$file; \
 
-endef
-	
 checkhtml:
-	$(foreach f,$(HTML_FILES),$(_checkhtml_one))
+	@echo "Checking HTML files..."
+	-@for file in dummy $(HTML_FILES) ; do \
+	    test $$file == dummy && continue; \
+	    echo $$file; \
+	    $(NSGMLS) -sv $$file; \
+	done
+	
+checksgml:
+	@echo "Checking SGML..."
+	$(NSGMLS) -sv help.sgml
 	
 #clean
 clean::
-	-$(RM) $(HTML_FILES) $(HTML_MANIFEST)
-
-#uninstall
-define _remove_one
--$(RM) $(helpdir)/$f
-
-endef
-
-uninstall::
-	$(foreach f,$(INSTALLABLES),$(_remove_one))
+	-$(RM) -r $(OUTDIR) $(OUTDIR).junk
 		
 ###
 

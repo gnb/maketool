@@ -25,18 +25,21 @@ suitable for HTML online help.
 (define %html-ext% ".html")
 
 ;; Declare docs HTML 4.0 compliant.  Hopefully they will be ;-)
-(define %html-pubid% "-//W3C//DTD HTML 4.0//EN")
+(define %html-pubid% "-//W3C//DTD HTML 4.0 Transitional//EN")
 
 ;; Filename of the root HTML doc
 (define %root-filename% "maketool")
 
 ;; Generate a manifest file (HTML.manifest) listing all HTML files generated
-(define html-manifest #t)
+;; (define html-manifest #t)
 
 
 ;; Filenames of each HTML file are derived from id= attributes
 (define %use-id-as-filename% #t)
 
+
+;; Add a CSS stylesheet to control appearance of some tags
+;; (define %stylesheet% "help.css")
 
 </style-specification-body>
 </style-specification>
