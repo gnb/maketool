@@ -51,6 +51,7 @@ typedef enum
     LF_SHOW_WARNINGS		=1<<1,
     LF_SHOW_ERRORS		=1<<2,
     LF_SUMMARISE		=1<<3,
+    LF_INDENT_DIRS		=1<<4,
     
     LF_DEFAULT_VALUE=		LF_SHOW_INFO|LF_SHOW_WARNINGS|LF_SHOW_ERRORS
 } LogFlags;

@@ -22,7 +22,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: log.c,v 1.20 1999-11-03 02:42:27 gnb Exp $");
+CVSID("$Id: log.c,v 1.21 1999-11-07 08:08:50 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -45,9 +45,9 @@ static GtkWidget	*logwin;	/* a GtkCTree widget */
 static int		num_errors;
 static int		num_warnings;
 static GList		*log;		/* list of LogRecs */
-static LogRec		*current_build_rec = 0;
 /*static GList		*log_pending_lines = 0;*/ /*TODO*/
 static GList		*log_directory_stack = 0;
+static GList		*log_node_stack = 0;	/* stack of LogRec's */
 static GdkFont		*fonts[L_MAX];
 static GdkColor		foregrounds[L_MAX];
 static gboolean		foreground_set[L_MAX];
@@ -68,6 +68,8 @@ filter_result_init(FilterResult *res)
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+/* TODO: hmm, do the directory names need to be strdup()ed ?? */
 
 static void
 log_change_dir(const char *dir)
@@ -111,6 +113,78 @@ static const char *
 log_current_dir(void)
 {
     return (log_directory_stack == 0 ? 0 : (const char *)log_directory_stack->data);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+log_change_node(LogRec *lr)
+{
+    if (log_node_stack == 0)
+	log_node_stack = g_list_append(log_node_stack, lr);
+    else
+    {
+	log_node_stack->data = lr;
+    }
+}
+
+static void
+log_push_node(LogRec *lr)
+{
+    log_node_stack = g_list_prepend(log_node_stack, lr);
+}
+
+static void
+log_pop_node(void)
+{
+    if (log_node_stack != 0)
+    {
+	log_node_stack = g_list_remove_link(log_node_stack, log_node_stack);
+    }
+}
+
+static void
+log_clear_nodes(void)
+{
+    while (log_node_stack != 0)
+    {
+	log_node_stack = g_list_remove_link(log_node_stack, log_node_stack);
+    }
+}
+
+
+/*
+ * Returns the node nearest the bottom of the stack (i.e.
+ * the rootmost in the log window's tree representation)
+ * with the same directory as the top of the stack. This
+ * trick prevents recursive make's which don't change
+ * directory from appearing as deeper levels in the tree.
+ */
+static LogRec *
+log_current_unique_node(void)
+{
+    GList *link;
+    LogRec *top;
+    
+    if (log_node_stack == 0)
+    	return 0;
+    top = (LogRec *)log_node_stack->data;
+    if (log_node_stack->next == 0 ||
+    	(top->res.code != FR_PUSHDIR && top->res.code != FR_CHANGEDIR))
+	return top;
+	
+    for (link = log_node_stack->next ; link != 0 ; link = link->next)
+    {
+    	LogRec *lr = (LogRec *)link->data;
+    	if ((lr->res.code != FR_PUSHDIR && lr->res.code != FR_CHANGEDIR) ||
+	    strcmp(lr->res.file, top->res.file))
+	    return (LogRec*)link->prev->data;
+    }
+    /*
+     * This should never happen 'cos the bottom-most in
+     * the stack should always be a FR_BUILDSTART.
+     */
+    return 0;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -163,9 +237,10 @@ log_show_rec(LogRec *lr)
 {
     gboolean was_empty = GTK_CTREE_IS_EMPTY(logwin);
     LogSeverity sev = L_INFO;
-    GtkCTreeNode *parent_node = (current_build_rec == 0 ? 0 : current_build_rec->node);
+    LogRec *parent_rec = log_current_unique_node();
     char *text;
-    
+    gboolean is_leaf = TRUE;
+
     switch (lr->res.code)
     {
     case FR_UNDEFINED:		/* same as INFORMATION */
@@ -185,9 +260,29 @@ log_show_rec(LogRec *lr)
 	    return;
     	break;
     case FR_BUILDSTART:
-	current_build_rec = lr;
-	parent_node = 0;
-    	break;
+	log_clear_nodes();
+	log_push_node(lr);
+	parent_rec = 0;
+	is_leaf = FALSE;
+	break;
+    case FR_CHANGEDIR:
+    	if (prefs.log_flags & LF_INDENT_DIRS)
+	{
+    	    log_change_node(lr);
+	    is_leaf = FALSE;
+    	}
+	break;
+    case FR_PUSHDIR:
+    	if (prefs.log_flags & LF_INDENT_DIRS)
+	{
+    	    log_push_node(lr);
+	    is_leaf = FALSE;
+	}
+	break;
+    case FR_POPDIR:
+    	if (prefs.log_flags & LF_INDENT_DIRS)
+    	    log_pop_node();
+	break;
     default:
     	break;
     }
@@ -206,7 +301,7 @@ log_show_rec(LogRec *lr)
     
     /* TODO: freeze & thaw if it redraws the wrong colour 1st */
     lr->node = gtk_ctree_insert_node(GTK_CTREE(logwin),
-    	parent_node,				/* parent */
+    	(parent_rec == 0 ? 0 : parent_rec->node),/* parent */
 	(GtkCTreeNode*)0,			/* sibling */
 	&text,					/* text[] */
 	0,					/* spacing */
@@ -214,7 +309,7 @@ log_show_rec(LogRec *lr)
 	icons[sev].closed_mask,			/* pixmap_closed,mask_closed */
 	icons[sev].open_pm,
 	icons[sev].open_mask,			/* pixmap_opened,mask_opened */
-	(parent_node != 0),			/* is_leaf */
+	is_leaf,	    			/* is_leaf */
 	lr->expanded);				/* expanded */
     gtk_ctree_node_set_row_data(GTK_CTREE(logwin), lr->node, (gpointer)lr);
     /* TODO: support different fonts */

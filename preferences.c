@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.27 1999-11-07 05:58:36 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.28 1999-11-07 08:08:50 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -264,6 +264,7 @@ static UiEnumRec log_flags_def[] = {
 {"SHOW_WARNINGS",	LF_SHOW_WARNINGS},
 {"SHOW_ERRORS",  	LF_SHOW_ERRORS},
 {"SUMMARISE",    	LF_SUMMARISE},
+{"INDENT_DIRS",    	LF_INDENT_DIRS},
 {0, 0}};
 
 void

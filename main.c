@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.42 1999-11-07 05:33:10 gnb Exp $");
+CVSID("$Id: main.c,v 1.43 1999-11-07 08:08:50 gnb Exp $");
 
 typedef enum
 {
@@ -1023,6 +1023,8 @@ ui_create_menus(GtkWidget *menubar)
     	0, log_get_flags() & LF_SHOW_INFO);
     ui_add_toggle(menu, _("_Summary"), 0, view_flags_cb, GINT_TO_POINTER(LF_SUMMARISE),
     	0, log_get_flags() & LF_SUMMARISE);
+    ui_add_toggle(menu, _("_Indent Directories"), 0, view_flags_cb, GINT_TO_POINTER(LF_INDENT_DIRS),
+    	0, log_get_flags() & LF_INDENT_DIRS);
     
     menu = ui_add_menu_right(menubar, _("_Help"));
     ui_add_tearoff(menu);

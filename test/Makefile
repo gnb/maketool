@@ -16,14 +16,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile,v 1.3 1999-11-02 08:49:42 gnb Exp $
+# $Id: Makefile,v 1.4 1999-11-07 08:08:53 gnb Exp $
 #
 
 
 CC=		gcc -Wall
 CFLAGS=		-g
 
-all:: errors targets delay recurse longline unendedline
+all:: errors targets nested delay recurse longline unendedline
 
 errors: error1 error2 error3
 
@@ -48,6 +48,12 @@ targets:
 	: VARIABLE_FIVE = $(VARIABLE_FIVE)
 	: VARIABLE_SIX = $(VARIABLE_SIX)
 	
+nested:
+	+$(MAKE) -C level2 TOPDIR=.. CURRDIR=level2 all
+
+clean::
+	+$(MAKE) -C level2 TOPDIR=.. CURRDIR=level2 clean
+
 delay:
 	sleep 10
 
@@ -67,3 +73,4 @@ longline:
 .PHONY: unendedline
 unendedline:
 	./unendedline
+

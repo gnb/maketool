@@ -1,0 +1,3 @@
+
+include $(TOPDIR)/crud.mk
+

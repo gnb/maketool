@@ -153,13 +153,13 @@ x  An error message which specifies an absolute pathname /abs/path tries
    
 x  Add ability to delete individual make runs from view window
 
-x  Add ability to view multi-directory logs as either flat or
+x  DONE: Add ability to view multi-directory logs as either flat or
    organised hierarchically by directory.
 
 x  DONE: Work out some way to handle the huge number of targets available
    in the Linux kernel toplevel makefile without overflowing the screen.
 
-x  Add option to map directory level to tree indent level
+x  DONE: Add option to map directory level to tree indent level
 
 x  Add a feature to watch an existing log file as it grows.
 
