@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.10 1999-07-14 07:35:50 gnb Exp $
+# $Id: Makefile.in,v 1.11 1999-09-05 04:41:34 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -176,10 +176,7 @@ rpm: dist
 	test -d /usr/src/redhat/SOURCES || $(INSTALL) -m 755 -d /usr/src/redhat/SOURCES
 	$(INSTALL) -m 644 $(DISTTAR) /usr/src/redhat/SOURCES/$(DISTTAR)
 	rpm -ba --clean maketool.spec
-	
-configure: configure.in
-	autoconf --localdir=/usr/share/aclocal
-	
+		
 ##
 # deps
 	
