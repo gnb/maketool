@@ -297,7 +297,7 @@ long show_configure_window(gboolean from_client);
 
 
 #define g_list_find_str(l, s) \
-	g_list_find_custom((l), (s), (GCompareFunc)strcmp)
+	g_list_find_custom((l), (gpointer)(s), (GCompareFunc)strcmp)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
