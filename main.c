@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.71 2001-07-25 08:35:22 gnb Exp $");
+CVSID("$Id: main.c,v 1.72 2001-07-25 09:17:48 gnb Exp $");
 
 
 /*
@@ -1193,6 +1193,23 @@ build_cb(GtkWidget *w, gpointer data)
     build_start((char *)data);    
 }
 
+/*
+ * Same as build_cb() but uses an idle function to
+ * work around a problem with toolbar highlighting.
+ */
+static gboolean
+tool_build_idle_fn(gpointer data)
+{
+    build_start((char *)data);    
+    return FALSE;   /* stop calling me already */
+}
+
+static void
+delayed_build_cb(GtkWidget *w, gpointer data)
+{
+    gtk_idle_add(tool_build_idle_fn, data);    
+}
+
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
@@ -1498,12 +1515,12 @@ ui_create_tools(GtkWidget *toolbar)
 
     tooltip = g_strdup_printf(_("Build `%s'"), "all");
     ui_tool_create(toolbar, "all", tooltip,
-    	all_xpm, build_cb, "all", GR_ALL, "tools-all");
+    	all_xpm, delayed_build_cb, "all", GR_ALL, "tools-all");
     g_free(tooltip);
     
     tooltip = g_strdup_printf(_("Build `%s'"), "clean");
     ui_tool_create(toolbar, "clean", tooltip,
-    	clean_xpm, build_cb, "clean", GR_CLEAN, "tools-clean");
+    	clean_xpm, delayed_build_cb, "clean", GR_CLEAN, "tools-clean");
     g_free(tooltip);
     
     ui_tool_add_space(toolbar);
