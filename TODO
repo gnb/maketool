@@ -1,5 +1,16 @@
 --- open ---
 
+x  Allow the Makefile to be built on-demand, with an entry in the
+   first part of the Build menu.  Turn off automatically building
+   by default.
+
+x  Use config.status if it exists and is not newer than configure
+   or configure.in.
+   
+x  When running configure, pop up a dialog which requests arguments
+   for configure (just a text box initially).  Default value is the
+   last arguments used (from config.status, then from preferences).
+
 x  Help: make the browser command configuruable in preferences.
 
 x  Help: organise smart way to generate index at least semi-automatically.
