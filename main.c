@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.81 2001-09-22 03:33:36 gnb Exp $");
+CVSID("$Id: main.c,v 1.82 2001-09-23 08:05:37 gnb Exp $");
 
 
 /*
@@ -380,11 +380,11 @@ static const MakeSystem makesys_automake =
 	0
     },	    	    	/* deps */
     {
-    	{N_("Run auto_make..."), "automake -a"},
-    	{N_("Run a_utoconf..."), "autoconf"},
-    	{N_("_Remove config.cache..."), "/bin/rm -f config.cache"},
+    	{N_("Run auto_make"), "automake -a"},
+    	{N_("Run a_utoconf"), "autoconf"},
+    	{N_("_Remove config.cache"), "/bin/rm -f config.cache"},
     	{N_("Run _configure..."), 0, build_configure_cb},
-    	{N_("Run config._status..."), "./config.status"},
+    	{N_("Run config._status"), "./config.status"},
 	{0}
     }	    	    	/* commands */
 };
@@ -400,9 +400,9 @@ static const MakeSystem makesys_autoconf_dist =
 	0
     },	    	    	/* deps */
     {
-    	{N_("_Remove config.cache..."), "/bin/rm -f config.cache"},
+    	{N_("_Remove config.cache"), "/bin/rm -f config.cache"},
     	{N_("Run _configure..."), 0, build_configure_cb},
-    	{N_("Run config._status..."), "./config.status"},
+    	{N_("Run config._status"), "./config.status"},
 	{0}
     }	    	    	/* commands */
 };
@@ -419,10 +419,10 @@ static const MakeSystem makesys_autoconf_maint =
 	0
     },	    	    	/* deps */
     {
-    	{N_("Run a_utoconf..."), "autoconf"},
-    	{N_("_Remove config.cache..."), "/bin/rm -f config.cache"},
+    	{N_("Run a_utoconf"), "autoconf"},
+    	{N_("_Remove config.cache"), "/bin/rm -f config.cache"},
     	{N_("Run _configure..."), 0, build_configure_cb},
-    	{N_("Run config._status..."), "./config.status"},
+    	{N_("Run config._status"), "./config.status"},
 	{0}
     }	    	    	/* commands */
 };
@@ -436,7 +436,7 @@ static const MakeSystem makesys_imake =
 	0
     },	    	    	/* deps */
     {
-    	{N_("Run _xmkmf..."), "xmkmf"},
+    	{N_("Run _xmkmf"), "xmkmf"},
 	{0}
     }	    	    	/* commands */
 };
@@ -1707,8 +1707,9 @@ ui_create_menus(GtkWidget *menubar)
     ui_add_button(menu, _("_Help on..."), "F1", help_on_cb, 0, GR_NONE);
     ui_add_separator(menu);
     ui_add_button(menu, _("_Tutorial..."), 0, help_goto_helpname_cb, "tutorial", GR_NONE);
+    ui_add_button(menu, _("Table of _Contents..."), 0, help_goto_helpname_cb, "maketool", GR_NONE);
     ui_add_button(menu, _("Index..."), 0, help_goto_helpname_cb, "index", GR_NONE);
-    ui_add_button(menu, _("_Home Page..."), 0, help_goto_url_cb, HOMEPAGE, GR_NONE);
+    ui_add_button(menu, _("Web Page..."), 0, help_goto_url_cb, HOMEPAGE, GR_NONE);
 #endif
 }
 
