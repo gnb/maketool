@@ -1,18 +1,27 @@
 # List of source files containing strings requiring translation
-# Copyright (c) 1999-2001 Greg Banks
-# $Id: POTFILES.in,v 1.6 2001-09-22 00:57:27 gnb Exp $
+# Copyright (c) 1999-2003 Greg Banks
+# $Id: POTFILES.in,v 1.7 2003-05-24 05:56:58 gnb Exp $
 
 autoconf.c
 autoconf_strs.c
 client.c
 filter.c
 find.c
+gmake.c
 help.c
+imake.c
+irix-makesys.c
 log.c
 main.c
+makeprog.c
+makesys.c
 mqueue.c
+pmake.c
 preferences.c
 print.c
+ps.c
+sunmake.c
 task.c
 ui.c
 uix.c
+util.c
