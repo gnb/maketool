@@ -25,7 +25,7 @@
 #error Why are you even bothering to compile with POSIX regular expressions?
 #endif
 
-CVSID("$Id: pmake.c,v 1.1 2003-02-09 04:59:39 gnb Exp $");
+CVSID("$Id: pmake.c,v 1.2 2003-05-04 04:21:49 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -68,10 +68,22 @@ pmake_dryrun_flags(estring *e)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+/* 
+ * pmake is impossibly modest...there is no way to emit even
+ * a version string, let alone a copyright/authorship message.
+ * So we do the best we can.
+ */
+static const char version_hack[] = 
+"-n _no_such_target_ > /dev/null 2>&1 ;"
+"echo \"BSD Pmake\" ;"
+"echo \"by the NetBSD Project\" ;"
+"echo \"http://www.netbsd.org/\" ;"
+;
+
 static void
 pmake_version_flags(estring *e)
 {
-    estring_append_string(e, "-V"); 	/* TODO: check */
+    estring_append_string(e, version_hack);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -79,8 +91,16 @@ pmake_version_flags(estring *e)
 static void
 pmake_list_targets_flags(estring *e)
 {
+    estring_append_string(e, "-q -d g1 _no_such_target_");
+}
+
+#if HAVE_IRIX_SMAKE
+static void
+irix_smake_list_targets_flags(estring *e)
+{
     estring_append_string(e, "-q -p 1 _no_such_target_");
 }
+#endif
 
 typedef struct
 {
@@ -132,7 +152,7 @@ static void
 pmake_list_targets_input(Task *task, int len, const char *buf)
 {
     PmakeListTargetsTask *ltt = (PmakeListTargetsTask *)task;
-    regmatch_t match;
+    regmatch_t match[2];
 
     /*
      * Save the first few lines of the output to a buffer
@@ -160,7 +180,7 @@ pmake_list_targets_input(Task *task, int len, const char *buf)
     }
     
     /* Match line against the target regular expression. */
-    if (regexec(&ltt->target_re, buf, /*nmatches*/1, &match, 0) == 0)
+    if (regexec(&ltt->target_re, buf, /*nmatches*/2, match, 0) == 0)
     {
     	if (ltt->is_file && ltt->is_target)
 	{
@@ -168,8 +188,8 @@ pmake_list_targets_input(Task *task, int len, const char *buf)
 	    char *targ, oldc;
 	    int len;
 
-	    targ = (char *)buf+match.rm_so;
-	    len = match.rm_eo - match.rm_so;
+	    targ = (char *)buf+match[1].rm_so;
+	    len = match[1].rm_eo - match[1].rm_so;
 	    
 	    oldc = targ[len];
 	    targ[len] = '\0';
@@ -243,11 +263,14 @@ static const char * const pmake_makefiles[] =
     0
 };
 
+#include "BSD-daemon.xpm"
 
 MakeProgram makeprog_pmake = 
 {
     "pmake",
+    "pmake",
     N_("BSD 4.4 pmake"),
+    BSD_daemon_xpm,
     pmake_makefiles,
     pmake_makefile_flags,
     pmake_parallel_flags,
@@ -262,14 +285,16 @@ MakeProgram makeprog_pmake =
 MakeProgram makeprog_irix_smake = 
 {
     "irix-smake",
+    "smake",
     N_("IRIX smake"),
+    /*logo_xpm*/0,
     pmake_makefiles,
     pmake_makefile_flags,
     pmake_parallel_flags,
     pmake_keep_going_flags,
     pmake_dryrun_flags,
     pmake_version_flags,
-    pmake_list_targets_flags,
+    irix_smake_list_targets_flags,
     pmake_list_targets_task
 };
 #endif
