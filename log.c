@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.26 2000-01-03 14:47:14 gnb Exp $");
+CVSID("$Id: log.c,v 1.27 2000-01-04 12:01:46 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -606,10 +606,31 @@ log_get_indent_level(GtkCTreeNode *node)
 static void
 log_print_node(GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
 {
-    FILE *fp = (FILE *)data;
+    PsDocument *ps = (PsDocument *)data;
     LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(GTK_CTREE(logwin), node);
+    LogSeverity sev = L_INFO;
+
+    switch (lr->res.code)
+    {    
+    case FR_UNDEFINED:		/* same as INFORMATION */
+    case FR_INFORMATION:
+    	/* use default font, fgnd, bgnd */
+	if (!(prefs.log_flags & LF_SHOW_INFO))
+	    return;
+    	break;
+    case FR_WARNING:
+	sev = L_WARNING;
+	if (!(prefs.log_flags & LF_SHOW_WARNINGS))
+	    return;
+    	break;
+    case FR_ERROR:
+	sev = L_ERROR;
+	if (!(prefs.log_flags & LF_SHOW_ERRORS))
+	    return;
+    	break;
+    }
     
-    ps_line(fp, log_get_text(lr), log_get_indent_level(node));
+    ps_line(ps, log_get_text(lr), sev, log_get_indent_level(node));
 }
 
 
@@ -617,12 +638,26 @@ void
 log_print(FILE *fp)
 {
     GList *list;
+    PsDocument *ps;
+    int i;
     
-    ps_begin_file(fp);
+    ps = ps_begin(fp);
     /* TODO: other std comments */
-    ps_title(fp, "Maketool log");	/* TODO: more details */
-    ps_prologue(fp);
-    
+    ps_title(ps, "Maketool log");	/* TODO: more details */
+    for (i=0 ; i<L_MAX ; i++)
+    {
+    	if (foreground_set[i])
+	    ps_foreground(ps, i,
+    		(float)foregrounds[i].red / 65535.0,
+    		(float)foregrounds[i].green / 65535.0,
+    		(float)foregrounds[i].blue / 65535.0);
+    	if (background_set[i])
+	    ps_background(ps, i,
+    		(float)backgrounds[i].red / 65535.0,
+    		(float)backgrounds[i].green / 65535.0,
+    		(float)backgrounds[i].blue / 65535.0);
+    }
+    ps_prologue(ps);
     
     for (list=log ; list!=0 ; list=list->next)
     {
@@ -630,10 +665,10 @@ log_print(FILE *fp)
 	
 	if (lr->res.code == FR_BUILDSTART)
 	    gtk_ctree_pre_recursive(GTK_CTREE(logwin), lr->node,
-    	    	    		log_print_node, (gpointer)fp);
+    	    	    		log_print_node, (gpointer)ps);
     }
     
-    ps_end_file(fp);
+    ps_end(ps);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

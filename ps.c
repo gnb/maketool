@@ -21,33 +21,70 @@
 #include "ps.h"
 #include "util.h"
 
-CVSID("$Id: ps.c,v 1.1 1999-12-20 11:04:40 gnb Exp $");
+CVSID("$Id: ps.c,v 1.2 2000-01-04 12:01:46 gnb Exp $");
 
-static gboolean in_page;
-static int page_num;
-static int num_pages;
-static int line;
-static int font_size = 10;
-static int lines_per_page;
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+typedef struct
+{
+    gboolean defined;
+    float red, green, blue;
+} PsColor;
+
+typedef struct
+{
+    PsColor foreground, background;
+} PsStyle;
+
+struct _PsDocument
+{
+    FILE *fp;
+    gboolean in_page;
+    int page_num;
+    int num_pages;
+    int line;
+    int font_size;
+    int lines_per_page;
+    int num_styles;
+    PsStyle *styles;
+    PsColor default_foreground;
+};
+
 
 #define LINE_SPACING 2
 #define INDENT 36   	/* 1/2 in */
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-void
-ps_begin_file(FILE *fp)
+PsDocument *
+ps_begin(FILE *fp)
 {
-    fprintf(fp, "%%!PS-Adobe-2.0\n");
-    fprintf(fp, "%%%%Creator: Greg Banks' Maketool %s\n", VERSION); 
-    fprintf(fp, "%%%%Pages: atend\n"); 
-    in_page = FALSE;
-    page_num = 1;
-    num_pages = 0;
-    line = 0;
+    PsDocument *ps;
     
-    lines_per_page = ((prefs.paper_height - prefs.margin_top - prefs.margin_bottom)
-    	    	      / (font_size + LINE_SPACING));
+    ps = g_new(PsDocument, 1);
+    memset(ps, 0, sizeof(PsDocument));
+    
+    ps->fp = fp;
+    fprintf(ps->fp, "%%!PS-Adobe-2.0\n");
+    fprintf(ps->fp, "%%%%Creator: Greg Banks' Maketool %s\n", VERSION); 
+    fprintf(ps->fp, "%%%%Pages: atend\n"); 
+    ps->in_page = FALSE;
+    ps->page_num = 1;
+    ps->num_pages = 0;
+    ps->line = 0;
+    ps->font_size = 10;
+    ps->num_styles = 0;
+    ps->styles = 0;
+    
+    ps->default_foreground.defined = TRUE;
+    ps->default_foreground.red = 0;
+    ps->default_foreground.green = 0;
+    ps->default_foreground.blue = 0;
+    
+    ps->lines_per_page = ((prefs.paper_height - prefs.margin_top - prefs.margin_bottom)
+    	    	      / (ps->font_size + LINE_SPACING));
+
+    return ps;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -57,9 +94,70 @@ ps_begin_file(FILE *fp)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 void
-ps_title(FILE *fp, const char *title)
+ps_title(PsDocument *ps, const char *title)
 {
-    fprintf(fp, "%%%%Title: %s\n", title); 
+    fprintf(ps->fp, "%%%%Title: %s\n", title); 
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+ps_expand_styles(PsDocument *ps, int n)
+{
+    if (n > ps->num_styles)
+    {
+    	PsStyle *old = ps->styles;
+	
+	ps->styles = g_new(PsStyle, n);
+	if (old != 0)
+	{
+	    memcpy(ps->styles, old, sizeof(PsStyle)*ps->num_styles);
+	    g_free(old);
+	}
+	ps->num_styles = n;
+    }
+}
+
+void
+ps_foreground(PsDocument *ps, int style, float r, float g, float b)
+{
+    PsStyle *s;
+    
+    ps_expand_styles(ps, style+1);
+    s = &ps->styles[style];
+    s->foreground.defined = TRUE;
+    s->foreground.red = r;
+    s->foreground.green = g;
+    s->foreground.blue = b;
+}
+
+static PsColor *
+ps_get_foreground(PsDocument *ps, int style)
+{
+    return (style < ps->num_styles &&
+    	    ps->styles[style].foreground.defined ?
+	    &ps->styles[style].foreground : 0);
+}
+
+void
+ps_background(PsDocument *ps, int style, float r, float g, float b)
+{
+    PsStyle *s;
+    
+    ps_expand_styles(ps, style+1);
+    s = &ps->styles[style];
+    s->background.defined = TRUE;
+    s->background.red = r;
+    s->background.green = g;
+    s->background.blue = b;
+}
+
+static PsColor *
+ps_get_background(PsDocument *ps, int style)
+{
+    return (style < ps->num_styles &&
+    	    ps->styles[style].background.defined ?
+	    &ps->styles[style].background : 0);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -72,12 +170,14 @@ MaketoolDict begin\n\
 /bd{bind def}bind def\n\
 /m{moveto}bd\n\
 /l{lineto}bd\n\
+/c{setrgbcolor}bd\n\
 /b{4 dict begin\n\
-/h exch def /w exch def /y exch def /x exch def\n\
-x y moveto x w add y lineto x w add y h add lineto x y h add lineto\n\
-closepath\n\
-end}bd\n\
+ /h exch def /w exch def /y exch def /x exch def\n\
+ x y moveto x w add y lineto x w add y h add lineto x y h add lineto\n\
+ closepath\n\
+ end}bd\n\
 /s{stroke}bd\n\
+/f{fill}bd\n\
 /t{show}bd\n\
 /bp{_f setfont 0 0 0 setrgbcolor 1 setlinewidth}bd\n\
 /ep{showpage}bd\n\
@@ -86,9 +186,9 @@ end\n\
 ";
 
 void
-ps_prologue(FILE *fp)
+ps_prologue(PsDocument *ps)
 {
-    fputs(prologue, fp);
+    fputs(prologue, ps->fp);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -109,75 +209,104 @@ end %MaketoolDict\n\
 ";
 
 static void
-ps_end_page(FILE *fp)
+ps_end_page(PsDocument *ps)
 {
-    if (in_page)
-	fputs(page_trailer, fp);
-    in_page = FALSE;
+    if (ps->in_page)
+	fputs(page_trailer, ps->fp);
+    ps->in_page = FALSE;
 }
 
 static void
-ps_begin_page(FILE *fp, int n)
+ps_begin_page(PsDocument *ps, int n)
 {
-    fprintf(fp, "%%Page %d %d\n", n, n);
-    fputs(page_setup, fp);
+    fprintf(ps->fp, "%%Page %d %d\n", n, n);
+    fputs(page_setup, ps->fp);
     
     /* Draw a box around the usable area */
-    fprintf(fp, "%d %d %d %d b s\n",
+    fprintf(ps->fp, "%d %d %d %d b s\n",
     	prefs.margin_left,
 	prefs.margin_top,
 	prefs.paper_width - prefs.margin_left - prefs.margin_right,
 	prefs.paper_height - prefs.margin_top - prefs.margin_bottom);
 
-    page_num = n;
-    num_pages++;
-    in_page = TRUE;
+    ps->page_num = n;
+    ps->num_pages++;
+    ps->in_page = TRUE;
 
 }
 
 static void
-ps_next_page(FILE *fp)
+ps_next_page(PsDocument *ps)
 {
     /* End the previous page if any */
-    ps_end_page(fp);
-    ps_begin_page(fp, page_num+1);
+    ps_end_page(ps);
+    ps_begin_page(ps, ps->page_num+1);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-ps_put_escaped_string(FILE *fp, const char *text)
+ps_put_escaped_string(PsDocument *ps, const char *text)
 {
     static const char escapable[] = "\n\r\t\b\f\\()";
     
     for ( ; *text ; text++)
     {
     	if (strchr(escapable, *text) != 0)
-	    fprintf(fp, "\\%03o", (int)*text);
+	    fprintf(ps->fp, "\\%03o", (int)*text);
 	else
-	    fputc(*text, fp);
+	    fputc(*text, ps->fp);
     }
 }
 
+static void
+ps_color(PsDocument *ps, const PsColor *col)
+{
+    if (col != 0)
+	fprintf(ps->fp, "%.3g %.3g %.3g c\n",
+    	    col->red, col->green, col->blue);
+}
+
 void
-ps_line(FILE *fp, const char *text, int indent_level)
+ps_line(
+    PsDocument *ps,
+    const char *text,
+    int style,
+    int indent_level)
 {
     double x, y;
+    PsColor *f, *b;
     
-    if (line == 0)
-    	ps_next_page(fp);
+    f = ps_get_foreground(ps, style);
+    b = ps_get_background(ps, style);
+    
+    if (ps->line == 0)
+    	ps_next_page(ps);
 
     y = prefs.paper_height - prefs.margin_bottom -
-    	    	    (line+1) * (font_size + LINE_SPACING);
+    	    	    (ps->line+1) * (ps->font_size + LINE_SPACING);
     x = prefs.margin_left + indent_level * INDENT;
 
-    fprintf(fp, "%g %g m\n", x, y);
-    fprintf(fp, "(");
-    ps_put_escaped_string(fp, text);
-    fprintf(fp, ") t\n");
+    if (b != 0)
+    {
+    	/* set to background colour */
+	ps_color(ps, b);
+    	/* box around line */
+	fprintf(ps->fp, "%d %d %d %d b f\n",
+    	    prefs.margin_left,
+	    (int)y-LINE_SPACING/2-(int)(0.3 * ps->font_size),  /* hack for descenders */
+	    prefs.paper_width - prefs.margin_left - prefs.margin_right,
+	    ps->font_size + LINE_SPACING);
+	/* set the colour back */
+    }
+    ps_color(ps, (f == 0 ? &ps->default_foreground : f));
+    fprintf(ps->fp, "%g %g m\n", x, y);
+    fprintf(ps->fp, "(");
+    ps_put_escaped_string(ps, text);
+    fprintf(ps->fp, ") t\n");
 
-    if (++line == lines_per_page)
-    	line = 0;
+    if (++ps->line == ps->lines_per_page)
+    	ps->line = 0;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -190,11 +319,13 @@ static const char trailer[] = "\
 ";
 
 void    
-ps_end_file(FILE *fp)
+ps_end(PsDocument *ps)
 {
-    ps_end_page(fp);
-    fprintf(fp, trailer, num_pages);
-    fflush(fp);
+    ps_end_page(ps);
+    fprintf(ps->fp, trailer, ps->num_pages);
+    fflush(ps->fp);
+    
+    g_free(ps);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
