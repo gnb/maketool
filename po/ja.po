@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: maketool 0.6.2\n"
-"POT-Creation-Date: 2000-12-02 04:19+1100\n"
+"POT-Creation-Date: 2001-07-25 16:56+1000\n"
 "PO-Revision-Date: 2000-12-01 19:53+09:00\n"
 "Last-Translator: SATO Satoru <ss@gnome.gr.jp>\n"
 "Language-Team: Japanese <translation@gnome.gr.jp>\n"
@@ -522,57 +522,57 @@ msgstr "(デフォルト)"
 msgid "Browse..."
 msgstr "閲覧..."
 
-#: preferences.c:954
+#: preferences.c:984
 msgid "Make"
 msgstr "Make"
 
-#: preferences.c:955
+#: preferences.c:985
 msgid "Environ"
 msgstr "環境"
 
-#: preferences.c:966
+#: preferences.c:996
 msgid "Name"
 msgstr "名前"
 
-#: preferences.c:967
+#: preferences.c:997
 msgid "Value"
 msgstr "値"
 
-#: preferences.c:968
+#: preferences.c:998
 msgid "Type"
 msgstr "タイプ"
 
 #.
 #. * Name
 #.
-#: preferences.c:995 preferences.c:1592
+#: preferences.c:1025 preferences.c:1622
 msgid "Name:"
 msgstr "名前:"
 
 #.
 #. * Value
 #.
-#: preferences.c:1013
+#: preferences.c:1043
 msgid "Value:"
 msgstr "値:"
 
 #.
 #. * Type
 #.
-#: preferences.c:1031
+#: preferences.c:1061
 msgid "Type:"
 msgstr "タイプ:"
 
-#: preferences.c:1059
+#: preferences.c:1089
 msgid "Set"
 msgstr "設定"
 
-#: preferences.c:1067
+#: preferences.c:1097
 msgid "Unset"
 msgstr "設定を解除"
 
 #. -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#: preferences.c:1080
+#: preferences.c:1110
 msgid ""
 "Key\n"
 "%f              source filename\n"
@@ -600,100 +600,100 @@ msgstr ""
 #.
 #. * Make program
 #.
-#: preferences.c:1114
+#: preferences.c:1144
 msgid "Make:"
 msgstr "Make:"
 
 #.
 #. * Make target lister
 #.
-#: preferences.c:1132
+#: preferences.c:1162
 msgid "List make targets:"
 msgstr "make ターゲットをリスト表示:"
 
 #.
 #. * Make version lister
 #.
-#: preferences.c:1149
+#: preferences.c:1179
 msgid "List make version:"
 msgstr "make のバージョンをリスト表示:"
 
 #.
 #. * Editor
 #.
-#: preferences.c:1166
+#: preferences.c:1196
 msgid "Edit source files:"
 msgstr "ソースファイルを編集:"
 
 #.
 #. * Makefile updater
 #.
-#: preferences.c:1191
+#: preferences.c:1221
 msgid "Build makefile:"
 msgstr "makefile を生成:"
 
-#: preferences.c:1310
+#: preferences.c:1340
 #, c-format
 msgid "Maketool: %s Choose Color"
 msgstr "Maketool: 選択した色 %s"
 
-#: preferences.c:1354
+#: preferences.c:1384
 msgid "Choose..."
 msgstr "選択..."
 
-#: preferences.c:1434
+#: preferences.c:1464
 msgid "Information Background:"
 msgstr "[情報]の背景色:"
 
-#: preferences.c:1435
+#: preferences.c:1465
 msgid "Information Foreground:"
 msgstr "[情報]の前景色:"
 
-#: preferences.c:1436
+#: preferences.c:1466
 msgid "Warning Background:"
 msgstr "[警告]の背景色:"
 
-#: preferences.c:1437
+#: preferences.c:1467
 msgid "Warning Foreground:"
 msgstr "[警告]の前景色:"
 
-#: preferences.c:1438
+#: preferences.c:1468
 msgid "Error Background:"
 msgstr "エラーの背景色:"
 
-#: preferences.c:1439
+#: preferences.c:1469
 msgid "Error Foreground:"
 msgstr "[エラー]の前景色:"
 
-#: preferences.c:1444
+#: preferences.c:1474
 msgid "Sample"
 msgstr "サンプル"
 
-#: preferences.c:1464
+#: preferences.c:1494
 msgid "information: yadda yadda yadda"
 msgstr "情報：いろいろ"
 
-#: preferences.c:1467
+#: preferences.c:1497
 msgid "warning: danger, Will Robinson!"
 msgstr "警告: ロビンソン、危険!"
 
-#: preferences.c:1470
+#: preferences.c:1500
 msgid "error: I'm sorry Dave I can't do that"
 msgstr "エラー: ごめんよ Dave、それはできない"
 
-#: preferences.c:1503
+#: preferences.c:1533
 msgid "Reset to Old"
 msgstr "古い設定にリセット"
 
-#: preferences.c:1509
+#: preferences.c:1539
 msgid "Reset to Defaults"
 msgstr "デフォルト設定にリセット"
 
-#: preferences.c:1529
+#: preferences.c:1559
 msgid "mm"
 msgstr "mm"
 
-#: preferences.c:1567
+#: preferences.c:1597
 msgid ""
 "Large\n"
 "canvas\n"
@@ -707,99 +707,99 @@ msgstr ""
 "実行\n"
 "ここ"
 
-#: preferences.c:1579
+#: preferences.c:1609
 msgid "Paper Size"
 msgstr "ページャーの大きさ"
 
-#: preferences.c:1600
+#: preferences.c:1630
 msgid "A4"
 msgstr "A4"
 
-#: preferences.c:1601
+#: preferences.c:1631
 msgid "B5"
 msgstr "B5"
 
-#: preferences.c:1602
+#: preferences.c:1632
 msgid "US letter"
 msgstr "US レター"
 
-#: preferences.c:1603
+#: preferences.c:1633
 msgid "US legal"
 msgstr "US リーガル"
 
-#: preferences.c:1604
+#: preferences.c:1634
 msgid "Custom"
 msgstr "カスタム"
 
-#: preferences.c:1615
+#: preferences.c:1645
 msgid "Orientation:"
 msgstr "方向:"
 
-#: preferences.c:1623
+#: preferences.c:1653
 msgid "Portrait"
 msgstr "ポートレート"
 
-#: preferences.c:1624
+#: preferences.c:1654
 msgid "Landscape"
 msgstr "ランドスケープ"
 
-#: preferences.c:1635
+#: preferences.c:1665
 msgid "Width:"
 msgstr "幅:"
 
-#: preferences.c:1657
+#: preferences.c:1687
 msgid "Height:"
 msgstr "高さ:"
 
-#: preferences.c:1680
+#: preferences.c:1710
 msgid "Margins"
 msgstr "マージン"
 
-#: preferences.c:1694
+#: preferences.c:1724
 msgid "Left:"
 msgstr "左:"
 
-#: preferences.c:1716
+#: preferences.c:1746
 msgid "Right:"
 msgstr "右:"
 
-#: preferences.c:1738
+#: preferences.c:1768
 msgid "Top:"
 msgstr "上:"
 
-#: preferences.c:1760
+#: preferences.c:1790
 msgid "Bottom:"
 msgstr "下:"
 
-#: preferences.c:1801
+#: preferences.c:1831
 msgid "Editor:"
 msgstr "エディタ:"
 
-#: preferences.c:1888
+#: preferences.c:1918
 msgid "Maketool: Preferences"
 msgstr "Maketool: 設定"
 
-#: preferences.c:1905
+#: preferences.c:1935
 msgid "General"
 msgstr "一般"
 
-#: preferences.c:1911
+#: preferences.c:1941
 msgid "Variables"
 msgstr "変数"
 
-#: preferences.c:1916
+#: preferences.c:1946
 msgid "Programs"
 msgstr "プログラム"
 
-#: preferences.c:1921
+#: preferences.c:1951
 msgid "Colors"
 msgstr "色"
 
-#: preferences.c:1926
+#: preferences.c:1956
 msgid "Page Setup"
 msgstr "ページ設定"
 
-#: preferences.c:1933
+#: preferences.c:1963
 msgid "Styles"
 msgstr "スタイル"
 

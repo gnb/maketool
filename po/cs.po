@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: maketool-0.6.2\n"
-"POT-Creation-Date: 2000-12-11 09:12+1100\n"
+"POT-Creation-Date: 2001-07-25 16:56+1000\n"
 "PO-Revision-Date: 2000-12-08 13:43+0100\n"
 "Last-Translator: Vaclav Slavik <v.slavik@volny.cz>\n"
 "Language-Team: TEAM <LL@li.org>\n"
@@ -517,57 +517,57 @@ msgstr "(standardní)"
 msgid "Browse..."
 msgstr "Najít..."
 
-#: preferences.c:954
+#: preferences.c:984
 msgid "Make"
 msgstr "Make"
 
-#: preferences.c:955
+#: preferences.c:985
 msgid "Environ"
 msgstr "Prostøedí"
 
-#: preferences.c:966
+#: preferences.c:996
 msgid "Name"
 msgstr "Jméno"
 
-#: preferences.c:967
+#: preferences.c:997
 msgid "Value"
 msgstr "Hodnota"
 
-#: preferences.c:968
+#: preferences.c:998
 msgid "Type"
 msgstr "Type"
 
 #.
 #. * Name
 #.
-#: preferences.c:995 preferences.c:1592
+#: preferences.c:1025 preferences.c:1622
 msgid "Name:"
 msgstr "Jméno:"
 
 #.
 #. * Value
 #.
-#: preferences.c:1013
+#: preferences.c:1043
 msgid "Value:"
 msgstr "Hodnota:"
 
 #.
 #. * Type
 #.
-#: preferences.c:1031
+#: preferences.c:1061
 msgid "Type:"
 msgstr "Typ:"
 
-#: preferences.c:1059
+#: preferences.c:1089
 msgid "Set"
 msgstr "Nastavit"
 
-#: preferences.c:1067
+#: preferences.c:1097
 msgid "Unset"
 msgstr "Smazat"
 
 #. -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#: preferences.c:1080
+#: preferences.c:1110
 msgid ""
 "Key\n"
 "%f              source filename\n"
@@ -584,100 +584,100 @@ msgstr ""
 #.
 #. * Make program
 #.
-#: preferences.c:1114
+#: preferences.c:1144
 msgid "Make:"
 msgstr "Make:"
 
 #.
 #. * Make target lister
 #.
-#: preferences.c:1132
+#: preferences.c:1162
 msgid "List make targets:"
 msgstr "Vypsat cíle"
 
 #.
 #. * Make version lister
 #.
-#: preferences.c:1149
+#: preferences.c:1179
 msgid "List make version:"
 msgstr "Vypsat verzi make:"
 
 #.
 #. * Editor
 #.
-#: preferences.c:1166
+#: preferences.c:1196
 msgid "Edit source files:"
 msgstr "Editovat zdrojové soubory:"
 
 #.
 #. * Makefile updater
 #.
-#: preferences.c:1191
+#: preferences.c:1221
 msgid "Build makefile:"
 msgstr "Vytvoøit makefile"
 
-#: preferences.c:1310
+#: preferences.c:1340
 #, c-format
 msgid "Maketool: %s Choose Color"
 msgstr "Maketool: %s Výbìr barvy"
 
-#: preferences.c:1354
+#: preferences.c:1384
 msgid "Choose..."
 msgstr "Vybrat..."
 
-#: preferences.c:1434
+#: preferences.c:1464
 msgid "Information Background:"
 msgstr "Pozadí informací:"
 
-#: preferences.c:1435
+#: preferences.c:1465
 msgid "Information Foreground:"
 msgstr "Text informací:"
 
-#: preferences.c:1436
+#: preferences.c:1466
 msgid "Warning Background:"
 msgstr "Pozadí varování:"
 
-#: preferences.c:1437
+#: preferences.c:1467
 msgid "Warning Foreground:"
 msgstr "Text varování:"
 
-#: preferences.c:1438
+#: preferences.c:1468
 msgid "Error Background:"
 msgstr "Pozadí chyb:"
 
-#: preferences.c:1439
+#: preferences.c:1469
 msgid "Error Foreground:"
 msgstr "Text chyb:"
 
-#: preferences.c:1444
+#: preferences.c:1474
 msgid "Sample"
 msgstr "Pøíklad"
 
-#: preferences.c:1464
+#: preferences.c:1494
 msgid "information: yadda yadda yadda"
 msgstr "information: yadda yadda yadda"
 
-#: preferences.c:1467
+#: preferences.c:1497
 msgid "warning: danger, Will Robinson!"
 msgstr "warning: danger, Will Robinson!"
 
-#: preferences.c:1470
+#: preferences.c:1500
 msgid "error: I'm sorry Dave I can't do that"
 msgstr "error: I'm sorry Dave I can't do that"
 
-#: preferences.c:1503
+#: preferences.c:1533
 msgid "Reset to Old"
 msgstr "Vrátit se ke starým"
 
-#: preferences.c:1509
+#: preferences.c:1539
 msgid "Reset to Defaults"
 msgstr "Vrátit se k standardním"
 
-#: preferences.c:1529
+#: preferences.c:1559
 msgid "mm"
 msgstr ""
 
-#: preferences.c:1567
+#: preferences.c:1597
 msgid ""
 "Large\n"
 "canvas\n"
@@ -691,99 +691,99 @@ msgstr ""
 "goes\n"
 "here"
 
-#: preferences.c:1579
+#: preferences.c:1609
 msgid "Paper Size"
 msgstr "Velikost papíru"
 
-#: preferences.c:1600
+#: preferences.c:1630
 msgid "A4"
 msgstr ""
 
-#: preferences.c:1601
+#: preferences.c:1631
 msgid "B5"
 msgstr ""
 
-#: preferences.c:1602
+#: preferences.c:1632
 msgid "US letter"
 msgstr ""
 
-#: preferences.c:1603
+#: preferences.c:1633
 msgid "US legal"
 msgstr ""
 
-#: preferences.c:1604
+#: preferences.c:1634
 msgid "Custom"
 msgstr "Vlastní"
 
-#: preferences.c:1615
+#: preferences.c:1645
 msgid "Orientation:"
 msgstr "Orientace:"
 
-#: preferences.c:1623
+#: preferences.c:1653
 msgid "Portrait"
 msgstr "na vý¹ku"
 
-#: preferences.c:1624
+#: preferences.c:1654
 msgid "Landscape"
 msgstr "na ¹íøku"
 
-#: preferences.c:1635
+#: preferences.c:1665
 msgid "Width:"
 msgstr "©íøka:"
 
-#: preferences.c:1657
+#: preferences.c:1687
 msgid "Height:"
 msgstr "Vý¹ka:"
 
-#: preferences.c:1680
+#: preferences.c:1710
 msgid "Margins"
 msgstr "Okraje"
 
-#: preferences.c:1694
+#: preferences.c:1724
 msgid "Left:"
 msgstr "Levý:"
 
-#: preferences.c:1716
+#: preferences.c:1746
 msgid "Right:"
 msgstr "Pravý:"
 
-#: preferences.c:1738
+#: preferences.c:1768
 msgid "Top:"
 msgstr "Horní:"
 
-#: preferences.c:1760
+#: preferences.c:1790
 msgid "Bottom:"
 msgstr "Dolní:"
 
-#: preferences.c:1801
+#: preferences.c:1831
 msgid "Editor:"
 msgstr "Editor:"
 
-#: preferences.c:1888
+#: preferences.c:1918
 msgid "Maketool: Preferences"
 msgstr "Maketool: Nastavení"
 
-#: preferences.c:1905
+#: preferences.c:1935
 msgid "General"
 msgstr "Rùzné"
 
-#: preferences.c:1911
+#: preferences.c:1941
 msgid "Variables"
 msgstr "Promnìné"
 
-#: preferences.c:1916
+#: preferences.c:1946
 msgid "Programs"
 msgstr "Programy"
 
-#: preferences.c:1921
+#: preferences.c:1951
 msgid "Colors"
 msgstr "Barvy"
 
-#: preferences.c:1926
+#: preferences.c:1956
 msgid "Page Setup"
 msgstr "Nastavení stránky"
 
-#: preferences.c:1933
+#: preferences.c:1963
 msgid "Styles"
 msgstr "Styly"
 
