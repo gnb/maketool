@@ -4,7 +4,7 @@
 ]>
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.8 2001-08-28 14:57:49 gnb Exp $"
+         revision="$Id: help.sgml,v 1.9 2001-08-29 07:19:42 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool online help</title>
@@ -12,7 +12,7 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2001-08-28 14:57:49 $</pubdate>
+  <pubdate role="cvs">$Date: 2001-08-29 07:19:42 $</pubdate>
   <releaseinfo>This is version &version;</releaseinfo>
   <copyright>
     <year>2000</year>
@@ -1411,7 +1411,9 @@ Makefile:10: *** missing separator.  Stop.
 
 <para>
 If you're still not frightened of metacharacters, go buy a good book on
-the UNIX shell and read it.  You will learn a powerful and useful tool.
+the UNIX shell and read it.  Alternatively, the
+<ulink url="http://linuxdoc.org/LDP/abs/html/index.html">Advanced Bash-Scripting Guide</ulink>
+is available online.  You will learn a powerful and useful tool.
 </para>
 
 
