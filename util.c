@@ -21,7 +21,7 @@
 #include <stdarg.h>
 #include <sys/stat.h>
 
-CVSID("$Id: util.c,v 1.14 2001-07-25 08:35:22 gnb Exp $");
+CVSID("$Id: util.c,v 1.15 2001-09-02 12:56:35 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -102,6 +102,38 @@ estring_free(estring *e)
 	e->length = 0;
 	e->available = 0;
    }
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+const char _util_metachars[] = "'`\"&|$(){};<>\\#*?";
+
+
+int
+strprefix(const char *str, const char *pref)
+{
+    int sl = strlen(str), pl = strlen(pref);
+    if (sl < pl)
+    	return -1;
+    return strncmp(str, pref, pl);
+}
+
+
+char *
+strescape(const char *s)
+{
+    estring e;
+    
+    estring_init(&e);
+    
+    for ( ; *s ; s++)
+    {
+    	if (ismetachar(*s) || isspace(*s))
+	    estring_append_char(&e, '\\');
+	estring_append_char(&e, *s);
+    }
+    
+    return (e.length == 0 ? g_strdup("") : e.data);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

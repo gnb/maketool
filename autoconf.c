@@ -168,40 +168,8 @@ static GtkWidget *preview_page;
 static GtkWidget *preview_text;
 static GtkTooltips *tooltips;
 static gboolean advanced = FALSE;
-static const char metachars[] = "'`\"&|$(){};<>\\#*?";
-
-#define ismetachar(c)	(strchr(metachars, (c)) != 0)
 
 
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-
-static int
-strprefix(const char *str, const char *pref)
-{
-    int sl = strlen(str), pl = strlen(pref);
-    if (sl < pl)
-    	return -1;
-    return strncmp(str, pref, pl);
-}
-
-/* Return a new string which is the old one with shell meta-characters escaped */
-static char *
-strescape(const char *s)
-{
-    estring e;
-    
-    estring_init(&e);
-    
-    for ( ; *s ; s++)
-    {
-    	if (ismetachar(*s) || isspace(*s))
-	    estring_append_char(&e, '\\');
-	estring_append_char(&e, *s);
-    }
-    
-    return (e.length == 0 ? g_strdup("") : e.data);
-}
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 

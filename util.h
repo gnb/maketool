@@ -44,6 +44,20 @@ void estring_free(estring *e);
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+/* Returns non-zero iff c is a shell or make metacharacter */
+extern const char _util_metachars[];
+#define ismetachar(c)	(strchr(_util_metachars, (c)) != 0)
+
+
+/* Returns 0 iff `pref' is the initial part of `str' */
+int strprefix(const char *str, const char *pref);
+
+/*
+ * Return a new string which is the old one with
+ * shell meta-characters and whitespace escaped.
+ */
+char *strescape(const char *s);
+
 /* Result needs to be free()d */
 char *expand_string(const char *in, const char *expands[256]);
 

@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.47 2001-07-26 15:32:58 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.48 2001-09-02 12:56:35 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -219,7 +219,6 @@ prefs_set_var_make_flags(void)
 {
     estring out;
     GList *list;
-    static const char shell_metas[] = " \t\n\r\"'\\*;><?";
     
     estring_init(&out);
     for (list = prefs.variables ; list != 0 ; list = list->next)
@@ -235,16 +234,21 @@ prefs_set_var_make_flags(void)
 	estring_append_char(&out, '=');
 	if (strchr(var->value, '\''))
 	{
-	    const char *p;
-	    for (p = var->value ; *p ; p++)
-	    {
-		if (strchr(shell_metas, *p))
-		    estring_append_char(&out, '\\');
-		estring_append_char(&out, *p);
-	    }
+	    /*
+	     * Shell can't escape single-quote inside single-quoted,
+	     * which is frankly just plain bizarre.  So we do it the
+	     * hard way, backslash-escaping each problematical character.
+	     */
+	    char *escval = strescape(var->value);
+	    estring_append_string(&out, escval);
+	    g_free(escval);
 	}
 	else
 	{
+	    /*
+	     * Use single-quote quoting in preference,
+	     * because it's the most compact form.
+	     */
 	    estring_append_char(&out, '\'');
 	    estring_append_string(&out, var->value);
 	    estring_append_char(&out, '\'');
