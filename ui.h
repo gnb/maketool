@@ -52,6 +52,7 @@ void ui_tool_add_space(GtkWidget *toolbar);
 
 /* Menubar stuff */    
 
+void ui_set_accel_group(GtkAccelGroup *ag);
 GtkWidget *ui_add_menu(GtkWidget *menubar, const char *label);
 GtkWidget *ui_add_menu_right(GtkWidget *menubar, const char *label);
 GtkWidget *ui_add_button(
@@ -61,10 +62,19 @@ GtkWidget *ui_add_button(
     void (*callback)(GtkWidget*, gpointer),
     gpointer calldata,
     gint group);
+GtkWidget *ui_add_button_2(
+    GtkWidget *menu,
+    const char *label,
+    gboolean douline,
+    const char *accel,
+    void (*callback)(GtkWidget*, gpointer),
+    gpointer calldata,
+    gint group);
 GtkWidget *ui_add_tearoff(GtkWidget *menu);
 GtkWidget *ui_add_toggle(
     GtkWidget *menu,
     const char *label,
+    const char *accel,
     void (*callback)(GtkWidget*, gpointer),
     gpointer calldata,
     GtkWidget *radio_other,

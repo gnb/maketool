@@ -24,11 +24,12 @@
 #include "ui.h"
 #include "log.h"
 #include "util.h"
+#include <ctype.h>
 #if HAVE_SIGNAL_H
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.30 1999-06-10 08:47:57 gnb Exp $");
+CVSID("$Id: main.c,v 1.31 1999-06-13 13:37:55 gnb Exp $");
 
 typedef enum
 {
@@ -212,11 +213,27 @@ anim_start(void)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
+append_build_menu_items(GList *list)
+{
+    char *targ;
+
+    for ( ; list != 0 ; list = list->next)
+    {
+    	targ = (char*)list->data;
+    	if (!strcmp(targ, "-"))
+	    ui_add_separator(build_menu);	
+	else
+	    ui_add_button_2(build_menu, targ, FALSE, 0, build_cb, targ,
+	    			GR_NOTRUNNING);
+    }
+}
+
+static void
 reap_list(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 {
     estring *targs = (estring *)user_data;
     char *t, *buf;
-    GList *predefs = 0, *list;
+    GList *predefs = 0;
 
     if (!(WIFEXITED(status) || WIFSIGNALED(status)))
     	return;
@@ -233,11 +250,6 @@ reap_list(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     buf = targs->data;
     while ((t = strtok(buf, " \t\r\n")) != 0)
     {
-    	if (!strcmp(t, "-"))
-	{
-	    ui_add_separator(build_menu);	
-	}
-	else
 	{
     	   t = g_strdup(t);
 	   if (g_list_find_str(predefined_targets, t) != 0)
@@ -255,14 +267,10 @@ reap_list(pid_t pid, int status, struct rusage *usg, gpointer user_data)
      * `all' and `install' will appear early in the menu and
      * will always be visible regardless of its size.
      */
-    for (list = predefs ; list != 0 ; list = list->next)
-	ui_add_button(build_menu, (const char*)list->data, 0, build_cb, list->data,
-		GR_NOTRUNNING);
+    append_build_menu_items(predefs);
     if (predefs != 0 && available_targets != 0)
 	ui_add_separator(build_menu);
-    for (list = available_targets ; list != 0 ; list = list->next)
-	ui_add_button(build_menu, (const char*)list->data, 0, build_cb, list->data,
-		GR_NOTRUNNING);
+    append_build_menu_items(available_targets);
 
     /*
      * Now prepend predefs to available_targets, which is now a
@@ -660,33 +668,33 @@ ui_create_menus(GtkWidget *menubar)
     ui_set_accel_group(ag);
 
     
-    menu = ui_add_menu(menubar, _("File"));
+    menu = ui_add_menu(menubar, _("_File"));
     ui_add_tearoff(menu);
-    ui_add_button(menu, _("Open Log..."), "<Ctrl>O", file_open_cb, 0, GR_NONE);
-    ui_add_button(menu, _("Save Log..."), "<Ctrl>S", file_save_cb, 0, GR_NOTEMPTY);
+    ui_add_button(menu, _("_Open Log..."), "<Ctrl>O", file_open_cb, 0, GR_NONE);
+    ui_add_button(menu, _("_Save Log..."), "<Ctrl>S", file_save_cb, 0, GR_NOTEMPTY);
     ui_add_separator(menu);
 #if 0
-    ui_add_button(menu, _("Change directory..."), 0, unimplemented, 0, GR_NOTRUNNING);
+    ui_add_button(menu, _("_Change directory..."), 0, unimplemented, 0, GR_NOTRUNNING);
     ui_add_separator(menu);
-    ui_add_button(menu, _("Print"), "<Ctrl>P", unimplemented, 0, GR_NOTEMPTY);
-    ui_add_button(menu, _("Print Settings..."), 0, unimplemented, 0, GR_NONE);
+    ui_add_button(menu, _("_Print"), "<Ctrl>P", unimplemented, 0, GR_NOTEMPTY);
+    ui_add_button(menu, _("Print S_ettings..."), 0, unimplemented, 0, GR_NONE);
     ui_add_separator(menu);
 #endif
-    ui_add_button(menu, _("Exit"), "<Ctrl>X", file_exit_cb, 0, GR_NONE);
+    ui_add_button(menu, _("E_xit"), "<Ctrl>X", file_exit_cb, 0, GR_NONE);
     
-    menu = ui_add_menu(menubar, _("Edit"));
+    menu = ui_add_menu(menubar, _("_Edit"));
     ui_add_tearoff(menu);
-    ui_add_button(menu, _("Edit Error"), 0, edit_error_cb, 0, GR_EDITABLE);
-    ui_add_button(menu, _("Edit Next Error"), "<Ctrl>E", edit_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
-    ui_add_button(menu, _("Edit Prev Error"), 0, edit_next_error_cb, GINT_TO_POINTER(FALSE), GR_NOTEMPTY);
+    ui_add_button(menu, _("Edit _Error"), 0, edit_error_cb, 0, GR_EDITABLE);
+    ui_add_button(menu, _("Edit _Next Error"), "<Ctrl>E", edit_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
+    ui_add_button(menu, _("Edit _Prev Error"), 0, edit_next_error_cb, GINT_TO_POINTER(FALSE), GR_NOTEMPTY);
     ui_add_separator(menu);
-    ui_add_button(menu, _("Preferences..."), 0, edit_preferences_cb, 0, GR_NONE);
+    ui_add_button(menu, _("Pre_ferences..."), 0, edit_preferences_cb, 0, GR_NONE);
 
-    menu = ui_add_menu(menubar, _("Build"));
+    menu = ui_add_menu(menubar, _("_Build"));
     build_menu = menu;
     ui_add_tearoff(menu);
-    ui_add_button(menu, _("Again"), "<Ctrl>A", build_again_cb, 0, GR_AGAIN);
-    ui_add_button(menu, _("Stop"), 0, build_stop_cb, 0, GR_RUNNING);
+    ui_add_button(menu, _("_Again"), "<Ctrl>A", build_again_cb, 0, GR_AGAIN);
+    ui_add_button(menu, _("_Stop"), 0, build_stop_cb, 0, GR_RUNNING);
     ui_add_separator(menu);
 #if 0
     ui_add_button(menu, "all", 0, build_cb, "all", GR_NOTRUNNING);
@@ -698,32 +706,32 @@ ui_create_menus(GtkWidget *menubar)
     ui_add_button(menu, "targets", 0, build_cb, "targets", GR_NOTRUNNING);
 #endif
     
-    menu = ui_add_menu(menubar, _("View"));
+    menu = ui_add_menu(menubar, _("_View"));
     ui_add_tearoff(menu);
-    ui_add_button(menu, _("Clear Log"), 0, view_clear_cb, 0, GR_NOTEMPTY);
-    ui_add_button(menu, _("Collapse All"), 0, view_collapse_all_cb, 0, GR_NOTEMPTY);
+    ui_add_button(menu, _("_Clear Log"), 0, view_clear_cb, 0, GR_NOTEMPTY);
+    ui_add_button(menu, _("C_ollapse All"), 0, view_collapse_all_cb, 0, GR_NOTEMPTY);
     ui_add_separator(menu);
-    ui_add_toggle(menu, _("Toolbar"), view_widget_cb, (gpointer)&toolbar_hb, 0, TRUE);
-    ui_add_toggle(menu, _("Statusbar"), view_widget_cb, (gpointer)&messagebox, 0, TRUE);
+    ui_add_toggle(menu, _("_Toolbar"), 0, view_widget_cb, (gpointer)&toolbar_hb, 0, TRUE);
+    ui_add_toggle(menu, _("_Statusbar"), 0, view_widget_cb, (gpointer)&messagebox, 0, TRUE);
     ui_add_separator(menu);
-    ui_add_toggle(menu, _("Errors"), view_flags_cb, GINT_TO_POINTER(LF_SHOW_ERRORS),
+    ui_add_toggle(menu, _("_Errors"), 0, view_flags_cb, GINT_TO_POINTER(LF_SHOW_ERRORS),
     	0, log_get_flags() & LF_SHOW_ERRORS);
-    ui_add_toggle(menu, _("Warnings"), view_flags_cb, GINT_TO_POINTER(LF_SHOW_WARNINGS),
+    ui_add_toggle(menu, _("_Warnings"), 0, view_flags_cb, GINT_TO_POINTER(LF_SHOW_WARNINGS),
     	0, log_get_flags() & LF_SHOW_WARNINGS);
-    ui_add_toggle(menu, _("Information"), view_flags_cb, GINT_TO_POINTER(LF_SHOW_INFO),
+    ui_add_toggle(menu, _("_Information"), 0, view_flags_cb, GINT_TO_POINTER(LF_SHOW_INFO),
     	0, log_get_flags() & LF_SHOW_INFO);
     
-    menu = ui_add_menu_right(menubar, _("Help"));
+    menu = ui_add_menu_right(menubar, _("_Help"));
     ui_add_tearoff(menu);
-    ui_add_button(menu, _("About Maketool..."), 0, help_about_cb, 0, GR_NONE);
-    ui_add_button(menu, _("About make..."), 0, help_about_make_cb, 0, GR_NONE);
+    ui_add_button(menu, _("_About Maketool..."), 0, help_about_cb, 0, GR_NONE);
+    ui_add_button(menu, _("About _make..."), 0, help_about_make_cb, 0, GR_NONE);
 #if 0
     ui_add_separator(menu);
-    ui_add_button(menu, _("Help on..."), 0, unimplemented, 0, GR_NONE);
+    ui_add_button(menu, _("_Help on..."), 0, unimplemented, 0, GR_NONE);
     ui_add_separator(menu);
-    ui_add_button(menu, _("Tutorial"), 0, unimplemented, 0, GR_NONE);
-    ui_add_button(menu, _("Reference Index"), 0, unimplemented, 0, GR_NONE);
-    ui_add_button(menu, _("Home Page"), 0, unimplemented, 0, GR_NONE);
+    ui_add_button(menu, _("_Tutorial"), 0, unimplemented, 0, GR_NONE);
+    ui_add_button(menu, _("_Reference Index"), 0, unimplemented, 0, GR_NONE);
+    ui_add_button(menu, _("_Home Page"), 0, unimplemented, 0, GR_NONE);
 #endif
 }
 

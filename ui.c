@@ -19,7 +19,7 @@
 
 #include "ui.h"
 
-CVSID("$Id: ui.c,v 1.10 1999-06-10 08:47:58 gnb Exp $");
+CVSID("$Id: ui.c,v 1.11 1999-06-13 13:37:55 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -129,6 +129,16 @@ ui_create_file_sel(
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+#define UI_MENU_ACCEL_GROUP	"ui_menu_accel_group"
+
+static GtkAccelGroup *ui_accel_group = 0;
+
+void
+ui_set_accel_group(GtkAccelGroup *ag)
+{
+    ui_accel_group = ag;
+}
+
 
 static GtkWidget *
 _ui_add_menu_aux(
@@ -136,10 +146,20 @@ _ui_add_menu_aux(
     const char *label,
     gboolean is_right)
 {
-    GtkWidget *menu, *item;
+    GtkWidget *menu, *item, *label_w;
+    guint uline_key;
+    
+    label_w = gtk_accel_label_new(label);
+    uline_key = gtk_label_parse_uline(GTK_LABEL(label_w), label);
+    gtk_misc_set_alignment(GTK_MISC(label_w), 0.0, 0.5);
+    gtk_widget_show(label_w);
 
-    item = gtk_menu_item_new_with_label(label);
+    item = gtk_menu_item_new();
+    gtk_container_add(GTK_CONTAINER(item), label_w);
     gtk_widget_show(item);
+    
+    gtk_widget_add_accelerator(item, "activate_item", 
+				ui_accel_group, uline_key, GDK_MOD1_MASK, 0);
 
     menu = gtk_menu_new();
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), menu);
@@ -164,13 +184,94 @@ ui_add_menu_right(GtkWidget *menubar, const char *label)
     return _ui_add_menu_aux(menubar, label, TRUE);
 }
 
-static GtkAccelGroup *ui_accel_group = 0;
-void
-ui_set_accel_group(GtkAccelGroup *ag)
+
+static void
+_ui_add_menu_accel(
+    GtkWidget *menu,
+    GtkWidget *item,
+    guint uline_key)
 {
-    ui_accel_group = ag;
+    GtkAccelGroup *menu_accel_grp;
+    GtkWidget *menu_shell;
+ 
+    if (uline_key == 0)
+    	return;
+
+    menu_accel_grp = gtk_object_get_data(GTK_OBJECT(menu),
+			    UI_MENU_ACCEL_GROUP);
+    if (menu_accel_grp == 0)
+    {
+	menu_accel_grp = gtk_accel_group_new();
+	menu_shell = gtk_widget_get_ancestor(menu, gtk_menu_shell_get_type());
+	gtk_accel_group_attach(menu_accel_grp, GTK_OBJECT(menu_shell));
+	gtk_object_set_data(GTK_OBJECT(menu), UI_MENU_ACCEL_GROUP,
+	    	   	     menu_accel_grp);
+    }
+    gtk_widget_add_accelerator(item, "activate_item", 
+			    menu_accel_grp, uline_key, 0, 0);
 }
 
+
+static void
+_ui_add_accel(
+    GtkWidget *menu,
+    GtkWidget *item,
+    const char *accel)
+{
+    GdkModifierType mods = 0;
+    guint key = 0;
+
+    if (ui_accel_group == 0)
+    	return;
+
+    gtk_accelerator_parse(accel, &key, &mods);
+    gtk_accel_group_add(ui_accel_group,
+	    key, mods, GTK_ACCEL_VISIBLE,
+	    GTK_OBJECT(item), "activate");
+}
+
+
+GtkWidget *
+ui_add_button_2(
+    GtkWidget *menu,
+    const char *label,
+    gboolean douline,
+    const char *accel,
+    void (*callback)(GtkWidget*, gpointer),
+    gpointer calldata,
+    gint group)
+{
+    GtkWidget *item;
+    GtkWidget *label_w;
+    guint uline_key = 0;
+    
+    label_w = gtk_accel_label_new(label);
+    if (douline)
+	 uline_key = gtk_label_parse_uline(GTK_LABEL(label_w), label);
+    gtk_misc_set_alignment(GTK_MISC(label_w), 0.0, 0.5);
+    gtk_widget_show(label_w);
+
+
+    item = gtk_menu_item_new();
+    gtk_container_add(GTK_CONTAINER(item), label_w);
+    
+    gtk_menu_append(GTK_MENU(menu), item);
+    gtk_signal_connect(GTK_OBJECT(item), "activate", 
+    	GTK_SIGNAL_FUNC(callback), calldata);
+    if (group >= 0)
+    	ui_group_add(group, item);
+	
+    /* Handle underline accelerator */
+    if (douline)
+	_ui_add_menu_accel(menu, item, uline_key);
+
+    /* Handle accelerator */
+    if (accel != 0)
+	_ui_add_accel(menu, item, accel);
+
+    gtk_widget_show(item);
+    return item;
+}
 
 GtkWidget *
 ui_add_button(
@@ -181,30 +282,9 @@ ui_add_button(
     gpointer calldata,
     gint group)
 {
-    GtkWidget *item;
-
-    item = gtk_menu_item_new_with_label(label);
-    gtk_menu_append(GTK_MENU(menu), item);
-    gtk_signal_connect(GTK_OBJECT(item), "activate", 
-    	GTK_SIGNAL_FUNC(callback), calldata);
-    if (group >= 0)
-    	ui_group_add(group, item);
-
-    /* Handle accelerator */
-    if (accel != 0 && ui_accel_group != 0)
-    {
-	GdkModifierType mods = 0;
-	guint key = 0;
-		
-	gtk_accelerator_parse(accel, &key, &mods);
-	gtk_accel_group_add(ui_accel_group,
-		key, mods, GTK_ACCEL_VISIBLE,
-		GTK_OBJECT(item), "activate");
-    }
-
-    gtk_widget_show(item);
-    return item;
+    return ui_add_button_2(menu, label, TRUE, accel, callback, calldata, group);
 }
+
 
 GtkWidget *
 ui_add_tearoff(GtkWidget *menu)
@@ -221,29 +301,46 @@ GtkWidget *
 ui_add_toggle(
     GtkWidget *menu,
     const char *label,
+    const char *accel,
     void (*callback)(GtkWidget*, gpointer),
     gpointer calldata,
     GtkWidget *radio_other,
     gboolean set)
 {
-    GtkWidget *item;
+    GtkWidget *item, *label_w;
+    guint uline_key;
     
     if (radio_other == 0)
     {
-	item = gtk_check_menu_item_new_with_label(label);
+	item = gtk_check_menu_item_new();
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), set);
     }
     else
     {
     	GSList *group;
 	group = gtk_radio_menu_item_group(GTK_RADIO_MENU_ITEM(radio_other));
-	item = gtk_radio_menu_item_new_with_label(group, label);
+	item = gtk_radio_menu_item_new(group);
     }
+
+    label_w = gtk_accel_label_new(label);
+    uline_key = gtk_label_parse_uline(GTK_LABEL(label_w), label);
+    gtk_misc_set_alignment(GTK_MISC(label_w), 0.0, 0.5);
+    gtk_widget_show(label_w);
+
+    gtk_container_add(GTK_CONTAINER(item), label_w);
     
     gtk_menu_append(GTK_MENU(menu), item);
     gtk_signal_connect(GTK_OBJECT(item), "activate", 
     	GTK_SIGNAL_FUNC(callback), calldata);
-    gtk_widget_show(item);
+    
+    /* Handle underline accelerator */
+    _ui_add_menu_accel(menu, item, uline_key);
+
+    /* Handle accelerator */
+    if (accel != 0)
+	_ui_add_accel(menu, item, accel);
+
+    gtk_widget_show(item);    
     return item;
 }
 
