@@ -90,3 +90,10 @@ x  Remove line length limitation in filter_apply_one().
 x  Add check for buffer overflow in uiCreateTools().
 
 x  Use getopt?
+
+x  DONE: Remove those irritating variable values from the Preferences window.
+
+x  Fix bug whereby `configure --with-included-gettext' leaves a symlink
+   intl/libintl.h -> intl/libgettext.h which is not removed again when
+   re-configured and causes other builds to break with `symbol dcgettext__
+   not found'.

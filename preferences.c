@@ -21,7 +21,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: preferences.c,v 1.16 1999-06-10 08:47:58 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.17 1999-07-04 03:10:53 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -238,12 +238,14 @@ preferences_init(void)
     prefs.makefile = 0;
     
     prefs.variables = 0;
+#if 0    
     prefs_add_variable("VARIABLE_ONE", "The value for 'ONE'", VAR_MAKE);
     prefs_add_variable("VARIABLE_TWO", "'The' value for TWO", VAR_MAKE);
     prefs_add_variable("VARIABLE_THREE", "'The' value for THREE", VAR_ENVIRON);
     prefs_add_variable("VARIABLE_FOUR", "The value for FOUR", VAR_MAKE);
     prefs_add_variable("VARIABLE_FIVE", "The value for 'FIVE'", VAR_ENVIRON);
     prefs_add_variable("VARIABLE_SIX", "The value for SIX", VAR_MAKE);
+#endif
     prefs_set_var_environment();
     prefs_set_var_make_flags();
     
