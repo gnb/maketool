@@ -173,7 +173,28 @@ x  Add an editor choice for "gvim +%l %f"
 
 x  Fix the page name and page orientation combos in the Preferences
    window to behave correctly and actually be used.
+
+x  The directory /usr/src/redhat/SOURCES is RH-specific.  Mandrake
+   uses the more vendor-neutral /usr/src/RPM/SOURCES which needs
+   to be accomodated.
    
+x  Bug where maketool crashes if first line of make output is empty,
+   e.g. the XFree86 build.
+   
+x  When the make child is generating lots of output very quickly, the
+   GTK library is starved of CPU and does not repaint the window (which
+   is slightly annoying) or allow the user to press Stop (which is
+   very bad).
+   
+x  Add the ability for the user to configure his own toolbar icons,
+   including all the existing icons and new icons made up of a sequence
+   of commands e.g. "Clear log; Build `clean'; Build `all'; Build `install'".
+   
+x  Bug where make variable overrides specified on command line are
+   ignored until Preferences dialog OK is pressed.
+   
+x  Tweak icon to look good when scaled down for taskbar by modern GNOME.
+     
 --- closed ---
 
 x  DONE: `Variables' tab in Preferences window needs to shrink.
