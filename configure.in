@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
-dnl $Id: configure.in,v 1.36 2001-09-22 11:44:46 gnb Exp $
+dnl $Id: configure.in,v 1.37 2001-09-22 11:48:09 gnb Exp $
 dnl
 
 AC_INIT(main.c)
@@ -29,7 +29,7 @@ sinclude(/usr/share/aclocal/gtk.m4)dnl
 AC_CONFIG_HEADER(config.h)
 
 PACKAGE=maketool
-VERSION=0.7-pre1
+VERSION=0.6.99
 
 dnl Checks for programs.
 AC_PROG_INSTALL
