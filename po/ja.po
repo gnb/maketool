@@ -1,79 +1,75 @@
-# Pig Latin translation for Maketool. Well warthog Latin actually.
-# Copyright (C) YEAR Free Software Foundation, Inc.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# ja.po for maketool.
+# Copyright (C) 2000 Free Software Foundation, Inc.
+# SATO Satoru <ss@gnome.gr.jp>, 2000.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: maketool 0.6.2\n"
 "POT-Creation-Date: 2000-12-02 04:19+1100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Greg Banks <gnb@alphalink.com.au>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2000-12-01 19:53+09:00\n"
+"Last-Translator: SATO Satoru <ss@gnome.gr.jp>\n"
+"Language-Team: Japanese <translation@gnome.gr.jp>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
-"Content-Transfer-Encoding: 7bit\n"
+"Content-Type: text/plain; charset=EUC-JP\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 #. TODO: decent error reporting mechanism
 #: filter.c:65 find.c:133
 #, c-format
 msgid "%s: error in regular expression \"%s\": %s\n"
-msgstr "%s: Erratum expressio regularm \"%s\": %s\n"
+msgstr "%s: Àµµ¬É½¸½ \"%s\" ¤Ç¥¨¥é¡¼: %s\n"
 
 #: find.c:282
 msgid "Pattern not found."
-msgstr ""
+msgstr "¥Ñ¥¿¡¼¥ó¤¬¤ß¤Ä¤«¤ê¤Þ¤»¤ó¤Ç¤·¤¿"
 
 #: find.c:360
-#, fuzzy
 msgid "Maketool: Find"
-msgstr "Maketool: Open Loggia Filum"
+msgstr "Maketool: ¸¡º÷"
 
 #: find.c:365
 msgid "Use PageUp/PageDown to recall earlier searches."
-msgstr ""
+msgstr "ºÇ½é¤Î¸¡º÷¤ò¸Æ¤ÓÌá¤¹¤¿¤á¤Ë PageUP/PageDown ¥­¡¼¤ò»È¤¦"
 
 #: find.c:379
 msgid "Search for:"
-msgstr ""
+msgstr "¸¡º÷ÂÐ¾Ý:"
 
 #: find.c:402
 msgid "Literal"
-msgstr ""
+msgstr "¥ê¥Æ¥é¥ë"
 
 #: find.c:408
 msgid "Case Sensitive Literal"
-msgstr ""
+msgstr "ÂçÊ¸»ú¤È¾®Ê¸»ú¤ò¶èÊÌ¤¹¤ë¥ê¥Æ¥é¥ë"
 
 #: find.c:414
 msgid "Regular Expression"
-msgstr ""
+msgstr "Àµµ¬É½¸½"
 
 #: find.c:424
 msgid "Search Forwards"
-msgstr ""
+msgstr "Á°Êý¸¡º÷"
 
 #: find.c:432
 msgid "Search Backwards"
-msgstr ""
+msgstr "¸åÊý¸¡º÷"
 
 #: find.c:440
 msgid "Wrap"
-msgstr ""
+msgstr "¥é¥Ã¥×"
 
 #: find.c:448
-#, fuzzy
 msgid "Find"
-msgstr "_Filum"
+msgstr "¸¡º÷"
 
 #: find.c:450
 msgid "Close"
-msgstr ""
+msgstr "ÊÄ¤¸¤ë"
 
 #: help.c:50
-#, fuzzy
 msgid "Maketool: Licence"
-msgstr "Maketool: Open Loggia Filum"
+msgstr "Maketool: ¥é¥¤¥»¥ó¥¹"
 
 #: help.c:79
 msgid ""
@@ -83,506 +79,497 @@ msgid ""
 "under certain conditions; press the Licence button\n"
 "for details."
 msgstr ""
+"Maketool ¤Ï¤Þ¤Ã¤¿¤¯ÌµÊÝ¾Ú¤Ç¤¹¡£¤³¤ì¤Ï¥Õ¥ê¡¼¥½¥Õ¥È\n"
+"¥¦¥§¥¢¤Ç¡¢»ØÄê¾ò·ï²¼¤Ç¤ÎºÆÇÛÉÛ¤ò´¿·Þ¤·¤Þ¤¹¡£¥é¥¤\n"
+"¥»¥ó¥¹¤Î¾ÜºÙ¤Ë¤Ä¤¤¤Æ¤Ï¥é¥¤¥»¥ó¥¹¥Ü¥¿¥ó¤ò¥¯¥ê¥Ã¥¯\n"
+"¤·¤Æ»²¾È¤·¤Æ²¼¤µ¤¤¡£"
 
 #: help.c:107
 msgid "Maketool: About"
-msgstr "Maketool: Re"
+msgstr "Maketool: ³µÍ×"
 
 #: help.c:129
 msgid "Licence..."
-msgstr "Licencum..."
+msgstr "¥é¥¤¥»¥ó¥¹..."
 
 #: help.c:162
 msgid "Maketool: About Make"
-msgstr "Maketool: Re Make"
+msgstr "Maketool: Make ¤Ë¤Ä¤¤¤Æ"
 
 #: log.c:367
-#, fuzzy, c-format
+#, c-format
 msgid "%d errors"
-msgstr ", %d errata"
+msgstr "%d ¥¨¥é¡¼"
 
 #: log.c:374
-#, fuzzy, c-format
+#, c-format
 msgid "%d warnings"
-msgstr ", %d warnia"
+msgstr "%d ·Ù¹ð"
 
 #: log.c:597
 #, c-format
 msgid "Log file %s"
-msgstr "Filum Loggia %s"
+msgstr "¥í¥°¥Õ¥¡¥¤¥ë %s"
 
 #. Note: this assumes that the accelerator remains constant, i.e. Ctrl+A,
 #. *       even though the position of the underscore in the label
 #. *       may change.
 #.
 #: main.c:248
-#, fuzzy, c-format
+#, c-format
 msgid "_Again (%s)"
-msgstr "_Repetum"
+msgstr "ºÆ¼Â¹Ô(_A)(%s)"
 
 #: main.c:254
-#, fuzzy, c-format
+#, c-format
 msgid "Build `%s' again"
-msgstr "Facit `%s'"
+msgstr "ºÆÅÙ `%s' ¤ò¥Ó¥ë¥É"
 
 #: main.c:566
 #, c-format
 msgid "Editing %s (line %d)"
-msgstr "Edentata %s (linea %d)"
+msgstr "%s ¤òÊÔ½¸Ãæ(¹Ô %d)"
 
 #: main.c:700
-#, fuzzy
 msgid "Maketool: Finished"
-msgstr "Maketool: Open Loggia Filum"
+msgstr "Maketool: ´°Î»"
 
 #: main.c:724
-#, fuzzy, c-format
+#, c-format
 msgid "Finished building `%s'\n"
-msgstr "Facit completio %s%s%s%s"
+msgstr "`%s' ¤Î¥Ó¥ë¥É¤¬´°Î»¤·¤Þ¤·¤¿\n"
 
 #: main.c:727
-#, fuzzy, c-format
+#, c-format
 msgid "%d errors\n"
-msgstr ", %d errata"
+msgstr "%d ¥¨¥é¡¼\n"
 
 #: main.c:730
-#, fuzzy, c-format
+#, c-format
 msgid "%d warnings\n"
-msgstr ", %d warnia"
+msgstr "%d ·Ù¹ð\n"
 
 #: main.c:751
 #, c-format
 msgid "Making %s"
-msgstr "Facit %s"
+msgstr "%s ¤ò make Ãæ"
 
 #: main.c:786
 #, c-format
 msgid ", %d errors"
-msgstr ", %d errata"
+msgstr ", %d ¥¨¥é¡¼"
 
 #: main.c:789
 #, c-format
 msgid ", %d warnings"
-msgstr ", %d warnia"
+msgstr ", %d ·Ù¹ð"
 
 #: main.c:792
 msgid " (interrupted)"
-msgstr " (interruptus)"
+msgstr " (ÃæÃÇ)"
 
 #: main.c:794
 #, c-format
 msgid "Finished making %s%s%s%s"
-msgstr "Facit completio %s%s%s%s"
+msgstr "%s%s%s%s ¤Î make ¤ò´°Î»¤·¤Þ¤·¤¿"
 
 #: main.c:913
 msgid "Maketool: Open Log File"
-msgstr "Maketool: Open Loggia Filum"
+msgstr "Maketool: ¥í¥°¥Õ¥¡¥¤¥ë¤ò³«¤¯"
 
 #: main.c:941
 msgid "Maketool: Save Log File"
-msgstr "Maketool: Save Loggia Filum"
+msgstr "Maketool: ¥í¥°¥Õ¥¡¥¤¥ë¤òÊÝÂ¸"
 
 #: main.c:988
 msgid "No previous directories"
-msgstr ""
+msgstr "°ÊÁ°¤Î¥Ç¥£¥ì¥¯¥È¥ê¤¬Â¸ºß¤·¤Þ¤»¤ó"
 
 #: main.c:1078
-#, fuzzy
 msgid "Maketool: Change Directory"
-msgstr "Directatum _Changæ"
+msgstr "Maketool: ¥Ç¥£¥ì¥¯¥È¥ê¤òÊÑ¹¹"
 
 #: main.c:1151
 msgid "No makefile appears to be present in this directory"
-msgstr ""
+msgstr "¤³¤Î¥Ç¥£¥ì¥¯¥È¥ê¤Ë¤Ï Makefile ¤¬Â¸ºß¤·¤Þ¤»¤ó"
 
 #: main.c:1155
-#, fuzzy, c-format
+#, c-format
 msgid "Editing %s"
-msgstr "Edentata %s (linea %d)"
+msgstr "%s ¤òÊÔ½¸Ãæ"
 
 #: main.c:1267 main.c:1299
 msgid "No more errors in log"
-msgstr "Erratum in loggia nil est"
+msgstr "¥í¥°¤Ë¤Ï¤â¤¦¥¨¥é¡¼¤Ï¤¢¤ê¤Þ¤»¤ó"
 
 #: main.c:1389
 msgid "_Again"
-msgstr "_Repetum"
+msgstr "ºÆ¼Â¹Ô(_A)"
 
 #: main.c:1390
 msgid "_Stop"
-msgstr "_Endare"
+msgstr "Ää»ß(_S)"
 
 #: main.c:1391
 msgid "_Dryrun Only"
-msgstr ""
+msgstr "¥É¥é¥¤¥é¥ó¤Î¤ß(¼ÂºÝ¤Ë¤Ï¼Â¹Ô¤·¤Ê¤¤)(_D)"
 
 #: main.c:1408
 msgid "_File"
-msgstr "_Filum"
+msgstr "¥Õ¥¡¥¤¥ë(_F)"
 
 #: main.c:1410
 msgid "_Open Log..."
-msgstr "_Open Loggia..."
+msgstr "¥í¥°¤ò³«¤¯(_O)..."
 
 #: main.c:1411
 msgid "_Save Log..."
-msgstr "_Save Loggia..."
+msgstr "¥í¥°¤òÊÝÂ¸(_S)..."
 
 #: main.c:1413
-#, fuzzy
 msgid "_Change Directory..."
-msgstr "Directatum _Changæ"
+msgstr "¥Ç¥£¥ì¥¯¥È¥ê¤òÊÑ¹¹(_C)..."
 
 #: main.c:1414
-#, fuzzy
 msgid "_Previous Directories"
-msgstr "_Indentus Directorum"
+msgstr "Á°¤Î¥Ç¥£¥ì¥¯¥È¥ê(_P)"
 
 #: main.c:1418
-#, fuzzy
 msgid "_Edit Makefile..."
-msgstr "_Re Maketool..."
+msgstr "Makefile ¤òÊÔ½¸(_E)..."
 
 #: main.c:1420
-#, fuzzy
 msgid "_Print..."
-msgstr "_Printare"
+msgstr "°õºþ(_P)..."
 
 #: main.c:1422
 msgid "E_xit"
-msgstr "E_xitus"
+msgstr "½ªÎ»(_x)"
 
 #: main.c:1424
 msgid "_Edit"
-msgstr "_Editare"
+msgstr "ÊÔ½¸(_E)"
 
 #: main.c:1426
 msgid "Edit _Error"
-msgstr ""
+msgstr "¥¨¥é¡¼¤òÊÔ½¸(_E)"
 
 #: main.c:1427
 msgid "Edit _Next Error"
-msgstr ""
+msgstr "¼¡¤Î¥¨¥é¡¼¤òÊÔ½¸(_N)"
 
 #: main.c:1428
 msgid "Edit _Prev Error"
-msgstr ""
+msgstr "Á°¤Î¥¨¥é¡¼¤òÊÔ½¸(_P)"
 
 #: main.c:1429
 msgid "Edit Next _File Error"
-msgstr ""
+msgstr "¼¡¤Î¥Õ¥¡¥¤¥ë¥¨¥é¡¼¤òÊÔ½¸(_F)"
 
 #: main.c:1431
-#, fuzzy
 msgid "_Copy"
-msgstr "_Endare"
+msgstr "¥³¥Ô¡¼(_C)"
 
 #: main.c:1433
-#, fuzzy
 msgid "_Find..."
-msgstr "_Filum"
+msgstr "¸¡º÷(_F)..."
 
 #: main.c:1434
-#, fuzzy
 msgid "Find _Again"
-msgstr "_Repetum"
+msgstr "ºÆÅÙ¸¡º÷(_A)"
 
 #: main.c:1436
 msgid "Pre_ferences..."
-msgstr ""
+msgstr "ÀßÄê(_f)..."
 
 #: main.c:1438
 msgid "_Build"
-msgstr "F_acit"
+msgstr "¥Ó¥ë¥É(_B)"
 
 #: main.c:1442
 msgid "_View"
-msgstr "_Vidi"
+msgstr "±ÜÍ÷(_V)"
 
 #: main.c:1444
 msgid "_Clear Log"
-msgstr ""
+msgstr "¥í¥°¤ò½é´ü²½(_C)"
 
 #: main.c:1445
 msgid "C_ollapse All"
-msgstr ""
+msgstr "¤¹¤Ù¤ÆÀÞ¾ö¤à(_o)"
 
 #: main.c:1447
 msgid "_Toolbar"
-msgstr ""
+msgstr "¥Ä¡¼¥ë¥Ð¡¼(_T)"
 
 #: main.c:1448
 msgid "_Statusbar"
-msgstr ""
+msgstr "¥¹¥Æ¡¼¥¿¥¹¥Ð¡¼(_S)"
 
 #: main.c:1450
 msgid "_Errors"
-msgstr ""
+msgstr "¥¨¥é¡¼(_E)"
 
 #: main.c:1452
 msgid "_Warnings"
-msgstr ""
+msgstr "·Ù¹ð(_W)"
 
 #: main.c:1454
 msgid "_Information"
-msgstr ""
+msgstr "¾ðÊó(_I)"
 
 #: main.c:1456
 msgid "_Summary"
-msgstr ""
+msgstr "¥µ¥Þ¥ê(_S)"
 
 #: main.c:1458
 msgid "_Indent Directories"
-msgstr "_Indentus Directorum"
+msgstr "¥Ç¥£¥ì¥¯¥È¥ê¤ò»ú²¼¤²(_I)"
 
 #: main.c:1461
 msgid "_Help"
-msgstr ""
+msgstr "¥Ø¥ë¥×(_H)"
 
 #: main.c:1463
 msgid "_About Maketool..."
-msgstr "_Re Maketool..."
+msgstr "Maketool ¤Î³µÍ×(_A)..."
 
 #: main.c:1464
 msgid "About _make..."
-msgstr "Re _make..."
+msgstr "make ¤Ë¤Ä¤¤¤Æ(_m)..."
 
 #: main.c:1467
 msgid "_Help on..."
-msgstr ""
+msgstr "¥Ø¥ë¥×(_H)..."
 
 #: main.c:1469
 msgid "_Tutorial..."
-msgstr ""
+msgstr "¥Á¥å¡¼¥È¥ê¥¢¥ë(_T)..."
 
 #: main.c:1470
 msgid "Index..."
-msgstr ""
+msgstr "¥¤¥ó¥Ç¥Ã¥¯¥¹..."
 
 #: main.c:1471
 msgid "_Home Page..."
-msgstr ""
+msgstr "¥Û¡¼¥à¥Ú¡¼¥¸(_H)..."
 
 #: main.c:1491
-#, fuzzy
 msgid "Again"
-msgstr "_Repetum"
+msgstr "ºÆ¼Â¹Ô"
 
 #: main.c:1491
 msgid "Build last target again"
-msgstr ""
+msgstr "ºÇ¸å¤Î¥¿¡¼¥²¥Ã¥È¤òºÆÅÙ¥Ó¥ë¥É"
 
 #: main.c:1494
-#, fuzzy
 msgid "Stop"
-msgstr "_Endare"
+msgstr "Ää»ß"
 
 #: main.c:1494
 msgid "Stop current build"
-msgstr ""
+msgstr "º£¤Î¥Ó¥ë¥É¤òÄä»ß"
 
 #: main.c:1499 main.c:1504
 #, c-format
 msgid "Build `%s'"
-msgstr "Facit `%s'"
+msgstr "`%s' ¤ò¥Ó¥ë¥É"
 
 #: main.c:1511
 msgid "Clear"
-msgstr ""
+msgstr "¥¯¥ê¥¢"
 
 #: main.c:1511 preferences.c:741
 msgid "Clear log"
-msgstr ""
+msgstr "¥í¥°¤ò¥¯¥ê¥¢"
 
 #: main.c:1513
 msgid "Next"
-msgstr ""
+msgstr "¼¡"
 
 #: main.c:1513
 msgid "Edit next error or warning"
-msgstr ""
+msgstr "¼¡¤Î¥¨¥é¡¼¤¢¤ë¤¤¤Ï·Ù¹ð¤Ë¤Ä¤¤¤ÆÊÔ½¸"
 
 #: main.c:1516
 msgid "File Next"
-msgstr ""
+msgstr "¼¡¤Î¥Õ¥¡¥¤¥ë"
 
 #: main.c:1516
 msgid "Edit first error or warning in next file"
-msgstr ""
+msgstr "¼¡¤Î¥Õ¥¡¥¤¥ë¤Î¥¨¥é¡¼¤«·Ù¹ð¤Ë¤Ä¤¤¤ÆÊÔ½¸"
 
 #: main.c:1522
-#, fuzzy
 msgid "Print"
-msgstr "_Printare"
+msgstr "°õºþ"
 
 #: main.c:1522
 msgid "Print log"
-msgstr ""
+msgstr "¥í¥°¤ò°õºþ"
 
 #: main.c:1637
-#, fuzzy
 msgid "Maketool"
-msgstr "Re Maketool"
+msgstr "Maketool"
 
 #: main.c:1777
 msgid "Welcome to Maketool"
-msgstr "Bonaventura a Maketool"
+msgstr "Maketool ¤Ë¤è¤¦¤³¤½"
 
 #: preferences.c:575
 msgid "Choose Makefile"
-msgstr ""
+msgstr "Makefile ¤ÎÁªÂò"
 
 #.
 #. * `Parallel' frame
 #.
 #: preferences.c:609
 msgid "Make runs commands"
-msgstr ""
+msgstr "¥³¥Þ¥ó¥É¤ò¼Â¹Ô"
 
 #: preferences.c:619
 msgid "in series."
-msgstr ""
+msgstr "Ï¢Â³¤Ç"
 
 #: preferences.c:629
 msgid "in parallel. Maximum number of processes is "
-msgstr ""
+msgstr "ÊÂ¹Ô¤·¤Æ¡£ºÇÂç¥×¥í¥»¥¹¿ô¤Ï "
 
 #: preferences.c:653
 msgid "in parallel. Maximum machine load is "
-msgstr ""
+msgstr "ÊÂ¹Ô¤·¤Æ¡£ºÇÂç¥Þ¥·¥óÉé²Ù¤Ï "
 
 #.
 #. * Edit first detected error.
 #.
 #: preferences.c:677
 msgid "Automatically edit first error"
-msgstr ""
+msgstr "ºÇ½é¤Î¥¨¥é¡¼¤Ë¤Ä¤¤¤Æ¼«Æ°Åª¤ËÊÔ½¸"
 
 #.
 #. * Auto edit warnings
 #.
 #: preferences.c:688
 msgid "Edit Next ignores warnings"
-msgstr ""
+msgstr "¼¡¤ÎÌµ»ë¤·¤¿·Ù¹ð¤òÊÔ½¸"
 
 #.
 #. * -k flag
 #.
 #: preferences.c:699
 msgid "Continue despite failures"
-msgstr ""
+msgstr "·Ù¹ð¤òÌµ»ë¤·¤ÆÂ³¤±¤ë"
 
 #.
 #. * enable make_makefiles script
 #.
 #: preferences.c:710
 msgid "Build Makefile from Imakefile or Makefile.in"
-msgstr ""
+msgstr "Imakefile ¤« Makefile.in ¤«¤é Makefile ¤òÀ¸À®"
 
 #.
 #. * scroll to end of window on make child's output
 #.
 #: preferences.c:721
 msgid "Scroll to end on output"
-msgstr ""
+msgstr "½ÐÎÏ¤ÎºÇ¸å¤Ë¥¹¥¯¥í¡¼¥ë"
 
 #.
 #. * Action on starting build.
 #.
 #: preferences.c:732
 msgid "On starting each build: "
-msgstr ""
+msgstr "³Æ¥Ó¥ë¥É¤ÎºÇ½é: "
 
 #: preferences.c:740 preferences.c:764
 msgid "Do nothing"
-msgstr ""
+msgstr "²¿¤â¤·¤Ê¤¤"
 
 #: preferences.c:742
 msgid "Collapse all log items"
-msgstr ""
+msgstr "¤¹¤Ù¤Æ¤Î¥í¥°¥¢¥¤¥Æ¥à¤òÀÞ¾ö¤à"
 
 #.
 #. * Action on finishing build.
 #.
 #: preferences.c:756
 msgid "On finishing each build: "
-msgstr ""
+msgstr "³Æ¥Ó¥ë¥É¤ÎºÇ¸å: "
 
 #: preferences.c:765
 msgid "Beep"
-msgstr ""
+msgstr "¥Ó¡¼¥×²»"
 
 #: preferences.c:766
 msgid "Run command"
-msgstr ""
+msgstr "¥³¥Þ¥ó¥É¤ò¼Â¹Ô"
 
 #: preferences.c:767
 msgid "Show dialog"
-msgstr ""
+msgstr "¥À¥¤¥¢¥í¥°¤òÉ½¼¨"
 
 #.
 #. * Choose Makefile.
 #.
 #: preferences.c:791
 msgid "Makefile:"
-msgstr ""
+msgstr "Makefile:"
 
 #: preferences.c:799
 msgid "(default)"
-msgstr ""
+msgstr "(¥Ç¥Õ¥©¥ë¥È)"
 
 #: preferences.c:815 print.c:361
 msgid "Browse..."
-msgstr ""
+msgstr "±ÜÍ÷..."
 
 #: preferences.c:954
 msgid "Make"
-msgstr ""
+msgstr "Make"
 
 #: preferences.c:955
 msgid "Environ"
-msgstr ""
+msgstr "´Ä¶­"
 
 #: preferences.c:966
 msgid "Name"
-msgstr ""
+msgstr "Ì¾Á°"
 
 #: preferences.c:967
 msgid "Value"
-msgstr ""
+msgstr "ÃÍ"
 
 #: preferences.c:968
 msgid "Type"
-msgstr ""
+msgstr "¥¿¥¤¥×"
 
 #.
 #. * Name
 #.
 #: preferences.c:995 preferences.c:1592
 msgid "Name:"
-msgstr ""
+msgstr "Ì¾Á°:"
 
 #.
 #. * Value
 #.
 #: preferences.c:1013
 msgid "Value:"
-msgstr ""
+msgstr "ÃÍ:"
 
 #.
 #. * Type
 #.
 #: preferences.c:1031
 msgid "Type:"
-msgstr ""
+msgstr "¥¿¥¤¥×:"
 
 #: preferences.c:1059
 msgid "Set"
-msgstr ""
+msgstr "ÀßÄê"
 
 #: preferences.c:1067
 msgid "Unset"
-msgstr ""
+msgstr "ÀßÄê¤ò²ò½ü"
 
 #. -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #: preferences.c:1080
@@ -598,102 +585,113 @@ msgid ""
 "%t              make target\n"
 "%{x:+y}         y if %x is not empty\n"
 msgstr ""
+"¥­¡¼\n"
+"%f              ¥½¡¼¥¹¥Õ¥¡¥¤¥ëÌ¾\n"
+"%l              ¥½¡¼¥¹¹ÔÈÖ¹æ\n"
+"%m              -f ¤Ç»ØÄê¤¹¤ë makefile\n"
+"%n              ¥É¥é¥¤¥é¥ó(¼ÂºÝ¤Ë¤Ï¼Â¹Ô¤·¤Ê¤¤)\n"
+"                ¥Õ¥é¥°(-n)¤ò»ØÄê\n"
+"%p              ÊÂÎó½èÍý¥Õ¥é¥° (-j ¤¢¤ë¤¤¤Ï -l)\n"
+"%k              Â³¹Ô¥Õ¥é¥° (-k) ¤ò»ØÄê\n"
+"%v              ¾å½ñ¤­»ØÄê¤¹¤ë make ÊÑ¿ô\n"
+"%t              make ¥¿¡¼¥²¥Ã¥È\n"
+"%{x:+y}         %x ¤¬¶õ¤Ç¤Ê¤±¤ì¤Ð y\n"
 
 #.
 #. * Make program
 #.
 #: preferences.c:1114
 msgid "Make:"
-msgstr ""
+msgstr "Make:"
 
 #.
 #. * Make target lister
 #.
 #: preferences.c:1132
 msgid "List make targets:"
-msgstr ""
+msgstr "make ¥¿¡¼¥²¥Ã¥È¤ò¥ê¥¹¥ÈÉ½¼¨:"
 
 #.
 #. * Make version lister
 #.
 #: preferences.c:1149
 msgid "List make version:"
-msgstr ""
+msgstr "make ¤Î¥Ð¡¼¥¸¥ç¥ó¤ò¥ê¥¹¥ÈÉ½¼¨:"
 
 #.
 #. * Editor
 #.
 #: preferences.c:1166
 msgid "Edit source files:"
-msgstr ""
+msgstr "¥½¡¼¥¹¥Õ¥¡¥¤¥ë¤òÊÔ½¸:"
 
 #.
 #. * Makefile updater
 #.
 #: preferences.c:1191
 msgid "Build makefile:"
-msgstr ""
+msgstr "makefile ¤òÀ¸À®:"
 
 #: preferences.c:1310
-#, fuzzy, c-format
+#, c-format
 msgid "Maketool: %s Choose Color"
-msgstr "Re Maketool"
+msgstr "Maketool: ÁªÂò¤·¤¿¿§ %s"
 
 #: preferences.c:1354
 msgid "Choose..."
-msgstr ""
+msgstr "ÁªÂò..."
 
 #: preferences.c:1434
 msgid "Information Background:"
-msgstr ""
+msgstr "[¾ðÊó]¤ÎÇØ·Ê¿§:"
 
 #: preferences.c:1435
 msgid "Information Foreground:"
-msgstr ""
+msgstr "[¾ðÊó]¤ÎÁ°·Ê¿§:"
 
 #: preferences.c:1436
 msgid "Warning Background:"
-msgstr ""
+msgstr "[·Ù¹ð]¤ÎÇØ·Ê¿§:"
 
 #: preferences.c:1437
 msgid "Warning Foreground:"
-msgstr ""
+msgstr "[·Ù¹ð]¤ÎÁ°·Ê¿§:"
 
 #: preferences.c:1438
 msgid "Error Background:"
-msgstr ""
+msgstr "¥¨¥é¡¼¤ÎÇØ·Ê¿§:"
 
 #: preferences.c:1439
 msgid "Error Foreground:"
-msgstr ""
+msgstr "[¥¨¥é¡¼]¤ÎÁ°·Ê¿§:"
 
 #: preferences.c:1444
 msgid "Sample"
-msgstr ""
+msgstr "¥µ¥ó¥×¥ë"
 
 #: preferences.c:1464
 msgid "information: yadda yadda yadda"
-msgstr ""
+msgstr "¾ðÊó¡§¤¤¤í¤¤¤í"
 
 #: preferences.c:1467
 msgid "warning: danger, Will Robinson!"
-msgstr ""
+msgstr "·Ù¹ð: ¥í¥Ó¥ó¥½¥ó¡¢´í¸±!"
 
 #: preferences.c:1470
 msgid "error: I'm sorry Dave I can't do that"
-msgstr ""
+msgstr "¥¨¥é¡¼: ¤´¤á¤ó¤è Dave¡¢¤½¤ì¤Ï¤Ç¤­¤Ê¤¤"
 
 #: preferences.c:1503
 msgid "Reset to Old"
-msgstr ""
+msgstr "¸Å¤¤ÀßÄê¤Ë¥ê¥»¥Ã¥È"
 
 #: preferences.c:1509
 msgid "Reset to Defaults"
-msgstr ""
+msgstr "¥Ç¥Õ¥©¥ë¥ÈÀßÄê¤Ë¥ê¥»¥Ã¥È"
 
 #: preferences.c:1529
 msgid "mm"
-msgstr ""
+msgstr "mm"
 
 #: preferences.c:1567
 msgid ""
@@ -703,158 +701,152 @@ msgid ""
 "goes\n"
 "here"
 msgstr ""
+"¥é¡¼¥¸\n"
+"¥­¥ã¥ó¥Ð¥¹\n"
+"¥µ¥ó¥×¥ë\n"
+"¼Â¹Ô\n"
+"¤³¤³"
 
 #: preferences.c:1579
 msgid "Paper Size"
-msgstr ""
+msgstr "¥Ú¡¼¥¸¥ã¡¼¤ÎÂç¤­¤µ"
 
 #: preferences.c:1600
 msgid "A4"
-msgstr ""
+msgstr "A4"
 
 #: preferences.c:1601
 msgid "B5"
-msgstr ""
+msgstr "B5"
 
 #: preferences.c:1602
 msgid "US letter"
-msgstr ""
+msgstr "US ¥ì¥¿¡¼"
 
 #: preferences.c:1603
 msgid "US legal"
-msgstr ""
+msgstr "US ¥ê¡¼¥¬¥ë"
 
 #: preferences.c:1604
 msgid "Custom"
-msgstr ""
+msgstr "¥«¥¹¥¿¥à"
 
 #: preferences.c:1615
 msgid "Orientation:"
-msgstr ""
+msgstr "Êý¸þ:"
 
 #: preferences.c:1623
-#, fuzzy
 msgid "Portrait"
-msgstr "_Printare"
+msgstr "¥Ý¡¼¥È¥ì¡¼¥È"
 
 #: preferences.c:1624
 msgid "Landscape"
-msgstr ""
+msgstr "¥é¥ó¥É¥¹¥±¡¼¥×"
 
 #: preferences.c:1635
 msgid "Width:"
-msgstr ""
+msgstr "Éý:"
 
 #: preferences.c:1657
 msgid "Height:"
-msgstr ""
+msgstr "¹â¤µ:"
 
 #: preferences.c:1680
-#, fuzzy
 msgid "Margins"
-msgstr "Facit %s"
+msgstr "¥Þ¡¼¥¸¥ó"
 
 #: preferences.c:1694
 msgid "Left:"
-msgstr ""
+msgstr "º¸:"
 
 #: preferences.c:1716
 msgid "Right:"
-msgstr ""
+msgstr "±¦:"
 
 #: preferences.c:1738
 msgid "Top:"
-msgstr ""
+msgstr "¾å:"
 
 #: preferences.c:1760
 msgid "Bottom:"
-msgstr ""
+msgstr "²¼:"
 
 #: preferences.c:1801
 msgid "Editor:"
-msgstr ""
+msgstr "¥¨¥Ç¥£¥¿:"
 
 #: preferences.c:1888
 msgid "Maketool: Preferences"
-msgstr ""
+msgstr "Maketool: ÀßÄê"
 
 #: preferences.c:1905
 msgid "General"
-msgstr ""
+msgstr "°ìÈÌ"
 
 #: preferences.c:1911
 msgid "Variables"
-msgstr ""
+msgstr "ÊÑ¿ô"
 
 #: preferences.c:1916
 msgid "Programs"
-msgstr ""
+msgstr "¥×¥í¥°¥é¥à"
 
 #: preferences.c:1921
 msgid "Colors"
-msgstr ""
+msgstr "¿§"
 
 #: preferences.c:1926
 msgid "Page Setup"
-msgstr ""
+msgstr "¥Ú¡¼¥¸ÀßÄê"
 
 #: preferences.c:1933
 msgid "Styles"
-msgstr ""
+msgstr "¥¹¥¿¥¤¥ë"
 
 #. TODO: lpr_ API should allow us an error message
 #: print.c:224
 #, c-format
 msgid "Can't create job on printer `%s'"
-msgstr ""
+msgstr "¥×¥ê¥ó¥¿¡¼ `%s' ¤Ë¥¸¥ç¥Ö¤òÁ÷¤ì¤Þ¤»¤ó"
 
 #: print.c:273
-#, fuzzy
 msgid "Maketool: Choose Output File"
-msgstr "Re Maketool"
+msgstr "Maketool: ½ÐÎÏ¥Õ¥¡¥¤¥ë¤òÁªÂò"
 
 #: print.c:311
-#, fuzzy
 msgid "Maketool: Print"
-msgstr "Maketool: Open Loggia Filum"
+msgstr "Maketool: °õºþ"
 
 #: print.c:323
 msgid "Print to printer"
-msgstr ""
+msgstr "¥×¥ê¥ó¥¿¡¼¤Ë½ÐÎÏ"
 
 #: print.c:335
 msgid "no printers on this system"
-msgstr ""
+msgstr "¥×¥ê¥ó¥¿¤¬¤ß¤Ä¤«¤ê¤Þ¤»¤ó"
 
 #: print.c:346
 msgid "Print to file"
-msgstr ""
+msgstr "¥Õ¥¡¥¤¥ë¤Ë½ÐÎÏ"
 
 #: print.c:372 ui.c:508 ui.c:572
 msgid "OK"
-msgstr ""
+msgstr "Î»²ò"
 
 #: print.c:374
 msgid "Page Setup..."
-msgstr ""
+msgstr "¥Ú¡¼¥¸ÀßÄê..."
 
 #: print.c:376 ui.c:578
 msgid "Cancel"
-msgstr "Cancelare"
+msgstr "¥­¥ã¥ó¥»¥ë"
 
 #. it's not paranoia when they're really out to get you
 #: task.c:108
 #, c-format
 msgid "maketool: reaped unexpected pid %d\n"
-msgstr ""
+msgstr "maketool: Í½´ü¤·¤Ê¤¤ PID %d ¤ò´¢¼è¤ê\n"
 
 #: ui.c:575
 msgid "Apply"
-msgstr "Applicus"
-
-#~ msgid "Print S_ettings..."
-#~ msgstr "S_ettingus Printæ"
-
-# In GTK file selection window
-#~ msgid "Create Dir"
-#~ msgstr "Facit Dir"
+msgstr "Å¬ÍÑ"

@@ -1,10 +1,13 @@
 # List of source files containing strings requiring translation
 # Copyright (c) 1999-2000 Greg Banks
-# $Id: POTFILES.in,v 1.3 2000-07-21 06:12:08 gnb Exp $
+# $Id: POTFILES.in,v 1.4 2000-12-05 15:22:57 gnb Exp $
 
 filter.c
+find.c
 help.c
 log.c
 main.c
 preferences.c
+print.c
+task.c
 ui.c
