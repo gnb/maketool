@@ -1,7 +1,5 @@
 --- open ---
 
-x  Strongly limit the inclusion of gdkx.h.
-
 x  Add a Build->Makefile menu item to allow the user to manually start
    the Makefile-build process.
    
@@ -481,4 +479,6 @@ x  DONE: When running configure, pop up a dialog which requests arguments
    last arguments used (from config.status, then from preferences).
 
 x  DONE: Add a GUI for setting CONFIGUREFLAGS based on ./configure --help
+
+x  DONE: Strongly limit the inclusion of gdkx.h.
 

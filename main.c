@@ -21,7 +21,6 @@
 #include <stdarg.h>
 #include "maketool.h"
 #include "ui.h"
-#include <gdk/gdkx.h>
 #include "log.h"
 #include "util.h"
 #include <ctype.h>
@@ -33,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.77 2001-09-21 04:33:04 gnb Exp $");
+CVSID("$Id: main.c,v 1.78 2001-09-21 05:34:04 gnb Exp $");
 
 
 /*
@@ -2006,7 +2005,7 @@ ui_create(void)
      * TODO: isolate dep on gdkx.h
      */
 #if HAVE_PUTENV
-    putenv(g_strdup_printf("MAKETOOL_WINDOWID=0x%lx", GDK_WINDOW_XWINDOW(toplevel->window)));
+    putenv(g_strdup_printf("MAKETOOL_WINDOWID=0x%lx", ui_windowid(toplevel)));
 #endif
 
     /*

@@ -130,4 +130,7 @@ void ui_config_set_flags(const char *name, int val, UiEnumRec *enumdef);
 void ui_config_set_boolean(const char *name, gboolean val);
 void ui_config_sync(void);
 
+/* uix.c */
+unsigned long ui_windowid(GtkWidget *);
+
 #endif /* _UI_H_ */
