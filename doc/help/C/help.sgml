@@ -6,7 +6,7 @@
 ]>
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.16 2003-09-28 07:23:02 gnb Exp $"
+         revision="$Id: help.sgml,v 1.17 2003-09-28 11:37:36 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool</title>
@@ -14,11 +14,13 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2003-09-28 07:23:02 $</pubdate>
+  <pubdate role="cvs">$Date: 2003-09-28 11:37:36 $</pubdate>
   <releaseinfo>This is version &version;</releaseinfo>
   <copyright>
     <year>2000</year>
     <year>2001</year>
+    <year>2002</year>
+    <year>2003</year>
     <holder role="mailto:gnb@alphalink.com.au">Greg Banks</holder> 
   </copyright>
   <legalnotice>
@@ -788,31 +790,11 @@ gmake some-target >& <emphasis>make.log</emphasis>
   </varlistentry>
 
   <varlistentry>
-    <term><guibutton>Tutorial...</guibutton></term>
-    <listitem>
-      <anchor id="help-tutorial" xreflabel="Tutorial">
-      <para>
-      Shows the maketool Tutorial in the help browser. 
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
     <term><guibutton>Table of Contents...</guibutton></term>
     <listitem>
       <anchor id="help-table-of-contents" xreflabel="Table of Contents">
       <para>
       Shows the maketool help Table of Contents in the help browser.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term><guibutton>Index...</guibutton></term>
-    <listitem>
-      <anchor id="help-index" xreflabel="Index">
-      <para>
-      Shows the maketool help Index in the help browser.
       </para>
     </listitem>
   </varlistentry>
@@ -1931,6 +1913,22 @@ various tasks.
     </listitem>
   </varlistentry>
 
+  <varlistentry>
+    <term><guibutton>Help browser:</guibutton></term>
+    <listitem>
+      <anchor id="programs-help-browser" xreflabel="Help browser:">
+      <para>
+      This text field specifies the command run when maketool's
+      help text or web page is viewed.  The program must be capable
+      of displaying HTML text and resolving <filename>file:</filename>
+      and <filename>http:</filename> URLs.  The only percent escape
+      (see <xref linkend="percent-escapes">) expanded is <option>%u</option>.
+      Maketool discards the command's output and does not wait for the
+      command to finish or check the command's exit code.
+      </para>
+    </listitem>
+  </varlistentry>
+
 </variablelist>
 
 </section>
@@ -2206,9 +2204,8 @@ The various context in which escapes are expanded are:
       <para>
       The make program is being run to emit text describing itself, e.g.
       copyright and version messages.  This happens the first time
-      the About GNU make dialog is opened, and subsequently after the make
-      program is changed in the <xref linkend="programs-pane"> in the
-      <xref linkend="preferences-window">.
+      the <xref linkend="help-about-make"> dialog is opened, and subsequently
+      after the make program is changed in the <xref linkend="programs-pane">.
       </para>
     </listitem>
   </varlistentry>
@@ -2219,7 +2216,11 @@ The various context in which escapes are expanded are:
       <para>
       A source file is being edited.  This happens when an error or
       warning line in the <xref linkend="log-window"> is double-clicked,
-      or the <xref linkend="file-edit-makefile"> item is selected.
+      the <xref linkend="file-edit-makefile">, <xref linkend="edit-edit-error">,
+      <xref linkend="edit-edit-next-error">, <xref linkend="edit-edit-prev-error">,
+      or <xref linkend="edit-edit-next-file-error"> menu items are selected,
+      or the <xref linkend="edit-next-tool"> tool or the
+      <xref linkend="edit-file-next-tool"> tool are clicked.
       </para>
     </listitem>
   </varlistentry>
@@ -2247,6 +2248,17 @@ The various context in which escapes are expanded are:
     </listitem>
   </varlistentry>
 
+  <varlistentry>
+    <term>help</term>
+    <listitem>
+      <para>
+      The help browser is started to view either a local HTML help
+      file or the maketool web page.  Note that the table below,
+      "!help" means every context except this one.
+      </para>
+    </listitem>
+  </varlistentry>
+
 </variablelist>
 
 <para>
@@ -2270,7 +2282,7 @@ The available percent escapes are:
 	<tbody>
 	    <row>
 		<entry>%D</entry>
-		<entry>all</entry>
+		<entry>!help</entry>
 		<entry>
   		    maketool's data directory, e.g.
 		    <filename>/usr/local/share/maketool</filename>.
@@ -2278,7 +2290,7 @@ The available percent escapes are:
 	    </row>
 	    <row>
 		<entry>%M</entry>
-		<entry>all</entry>
+		<entry>!help</entry>
 		<entry>
     	    	    the make program currently selected in the
     	    	    <xref linkend="programs-pane">, e.g.
@@ -2287,7 +2299,7 @@ The available percent escapes are:
 	    </row>
 	    <row>
 		<entry>%S</entry>
-		<entry>all</entry>
+		<entry>!help</entry>
 		<entry>
     	    	    the name of the makefile system automatically
     	    	    detected when maketool is started or the current
@@ -2297,7 +2309,7 @@ The available percent escapes are:
 	    </row>
 	    <row>
 		<entry>%V</entry>
-		<entry>all</entry>
+		<entry>!help</entry>
 		<entry>
     	    	    the flags which cause make to print its version
     	    	    to stdout or stderr and exit, e.g.
@@ -2313,7 +2325,7 @@ The available percent escapes are:
 	    </row>
 	    <row>
 		<entry>%k</entry>
-		<entry>all</entry>
+		<entry>!help</entry>
 		<entry>
     	    	    the flag which causes make to keep
     	    	    on building targets when targets fail, e.g.
@@ -2329,7 +2341,7 @@ The available percent escapes are:
 	    </row>
 	    <row>
 		<entry>%m</entry>
-		<entry>all</entry>
+		<entry>!help</entry>
 		<entry>
     	    	    if a makefile is defined in the
     	    	    <xref linkend="general-pane">, expands to the
@@ -2339,7 +2351,7 @@ The available percent escapes are:
 	    </row>
 	    <row>
 		<entry>%n</entry>
-		<entry>all</entry>
+		<entry>!help</entry>
 		<entry>
     	    	    flags which cause make to print the commands it
     	    	    would run instead of running them, e.g.
@@ -2348,7 +2360,7 @@ The available percent escapes are:
 	    </row>
 	    <row>
 		<entry>%p</entry>
-		<entry>all</entry>
+		<entry>!help</entry>
 		<entry>
     	    	    to the flags which implement the
     	    	    parallelism policy controlled by the 
@@ -2358,7 +2370,7 @@ The available percent escapes are:
 	    </row>
 	    <row>
 		<entry>%q</entry>
-		<entry>all</entry>
+		<entry>!help</entry>
 		<entry>
     	    	    the flags which cause make to dump
     	    	    its internal database to stdout or stderr, e.g.
@@ -2395,8 +2407,16 @@ The available percent escapes are:
 		</entry>
 	    </row>
 	    <row>
+		<entry>%u</entry>
+		<entry>help</entry>
+		<entry>
+    	    	    A URL pointing to either a local help HTML file or
+		    the maketool web page.
+		</entry>
+	    </row>
+	    <row>
 		<entry>%v</entry>
-		<entry>all</entry>
+		<entry>!help</entry>
 		<entry>
     	    	    set of make arguments of the form
     	    	    <option>VAR=VALUE</option> for all the variables
@@ -2415,7 +2435,7 @@ The available percent escapes are:
 	    </row>
 	    <row>
 		<entry>%{x:+y}</entry>
-		<entry>all</entry>
+		<entry>!help</entry>
 		<entry>
     	    	    if the simple expansion <option>%x</option> has a
     	    	    non-empty value, expands to the expansion of
