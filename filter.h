@@ -35,7 +35,11 @@ typedef enum
     FR_PUSHDIR,		/* result_str is directory to push on dir stack */
     FR_POPDIR,		/* pop directory stack */
     
-    FR_PENDING		/* result_str is new state for recognition machine */
+    FR_DONE 	    	/* end multiple-line match without modifying result */
+
+    /* extra information bitfields */
+#define FR_PENDING  	(1<<8)	/* start multiple-line match */
+#define FR_CODE_MASK	0xff
 } FilterCode;
 
 typedef struct
