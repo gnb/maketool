@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.23 2000-07-29 16:20:07 gnb Exp $");
+CVSID("$Id: filter.c,v 1.24 2001-07-25 06:54:32 gnb Exp $");
 
 typedef struct
 {
@@ -138,7 +138,17 @@ filter_load(void)
 	
     filter_add(
     	"",				/* state */
-	"^([^: \t]+):([0-9]+): warning:(.*)$",	/* regexp */
+	"^([^: \t]+):([0-9]+):([0-9]+): [wW]arning:(.*)$",	/* regexp */
+	FR_WARNING,			/* code */
+	"\\1",				/* file */
+	"\\2",				/* line */
+	"\\3",				/* col */
+	"\\4",				/* summary */
+    	"new gcc warnings");		/* comment */
+	
+    filter_add(
+    	"",				/* state */
+	"^([^: \t]+):([0-9]+): [wW]arning:(.*)$",	/* regexp */
 	FR_WARNING,			/* code */
 	"\\1",				/* file */
 	"\\2",				/* line */
@@ -146,6 +156,16 @@ filter_load(void)
 	"\\3",				/* summary */
     	"gcc warnings");		/* comment */
 	
+    filter_add(
+    	"",				/* state */
+	"^([^: \t]+):([0-9]+):([0-9]+):(.*)$",	/* regexp */
+	FR_ERROR,			/* code */
+	"\\1",				/* file */
+	"\\2",				/* line */
+	"\\3",				/* col */
+	"\\4",				/* summary */
+    	"new gcc errors");		/* comment */
+
     filter_add(
     	"",				/* state */
 	"^([^: \t]+):([0-9]+):(.*)$",	/* regexp */
@@ -234,16 +254,31 @@ filter_load(void)
     /*
      * The remaining filters don't detect errors,
      * they just provide summaries of compile lines.
+     *
+     * Sadly, <> don't do quite what I expected in
+     * regexps, so they've been replaced with the
+     * horror ([ \t]|[ \t].*[ \t]) which matches a
+     * string of 1 or more chars starting and ending
+     * with whitespace.
      */
     filter_add(
     	"",				/* state */
-	"^(cc|c89|gcc|CC|c\\+\\+|g\\+\\+).*[ \t]*-c[ \t]*.*[ \t]([^ \t]*\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
+	"^(cc|c89|gcc|CC|c\\+\\+|g\\+\\+)([ \t]|[ \t].*[ \t])-c([ \t]|[ \t].*[ \t])([^ \t]*\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
 	FR_INFORMATION,			/* code */
-	"\\2\\3",			/* file */
+	"\\4\\5",			/* file */
 	"",				/* line */
 	"",				/* col */
-	"Compiling \\2\\3",		/* summary */
+	"Compiling \\4\\5",		/* summary */
     	"C/C++ compile line");		/* comment */
+    filter_add(
+    	"",				/* state */
+	"^[-/a-z0-9]+-(cc|gcc|c\\+\\+|g\\+\\+).*[ \t]-c([ \t]|[ \t].*[ \t])([^ \t]+\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
+	FR_INFORMATION,			/* code */
+	"\\3\\4",			/* file */
+	"",				/* line */
+	"",				/* col */
+	"Cross-compiling \\3\\4",   	/* summary */
+    	"GNU C/C++ cross-compile line"); /* comment */
     filter_add(
     	"",				/* state */
 	"^javac[ \t].*[ \t]([A-Za-z_*][A-Za-z0-3_*]*).java", /* regexp */
@@ -255,13 +290,22 @@ filter_load(void)
     	"Java compile line");		/* comment */
     filter_add(
     	"",				/* state */
-	"^(cc|c89|gcc|CC|c\\+\\+|g\\+\\+|ld).*[ \t]*-o[ \t]*([^ \t]*)", /* regexp */
+	"^(cc|c89|gcc|CC|c\\+\\+|g\\+\\+|ld).*[ \t]+-o[ \t]+([^ \t]+)", /* regexp */
 	FR_INFORMATION,			/* code */
 	"",				/* file */
 	"",				/* line */
 	"",				/* col */
 	"Linking \\2",			/* summary */
     	"C/C++ link line");		/* comment */
+    filter_add(
+    	"",				/* state */
+	"^[-/a-z0-9]+-(cc|gcc|c\\+\\+|g\\+\\+|ld).*[ \t]+-o[ \t]+([^ \t]+)", /* regexp */
+	FR_INFORMATION,			/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	"Cross-linking \\2",		/* summary */
+    	"GNU C/C++ cross-link line");	/* comment */
     filter_add(
     	"",				/* state */
 	"^ar[ \t][ \t]*[rc][a-z]*[ \t][ \t]*(lib[^ \t]*.a)", /* regexp */
