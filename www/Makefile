@@ -6,7 +6,7 @@ PAGES=		index.html download.html \
 IMAGES=		maketool_n.gif mainw.gif fm.mini.jpg tocbg.gif \
 		autoconf.gif autoconf_t.gif kernel.gif kernel_t.gif \
 		colors.jpg colors_t.jpg about_make.gif about_make_t.gif \
-		arrow_l2.gif arrow_r2.gif caubutt1.gif gimp.gif \
+		arrow_l2.gif arrow_r2.gif gimp.gif \
 		acgui.gif acgui_t.gif ja.gif ja_t.gif
 BINARIES:=	$(shell m4 list-binaries.m4)	
 
