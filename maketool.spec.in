@@ -42,8 +42,12 @@ rm -rf $RPM_BUILD_ROOT
 %docdir /usr/share/maketool/help
 /usr/share/maketool/help
 /usr/share/locale/*/LC_MESSAGES/maketool.mo
+%docdir /usr/man/man1
+/usr/man/man1/maketool.1
 
 %changelog
+* Fri Feb 15 2002 Greg Banks <gnb@alphalink.com.au>
+- manpage added to rpm
 * Sun Oct 21 2001 Greg Banks <gnb@alphalink.com.au>
 - maketool_client added to rpm
 * Fri Sep 21 2001 Greg Banks <gnb@alphalink.com.au>
