@@ -9,3 +9,4 @@ config.status
 config.h
 Makefile
 maketool-*.tgz
+extract_targets
