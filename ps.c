@@ -22,7 +22,7 @@
 #include "util.h"
 #include <time.h>
 
-CVSID("$Id: ps.c,v 1.8 2003-05-24 05:48:21 gnb Exp $");
+CVSID("$Id: ps.c,v 1.9 2003-08-10 10:19:39 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -50,6 +50,10 @@ struct _PsDocument
     int num_styles;
     PsStyle *styles;
     PsColor default_foreground;
+    struct
+    {
+    	int top, left, width, height;
+    } pagebox;
 };
 
 
@@ -82,6 +86,11 @@ ps_begin(FILE *fp)
     
     ps->lines_per_page = ((prefs.paper_height - prefs.margin_top - prefs.margin_bottom)
     	    	      / (ps->font_size + LINE_SPACING));
+
+    ps->pagebox.left = prefs.margin_left;
+    ps->pagebox.top = prefs.margin_top,
+    ps->pagebox.width = prefs.paper_width - prefs.margin_left - prefs.margin_right,
+    ps->pagebox.height = prefs.paper_height - prefs.margin_top - prefs.margin_bottom;
 
     return ps;
 }
@@ -180,7 +189,8 @@ MaketoolDict begin\n\
  x y moveto x w add y lineto x w add y h add lineto x y h add lineto\n\
  closepath\n\
  end}bd\n\
-/pb{4 copy b s b clip}bd\n\
+/pb{4 copy b clip 4 copy b 0 0 0 setrgbcolor fill b 1 1 1 setrgbcolor fill}bd\n\
+/pa{b 0 0 0 setrgbcolor stroke}bd\n\
 /s{stroke}bd\n\
 /f{fill}bd\n\
 /t{show}bd\n\
@@ -194,6 +204,7 @@ MaketoolDict begin\n\
 /SB{3 array astore _bg 3 1 roll put}bd\n\
 /F{_fg exch get aload pop setrgbcolor}bd\n\
 /B{_bg exch get aload pop setrgbcolor}bd\n\
+%multiple fills work around ghostscript 6.52 bug\n\
 /bp{_f setfont 0 0 0 setrgbcolor 1 setlinewidth}bd\n\
 /ep{showpage}bd\n\
 end\n\
@@ -260,7 +271,13 @@ static void
 ps_end_page(PsDocument *ps)
 {
     if (ps->in_page)
+    {
+	/* Draw a box around the usable area */
+	fprintf(ps->fp, "%d %d %d %d pa\n",
+    	    ps->pagebox.left, ps->pagebox.top,
+	    ps->pagebox.width, ps->pagebox.height);
 	fputs(page_trailer, ps->fp);
+    }
     ps->in_page = FALSE;
 }
 
@@ -271,14 +288,12 @@ ps_begin_page(PsDocument *ps, int n)
     fputs(page_setup, ps->fp);
     
     /* TODO: draw page/numpages outside usable area */
-    
-    /* Draw a box around the usable area & clip to it */
-    fprintf(ps->fp, "%d %d %d %d pb\n",
-    	prefs.margin_left,
-	prefs.margin_top,
-	prefs.paper_width - prefs.margin_left - prefs.margin_right,
-	prefs.paper_height - prefs.margin_top - prefs.margin_bottom);
 
+    /* Clip to the usable area */
+    fprintf(ps->fp, "%d %d %d %d pb\n",
+    	ps->pagebox.left, ps->pagebox.top,
+	ps->pagebox.width, ps->pagebox.height);
+    
     ps->page_num = n;
     ps->in_page = TRUE;
 }
