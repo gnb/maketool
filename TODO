@@ -75,3 +75,4 @@ x  Add autoconf support.
 
 x  Implement the FR_PENDING filter result.
 
+x  Install extract_targets.sh
