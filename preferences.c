@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.56 2003-05-04 04:26:05 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.57 2003-05-04 05:38:31 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -1252,7 +1252,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 2, row, row+1);
-    ui_combo_set_current(GTK_COMBO(combo), curr);
+    ui_combo_set_current(combo, curr);
     gtk_widget_show(combo);
     makeprog_combo = combo;
     

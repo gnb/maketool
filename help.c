@@ -23,7 +23,7 @@
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.36 2003-05-04 04:15:18 gnb Exp $");
+CVSID("$Id: help.c,v 1.37 2003-05-04 05:37:55 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*options_shell = 0;
@@ -193,7 +193,7 @@ help_about_cb(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static estring make_version = ESTRING_STATIC_INIT;
-static MakeProgram *make_version_makeprog;
+static const MakeProgram *make_version_makeprog;
 
 static void
 make_version_input(Task *task, int len, const char *buf)
@@ -230,7 +230,7 @@ create_about_make_shell(void)
 	GtkWidget *icon;
 
 	pm = gdk_pixmap_create_from_xpm_d(toplevel->window,
-    		    &mask, 0, makeprog->logo_xpm);
+    		    &mask, 0, (char **)makeprog->logo_xpm);
 	icon = gtk_pixmap_new(pm, mask);
 	gtk_container_add(GTK_CONTAINER(hbox), icon);
 	gtk_widget_show(icon);
