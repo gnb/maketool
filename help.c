@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: help.c,v 1.13 1999-06-06 17:43:00 gnb Exp $");
+CVSID("$Id: help.c,v 1.14 1999-08-07 14:36:26 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -100,6 +100,7 @@ help_about_cb(GtkWidget *w, gpointer data)
 	GtkWidget *hbox;
 	GdkPixmap *pm;
 	GdkBitmap *mask;
+	char *abt;
 
 	about_shell = ui_create_ok_dialog(toplevel, _("Maketool: About"));
 	
@@ -113,15 +114,11 @@ help_about_cb(GtkWidget *w, gpointer data)
 	gtk_container_add(GTK_CONTAINER(hbox), icon);
 	gtk_widget_show(icon);
 
-	{
-	    /* Build the string to display in the About box */
-	    const char *fmt = _(about_str);
-	    const char *version = VERSION;
-	    char *buf = g_new(char, strlen(fmt) + strlen(version) + 1);
-	    sprintf(buf, fmt, version);
-	    label = gtk_label_new(buf);
-	    g_free(buf);
-	}
+	/* Build the string to display in the About box */
+	abt = g_strdup_printf(_(about_str), VERSION);
+	label = gtk_label_new(abt);
+	g_free(abt);
+
 	gtk_container_add(GTK_CONTAINER(hbox), label);
 	gtk_widget_show(label);
 
