@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.46 2003-10-13 13:09:28 gnb Exp $");
+CVSID("$Id: filter.c,v 1.47 2003-10-16 15:19:57 gnb Exp $");
 
 typedef struct
 {
@@ -57,10 +57,6 @@ static GList *filter_sets;  /* in order encountered */
 static FilterSet *curr_filter_set;
 const char *filter_state = "";
 extern const char *argv0;
-#define ENABLE_LEADS_HACK 1
-#if ENABLE_LEADS_HACK
-gboolean enable_leads = FALSE;
-#endif
 static FilterStats total_stats;
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -71,7 +67,6 @@ static FilterStats total_stats;
  * Assumes the regexp is well formed, does little syntax
  * checking.
  */
-#define DEBUG 6
 static void
 filter_calc_leads(const char *regexp, unsigned char suitable[256])
 {
@@ -245,7 +240,6 @@ filter_calc_leads(const char *regexp, unsigned char suitable[256])
     fprintf(stderr, "\"\n");
 #endif
 }
-#define DEBUG 0
 
 static Filter *
 filter_add(
@@ -338,14 +332,6 @@ filter_set_start(const char *name)
 void
 filter_load(void)
 {
-#if ENABLE_LEADS_HACK
-    {
-    	const char *v = getenv("ENABLE_LEADS");
-	if (v != 0 && !strcmp(v, "yes"))
-	    enable_leads = 1;
-    }
-#endif
-
     filter_set_start(_("GNU make directory messages"));
 
     filter_add(
@@ -1071,14 +1057,7 @@ filter_apply(const char *line, FilterResult *result)
     GList *fl;
     gboolean matched;
     
-#if ENABLE_LEADS_HACK
-    if (enable_leads)
-    	fl = filters_by_lead[(int)line[0]];
-    else
-    	fl = filters;
-#else
     fl = filters_by_lead[(int)line[0]];
-#endif
 
     for ( ; fl != 0 ; fl=fl->next)
     {
@@ -1115,7 +1094,6 @@ filter_apply(const char *line, FilterResult *result)
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-#define DEBUG 1
 
 #if DEBUG
 static void
@@ -1148,7 +1126,6 @@ filter_post(void)
 #endif
 }
 
-#define DEBUG 0
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 void
