@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.14 1999-08-10 15:44:40 gnb Exp $");
+CVSID("$Id: ui.c,v 1.15 1999-09-05 11:39:31 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -522,21 +522,28 @@ static GHashTable *ui_config_data = 0;
 static char *ui_config_filename = 0;
 
 static void
-ui_config_set(const char *name, const char *value)
+ui_config_set_take_value(const char *name, char *value)
 {
-    char *v;
-    
-    v = (char *)g_hash_table_lookup(ui_config_data, name);
-    if (v != 0)
+    gpointer orig_key = 0, orig_value = 0;
+
+    if (g_hash_table_lookup_extended(ui_config_data, name, &orig_key, &orig_value))
     {
-	g_hash_table_remove(ui_config_data, name);
-	g_free(v);
+	g_hash_table_remove(ui_config_data, orig_key);
+    	g_free(orig_key);
+	g_free(orig_value);
     }
+
     if (value != 0)
-	g_hash_table_insert(ui_config_data, g_strdup(name), g_strdup(value));
+	g_hash_table_insert(ui_config_data, g_strdup(name), value);
 #if DEBUG
     fprintf(stderr, "ui_config_set: %s = \"%s\"\n", name, value);
 #endif
+}
+
+static void
+ui_config_set(const char *name, const char *value)
+{
+    ui_config_set_take_value(name, g_strdup(value));
 }
 
 
@@ -654,6 +661,41 @@ ui_config_get_enum(const char *name, int defv, UiEnumRec *enumdef)
     return defv;
 }
 
+int
+ui_config_get_flags(const char *name, int defv, UiEnumRec *enumdef)
+{
+    char *v;
+    int val = 0;
+    char **p, **parts;
+    UiEnumRec *er;
+    
+    v = (char *)g_hash_table_lookup(ui_config_data, name);
+    if (v == 0)
+    	return defv;
+	
+    parts = g_strsplit(v, ",", 1024);
+    for (p = parts ; *p ; p++)
+    {
+	if (isdigit((*p)[0]))
+	{
+	    val |= atoi(*p);
+	    continue;
+	}
+	
+	for (er = enumdef ; er->name != 0 ; er++)
+	{
+    	    if (!strcmp(er->name, *p))
+	    {
+	    	val |= er->value;
+		break;
+	    }
+    	}
+    }
+    g_strfreev(parts);
+    return val;
+}
+
+
 gboolean
 ui_config_get_boolean(const char *name, gboolean defv)
 {
@@ -694,6 +736,34 @@ ui_config_set_enum(const char *name, int val, UiEnumRec *enumdef)
     
     ui_config_set(name, v);
 }
+
+void
+ui_config_set_flags(const char *name, int val, UiEnumRec *enumdef)
+{
+    estring stringval;
+    
+    estring_init(&stringval);
+    
+    for ( ; val != 0 && enumdef->name != 0 ; enumdef++)
+    {
+    	if (enumdef->value & val)
+	{
+	    if (stringval.length > 0)
+	    	estring_append_char(&stringval, ',');
+	    estring_append_string(&stringval, enumdef->name);
+	    val &= ~enumdef->value;
+	}
+    }
+    if (val != 0)
+    {
+	if (stringval.length > 0)
+	    estring_append_char(&stringval, ',');
+    	estring_append_printf(&stringval, "%d", val);
+    }
+    
+    ui_config_set_take_value(name, stringval.data);
+}
+
 
 void
 ui_config_set_boolean(const char *name, gboolean val)

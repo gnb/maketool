@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.37 1999-08-10 15:44:39 gnb Exp $");
+CVSID("$Id: main.c,v 1.38 1999-09-05 11:39:31 gnb Exp $");
 
 typedef enum
 {
@@ -392,7 +392,6 @@ handle_line(const char *line)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-#define safe_str(s) 	((s) == 0 ? "" : (s))
 
 static void
 reap_make(pid_t pid, int status, struct rusage *usg, gpointer user_data)
@@ -441,7 +440,6 @@ reap_make(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     }
 }
 
-#undef safe_str
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 

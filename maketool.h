@@ -55,6 +55,17 @@ typedef enum
     LF_DEFAULT_VALUE=		LF_SHOW_INFO|LF_SHOW_WARNINGS|LF_SHOW_ERRORS
 } LogFlags;
 
+typedef enum
+{
+    COL_BG_INFO,
+    COL_FG_INFO,
+    COL_BG_WARNING,
+    COL_FG_WARNING,
+    COL_BG_ERROR,
+    COL_FG_ERROR,
+    
+    COL_MAX
+} Colors;
 
 typedef struct
 {
@@ -84,6 +95,9 @@ typedef struct
     int log_flags;		/* bitwise OR of LF_* flags */
     
     gboolean dryrun;
+    
+    /* X11 color names, or (char*)0 for no setting */
+    char *colors[COL_MAX];
 } Preferences;
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

@@ -21,7 +21,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: preferences.c,v 1.21 1999-08-10 15:55:42 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.22 1999-09-05 11:39:31 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -44,6 +44,12 @@ static GtkWidget	*var_set_btn;
 static GtkWidget	*var_unset_btn;
 static gboolean		creating = TRUE, setting = FALSE;
 static char		*var_type_strs[2];
+static GtkWidget    	*color_dialog;
+static GtkWidget    	*color_selector;
+const char  	    	*color_labels[COL_MAX];
+static GtkWidget	*color_entries[COL_MAX];
+static int  	    	color_current_index = -1;
+static gboolean     	color_from_selector;
 
 typedef enum
 {
@@ -240,6 +246,13 @@ static UiEnumRec var_type_enum_def[] = {
 {"VAR_ENVIRON",		VAR_ENVIRON},
 {0, 0}};
 
+static UiEnumRec log_flags_def[] = {
+{"SHOW_INFO",    	LF_SHOW_INFO},
+{"SHOW_WARNINGS",	LF_SHOW_WARNINGS},
+{"SHOW_ERRORS",  	LF_SHOW_ERRORS},
+{"SUMMARISE",    	LF_SUMMARISE},
+{0, 0}};
+
 void
 preferences_load(void)
 {
@@ -269,9 +282,16 @@ preferences_load(void)
     prefs.win_width = ui_config_get_int("win_width", 300);
     prefs.win_height = ui_config_get_int("win_height", 500);
 
-    prefs.log_flags = ui_config_get_int("log_flags", LF_DEFAULT_VALUE);
+    prefs.log_flags = ui_config_get_flags("log_flags", LF_DEFAULT_VALUE, log_flags_def);
 
     prefs.dryrun = ui_config_get_boolean("dryrun", FALSE);
+
+    prefs.colors[COL_BG_INFO] = ui_config_get_string("bgcolor_info", 0);
+    prefs.colors[COL_BG_WARNING] = ui_config_get_string("bgcolor_warning", "#ffffc2");
+    prefs.colors[COL_BG_ERROR] = ui_config_get_string("bgcolor_error", "#ffc2c2");
+    prefs.colors[COL_FG_INFO] = ui_config_get_string("fgcolor_info", 0);
+    prefs.colors[COL_FG_WARNING] = ui_config_get_string("fgcolor_warning", 0);
+    prefs.colors[COL_FG_ERROR] = ui_config_get_string("fgcolor_error", 0);
 }
 
 void
@@ -299,9 +319,16 @@ preferences_save(void)
     ui_config_set_int("win_width", prefs.win_width);
     ui_config_set_int("win_height", prefs.win_height);
     
-    ui_config_set_int("log_flags", prefs.log_flags);
+    ui_config_set_flags("log_flags", prefs.log_flags, log_flags_def);
 
     ui_config_set_boolean("dryrun", prefs.dryrun);
+
+    ui_config_set_string("bgcolor_info", prefs.colors[COL_BG_INFO]);
+    ui_config_set_string("bgcolor_warning", prefs.colors[COL_BG_WARNING]);
+    ui_config_set_string("bgcolor_error", prefs.colors[COL_BG_ERROR]);
+    ui_config_set_string("fgcolor_info", prefs.colors[COL_FG_INFO]);
+    ui_config_set_string("fgcolor_warning", prefs.colors[COL_FG_WARNING]);
+    ui_config_set_string("fgcolor_error", prefs.colors[COL_FG_ERROR]);
 
     ui_config_sync();
 }
@@ -331,7 +358,8 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
 {
     char *mf;
     char *text[VC_MAX];
-    int row, nrows;
+    int row, nrows, i;
+    gboolean colors_changed;
     
 #if DEBUG
     fprintf(stderr, "prefs_apply_cb()\n");
@@ -382,6 +410,24 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     }
     prefs_set_var_environment();
     prefs_set_var_make_flags();
+
+    colors_changed = FALSE;    
+    for (i = 0 ; i < COL_MAX ; i++)
+    {
+    	const char *newval = gtk_entry_get_text(GTK_ENTRY(color_entries[i]));
+	
+	if (newval != 0 && *newval == '\0')
+	    newval = 0;
+	if (strcmp(safe_str(newval), safe_str(prefs.colors[i])))
+	{
+    	    if (prefs.colors[i] != 0)
+		g_free(prefs.colors[i]);
+	    prefs.colors[i] = g_strdup(newval);
+	    colors_changed = TRUE;
+	}
+    }
+    if (colors_changed)
+    	log_colors_changed();
       
     preferences_save();
 }
@@ -997,6 +1043,176 @@ prefs_create_programs_page(GtkWidget *toplevel)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+/*
+ * Set the color in the color editing dialog.
+ * First convert the X11 color name into 3 doubles,
+ * which is what the color selector wants.
+ */
+static void
+color_dialog_set_color(const char *color_name)
+{
+    GdkColor col;
+    double dcol[3];
+
+    if (color_name == 0 || !gdk_color_parse(color_name, &col))
+    {
+    	col.red = 0;
+	col.green = 0;
+	col.blue = 0;
+    }
+    dcol[0] = (double)col.red / 65535.0;
+    dcol[1] = (double)col.green / 65535.0;
+    dcol[2] = (double)col.blue / 65535.0;
+    gtk_color_selection_set_color(GTK_COLOR_SELECTION(color_selector), dcol);
+}
+
+
+
+static void
+color_entry_changed_cb(GtkWidget *w, gpointer data)
+{
+    int index = (int)data;
+    
+    if (creating)
+    	return;
+
+    if (!color_from_selector && index == color_current_index)
+    {
+        /* user typed or pasted new value directly into entry */
+	color_dialog_set_color(gtk_entry_get_text(GTK_ENTRY(w)));
+    }
+    	
+    ui_dialog_changed(prefs_shell);
+}
+
+static void
+color_selection_change_cb(GtkWidget *w, gpointer data)
+{
+    char name[14];
+    double dcol[3];
+
+    gtk_color_selection_get_color(GTK_COLOR_SELECTION(w), dcol);
+    sprintf(name, "#%04X%04X%04X",
+    	(int)(dcol[0] * 65535.0),
+	(int)(dcol[1] * 65535.0),
+	(int)(dcol[2] * 65535.0));
+    color_from_selector = TRUE;
+    gtk_entry_set_text(GTK_ENTRY(color_entries[color_current_index]), name);
+    gtk_entry_select_region(GTK_ENTRY(color_entries[color_current_index]), 0, -1);
+    color_from_selector = FALSE;
+}
+
+static void
+color_choose_cb(GtkWidget *w, gpointer data)
+{
+    GtkWidget *dialog, *colorsel;
+    char *title;
+    
+    /*
+     * Create the color editing dialog if it doesn't exist.
+     */
+    if (color_dialog == 0)
+    {
+    	color_dialog = ui_create_ok_dialog(toplevel, "");
+    	color_selector = gtk_color_selection_new();
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(color_dialog)->vbox),
+	    color_selector);
+	gtk_signal_connect(GTK_OBJECT(color_selector), "color_changed", 
+    	    GTK_SIGNAL_FUNC(color_selection_change_cb), 0);
+	gtk_window_set_modal(GTK_WINDOW(color_dialog), TRUE);
+	gtk_widget_show(GTK_WIDGET(color_selector));
+    }
+	
+    /*
+     * Setup the color editing dialog for the current color index.
+     */
+    if (color_current_index >= 0)
+	gtk_entry_select_region(GTK_ENTRY(color_entries[color_current_index]), 0, 0);
+
+    color_current_index = (int)data;
+
+    title = g_strdup_printf(_("Maketool: %s Choose Color"),
+    	color_labels[color_current_index]);
+    gtk_window_set_title(GTK_WINDOW(color_dialog), title);
+    g_free(title);
+    
+    color_dialog_set_color(gtk_entry_get_text(GTK_ENTRY(color_entries[color_current_index])));
+    
+    /*
+     * Select the value in the entry widget corresponding to
+     * the current color index. This gives the user additional
+     * feedback about which color is being edited.
+     */
+    gtk_entry_select_region(GTK_ENTRY(color_entries[color_current_index]), 0, -1);
+
+    gtk_widget_show(color_dialog);
+}
+
+
+static GtkWidget *
+prefs_create_color_row(
+    GtkWidget *table,
+    int row,
+    int color_num)
+{
+    GtkWidget *label;
+    GtkWidget *entry;
+    GtkWidget *button;
+    
+    label = gtk_label_new(color_labels[color_num]);
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
+    gtk_widget_show(label);
+    
+    entry = gtk_entry_new();
+    gtk_signal_connect(GTK_OBJECT(entry), "changed", 
+    	GTK_SIGNAL_FUNC(color_entry_changed_cb), (gpointer)color_num);
+    gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    gtk_widget_show(entry);
+    
+    button = gtk_button_new_with_label(_("Choose..."));
+    gtk_signal_connect(GTK_OBJECT(button), "clicked", 
+    	GTK_SIGNAL_FUNC(color_choose_cb), (gpointer)color_num);
+    gtk_table_attach_defaults(GTK_TABLE(table), button, 2, 3, row, row+1);
+    gtk_widget_show(button);
+
+    /* 
+     * Set current value. This is isolated at the bottom
+     * of this function in case it needs to be separated later.
+     */
+    gtk_entry_set_text(GTK_ENTRY(entry), safe_str(prefs.colors[color_num]));
+    
+    return entry;
+}
+
+
+static GtkWidget *
+prefs_create_colors_page(GtkWidget *toplevel)
+{
+    GtkWidget *table;
+    int row = 0, i;
+    
+    table = gtk_table_new(6, 3, FALSE);
+    gtk_container_border_width(GTK_CONTAINER(table), SPACING);
+    gtk_table_set_row_spacings(GTK_TABLE(table), SPACING);
+    gtk_widget_show(table);
+    
+    color_labels[COL_BG_INFO] = _("Information Background:");
+    color_labels[COL_FG_INFO] = _("Information Foreground:");
+    color_labels[COL_BG_WARNING] = _("Warning Background:");
+    color_labels[COL_FG_WARNING] = _("Warning Foreground:");
+    color_labels[COL_BG_ERROR] = _("Error Background:");
+    color_labels[COL_FG_ERROR] = _("Error Foreground:");
+    
+    for (i = 0 ; i < COL_MAX ; i++)
+	color_entries[i] = prefs_create_color_row(table, row++, i);
+
+    return table;
+}
+
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 #if 0
 static GtkWidget *
 prefs_create_styles_page(GtkWidget *toplevel)
@@ -1063,6 +1279,11 @@ prefs_create_shell(GtkWidget *toplevel)
     page = prefs_create_programs_page(toplevel);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), page,
     				gtk_label_new(_("Programs")));
+    gtk_widget_show(page);
+
+    page = prefs_create_colors_page(toplevel);
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), page,
+    				gtk_label_new(_("Colors")));
     gtk_widget_show(page);
 
 #if 0    

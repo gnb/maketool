@@ -21,7 +21,7 @@
 #define _common_h_
 
 /*
- * $Id: common.h,v 1.4 1999-06-01 11:04:40 gnb Exp $
+ * $Id: common.h,v 1.5 1999-09-05 11:39:31 gnb Exp $
  */
 
 #include <config.h>
@@ -74,6 +74,7 @@ extern char *strrchr(char *);
 	static const char * const __cvsid[2] = {(const char*)__cvsid, (s)}
 #define ARRAYLEN(a) \
 	(sizeof((a))/sizeof((a)[0]))
+#define safe_str(s) 	((s) == 0 ? "" : (s))
 
 
 #ifndef _

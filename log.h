@@ -41,6 +41,7 @@ typedef enum
 } LogSeverity;
 
 void log_init(GtkWidget *);
+void log_colors_changed(void);
 
 void log_clear(void);
 void log_collapse_all(void);

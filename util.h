@@ -35,6 +35,7 @@ void estring_init(estring *e);
 void estring_append_string(estring *e, const char *str);
 void estring_append_char(estring *e, char c);
 void estring_append_chars(estring *e, const char *buf, int len);
+void estring_append_printf(estring *e, const char *fmt, ...);
 void estring_truncate(estring *e);
 void estring_free(estring *e);
 

@@ -18,8 +18,9 @@
  */
 
 #include "util.h"
+#include <stdarg.h>
 
-CVSID("$Id: util.c,v 1.10 1999-08-10 15:44:40 gnb Exp $");
+CVSID("$Id: util.c,v 1.11 1999-09-05 11:39:31 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -61,6 +62,25 @@ estring_append_chars(estring *e, const char *buf, int len)
     memcpy(&e->data[e->length], buf, len);
     e->length += len;
     e->data[e->length] = '\0';
+}
+
+void
+estring_append_printf(estring *e, const char *fmt, ...)
+{
+    va_list args;
+    int len;
+
+    /* ensure enough space exists for result, possibly too much */    
+    va_start(args, fmt);
+    len = g_printf_string_upper_bound(fmt, args);
+    va_end(args);
+    _estring_expand_by(e, len);
+
+    /* format the string into the new space */    
+    va_start(args, fmt);
+    vsprintf(e->data+e->length, fmt, args);
+    va_end(args);
+    e->length += strlen(e->data+e->length);
 }
 
 void

@@ -110,10 +110,12 @@ void ui_config_init(const char *pkg);
 char *ui_config_get_string(const char *name, const char *defv);
 int ui_config_get_int(const char *name, int defv);
 int ui_config_get_enum(const char *name, int defv, UiEnumRec *enumdef);
+int ui_config_get_flags(const char *name, int defv, UiEnumRec *enumdef);
 gboolean ui_config_get_boolean(const char *name, gboolean defv);
 void ui_config_set_string(const char *name, const char *val);
 void ui_config_set_int(const char *name, int val);
 void ui_config_set_enum(const char *name, int val, UiEnumRec *enumdef);
+void ui_config_set_flags(const char *name, int val, UiEnumRec *enumdef);
 void ui_config_set_boolean(const char *name, gboolean val);
 void ui_config_sync(void);
 

@@ -22,7 +22,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: log.c,v 1.16 1999-09-05 05:11:30 gnb Exp $");
+CVSID("$Id: log.c,v 1.17 1999-09-05 11:39:31 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -472,16 +472,76 @@ log_num_warnings(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static gboolean
+_log_load_color(
+    GdkColormap *colormap,
+    const char *color_name,
+    GdkColor *col)
+{
+    if (color_name == 0)
+    	return FALSE;
+	
+    if (!gdk_color_parse(color_name, col))
+    	return FALSE;
+	
+    if (!gdk_colormap_alloc_color(colormap, col, FALSE, TRUE))
+    	return FALSE;
+	
+    return TRUE;
+}
+    
+static void
+_log_setup_colors(void)
+{
+    GdkColormap *colormap = gtk_widget_get_colormap(toplevel);
+    
+    /* L_INFO */
+    foreground_set[L_INFO] = _log_load_color(colormap, prefs.colors[COL_FG_INFO],
+    	    	    	    	&foregrounds[L_INFO]);
+    background_set[L_INFO] = _log_load_color(colormap, prefs.colors[COL_BG_INFO],
+    	    	    	    	&backgrounds[L_INFO]);
+    
+    /* L_WARNING */
+    foreground_set[L_WARNING] = _log_load_color(colormap, prefs.colors[COL_FG_WARNING],
+    	    	    	    	&foregrounds[L_WARNING]);
+    background_set[L_WARNING] = _log_load_color(colormap, prefs.colors[COL_BG_WARNING],
+    	    	    	    	&backgrounds[L_WARNING]);
+    
+    /* L_ERROR */
+    foreground_set[L_ERROR] = _log_load_color(colormap, prefs.colors[COL_FG_ERROR],
+    	    	    	    	&foregrounds[L_ERROR]);
+    background_set[L_ERROR] = _log_load_color(colormap, prefs.colors[COL_BG_ERROR],
+    	    	    	    	&backgrounds[L_ERROR]);
+}
+
+static void
+_log_free_colors(void)
+{
+    GdkColormap *colormap = gtk_widget_get_colormap(toplevel);
+    
+    if (foreground_set[L_INFO])
+	gdk_colormap_free_colors(colormap, &foregrounds[L_INFO], 1);
+    if (background_set[L_INFO])
+	gdk_colormap_free_colors(colormap, &backgrounds[L_INFO], 1);
+
+    if (foreground_set[L_WARNING])
+	gdk_colormap_free_colors(colormap, &foregrounds[L_INFO], 1);
+    if (background_set[L_WARNING])
+	gdk_colormap_free_colors(colormap, &backgrounds[L_INFO], 1);
+
+    if (foreground_set[L_ERROR])
+	gdk_colormap_free_colors(colormap, &foregrounds[L_INFO], 1);
+    if (background_set[L_ERROR])
+	gdk_colormap_free_colors(colormap, &backgrounds[L_INFO], 1);
+}
+
 void
 log_init(GtkWidget *w)
 {
     GdkWindow *win = toplevel->window;
-    GdkColormap *colormap = gtk_widget_get_colormap(toplevel);
     
     /* L_INFO */
     fonts[L_INFO] = 0;
-    foreground_set[L_INFO] = FALSE;
-    background_set[L_INFO] = FALSE;
     icons[L_INFO].closed_pm = gdk_pixmap_create_from_xpm_d(win,
     			&icons[L_INFO].closed_mask, 0, info_xpm);
     icons[L_INFO].open_pm = icons[L_INFO].closed_pm;
@@ -489,10 +549,6 @@ log_init(GtkWidget *w)
     
     /* L_WARNING */
     fonts[L_WARNING] = 0;
-    gdk_color_parse("#ffffc2", &backgrounds[L_WARNING]);
-    gdk_colormap_alloc_color(colormap, &backgrounds[L_WARNING], FALSE, TRUE);
-    foreground_set[L_WARNING] = FALSE;
-    background_set[L_WARNING] = TRUE;
     icons[L_WARNING].closed_pm = gdk_pixmap_create_from_xpm_d(win,
     			&icons[L_WARNING].closed_mask, 0, warning_xpm);
     icons[L_WARNING].open_pm = icons[L_WARNING].closed_pm;
@@ -500,17 +556,23 @@ log_init(GtkWidget *w)
     
     /* L_ERROR */
     fonts[L_ERROR] = 0;
-    gdk_color_parse("#ffc2c2", &backgrounds[L_ERROR]);
-    gdk_colormap_alloc_color(colormap, &backgrounds[L_ERROR], FALSE, TRUE);
-    foreground_set[L_ERROR] = FALSE;
-    background_set[L_ERROR] = TRUE;
     icons[L_ERROR].closed_pm = gdk_pixmap_create_from_xpm_d(win,
     			&icons[L_ERROR].closed_mask, 0, error_xpm);
     icons[L_ERROR].open_pm = icons[L_ERROR].closed_pm;
     icons[L_ERROR].open_mask = icons[L_ERROR].closed_mask;
+
+    _log_setup_colors();
 			
     logwin = w;
     filter_load();
+}
+
+void
+log_colors_changed(void)
+{
+    _log_free_colors();
+    _log_setup_colors();
+    log_repopulate();
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
