@@ -1,24 +1,19 @@
-# Pig Latin translation for Maketool. Well warthog Latin actually.
-# Copyright (C) YEAR Free Software Foundation, Inc.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2000-12-02 04:19+1100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Greg Banks <gnb@alphalink.com.au>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Project-Id-Version: maketool-0.6.2\n"
+"POT-Creation-Date: 2000-12-11 09:12+1100\n"
+"PO-Revision-Date: 2000-12-08 13:43+0100\n"
+"Last-Translator: Vaclav Slavik <v.slavik@volny.cz>\n"
+"Language-Team: TEAM <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
-"Content-Transfer-Encoding: 7bit\n"
+"Content-Type: text/plain; charset=iso8859-2\n"
+"Content-Transfer-Encoding: 8-bit\n"
 
 #. TODO: decent error reporting mechanism
 #: filter.c:65 find.c:133
 #, c-format
 msgid "%s: error in regular expression \"%s\": %s\n"
-msgstr "%s: Erratum expressio regularm \"%s\": %s\n"
+msgstr "%s: chyba v regulárním výrazu \"%s\": %s\n"
 
 #: find.c:282
 msgid "Pattern not found."
@@ -27,7 +22,7 @@ msgstr ""
 #: find.c:360
 #, fuzzy
 msgid "Maketool: Find"
-msgstr "Maketool: Open Loggia Filum"
+msgstr "Maketool: Hotovo"
 
 #: find.c:365
 msgid "Use PageUp/PageDown to recall earlier searches."
@@ -64,16 +59,16 @@ msgstr ""
 #: find.c:448
 #, fuzzy
 msgid "Find"
-msgstr "_Filum"
+msgstr "_Najít..."
 
 #: find.c:450
+#, fuzzy
 msgid "Close"
-msgstr ""
+msgstr "Barvy"
 
 #: help.c:50
-#, fuzzy
 msgid "Maketool: Licence"
-msgstr "Maketool: Open Loggia Filum"
+msgstr "Maketool: Licence"
 
 #: help.c:79
 msgid ""
@@ -86,503 +81,490 @@ msgstr ""
 
 #: help.c:107
 msgid "Maketool: About"
-msgstr "Maketool: Re"
+msgstr "Maketool: O programu"
 
 #: help.c:129
 msgid "Licence..."
-msgstr "Licencum..."
+msgstr "Licence..."
 
 #: help.c:162
 msgid "Maketool: About Make"
-msgstr "Maketool: Re Make"
+msgstr "Maketool: O programu Make"
 
 #: log.c:367
-#, fuzzy, c-format
+#, c-format
 msgid "%d errors"
-msgstr ", %d errata"
+msgstr "%d chyb"
 
 #: log.c:374
-#, fuzzy, c-format
+#, c-format
 msgid "%d warnings"
-msgstr ", %d warnia"
+msgstr "%d varování"
 
 #: log.c:597
 #, c-format
 msgid "Log file %s"
-msgstr "Filum Loggia %s"
+msgstr "Log soubor %s"
 
 #. Note: this assumes that the accelerator remains constant, i.e. Ctrl+A,
 #. *       even though the position of the underscore in the label
 #. *       may change.
 #.
 #: main.c:248
-#, fuzzy, c-format
+#, c-format
 msgid "_Again (%s)"
-msgstr "_Repetum"
+msgstr "_Opakovat (%s)"
 
 #: main.c:254
-#, fuzzy, c-format
+#, c-format
 msgid "Build `%s' again"
-msgstr "Facit `%s'"
+msgstr "Znovu zkompilovat `%s'"
 
 #: main.c:566
 #, c-format
 msgid "Editing %s (line %d)"
-msgstr "Edentata %s (linea %d)"
+msgstr "Edituje se %s (øádek %d)"
 
 #: main.c:700
-#, fuzzy
 msgid "Maketool: Finished"
-msgstr "Maketool: Open Loggia Filum"
+msgstr "Maketool: Hotovo"
 
 #: main.c:724
-#, fuzzy, c-format
+#, c-format
 msgid "Finished building `%s'\n"
-msgstr "Facit completio %s%s%s%s"
+msgstr "Dokonèena kompilace '%s'\n"
 
 #: main.c:727
-#, fuzzy, c-format
+#, c-format
 msgid "%d errors\n"
-msgstr ", %d errata"
+msgstr "%d chyb\n"
 
 #: main.c:730
-#, fuzzy, c-format
+#, c-format
 msgid "%d warnings\n"
-msgstr ", %d warnia"
+msgstr "%d varování\n"
 
 #: main.c:751
 #, c-format
 msgid "Making %s"
-msgstr "Facit %s"
+msgstr "Vytváøím %s"
 
 #: main.c:786
 #, c-format
 msgid ", %d errors"
-msgstr ", %d errata"
+msgstr ", %d chyb"
 
 #: main.c:789
 #, c-format
 msgid ", %d warnings"
-msgstr ", %d warnia"
+msgstr ", %d varování"
 
 #: main.c:792
 msgid " (interrupted)"
-msgstr " (interruptus)"
+msgstr " (pøeru¹eno)"
 
 #: main.c:794
 #, c-format
 msgid "Finished making %s%s%s%s"
-msgstr "Facit completio %s%s%s%s"
+msgstr "Dokonèeno vytváøení %s%s%s%s"
 
 #: main.c:913
 msgid "Maketool: Open Log File"
-msgstr "Maketool: Open Loggia Filum"
+msgstr "Maketool: Otevøít log soubor"
 
 #: main.c:941
 msgid "Maketool: Save Log File"
-msgstr "Maketool: Save Loggia Filum"
+msgstr "Maketool: Ulo¾it log soubor"
 
 #: main.c:988
 msgid "No previous directories"
-msgstr ""
+msgstr "®ádné pøedchozí adresáøe"
 
 #: main.c:1078
-#, fuzzy
 msgid "Maketool: Change Directory"
-msgstr "Directatum _Changæ"
+msgstr "Maketool: Zmìna adresáøe"
 
 #: main.c:1151
 msgid "No makefile appears to be present in this directory"
-msgstr ""
+msgstr "V tomto adresáøi nejsou ¾ádné makefiles."
 
 #: main.c:1155
-#, fuzzy, c-format
+#, c-format
 msgid "Editing %s"
-msgstr "Edentata %s (linea %d)"
+msgstr "Editace %s"
 
 #: main.c:1267 main.c:1299
 msgid "No more errors in log"
-msgstr "Erratum in loggia nil est"
+msgstr "V logu nejsou ¾ádné dal¹í chyby."
 
 #: main.c:1389
 msgid "_Again"
-msgstr "_Repetum"
+msgstr "_Opakovat"
 
 #: main.c:1390
 msgid "_Stop"
-msgstr "_Endare"
+msgstr "_Stop"
 
 #: main.c:1391
 msgid "_Dryrun Only"
-msgstr ""
+msgstr "Jen _naneèisto"
 
 #: main.c:1408
 msgid "_File"
-msgstr "_Filum"
+msgstr "_Soubor"
 
 #: main.c:1410
 msgid "_Open Log..."
-msgstr "_Open Loggia..."
+msgstr "_Otevøít log..."
 
 #: main.c:1411
 msgid "_Save Log..."
-msgstr "_Save Loggia..."
+msgstr "_Ulo¾it log..."
 
 #: main.c:1413
-#, fuzzy
 msgid "_Change Directory..."
-msgstr "Directatum _Changæ"
+msgstr "_Zmìnit adresáø..."
 
 #: main.c:1414
-#, fuzzy
 msgid "_Previous Directories"
-msgstr "_Indentus Directorum"
+msgstr "_Pøechozí adresáøe"
 
 #: main.c:1418
-#, fuzzy
 msgid "_Edit Makefile..."
-msgstr "_Re Maketool..."
+msgstr "_Editovat Makefile..."
 
 #: main.c:1420
-#, fuzzy
 msgid "_Print..."
-msgstr "_Printare"
+msgstr "_Tisknout..."
 
 #: main.c:1422
 msgid "E_xit"
-msgstr "E_xitus"
+msgstr "_Konec"
 
 #: main.c:1424
 msgid "_Edit"
-msgstr "_Editare"
+msgstr "_Editace"
 
 #: main.c:1426
 msgid "Edit _Error"
-msgstr ""
+msgstr "Editovat _chybu"
 
 #: main.c:1427
 msgid "Edit _Next Error"
-msgstr ""
+msgstr "Editovat _následující chybu"
 
 #: main.c:1428
 msgid "Edit _Prev Error"
-msgstr ""
+msgstr "Editovat _pøedchozí chybu"
 
 #: main.c:1429
 msgid "Edit Next _File Error"
-msgstr ""
+msgstr "Editovat následující _soubor s chybou"
 
 #: main.c:1431
-#, fuzzy
 msgid "_Copy"
-msgstr "_Endare"
+msgstr "_Kopírovat"
 
 #: main.c:1433
-#, fuzzy
 msgid "_Find..."
-msgstr "_Filum"
+msgstr "_Najít..."
 
 #: main.c:1434
-#, fuzzy
 msgid "Find _Again"
-msgstr "_Repetum"
+msgstr "Najít _znovu"
 
 #: main.c:1436
 msgid "Pre_ferences..."
-msgstr ""
+msgstr "_Nastavení..."
 
 #: main.c:1438
 msgid "_Build"
-msgstr "F_acit"
+msgstr "_Kompilovat"
 
 #: main.c:1442
 msgid "_View"
-msgstr "_Vidi"
+msgstr "_Zobrazení"
 
 #: main.c:1444
 msgid "_Clear Log"
-msgstr ""
+msgstr "_Vyèistit log"
 
 #: main.c:1445
 msgid "C_ollapse All"
-msgstr ""
+msgstr "V¹e z_kolabovat"
 
 #: main.c:1447
 msgid "_Toolbar"
-msgstr ""
+msgstr "_Li¹ta s nástroji"
 
 #: main.c:1448
 msgid "_Statusbar"
-msgstr ""
+msgstr "_Stavová li¹ta"
 
 #: main.c:1450
 msgid "_Errors"
-msgstr ""
+msgstr "_Chyby"
 
 #: main.c:1452
 msgid "_Warnings"
-msgstr ""
+msgstr "_Varování"
 
 #: main.c:1454
 msgid "_Information"
-msgstr ""
+msgstr "_Informace"
 
 #: main.c:1456
 msgid "_Summary"
-msgstr ""
+msgstr "_Shrnutí"
 
 #: main.c:1458
 msgid "_Indent Directories"
-msgstr "_Indentus Directorum"
+msgstr "_Odsazovat adresáøe"
 
 #: main.c:1461
 msgid "_Help"
-msgstr ""
+msgstr "_Nápovìda"
 
 #: main.c:1463
 msgid "_About Maketool..."
-msgstr "_Re Maketool..."
+msgstr "_O programu Maketool..."
 
 #: main.c:1464
 msgid "About _make..."
-msgstr "Re _make..."
+msgstr "O programu _make..."
 
 #: main.c:1467
 msgid "_Help on..."
-msgstr ""
+msgstr "_Nápovìda o..."
 
 #: main.c:1469
 msgid "_Tutorial..."
-msgstr ""
+msgstr "_Tutoriál..."
 
 #: main.c:1470
 msgid "Index..."
-msgstr ""
+msgstr "Rejsøík..."
 
 #: main.c:1471
 msgid "_Home Page..."
-msgstr ""
+msgstr "_Domovská stránka"
 
 #: main.c:1491
-#, fuzzy
 msgid "Again"
-msgstr "_Repetum"
+msgstr "Opakovat"
 
 #: main.c:1491
 msgid "Build last target again"
-msgstr ""
+msgstr "Pøekompilovat minulý cíl"
 
 #: main.c:1494
-#, fuzzy
 msgid "Stop"
-msgstr "_Endare"
+msgstr "Stop"
 
 #: main.c:1494
 msgid "Stop current build"
-msgstr ""
+msgstr "Zastavit probíhající kompilaci"
 
 #: main.c:1499 main.c:1504
 #, c-format
 msgid "Build `%s'"
-msgstr "Facit `%s'"
+msgstr "Kompilovat `%s'"
 
 #: main.c:1511
 msgid "Clear"
-msgstr ""
+msgstr "Vyèistit"
 
 #: main.c:1511 preferences.c:741
 msgid "Clear log"
-msgstr ""
+msgstr "Vyèistit log"
 
 #: main.c:1513
 msgid "Next"
-msgstr ""
+msgstr "Dal¹í"
 
 #: main.c:1513
 msgid "Edit next error or warning"
-msgstr ""
+msgstr "Editovat dal¹í chybu nebo varování"
 
 #: main.c:1516
 msgid "File Next"
-msgstr ""
+msgstr "Dal¹í soubor"
 
 #: main.c:1516
 msgid "Edit first error or warning in next file"
-msgstr ""
+msgstr "Editovat první chybu nebo varování v dal¹ím souboru"
 
 #: main.c:1522
-#, fuzzy
 msgid "Print"
-msgstr "_Printare"
+msgstr "Tisk"
 
 #: main.c:1522
 msgid "Print log"
-msgstr ""
+msgstr "Log tisku"
 
 #: main.c:1637
-#, fuzzy
 msgid "Maketool"
-msgstr "Re Maketool"
+msgstr "Maketool"
 
 #: main.c:1777
 msgid "Welcome to Maketool"
-msgstr "Bonaventura a Maketool"
+msgstr "Vítejte v Maketoolu"
 
 #: preferences.c:575
 msgid "Choose Makefile"
-msgstr ""
+msgstr "Vyberte Makefile"
 
 #.
 #. * `Parallel' frame
 #.
 #: preferences.c:609
 msgid "Make runs commands"
-msgstr ""
+msgstr "Make provádí pøíkazy"
 
 #: preferences.c:619
 msgid "in series."
-msgstr ""
+msgstr "sériovì."
 
 #: preferences.c:629
 msgid "in parallel. Maximum number of processes is "
-msgstr ""
+msgstr "paralelnì. Maximální poèet procesù je "
 
 #: preferences.c:653
 msgid "in parallel. Maximum machine load is "
-msgstr ""
+msgstr "paralelnì. Maximální zátì¾ poèítaèe je "
 
 #.
 #. * Edit first detected error.
 #.
 #: preferences.c:677
 msgid "Automatically edit first error"
-msgstr ""
+msgstr "Automaticky editovat první chybu"
 
 #.
 #. * Auto edit warnings
 #.
 #: preferences.c:688
 msgid "Edit Next ignores warnings"
-msgstr ""
+msgstr "Pøi editování dal¹ího ignorovat varování"
 
 #.
 #. * -k flag
 #.
 #: preferences.c:699
 msgid "Continue despite failures"
-msgstr ""
+msgstr "Pokraèovat navzdory chybám"
 
 #.
 #. * enable make_makefiles script
 #.
 #: preferences.c:710
 msgid "Build Makefile from Imakefile or Makefile.in"
-msgstr ""
+msgstr "Vytvoøit Makefile z Imakefile nebo Makefile.in"
 
 #.
 #. * scroll to end of window on make child's output
 #.
 #: preferences.c:721
 msgid "Scroll to end on output"
-msgstr ""
+msgstr "Skoèit na konec výstupu"
 
 #.
 #. * Action on starting build.
 #.
 #: preferences.c:732
 msgid "On starting each build: "
-msgstr ""
+msgstr "Na zaèátku kompilace:"
 
 #: preferences.c:740 preferences.c:764
 msgid "Do nothing"
-msgstr ""
+msgstr "Nic nedìlat"
 
 #: preferences.c:742
 msgid "Collapse all log items"
-msgstr ""
+msgstr "Zkolabovat polo¾ky logu"
 
 #.
 #. * Action on finishing build.
 #.
 #: preferences.c:756
 msgid "On finishing each build: "
-msgstr ""
+msgstr "Po skonèení kompilace:"
 
 #: preferences.c:765
 msgid "Beep"
-msgstr ""
+msgstr "Pípnutí"
 
 #: preferences.c:766
 msgid "Run command"
-msgstr ""
+msgstr "Spustit pøíkaz"
 
 #: preferences.c:767
 msgid "Show dialog"
-msgstr ""
+msgstr "Zobrazit dialog"
 
 #.
 #. * Choose Makefile.
 #.
 #: preferences.c:791
 msgid "Makefile:"
-msgstr ""
+msgstr "Makefile:"
 
 #: preferences.c:799
 msgid "(default)"
-msgstr ""
+msgstr "(standardní)"
 
 #: preferences.c:815 print.c:361
 msgid "Browse..."
-msgstr ""
+msgstr "Najít..."
 
 #: preferences.c:954
 msgid "Make"
-msgstr ""
+msgstr "Make"
 
 #: preferences.c:955
 msgid "Environ"
-msgstr ""
+msgstr "Prostøedí"
 
 #: preferences.c:966
 msgid "Name"
-msgstr ""
+msgstr "Jméno"
 
 #: preferences.c:967
 msgid "Value"
-msgstr ""
+msgstr "Hodnota"
 
 #: preferences.c:968
 msgid "Type"
-msgstr ""
+msgstr "Type"
 
 #.
 #. * Name
 #.
 #: preferences.c:995 preferences.c:1592
 msgid "Name:"
-msgstr ""
+msgstr "Jméno:"
 
 #.
 #. * Value
 #.
 #: preferences.c:1013
 msgid "Value:"
-msgstr ""
+msgstr "Hodnota:"
 
 #.
 #. * Type
 #.
 #: preferences.c:1031
 msgid "Type:"
-msgstr ""
+msgstr "Typ:"
 
 #: preferences.c:1059
 msgid "Set"
-msgstr ""
+msgstr "Nastavit"
 
 #: preferences.c:1067
 msgid "Unset"
-msgstr ""
+msgstr "Smazat"
 
 #. -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #: preferences.c:1080
@@ -604,92 +586,92 @@ msgstr ""
 #.
 #: preferences.c:1114
 msgid "Make:"
-msgstr ""
+msgstr "Make:"
 
 #.
 #. * Make target lister
 #.
 #: preferences.c:1132
 msgid "List make targets:"
-msgstr ""
+msgstr "Vypsat cíle"
 
 #.
 #. * Make version lister
 #.
 #: preferences.c:1149
 msgid "List make version:"
-msgstr ""
+msgstr "Vypsat verzi make:"
 
 #.
 #. * Editor
 #.
 #: preferences.c:1166
 msgid "Edit source files:"
-msgstr ""
+msgstr "Editovat zdrojové soubory:"
 
 #.
 #. * Makefile updater
 #.
 #: preferences.c:1191
 msgid "Build makefile:"
-msgstr ""
+msgstr "Vytvoøit makefile"
 
 #: preferences.c:1310
-#, fuzzy, c-format
+#, c-format
 msgid "Maketool: %s Choose Color"
-msgstr "Re Maketool"
+msgstr "Maketool: %s Výbìr barvy"
 
 #: preferences.c:1354
 msgid "Choose..."
-msgstr ""
+msgstr "Vybrat..."
 
 #: preferences.c:1434
 msgid "Information Background:"
-msgstr ""
+msgstr "Pozadí informací:"
 
 #: preferences.c:1435
 msgid "Information Foreground:"
-msgstr ""
+msgstr "Text informací:"
 
 #: preferences.c:1436
 msgid "Warning Background:"
-msgstr ""
+msgstr "Pozadí varování:"
 
 #: preferences.c:1437
 msgid "Warning Foreground:"
-msgstr ""
+msgstr "Text varování:"
 
 #: preferences.c:1438
 msgid "Error Background:"
-msgstr ""
+msgstr "Pozadí chyb:"
 
 #: preferences.c:1439
 msgid "Error Foreground:"
-msgstr ""
+msgstr "Text chyb:"
 
 #: preferences.c:1444
 msgid "Sample"
-msgstr ""
+msgstr "Pøíklad"
 
 #: preferences.c:1464
 msgid "information: yadda yadda yadda"
-msgstr ""
+msgstr "information: yadda yadda yadda"
 
 #: preferences.c:1467
 msgid "warning: danger, Will Robinson!"
-msgstr ""
+msgstr "warning: danger, Will Robinson!"
 
 #: preferences.c:1470
 msgid "error: I'm sorry Dave I can't do that"
-msgstr ""
+msgstr "error: I'm sorry Dave I can't do that"
 
 #: preferences.c:1503
 msgid "Reset to Old"
-msgstr ""
+msgstr "Vrátit se ke starým"
 
 #: preferences.c:1509
 msgid "Reset to Defaults"
-msgstr ""
+msgstr "Vrátit se k standardním"
 
 #: preferences.c:1529
 msgid "mm"
@@ -703,10 +685,15 @@ msgid ""
 "goes\n"
 "here"
 msgstr ""
+"Large\n"
+"canvas\n"
+"sample\n"
+"goes\n"
+"here"
 
 #: preferences.c:1579
 msgid "Paper Size"
-msgstr ""
+msgstr "Velikost papíru"
 
 #: preferences.c:1600
 msgid "A4"
@@ -726,81 +713,79 @@ msgstr ""
 
 #: preferences.c:1604
 msgid "Custom"
-msgstr ""
+msgstr "Vlastní"
 
 #: preferences.c:1615
 msgid "Orientation:"
-msgstr ""
+msgstr "Orientace:"
 
 #: preferences.c:1623
-#, fuzzy
 msgid "Portrait"
-msgstr "_Printare"
+msgstr "na vý¹ku"
 
 #: preferences.c:1624
 msgid "Landscape"
-msgstr ""
+msgstr "na ¹íøku"
 
 #: preferences.c:1635
 msgid "Width:"
-msgstr ""
+msgstr "©íøka:"
 
 #: preferences.c:1657
 msgid "Height:"
-msgstr ""
+msgstr "Vý¹ka:"
 
 #: preferences.c:1680
-#, fuzzy
 msgid "Margins"
-msgstr "Facit %s"
+msgstr "Okraje"
 
 #: preferences.c:1694
 msgid "Left:"
-msgstr ""
+msgstr "Levý:"
 
 #: preferences.c:1716
 msgid "Right:"
-msgstr ""
+msgstr "Pravý:"
 
 #: preferences.c:1738
 msgid "Top:"
-msgstr ""
+msgstr "Horní:"
 
 #: preferences.c:1760
 msgid "Bottom:"
-msgstr ""
+msgstr "Dolní:"
 
 #: preferences.c:1801
 msgid "Editor:"
-msgstr ""
+msgstr "Editor:"
 
 #: preferences.c:1888
 msgid "Maketool: Preferences"
-msgstr ""
+msgstr "Maketool: Nastavení"
 
 #: preferences.c:1905
 msgid "General"
-msgstr ""
+msgstr "Rùzné"
 
 #: preferences.c:1911
 msgid "Variables"
-msgstr ""
+msgstr "Promnìné"
 
 #: preferences.c:1916
 msgid "Programs"
-msgstr ""
+msgstr "Programy"
 
 #: preferences.c:1921
 msgid "Colors"
-msgstr ""
+msgstr "Barvy"
 
 #: preferences.c:1926
 msgid "Page Setup"
-msgstr ""
+msgstr "Nastavení stránky"
 
 #: preferences.c:1933
 msgid "Styles"
-msgstr ""
+msgstr "Styly"
 
 #. TODO: lpr_ API should allow us an error message
 #: print.c:224
@@ -811,12 +796,12 @@ msgstr ""
 #: print.c:273
 #, fuzzy
 msgid "Maketool: Choose Output File"
-msgstr "Re Maketool"
+msgstr "Maketool: %s Výbìr barvy"
 
 #: print.c:311
 #, fuzzy
 msgid "Maketool: Print"
-msgstr "Maketool: Open Loggia Filum"
+msgstr "Maketool: Licence"
 
 #: print.c:323
 msgid "Print to printer"
@@ -827,20 +812,22 @@ msgid "no printers on this system"
 msgstr ""
 
 #: print.c:346
+#, fuzzy
 msgid "Print to file"
-msgstr ""
+msgstr "Log tisku"
 
 #: print.c:372 ui.c:508 ui.c:572
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: print.c:374
+#, fuzzy
 msgid "Page Setup..."
-msgstr ""
+msgstr "Nastavení stránky"
 
 #: print.c:376 ui.c:578
 msgid "Cancel"
-msgstr "Cancelare"
+msgstr "Zru¹it"
 
 #. it's not paranoia when they're really out to get you
 #: task.c:108
@@ -850,11 +837,4 @@ msgstr ""
 
 #: ui.c:575
 msgid "Apply"
-msgstr "Applicus"
-
-#~ msgid "Print S_ettings..."
-#~ msgstr "S_ettingus Printæ"
-
-# In GTK file selection window
-#~ msgid "Create Dir"
-#~ msgstr "Facit Dir"
+msgstr "Pou¾ít"
