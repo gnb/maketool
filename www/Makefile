@@ -29,7 +29,7 @@ $(PAGES): _styles.html _common.m4 _copyright.html toc.html.in
 index.html: _thanks.m4
 download.html: $(RELEASEDIR)/version.m4 downloadables.m4
 
-_changelist.html: $(RELEASEDIR)/CHANGES
+_changelist.html: $(RELEASEDIR)/ChangeLog
 	./changes2html < $< > $@
 
 HTMLINCDIRS=	-I$(RELEASEDIR)
