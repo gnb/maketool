@@ -24,7 +24,7 @@
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.40 2003-08-10 07:34:30 gnb Exp $");
+CVSID("$Id: help.c,v 1.41 2003-08-20 15:35:29 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*options_shell = 0;
@@ -304,8 +304,6 @@ help_about_make_cb(GtkWidget *w, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-#if ENABLE_ONLINE_HELP /* { */
-
 static TaskOps help_browser_ops =
 {
 0,  	    	    	    	/* start */
@@ -327,17 +325,14 @@ static TaskOps help_browser_ops =
 static Task *
 help_browser_task(const char *url)
 {
-    char *command;
+    const char *expands[256];
     
-    /* TODO: expand from prefs */
-    command = g_strdup_printf("gnome-help-browser %s", url);
-    
-    fprintf(stderr, "help_browser_task: command = \"%s\"\n", command);
+    memset(expands, 0, sizeof(expands));
+    expands['u'] = url;
     
     return task_create(
     	(Task *)g_new(Task, 1),
-	/*expand_prog(prefs.prog_list_version, 0, 0, 0),*/
-	command,
+	expand_string(prefs.prog_help_browser, expands),
 	/*environment*/0,
 	&help_browser_ops,
 	0);
@@ -383,7 +378,7 @@ help_find_help_file(const char *name)
 	locales[i] = 0;
 	assert(i < (int)ARRAYLEN(locales));
 	
-#if 1
+#if DEBUG > 2
     	fprintf(stderr, "help_find_help_file: search locales:");
     	for (i=0 ; locales[i] != 0 ; i++)
 	    fprintf(stderr, " \"%s\"", locales[i]);
@@ -394,7 +389,7 @@ help_find_help_file(const char *name)
     for (i=0 ; locales[i] != 0 ; i++)
     {
     	file = g_strconcat(HELPDIR "/", locales[i], "/", name, ".html", 0);
-#if 1
+#if DEBUG > 2
 	fprintf(stderr, "help_find_help_file: trying \"%s\"\n", file);
 #endif
 	if (file_exists(file))
@@ -403,7 +398,7 @@ help_find_help_file(const char *name)
 	file = 0;
     }
     
-#if 1
+#if DEBUG > 2
     fprintf(stderr, "help_find_help_file: found \"%s\"\n", file);
 #endif
     return file;
@@ -418,7 +413,7 @@ help_goto_helpname(const char *name)
     if ((file = help_find_help_file(name)) == 0)
     	return;
 	
-    url = g_strconcat("file:", file, 0);
+    url = g_strconcat("file://", file, 0);
     help_goto_url(url);
     g_free(file);
     g_free(url);
@@ -484,7 +479,9 @@ help_on_cb(GtkWidget *w, void *user_data)
 	help_cursor,
 	GDK_CURRENT_TIME);
 
+#if DEBUG > 2
     fprintf(stderr, "help_on_cb: about to get events\n");
+#endif
     for (;;)
     {
 	if ((event = gdk_event_get()) == 0)
@@ -492,11 +489,15 @@ help_on_cb(GtkWidget *w, void *user_data)
 	    sleep(1);
 	    continue;
 	}
+#if DEBUG > 2
 	fprintf(stderr, "help_on_cb: event->type = %d\n", event->type);
+#endif
 	
 	if (event->type == GDK_BUTTON_PRESS)
 	{
+#if DEBUG > 2
 	    fprintf(stderr, "help_on_cb: Trying to find help...\n");
+#endif
 	    if ((w = gtk_get_event_widget(event)) != 0 &&
 	    	(name = ui_get_help_name(w)) != 0)
 		help_goto_helpname(name);
@@ -511,12 +512,12 @@ help_on_cb(GtkWidget *w, void *user_data)
 	}
 	/* TODO: do we need to free the event?? */
     }
+#if DEBUG > 2
     fprintf(stderr, "help_on_cb: finished getting events\n");
-    
+#endif
+
     gdk_pointer_ungrab(GDK_CURRENT_TIME);
 }
-
-#endif /* } ENABLE_ONLINE_HELP*/
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 /*END*/
