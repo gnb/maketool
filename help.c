@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: help.c,v 1.15 1999-10-17 08:53:26 gnb Exp $");
+CVSID("$Id: help.c,v 1.16 1999-11-02 04:23:39 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -129,6 +129,8 @@ help_about_cb(GtkWidget *w, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+#include "gnu_l.xpm"
+
 static estring make_version = ESTRING_STATIC_INIT;
 
 static void
@@ -140,12 +142,25 @@ make_version_reap(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     if (about_make_shell == 0)
     {
 	GtkWidget *label;
+	GtkWidget *icon;
+	GtkWidget *hbox;
+	GdkPixmap *pm;
+	GdkBitmap *mask;
 
 	about_make_shell = ui_create_ok_dialog(toplevel, _("Maketool: About Make"));
 
-	/* TODO: logo */
+	hbox = gtk_hbox_new(FALSE, 5);
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_make_shell)->vbox), hbox);
+	gtk_widget_show(hbox);
+	
+	pm = gdk_pixmap_create_from_xpm_d(toplevel->window,
+    		    &mask, 0, gnu_l_xpm);
+	icon = gtk_pixmap_new(pm, mask);
+	gtk_container_add(GTK_CONTAINER(hbox), icon);
+	gtk_widget_show(icon);
+
 	label = gtk_label_new(make_version.data);
-	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_make_shell)->vbox), label);
+	gtk_container_add(GTK_CONTAINER(hbox), label);
 	gtk_widget_show(label);
     }
 
@@ -162,6 +177,7 @@ make_version_input(int len, const char *buf, gpointer data)
     	make_version.data);
 #endif
 }
+
 
 
 void
