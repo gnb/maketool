@@ -13,3 +13,5 @@ maketool-*.rpm
 *.patch.gz
 msg
 junk
+.xvpics
+backbone.php
