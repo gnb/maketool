@@ -32,7 +32,7 @@
 #include "mqueue.h"
 #include "progress.h"
 
-CVSID("$Id: main.c,v 1.105 2003-10-08 13:27:31 gnb Exp $");
+CVSID("$Id: main.c,v 1.106 2003-10-08 13:34:04 gnb Exp $");
 
 
 /*
@@ -2212,7 +2212,9 @@ VERSION);
     	ui_message_wait(msg);
     }
 
-    if (!file_exists(prefs.makefile))
+    if (prefs.makefile != 0 &&
+    	prefs.makefile[0] != '\0' &&
+	!file_exists(prefs.makefile))
     {
     	GtkWidget *msg;
 	
