@@ -1,5 +1,8 @@
 --- open ---
 
+x  On website, change mailto: references to make them easier to use
+   for people without Netscape or IE.
+
 x  Build->Makefile should say something pithy in the status bar
    when it finishes.  Also Build->Run configure etc.
 
