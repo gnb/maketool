@@ -28,7 +28,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.20 1999-06-01 11:04:40 gnb Exp $");
+CVSID("$Id: main.c,v 1.21 1999-06-01 11:32:48 gnb Exp $");
 
 typedef enum
 {
@@ -203,7 +203,9 @@ reapList(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     if (!(WIFEXITED(status) || WIFSIGNALED(status)))
     	return;
 	
+#if DEBUG
     fprintf(stderr, "reaped list target\n");
+#endif
     buf = targs->data;
     while ((t = strtok(buf, " \t\r\n")) != 0)
     {
@@ -244,10 +246,12 @@ listTargets(void)
     
     pid = spawn_with_output(prog, reapList, inputList, (gpointer)&targs,
     	prefs.var_environment);
+#if 0
     if (pid > 0)
     {
-    	/* TODO: remove old menu items */
+    	/* TODO: remove old menu items when Change Directory implemented */
     }
+#endif
     g_free(prog);
 }
 
@@ -597,11 +601,13 @@ uiCreateMenus(GtkWidget *menubar)
     uiAddButton(menu, _("Open Log..."), file_open_cb, 0, GR_NONE);
     uiAddButton(menu, _("Save Log..."), file_save_cb, 0, GR_NOTEMPTY);
     uiAddSeparator(menu);
+#if 0
     uiAddButton(menu, _("Change directory..."), unimplemented, 0, GR_NOTRUNNING);
     uiAddSeparator(menu);
     uiAddButton(menu, _("Print"), unimplemented, 0, GR_NOTEMPTY);
     uiAddButton(menu, _("Print Settings..."), unimplemented, 0, GR_NONE);
     uiAddSeparator(menu);
+#endif
     uiAddButton(menu, _("Exit"), file_exit_cb, 0, GR_NONE);
     
     menu = uiAddMenu(menubar, _("Build"));
@@ -644,12 +650,14 @@ uiCreateMenus(GtkWidget *menubar)
     uiAddTearoff(menu);
     uiAddButton(menu, _("About Maketool..."), help_about_cb, 0, GR_NONE);
     uiAddButton(menu, _("About make..."), help_about_make_cb, 0, GR_NONE);
+#if 0
     uiAddSeparator(menu);
     uiAddButton(menu, _("Help on..."), unimplemented, 0, GR_NONE);
     uiAddSeparator(menu);
     uiAddButton(menu, _("Tutorial"), unimplemented, 0, GR_NONE);
     uiAddButton(menu, _("Reference Index"), unimplemented, 0, GR_NONE);
     uiAddButton(menu, _("Home Page"), unimplemented, 0, GR_NONE);
+#endif
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
