@@ -26,7 +26,6 @@
 
 typedef struct
 {
-    /* TODO: 2 verbosity levels */
     char *line;
     FilterResult res;
     GtkCTreeNode *node;

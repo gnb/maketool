@@ -24,7 +24,7 @@
 #include <regex.h>	/* POSIX regular expression fns */
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: find.c,v 1.8 2000-07-29 15:18:14 gnb Exp $");
+CVSID("$Id: find.c,v 1.9 2000-07-29 16:20:07 gnb Exp $");
 
 #define FINDCASE 0  	/* TODO: implement case-insensitive literals */
 
@@ -232,7 +232,6 @@ find_apply_func(LogRec *lr, gpointer user_data)
 static void
 do_find(void)
 {
-    /* TODO: implement finding backwards */
     FindState *state, proto;
     
     memset(&proto, 0, sizeof(proto));
@@ -268,7 +267,6 @@ do_find(void)
 	(direction == FD_FORWARDS),
 	log_selected(),
 	(gpointer)state);
-    /* TODO: ask if user wants to wrap around from start/end of file */
     if (!found && wrap)
     {
     	/* try again from the other end */
@@ -464,7 +462,6 @@ edit_find_cb(GtkWidget *w, gpointer data)
 {
     if (find_shell == 0)
     	create_find_shell();
-    /* TODO: populate entry widget with current selection */
     gtk_widget_grab_focus(string_entry);
     gtk_entry_select_region(GTK_ENTRY(string_entry), 0, -1);
     gtk_widget_show(find_shell);

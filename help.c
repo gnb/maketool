@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: help.c,v 1.22 2000-07-29 15:18:14 gnb Exp $");
+CVSID("$Id: help.c,v 1.23 2000-07-29 16:20:07 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -72,8 +72,6 @@ licence_cb(GtkWidget *w, gpointer data)
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-/* TODO: add GPL text to doco & reference it from this window */
 
 #include "maketool_l.xpm"
 

@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.38 2000-07-29 15:18:14 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.39 2000-07-29 16:20:08 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -688,7 +688,6 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
     
-    		/* TODO: use option menu? */
     combo = gtk_combo_new();
     list = 0;
     list = g_list_append(list, _("Do nothing"));
@@ -1395,7 +1394,6 @@ prefs_create_colors_page(GtkWidget *toplevel)
 	    (GtkCTreeNode*)0,			/* sibling */
 	    &text,				/* text[] */
 	    0,					/* spacing */
-	    /* TODO: use the correct icons */
 	    closed_pm,
 	    closed_mask,  	    	    	/* pixmap_closed,mask_closed */
 	    open_pm,

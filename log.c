@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.32 2000-07-21 06:12:03 gnb Exp $");
+CVSID("$Id: log.c,v 1.33 2000-07-29 16:20:07 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -463,7 +463,6 @@ log_is_empty(void)
     return GTK_CTREE_IS_EMPTY(logwin);
 }
 
-/* TODO: this now just collapses top-level nodes */
 void
 log_collapse_all(void)
 {
@@ -507,7 +506,7 @@ log_save(const char *file)
     
     if ((fp = fopen(file, "w")) == 0)
     {
-    	/* TODO: i18n of system error messages? */
+    	/* Note: assumes g_strerror() does i18n of system error messages. */
     	message("%s: %s", file, g_strerror(errno));
 	return;
     }
@@ -536,7 +535,7 @@ log_open(const char *file)
     
     if ((fp = fopen(file, "r")) == 0)
     {
-    	/* TODO: i18n of system error messages? */
+    	/* Note: assumes g_strerror() does i18n of system error messages. */
     	message("%s: %s", file, g_strerror(errno));
 	return;
     }

@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.22 2000-07-21 06:12:03 gnb Exp $");
+CVSID("$Id: filter.c,v 1.23 2000-07-29 16:20:07 gnb Exp $");
 
 typedef struct
 {
@@ -179,7 +179,7 @@ filter_load(void)
     filter_add(
     	"",				/* state */
 	"^In file included from ([^: \t]+):([0-9]+)[,:]$",	/* regexp */
-	FR_INFORMATION,			/* code */  /* TODO: new category ??*/
+	FR_INFORMATION,			/* code */
 	"\\1",				/* file */
 	"\\2",				/* line */
 	"",				/* col */
@@ -188,7 +188,7 @@ filter_load(void)
     filter_add(
     	"",				/* state */
 	"^[ \t]+from +([^: \t]+):([0-9]+)[,:]$",	/* regexp */
-	FR_INFORMATION,			/* code */  /* TODO: new category ??*/
+	FR_INFORMATION,			/* code */
 	"\\1",				/* file */
 	"\\2",				/* line */
 	"",				/* col */
