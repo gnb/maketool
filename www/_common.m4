@@ -22,3 +22,6 @@ define(ENDBODY,
 </CENTER>
 </BODY></HTML>
 )dnl
+define(EMAILME,
+<A HREF="mailto:gnb@alphalink.com.au?Subject=maketool">$1</A>
+)dnl

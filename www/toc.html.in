@@ -3,7 +3,7 @@
 include(_styles.html)
 </HEAD><BODY BGCOLOR="#ffffff">
 
-<TABLE COLS=1 ROWS=1 BORDER=0 BACKGROUND="tocbg.gif" CELLSPACING=0 CELLPADDING=4>
+<TABLE COLS=1 ROWS=2 BORDER=0 BACKGROUND="tocbg.gif" CELLSPACING=0 CELLPADDING=4>
   <TR>
     <TD>
       <FONT COLOR="#ffffff" SIZE="+2"><B>maketool</B></FONT>
@@ -33,13 +33,22 @@ include(_styles.html)
 	  </TD>
 	</TR>
       </TABLE>
+      <TABLE COLS=1 ROWS=1 BORDER=0 CELLSPACING=0 CELLPADDING=2>
+	<TR>
+	  <TD>
+	  </TD>
+	</TR>
+      </TABLE>
+      <TABLE COLS=1 ROWS=1 BORDER=0 BACKGROUND="" BGCOLOR="#ffffff" CELLSPACING=0 CELLPADDING=5>
+	<TR>
+	  <TD>
+	    Watch for new releases on:<BR>
+	    <A HREF="http://www.freshmeat.net/"><IMG WIDTH=90 HEIGHT=36 SRC="fm.mini.jpg" ALT="freshmeat" BORDER=0></A>
+	  </TD>
+	</TR>
+      </TABLE>
     </TR>
   </TD>
 </TABLE>
-
-<P>
-Watch for new releases on:<BR>
-<A HREF="http://www.freshmeat.net/"><IMG WIDTH=90 HEIGHT=36 SRC="fm.mini.jpg" ALT="freshmeat" BORDER=0></A>
-</P>
 
 </BODY></HTML>

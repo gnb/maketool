@@ -32,6 +32,25 @@ Maketool's features include:
   <LI>Configure foreground & background colours of error & warnings lines.
 </UL>
 
+<P>
+I personally test maketool on these platforms:
+</P>
+<UL>
+  <LI>RedHat Linux 5.2 on i386
+</UL>
+<P>
+I have received reports of maketool running on these platforms:
+</P>
+<UL>
+  <LI>Slackware Linux 3.5 on i386
+  <LI>NetBSD
+  <LI>Solaris
+</UL>
+<P>
+If you port maketool to a new platform, please EMAILME(mail me) the
+patches. I will try to incorporate them into the next release.
+</P>
+
 <!-- TODO: move this to a new page -->
 <P>
 Thanks to the following people who have contributed to maketool.

@@ -1,0 +1,2 @@
+define(MAINPAGE,changelog.html)dnl
+include(_index.html)dnl

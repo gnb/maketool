@@ -1,0 +1,2 @@
+define(MAINPAGE,features.html)dnl
+include(_index.html)dnl
