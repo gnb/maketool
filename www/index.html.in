@@ -65,6 +65,7 @@ THANKS(Francesco Lamonica,bug report)
 THANKS(Albert Hofkamp,`bugs, lots of good suggestions')
 THANKS(Vaclav Slavik,`bugs, suggestions')
 THANKS(David T Bath,Solaris patch)
+THANKS(SATO Satoru,Japanese translation and I18N patches)
 ENDTHANKS
 
 ENDBODY
