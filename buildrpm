@@ -63,7 +63,6 @@ done
 
 case "$BUILDHOST" in
 ""|"$LOCALHOST"|localhost)
-    message "Building on local host ($LOCALHOST)"
     if [ -z "$__BUILDRPM_LOGGED" ]; then
 	export __BUILDRPM_LOGGED=yes
 	exec ./buildrpm \
@@ -72,7 +71,9 @@ case "$BUILDHOST" in
 		--rpm-destination=$RPMDEST \
 		--copy-tarball=$COPYTARBALL \
 		 2>&1 | tee build.$LOCALHOST.log
+	message "Got where I didnt expect!!"
     fi
+    message "Building on local host ($LOCALHOST)"
     ;;
 *)
     message "Building on remote host \"$BUILDHOST\""
@@ -102,6 +103,23 @@ DISTRO=
 if [ -f /etc/redhat-release ]; then
     DISTRO=rh$(sed -e 's|.*release[ \t]\+\([^ \t]\+\).*|\1|g' < /etc/redhat-release)
 fi
+
+get_package_version ()
+{
+    set -- `sed -n -e 's|^AM_INIT_AUTOMAKE(\([^,]\+\),\([^)]\+\))|\1 \2|p' < configure.in` notfound
+    if [ "$1" = notfound ]; then
+	AUTOMAKE=no
+	eval `egrep '^(PACKAGE|VERSION)=' < configure.in`
+    else
+	AUTOMAKE=yes
+	PACKAGE=$1
+	VERSION=$2
+    fi
+    [ -z "$PACKAGE" ] && fatal "Cant extract \$PACKAGE"
+    [ -z "$VERSION" ] && fatal "Cant extract \$VERSION"
+}
+
+get_package_version
 
 #echo RPMDIR=$RPMDIR
 #echo DISTRO=$DISTRO
@@ -147,15 +165,7 @@ HEAD)
     ;;
 esac
 
-set -- `sed -n -e 's|^AM_INIT_AUTOMAKE(\([^,]\+\),\([^)]\+\))|\1 \2|p' < configure.in` notfound
-if [ "$1" = notfound ]; then
-    AUTOMAKE=no
-    eval `egrep '^(PACKAGE|VERSION)=' < configure.in`
-else
-    AUTOMAKE=yes
-    PACKAGE=$1
-    VERSION=$2
-fi
+get_package_version
 
 SPECFILE=${PACKAGE}.spec
 
