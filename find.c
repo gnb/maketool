@@ -24,7 +24,7 @@
 #include <regex.h>	/* POSIX regular expression fns */
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: find.c,v 1.13 2001-09-21 04:20:01 gnb Exp $");
+CVSID("$Id: find.c,v 1.14 2001-09-22 02:18:07 gnb Exp $");
 
 #define FINDCASE 0  	/* TODO: implement case-insensitive literals */
 
@@ -218,6 +218,9 @@ find_apply_func(LogRec *lr, gpointer user_data)
     case FT_REGEXP: 	    /* regular expression */
         found = !regexec(&state->regexp, log_get_text(lr), 0, 0, 0);
 	break;
+	
+    case FT_MAX_TYPES:
+    	break;	    /* shut up gcc -Wall */
     }
     
     if (found)

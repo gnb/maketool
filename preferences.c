@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.50 2001-09-21 06:38:01 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.51 2001-09-22 02:17:52 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -281,10 +281,12 @@ static UiEnumRec finish_action_enum_def[] = {
 {"FINISH_DIALOG",	FINISH_DIALOG},
 {0, 0}};
 
+#if 0
 static UiEnumRec var_type_enum_def[] = {
 {"VAR_MAKE",		VAR_MAKE},
 {"VAR_ENVIRON",		VAR_ENVIRON},
 {0, 0}};
+#endif
 
 static UiEnumRec log_flags_def[] = {
 {"SHOW_INFO",    	LF_SHOW_INFO},
