@@ -1,3 +1,6 @@
+* 0.6.1  (19 Jul 2000)
+x  Fixed bug with glib 1.2.7 and the glib 1.2.6-7 in RH 6.2.
+
 * 0.6  (13 Jul 2000)
 x  Initial implementation of printing the make log.  Prints to PostScript.
    Preferences entries exist (e.g. paper size, margins) but there is no GUI
