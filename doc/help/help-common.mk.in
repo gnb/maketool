@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: help-common.mk.in,v 1.9 2001-09-21 05:56:24 gnb Exp $
+# $Id: help-common.mk.in,v 1.10 2001-09-23 08:07:10 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -66,18 +66,28 @@ installdirs::
 	test -d $(helpdir) || $(INSTALL) -d -m 755 $(helpdir)
 
 install::
-	@echo "Installing..."
+	@echo "Installing:"
 	@for file in $(INSTALLABLES) ; do \
-	    echo $$file; \
+	    if [ -z "$$INSTALL_VERBOSE" ]; then \
+		echo -n "."; \
+	    else \
+		echo $$file; \
+	    fi; \
 	    $(INSTALL) -m 644 $$file $(helpdir); \
 	done
+	@[ -z "$$INSTALL_VERBOSE" ] && echo "done"
 
 uninstall::
-	@echo "Uninstalling..."
+	@echo "Uninstalling:"
 	-@for file in $(INSTALLABLES) ; do \
-	    echo $$file; \
+	    if [ -z "$$INSTALL_VERBOSE" ]; then \
+		echo -n "."; \
+	    else \
+		echo $$file; \
+	    fi; \
 	    $(RM) $(helpdir)/$$file; \
 	done
+	@[ -z "$$INSTALL_VERBOSE" ] && echo "done"
 
 # check
 # $(NSGMLS) -sv $(SGMLDIR)/jade/pubtext/HTML4.dcl $$file; \
