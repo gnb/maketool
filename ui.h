@@ -1,6 +1,7 @@
 #ifndef _UI_H_
 #define _UI_H_
 
+#include "common.h"
 #include <gtk/gtk.h>
 
 

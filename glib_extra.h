@@ -1,10 +1,8 @@
 #ifndef _GLIB_EXTRA_H_
 #define _GLIB_EXTRA_H_
 
-#include <sys/types.h>
-#include <sys/wait.h>
+#include "common.h"
 #include <sys/resource.h>
-#include <glib.h>
 
 typedef void (*GUnixReapFunc)(pid_t, int status, struct rusage *, gpointer);
 

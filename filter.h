@@ -1,6 +1,8 @@
 #ifndef _FILTER_H_
 #define _FILTER_H_
 
+#include "common.h"
+
 typedef enum 
 {
     FR_UNDEFINED,	/* this filter can't tell */

@@ -1,10 +1,8 @@
 #ifndef _SPAWN_H_
 #define _SPAWN_H_
 
-#include <sys/types.h>
-#include <sys/wait.h>
+#include "common.h"
 #include <sys/resource.h>
-#include <glib.h>
 #include "glib_extra.h"
 
 typedef void (*SpawnInputFunc)(int len, const char *buf, gpointer);

@@ -1,6 +1,7 @@
 #ifndef _LOG_H_
 #define _LOG_H_
 
+#include "common.h"
 #include <gtk/gtk.h>
 #include "filter.h"
 

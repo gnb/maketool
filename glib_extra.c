@@ -1,11 +1,8 @@
 #define DEBUG 0
 
+#include "common.h"
 #include "glib_extra.h"
-#if DEBUG
-#include <stdio.h>
-#endif
 #include <signal.h>
-#include <errno.h>
 #include <sys/poll.h>
 
 

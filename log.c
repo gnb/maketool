@@ -260,7 +260,7 @@ logOpen(const char *file)
 	return;
     }
     
-    sprintf(buf, "Log file %s", file);
+    sprintf(buf, _("Log file %s"), file);
     logStartBuild(buf);
     
     while (fgets(buf, sizeof(buf), fp) != 0)

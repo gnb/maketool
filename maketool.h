@@ -1,14 +1,7 @@
 #ifndef _MAKETOOL_H_
 #define _MAKETOOL_H_
 
-#include <sys/types.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <malloc.h>
-#include <glib.h>
+#include "common.h"
 #include <gtk/gtk.h>
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

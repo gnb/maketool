@@ -46,7 +46,7 @@ help_about_cb(GtkWidget *w, gpointer data)
 	GdkPixmap *pm;
 	GdkBitmap *mask;
 
-	about_shell = uiCreateOkDialog(toplevel, "About Maketool");
+	about_shell = uiCreateOkDialog(toplevel, _("About Maketool"));
 	
 	hbox = gtk_hbox_new(FALSE, 5);
 	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_shell)->vbox), hbox);
@@ -58,11 +58,11 @@ help_about_cb(GtkWidget *w, gpointer data)
 	gtk_container_add(GTK_CONTAINER(hbox), icon);
 	gtk_widget_show(icon);
 
-	label = gtk_label_new(about_str);
+	label = gtk_label_new(_(about_str));
 	gtk_container_add(GTK_CONTAINER(hbox), label);
 	gtk_widget_show(label);
 
-	uiDialogCreateButton(about_shell, "Licence...", licence_cb, (gpointer)0);
+	uiDialogCreateButton(about_shell, _("Licence..."), licence_cb, (gpointer)0);
     }
     
     gtk_widget_show(about_shell);
@@ -83,7 +83,7 @@ make_version_reap(pid_t pid, int status, struct rusage *usg, gpointer user_data)
         GtkWidget *toplevel = GTK_WIDGET(user_data);
 	GtkWidget *label;
 
-	about_make_shell = uiCreateOkDialog(toplevel, "About Make");
+	about_make_shell = uiCreateOkDialog(toplevel, _("About Make"));
 
 	/* TODO: logo */
 	label = gtk_label_new(make_version);

@@ -1,10 +1,5 @@
-#include <sys/types.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <glib.h>
-#include <regex.h>	/* POSIX regular expression fns */
 #include "filter.h"
+#include <regex.h>	/* POSIX regular expression fns */
 
 typedef struct
 {
@@ -42,7 +37,7 @@ filter_add(
         char errbuf[1024];
     	regerror(err, &f->regexp, errbuf, sizeof(errbuf));
 	/* TODO: decent error reporting mechanism */
-	fprintf(stderr, "%s: error in regular expression \"%s\": %s\n",
+	fprintf(stderr, _("%s: error in regular expression \"%s\": %s\n"),
 		argv0, regexp, errbuf);
 	regfree(&f->regexp);
 	g_free(f);

@@ -269,7 +269,7 @@ uiCreateOkDialog(
     dialog = gtk_dialog_new();
     gtk_window_set_title(GTK_WINDOW(dialog), title);
     
-    uiDialogCreateButton(dialog, "OK", uiDialogOkCb, (gpointer)dialog);
+    uiDialogCreateButton(dialog, _("OK"), uiDialogOkCb, (gpointer)dialog);
     
     return dialog;
 }    
@@ -332,11 +332,11 @@ uiCreateApplyDialog(
     gtk_object_set_data(GTK_OBJECT(ad->dialog), APPLY_DIALOG_DATA,
     	(gpointer)ad);
     
-    ad->ok_btn = uiDialogCreateButton(ad->dialog, "OK", uiApplyDialogOkCb, (gpointer)ad);
+    ad->ok_btn = uiDialogCreateButton(ad->dialog, _("OK"), uiApplyDialogOkCb, (gpointer)ad);
     gtk_widget_set_sensitive(ad->ok_btn, FALSE);
-    ad->apply_btn = uiDialogCreateButton(ad->dialog, "Apply", uiApplyDialogApplyCb, (gpointer)ad);
+    ad->apply_btn = uiDialogCreateButton(ad->dialog, _("Apply"), uiApplyDialogApplyCb, (gpointer)ad);
     gtk_widget_set_sensitive(ad->apply_btn, FALSE);
-    uiDialogCreateButton(ad->dialog, "Cancel", uiApplyDialogCancelCb, (gpointer)ad);
+    uiDialogCreateButton(ad->dialog, _("Cancel"), uiApplyDialogCancelCb, (gpointer)ad);
     
     return ad->dialog;
 }    

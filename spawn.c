@@ -1,9 +1,5 @@
 #include "spawn.h"
-#include <stdio.h>
 #include <signal.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <sys/poll.h>
 #include <sys/ioctl.h>
 #include <gtk/gtk.h>

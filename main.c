@@ -1,7 +1,6 @@
 #define DEFINE_GLOBALS
 #include <sys/time.h>
 #include <stdarg.h>
-#include <errno.h>
 #include <signal.h>
 #include "maketool.h"
 #include "spawn.h"
@@ -182,7 +181,7 @@ startEdit(LogRec *lr)
     prog = expand_prog(prefs.prog_edit_source, lr->res.file, lr->res.line, 0);
     
     if (spawn_simple(prog, 0, 0) > 0)
-	message("Editing %s (line %d)", lr->res.file, lr->res.line);
+	message(_("Editing %s (line %d)"), lr->res.file, lr->res.line);
 	
     free(prog);
 }
@@ -201,21 +200,21 @@ reapMake(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	char intStr[256];
 	
 	if (logNumErrors() > 0)
-	    sprintf(errStr, ", %d errors", logNumErrors());
+	    sprintf(errStr, _(", %d errors"), logNumErrors());
 	else
 	    errStr[0] = '\0';
 	    
 	if (logNumWarnings() > 0)
-	    sprintf(warnStr, ", %d warnings", logNumWarnings());
+	    sprintf(warnStr, _(", %d warnings"), logNumWarnings());
 	else
 	    warnStr[0] = '\0';
 
 	if (interrupted)
-	    strcpy(intStr, " (interrupted)");
+	    strcpy(intStr, _(" (interrupted)"));
 	else
 	    intStr[0] = '\0';
 	    
-	message("Finished making %s%s%s%s", target, errStr, warnStr, intStr);
+	message(_("Finished making %s%s%s%s"), target, errStr, warnStr, intStr);
 	
 	currentPid = -1;
 	logEndBuild(target);
@@ -283,7 +282,7 @@ buildStart(const char *target)
     	prefs.var_environment);
     if (currentPid > 0)
     {
-	message("Making %s", target);
+	message(_("Making %s"), target);
 	
 	switch (prefs.start_action)
 	{
@@ -323,7 +322,7 @@ file_open_cb(GtkWidget *w, gpointer data)
     static GtkWidget *filesel = 0;
     
     if (filesel == 0)
-    	filesel = uiCreateFileSel("Open Log File", logOpen, "make.log");
+    	filesel = uiCreateFileSel(_("Open Log File"), logOpen, "make.log");
 
     gtk_widget_show(filesel);
 }
@@ -336,7 +335,7 @@ file_save_cb(GtkWidget *w, gpointer data)
     static GtkWidget *filesel = 0;
     
     if (filesel == 0)
-    	filesel = uiCreateFileSel("Save Log File", logSave, "make.log");
+    	filesel = uiCreateFileSel(_("Save Log File"), logSave, "make.log");
 
     gtk_widget_show(filesel);
 }
@@ -441,7 +440,7 @@ view_edit_next_cb(GtkWidget *w, gpointer data)
     }
     else
     {
-    	message("No more errors in log");
+    	message(_("No more errors in log"));
     }
 }
 
@@ -510,22 +509,22 @@ uiCreateMenus(GtkWidget *menubar)
 {
     GtkWidget *menu;
     
-    menu = uiAddMenu(menubar, "File");
+    menu = uiAddMenu(menubar, _("File"));
     uiAddTearoff(menu);
-    uiAddButton(menu, "Open Log...", file_open_cb, 0, GR_NONE);
-    uiAddButton(menu, "Save Log...", file_save_cb, 0, GR_NOTEMPTY);
+    uiAddButton(menu, _("Open Log..."), file_open_cb, 0, GR_NONE);
+    uiAddButton(menu, _("Save Log..."), file_save_cb, 0, GR_NOTEMPTY);
     uiAddSeparator(menu);
-    uiAddButton(menu, "Change directory...", unimplemented, 0, GR_NOTRUNNING);
+    uiAddButton(menu, _("Change directory..."), unimplemented, 0, GR_NOTRUNNING);
     uiAddSeparator(menu);
-    uiAddButton(menu, "Print", unimplemented, 0, GR_NOTEMPTY);
-    uiAddButton(menu, "Print Settings...", unimplemented, 0, GR_NONE);
+    uiAddButton(menu, _("Print"), unimplemented, 0, GR_NOTEMPTY);
+    uiAddButton(menu, _("Print Settings..."), unimplemented, 0, GR_NONE);
     uiAddSeparator(menu);
-    uiAddButton(menu, "Exit", file_exit_cb, 0, GR_NONE);
+    uiAddButton(menu, _("Exit"), file_exit_cb, 0, GR_NONE);
     
-    menu = uiAddMenu(menubar, "Build");
+    menu = uiAddMenu(menubar, _("Build"));
     uiAddTearoff(menu);
-    uiAddButton(menu, "Again", build_again_cb, 0, GR_AGAIN);
-    uiAddButton(menu, "Stop", build_stop_cb, 0, GR_RUNNING);
+    uiAddButton(menu, _("Again"), build_again_cb, 0, GR_AGAIN);
+    uiAddButton(menu, _("Stop"), build_stop_cb, 0, GR_RUNNING);
     uiAddSeparator(menu);
     uiAddButton(menu, "all", build_cb, "all", GR_NOTRUNNING);
     uiAddButton(menu, "install", build_cb, "install", GR_NOTRUNNING);
@@ -537,36 +536,36 @@ uiCreateMenus(GtkWidget *menubar)
     uiAddButton(menu, "targets", build_cb, "targets", GR_NOTRUNNING);
 #endif
     
-    menu = uiAddMenu(menubar, "View");
+    menu = uiAddMenu(menubar, _("View"));
     uiAddTearoff(menu);
-    uiAddButton(menu, "Clear Log", view_clear_cb, 0, GR_NOTEMPTY);
-    uiAddButton(menu, "Collapse All", view_collapse_all_cb, 0, GR_NOTEMPTY);
-    uiAddButton(menu, "Edit", view_edit_cb, 0, GR_EDITABLE);
-    uiAddButton(menu, "Edit Next Error", view_edit_next_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
-    uiAddButton(menu, "Edit Prev Error", view_edit_next_cb, GINT_TO_POINTER(FALSE), GR_NOTEMPTY);
+    uiAddButton(menu, _("Clear Log"), view_clear_cb, 0, GR_NOTEMPTY);
+    uiAddButton(menu, _("Collapse All"), view_collapse_all_cb, 0, GR_NOTEMPTY);
+    uiAddButton(menu, _("Edit"), view_edit_cb, 0, GR_EDITABLE);
+    uiAddButton(menu, _("Edit Next Error"), view_edit_next_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
+    uiAddButton(menu, _("Edit Prev Error"), view_edit_next_cb, GINT_TO_POINTER(FALSE), GR_NOTEMPTY);
     uiAddSeparator(menu);
-    uiAddToggle(menu, "Toolbar", view_widget_cb, (gpointer)&toolbar, 0, TRUE);
-    uiAddToggle(menu, "Statusbar", view_widget_cb, (gpointer)&messagebox, 0, TRUE);
+    uiAddToggle(menu, _("Toolbar"), view_widget_cb, (gpointer)&toolbar, 0, TRUE);
+    uiAddToggle(menu, _("Statusbar"), view_widget_cb, (gpointer)&messagebox, 0, TRUE);
     uiAddSeparator(menu);
-    uiAddToggle(menu, "Errors", view_flags_cb, GINT_TO_POINTER(LF_SHOW_ERRORS),
+    uiAddToggle(menu, _("Errors"), view_flags_cb, GINT_TO_POINTER(LF_SHOW_ERRORS),
     	0, logGetFlags() & LF_SHOW_ERRORS);
-    uiAddToggle(menu, "Warnings", view_flags_cb, GINT_TO_POINTER(LF_SHOW_WARNINGS),
+    uiAddToggle(menu, _("Warnings"), view_flags_cb, GINT_TO_POINTER(LF_SHOW_WARNINGS),
     	0, logGetFlags() & LF_SHOW_WARNINGS);
-    uiAddToggle(menu, "Information", view_flags_cb, GINT_TO_POINTER(LF_SHOW_INFO),
+    uiAddToggle(menu, _("Information"), view_flags_cb, GINT_TO_POINTER(LF_SHOW_INFO),
     	0, logGetFlags() & LF_SHOW_INFO);
     uiAddSeparator(menu);
-    uiAddButton(menu, "Preferences", view_preferences_cb, 0, GR_NONE);
+    uiAddButton(menu, _("Preferences"), view_preferences_cb, 0, GR_NONE);
     
-    menu = uiAddMenuRight(menubar, "Help");
+    menu = uiAddMenuRight(menubar, _("Help"));
     uiAddTearoff(menu);
-    uiAddButton(menu, "About Maketool...", help_about_cb, 0, GR_NONE);
-    uiAddButton(menu, "About make...", help_about_make_cb, 0, GR_NONE);
+    uiAddButton(menu, _("About Maketool..."), help_about_cb, 0, GR_NONE);
+    uiAddButton(menu, _("About make..."), help_about_make_cb, 0, GR_NONE);
     uiAddSeparator(menu);
-    uiAddButton(menu, "Help on...", unimplemented, 0, GR_NONE);
+    uiAddButton(menu, _("Help on..."), unimplemented, 0, GR_NONE);
     uiAddSeparator(menu);
-    uiAddButton(menu, "Tutorial", unimplemented, 0, GR_NONE);
-    uiAddButton(menu, "Reference Index", unimplemented, 0, GR_NONE);
-    uiAddButton(menu, "Home Page", unimplemented, 0, GR_NONE);
+    uiAddButton(menu, _("Tutorial"), unimplemented, 0, GR_NONE);
+    uiAddButton(menu, _("Reference Index"), unimplemented, 0, GR_NONE);
+    uiAddButton(menu, _("Home Page"), unimplemented, 0, GR_NONE);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -581,26 +580,30 @@ uiCreateMenus(GtkWidget *menubar)
 static void
 uiCreateTools()
 {
-    uiToolCreate(toolbar, "Again", "Build last target again",
+    char tooltip[1024];
+    
+    uiToolCreate(toolbar, _("Again"), _("Build last target again"),
     	again_xpm, build_again_cb, 0, GR_AGAIN);
     
     uiToolAddSpace(toolbar);
 
-    uiToolCreate(toolbar, "all", "Build `all'",
+    sprintf(tooltip, _("Build `%s'"), "all");
+    uiToolCreate(toolbar, "all", tooltip,
     	all_xpm, build_cb, "all", GR_NOTRUNNING);
-    uiToolCreate(toolbar, "clean", "Build `clean'",
+    sprintf(tooltip, _("Build `%s'"), "clean");
+    uiToolCreate(toolbar, "clean", tooltip,
     	clean_xpm, build_cb, "clean", GR_NOTRUNNING);
     
     uiToolAddSpace(toolbar);
     
-    uiToolCreate(toolbar, "Clear", "Clear log",
+    uiToolCreate(toolbar, _("Clear"), _("Clear log"),
     	clear_xpm, view_clear_cb, 0, GR_NOTEMPTY);
-    uiToolCreate(toolbar, "Next", "Edit next error or warning",
+    uiToolCreate(toolbar, _("Next"), _("Edit next error or warning"),
     	next_xpm, view_edit_next_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
     
     uiToolAddSpace(toolbar);
     
-    uiToolCreate(toolbar, "Print", "Print log",
+    uiToolCreate(toolbar, _("Print"), _("Print log"),
     	print_xpm, unimplemented, 0, GR_NOTEMPTY);
 }
 
@@ -713,7 +716,7 @@ uiCreate(void)
     
     messageent = gtk_entry_new();
     gtk_entry_set_editable(GTK_ENTRY(messageent), FALSE);
-    gtk_entry_set_text(GTK_ENTRY(messageent), "Welcome to Maketool");
+    gtk_entry_set_text(GTK_ENTRY(messageent), _("Welcome to Maketool"));
     gtk_box_pack_start(GTK_BOX(messagebox), messageent, TRUE, TRUE, 0);   
     gtk_widget_show(messageent);
     
@@ -734,7 +737,7 @@ uiCreate(void)
 static void
 usage(void)
 {
-    fprintf(stderr, "Usage: %s [options] target [target...]\n", argv0);
+    fprintf(stderr, _("Usage: %s [options] target [target...]\n"), argv0);
     /* TODO: options */
 }
 
@@ -770,7 +773,11 @@ parseArgs(int argc, char **argv)
 int
 main(int argc, char **argv)
 {
-    gtk_init(&argc, &argv);
+    /*setlocale(LC_ALL, "");*/
+    bindtextdomain("maketool", "."); /* TODO: defines in config.h */
+    textdomain("maketool");
+    
+    gtk_init(&argc, &argv);    
     preferences_init();
     parseArgs(argc, argv);
     uiCreate();

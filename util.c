@@ -1,12 +1,4 @@
 #include "util.h"
-#include <malloc.h>
-#include <glib.h>
-#include <string.h>
-#include <stdio.h>
-
-#ifndef MIN
-#define MIN(x,y) ((x)<(y)?(x):(y))
-#endif
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -123,7 +115,7 @@ expand_string(const char *in, const char *expands[256])
     estring_init(&out);
     do_expands(in, &out, expands);
         
-#if 1
+#if DEBUG
     fprintf(stderr, "expand_string(): \"%s\" -> \"%s\"\n", in, out.data);
 #endif
     return out.data;

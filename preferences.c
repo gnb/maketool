@@ -296,7 +296,7 @@ browse_makefile_cb(GtkWidget *w, gpointer data)
     char *mf = gtk_entry_get_text(GTK_ENTRY(makefile_entry));
     
     if (filesel == 0)
-    	filesel = uiCreateFileSel("Choose Makefile", set_makefile, mf);
+    	filesel = uiCreateFileSel(_("Choose Makefile"), set_makefile, mf);
     else
     	gtk_file_selection_set_filename(GTK_FILE_SELECTION(filesel), mf);
 
@@ -326,7 +326,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     /*
      * `Parallel' frame
      */
-    frame = gtk_frame_new("Make runs commands");
+    frame = gtk_frame_new(_("Make runs commands"));
     gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 2, row, row+1);
     gtk_widget_show(frame);
     
@@ -336,7 +336,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_widget_show(table2);
     
     run_radio[RUN_SERIES] = gtk_radio_button_new_with_label_from_widget(0,
-    			"in series.");
+    			_("in series."));
     gtk_signal_connect(GTK_OBJECT(run_radio[RUN_SERIES]), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table2), run_radio[RUN_SERIES], 0, 2, 0, 1);
@@ -345,7 +345,7 @@ prefs_create_general_page(GtkWidget *toplevel)
 
     run_radio[RUN_PARALLEL_PROC] = gtk_radio_button_new_with_label_from_widget(
     			GTK_RADIO_BUTTON(run_radio[RUN_SERIES]),
-    			"in parallel. Maximum number of processes is ");
+    			_("in parallel. Maximum number of processes is "));
     gtk_signal_connect(GTK_OBJECT(run_radio[RUN_PARALLEL_PROC]), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table2), run_radio[RUN_PARALLEL_PROC], 0, 1, 1, 2);
@@ -368,7 +368,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     
     run_radio[RUN_PARALLEL_LOAD] = gtk_radio_button_new_with_label_from_widget(
     			GTK_RADIO_BUTTON(run_radio[RUN_SERIES]),
-    			"in parallel. Maximum machine load is ");
+    			_("in parallel. Maximum machine load is "));
     gtk_signal_connect(GTK_OBJECT(run_radio[RUN_PARALLEL_LOAD]), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table2), run_radio[RUN_PARALLEL_LOAD], 0, 1, 2, 3);
@@ -391,7 +391,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     /*
      * Edit first detected error.
      */
-    edit1_check = gtk_check_button_new_with_label("Automatically edit first error");
+    edit1_check = gtk_check_button_new_with_label(_("Automatically edit first error"));
     gtk_signal_connect(GTK_OBJECT(edit1_check), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), edit1_check, 0, 2, row, row+1);
@@ -401,7 +401,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     /*
      * Auto edit warnings
      */
-    editw_check = gtk_check_button_new_with_label("Edit Next ignores warnings");
+    editw_check = gtk_check_button_new_with_label(_("Edit Next ignores warnings"));
     gtk_signal_connect(GTK_OBJECT(editw_check), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), editw_check, 0, 2, row, row+1);
@@ -411,7 +411,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     /*
      * -k flag
      */
-    fail_check = gtk_check_button_new_with_label("Continue despite failures");
+    fail_check = gtk_check_button_new_with_label(_("Continue despite failures"));
     gtk_signal_connect(GTK_OBJECT(fail_check), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), fail_check, 0, 2, row, row+1);
@@ -421,7 +421,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     /*
      * Action on starting build.
      */
-    label = gtk_label_new("On starting each build: ");
+    label = gtk_label_new(_("On starting each build: "));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -429,9 +429,9 @@ prefs_create_general_page(GtkWidget *toplevel)
     		/* TODO: use option menu? */
     combo = gtk_combo_new();
     list = 0;
-    list = g_list_append(list, "Do nothing");
-    list = g_list_append(list, "Clear log");
-    list = g_list_append(list, "Collapse all log items");
+    list = g_list_append(list, _("Do nothing"));
+    list = g_list_append(list, _("Clear log"));
+    list = g_list_append(list, _("Collapse all log items"));
     gtk_combo_set_popdown_strings(GTK_COMBO(combo), list);
     gtk_entry_set_editable(GTK_ENTRY(GTK_COMBO(combo)->entry), FALSE);
     gtk_signal_connect(GTK_OBJECT(GTK_COMBO(combo)->entry), "changed", 
@@ -446,7 +446,7 @@ prefs_create_general_page(GtkWidget *toplevel)
      * Choose Makefile.
      */
     
-    label = gtk_label_new("Makefile:");
+    label = gtk_label_new(_("Makefile:"));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -458,7 +458,7 @@ prefs_create_general_page(GtkWidget *toplevel)
 
     combo = gtk_combo_new();
     list = 0;
-    list = g_list_append(list, "(default)");
+    list = g_list_append(list, _("(default)"));
     list = g_list_append(list, "Makefile");
     list = g_list_append(list, "makefile");
     list = g_list_append(list, "GNUmakefile");
@@ -473,7 +473,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_widget_show(combo);
     makefile_entry = GTK_COMBO(combo)->entry;
 
-    button = gtk_button_new_with_label("Browse...");
+    button = gtk_button_new_with_label(_("Browse..."));
     gtk_signal_connect(GTK_OBJECT(button), "clicked", 
     	GTK_SIGNAL_FUNC(browse_makefile_cb), 0);
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, SPACING);	
@@ -603,8 +603,6 @@ var_unset_cb(GtkWidget *w, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-static char *variables_titles[] = { "Name", "Value", "Type" };
-
 
 static GtkWidget *
 prefs_create_variables_page(GtkWidget *toplevel)
@@ -628,7 +626,10 @@ prefs_create_variables_page(GtkWidget *toplevel)
     gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
     gtk_widget_show(hbox);
 
-    clist = gtk_clist_new_with_titles(3, variables_titles);
+    text[0] = _("Name");
+    text[1] = _("Value");
+    text[2] = _("Type");
+    clist = gtk_clist_new_with_titles(3, text);
     gtk_clist_set_sort_column(GTK_CLIST(clist), 0);
     gtk_clist_set_auto_sort(GTK_CLIST(clist), TRUE);
     gtk_clist_set_column_auto_resize(GTK_CLIST(clist), 0, TRUE);
@@ -654,7 +655,7 @@ prefs_create_variables_page(GtkWidget *toplevel)
     /*
      * Name
      */
-    label = gtk_label_new("Name:");
+    label = gtk_label_new(_("Name:"));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -671,7 +672,7 @@ prefs_create_variables_page(GtkWidget *toplevel)
     /*
      * Value
      */
-    label = gtk_label_new("Value:");
+    label = gtk_label_new(_("Value:"));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -688,7 +689,7 @@ prefs_create_variables_page(GtkWidget *toplevel)
     /*
      * Type
      */
-    label = gtk_label_new("Type:");
+    label = gtk_label_new(_("Type:"));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -710,7 +711,7 @@ prefs_create_variables_page(GtkWidget *toplevel)
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
     gtk_widget_show(hbox);
     
-    button = gtk_button_new_with_label("Set");
+    button = gtk_button_new_with_label(_("Set"));
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
     gtk_signal_connect(GTK_OBJECT(button), "clicked", 
     	GTK_SIGNAL_FUNC(var_set_cb), 0);
@@ -718,7 +719,7 @@ prefs_create_variables_page(GtkWidget *toplevel)
     gtk_widget_show(button);
     var_set_btn = button;
 
-    button = gtk_button_new_with_label("Unset");
+    button = gtk_button_new_with_label(_("Unset"));
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
     gtk_signal_connect(GTK_OBJECT(button), "clicked", 
     	GTK_SIGNAL_FUNC(var_unset_cb), 0);
@@ -779,7 +780,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     /*
      * Make program
      */
-    label = gtk_label_new("Make:");
+    label = gtk_label_new(_("Make:"));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -796,7 +797,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     /*
      * Make target lister
      */
-    label = gtk_label_new("List make targets:");
+    label = gtk_label_new(_("List make targets:"));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -812,7 +813,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     /*
      * Make version lister
      */
-    label = gtk_label_new("List make version:");
+    label = gtk_label_new(_("List make version:"));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -828,7 +829,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     /*
      * Editor
      */
-    label = gtk_label_new("Edit source files:");
+    label = gtk_label_new(_("Edit source files:"));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -888,7 +889,7 @@ prefs_create_styles_page(GtkWidget *toplevel)
     gtk_widget_show(table);
     
     
-    label = gtk_label_new("Editor:");
+    label = gtk_label_new(_("Editor:"));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -913,7 +914,7 @@ prefs_create_shell(GtkWidget *toplevel)
     GtkWidget *box;
     GtkWidget *page;
 
-    prefs_shell = uiCreateApplyDialog(toplevel, "Maketool: Preferences",
+    prefs_shell = uiCreateApplyDialog(toplevel, _("Maketool: Preferences"),
     	prefs_apply_cb, (gpointer)0);
 
     box = gtk_vbox_new(FALSE, 0);
@@ -928,24 +929,24 @@ prefs_create_shell(GtkWidget *toplevel)
     
     page = prefs_create_general_page(toplevel);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), page,
-    				gtk_label_new("General"));
+    				gtk_label_new(_("General")));
     gtk_widget_show(page);
 
     
     page = prefs_create_variables_page(toplevel);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), page,
-    				gtk_label_new("Variables"));
+    				gtk_label_new(_("Variables")));
     gtk_widget_show(page);
 
     page = prefs_create_programs_page(toplevel);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), page,
-    				gtk_label_new("Programs"));
+    				gtk_label_new(_("Programs")));
     gtk_widget_show(page);
 
 #if 0    
     page = prefs_create_styles_page(toplevel);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), page,
-    				gtk_label_new("Styles"));
+    				gtk_label_new(_("Styles")));
     gtk_widget_show(page);
 #endif
 
