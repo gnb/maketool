@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.45 2003-10-13 12:55:55 gnb Exp $");
+CVSID("$Id: filter.c,v 1.46 2003-10-13 13:09:28 gnb Exp $");
 
 typedef struct
 {
@@ -780,7 +780,7 @@ filter_load(void)
     filter_set_start(_("GNU cross-compilers"));
     filter_add(
     	"",				/* state */
-	"^[ \t]*(|[^ \t:#]+/)[-/a-z0-9]+-(cc|gcc|c\\+\\+|g\\+\\+).*[ \t]-c([ \t]|[ \t].*[ \t])([^ \t]+\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
+	"^[ \t]*(|/[^ \t:#]+/)[-/a-z0-9]+-(cc|gcc|c\\+\\+|g\\+\\+).*[ \t]-c([ \t]|[ \t].*[ \t])([^ \t]+\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
 	FR_INFORMATION,			/* code */
 	"\\4\\5",			/* file */
 	"",				/* line */
@@ -791,7 +791,7 @@ filter_load(void)
     filter_set_start(_("Generic UNIX C compiler"));
     filter_add(
     	"",				/* state */
-	"^[ \t]*(|[^ \t:#]+/)(cc|c89|gcc|CC|c\\+\\+|g\\+\\+|ld).*[ \t]+-o[ \t]+([^ \t]+)", /* regexp */
+	"^[ \t]*(|/[^ \t:#]+/)(cc|c89|gcc|CC|c\\+\\+|g\\+\\+|ld).*[ \t]+-o[ \t]+([^ \t]+)", /* regexp */
 	FR_INFORMATION,			/* code */
 	"",				/* file */
 	"",				/* line */
@@ -802,7 +802,7 @@ filter_load(void)
     filter_set_start(_("GNU cross-compilers"));
     filter_add(
     	"",				/* state */
-	"^[ \t]*(|[^ \t:#]+/)[-/a-z0-9]+-(cc|gcc|c\\+\\+|g\\+\\+|ld).*[ \t]+-o[ \t]+([^ \t]+)", /* regexp */
+	"^[ \t]*(|/[^ \t:#]+/)[-/a-z0-9]+-(cc|gcc|c\\+\\+|g\\+\\+|ld).*[ \t]+-o[ \t]+([^ \t]+)", /* regexp */
 	FR_INFORMATION,			/* code */
 	"",				/* file */
 	"",				/* line */
@@ -813,7 +813,7 @@ filter_load(void)
     filter_set_start(_("Generic UNIX C compiler"));
     filter_add(
     	"",				/* state */
-	"^[ \t]*(|[^ \t:#]+/)ar[ \t][ \t]*[rc][a-z]*[ \t][ \t]*(lib[^ \t]*.a)", /* regexp */
+	"^[ \t]*(|/[^ \t:#]+/)ar[ \t][ \t]*[rc][a-z]*[ \t][ \t]*(lib[^ \t]*.a)", /* regexp */
 	FR_INFORMATION,			/* code */
 	"",				/* file */
 	"",				/* line */
