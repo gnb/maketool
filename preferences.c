@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.26 1999-11-07 05:33:10 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.27 1999-11-07 05:58:36 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -391,7 +391,12 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
 
         
     prefs.run_processes = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(run_proc_sb));
-    prefs.run_load = (int)(10.0 * gtk_spin_button_get_value_as_float(GTK_SPIN_BUTTON(run_load_sb)));
+    prefs.run_load = (int)(10.0 * gtk_spin_button_get_value_as_float(GTK_SPIN_BUTTON(run_load_sb)) + 0.5);
+#if DEBUG > 4
+    fprintf(stderr, "run_load = (double)%g = (int)%d\n",
+    	10.0*(double)gtk_spin_button_get_value_as_float(GTK_SPIN_BUTTON(run_load_sb)),
+	prefs.run_load);
+#endif
     
     prefs.edit_first_error = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(edit1_check));
     prefs.edit_warnings = !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(editw_check));

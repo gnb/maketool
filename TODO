@@ -79,7 +79,7 @@ x  DONE: Install extract_targets.sh
 
 x  DONE: Accelerators etc for menu items.
 
-x  Allow user to configure error & warning colours & icons in Preferences.
+x  DONE: (for colours only) Allow user to configure error & warning colours & icons in Preferences.
 
 x  Doco.
 
@@ -101,7 +101,8 @@ x  Fix bug whereby `configure --with-included-gettext' leaves a symlink
 x  On startup, when preferences or args specify a non-existant makefile,
    issue a warning alert to the user.
    
-x  Fix bug whereby run load spinbox saves wrong value to preferences.
+x  DONE: Fix bug whereby run load spinbox saves wrong value to preferences.
+   It was a float rounding problem.
    
 x  Add filters to summarise compile lines, and a View menu item
    to choose between full and summarised version in log window.
@@ -127,7 +128,7 @@ x  Change the preferences so that the actual make executable used is
    prog_make_version, and inside the shell script extract_targets).
    Use %M as the name of the executable in those cases.
    
-x  Allow setting of make variables using VAR=val syntax on command line.
+x  DONE: Allow setting of make variables using VAR=val syntax on command line.
 
 x  Make the default text editor configurable, figured out in configure.
 
@@ -174,5 +175,10 @@ x  Provide a Preferences setting to control what happens when a make
 x  Add timestamp to log start line, either current time for normal builds
    or file modification time for log files. Also number of errors & warnings.
 
-x  Should be able to edit main.c by clicking on "    from main.c" in gcc
+x  DONE: Should be able to edit main.c by clicking on "    from main.c" in gcc
    inclusion trace.
+
+x  Provide facility to search the log text.
+
+x  Fix bug where sometimes list_targets doesn't finish, or isn't reaped,
+   or something.
