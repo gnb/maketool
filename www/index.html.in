@@ -62,7 +62,7 @@ BEGINTHANKS
 THANKS(Frederick Bruckman,`NetBSD port, bugfixes')
 THANKS(Alistair Crooks,Solaris port)
 THANKS(Francesco Lamonica,bug report)
-THANKS(Albert Hofkamp,`bugs, suggestions')
+THANKS(Albert Hofkamp,`bugs, lots of good suggestions')
 THANKS(Vaclav Slavik,`bugs, suggestions')
 THANKS(David T Bath,Solaris patch)
 ENDTHANKS
