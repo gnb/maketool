@@ -28,7 +28,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.25 1999-06-06 16:10:42 gnb Exp $");
+CVSID("$Id: main.c,v 1.26 1999-06-06 17:43:00 gnb Exp $");
 
 typedef enum
 {
@@ -46,19 +46,19 @@ typedef enum
 } Groups;
 
 char		*targets;		/* targets on commandline */
-const char	*lastTarget = 0;	/* last target built, for `again' */
-GList		*predefinedTargets = 0;	/* special well-known targets */
-GList		*availableTargets = 0;	/* all possible targets, for menu */
-GtkWidget	*buildMenu;
+const char	*last_target = 0;	/* last target built, for `again' */
+GList		*predefined_targets = 0;	/* special well-known targets */
+GList		*available_targets = 0;	/* all possible targets, for menu */
+GtkWidget	*build_menu;
 GtkWidget	*toolbar, *messagebox;
 GtkWidget	*messageent;
-pid_t		currentPid = -1;
+pid_t		current_pid = -1;
 gboolean	interrupted = FALSE;
-gboolean	firstError = FALSE;
+gboolean	first_error = FALSE;
 
 #define ANIM_MAX 15
-GdkPixmap	*animPixmaps[ANIM_MAX+1];
-GdkBitmap	*animMasks[ANIM_MAX+1];
+GdkPixmap	*anim_pixmaps[ANIM_MAX+1];
+GdkBitmap	*anim_masks[ANIM_MAX+1];
 GtkWidget	*anim;
 
 
@@ -91,21 +91,21 @@ message(const char *fmt, ...)
 void
 grey_menu_items(void)
 {
-    gboolean running = (currentPid > 0);
-    gboolean empty = logIsEmpty();
-    LogRec *sel = logSelected();
+    gboolean running = (current_pid > 0);
+    gboolean empty = log_is_empty();
+    LogRec *sel = log_selected();
     gboolean editable = (sel != 0 && sel->res.file != 0);
-    gboolean again = (lastTarget != 0 && !running);
-    gboolean all = (!running && g_list_find_str(availableTargets, "all") != 0);
-    gboolean clean = (!running && g_list_find_str(availableTargets, "clean") != 0);
+    gboolean again = (last_target != 0 && !running);
+    gboolean all = (!running && g_list_find_str(available_targets, "all") != 0);
+    gboolean clean = (!running && g_list_find_str(available_targets, "clean") != 0);
 
-    uiGroupSetSensitive(GR_NOTRUNNING, !running);
-    uiGroupSetSensitive(GR_RUNNING, running);
-    uiGroupSetSensitive(GR_NOTEMPTY, !empty);
-    uiGroupSetSensitive(GR_EDITABLE, editable);
-    uiGroupSetSensitive(GR_AGAIN, again);
-    uiGroupSetSensitive(GR_ALL, all);
-    uiGroupSetSensitive(GR_CLEAN, clean);
+    ui_group_set_sensitive(GR_NOTRUNNING, !running);
+    ui_group_set_sensitive(GR_RUNNING, running);
+    ui_group_set_sensitive(GR_NOTEMPTY, !empty);
+    ui_group_set_sensitive(GR_EDITABLE, editable);
+    ui_group_set_sensitive(GR_AGAIN, again);
+    ui_group_set_sensitive(GR_ALL, all);
+    ui_group_set_sensitive(GR_CLEAN, clean);
 }
 
 char *
@@ -180,7 +180,7 @@ anim_advance(gpointer data)
     if (anim_current++ == ANIM_MAX)
     	anim_current = 1;
     gtk_pixmap_set(GTK_PIXMAP(anim),
-    	animPixmaps[anim_current], animMasks[anim_current]);
+    	anim_pixmaps[anim_current], anim_masks[anim_current]);
     return TRUE;  /* keep going */
 }
 
@@ -193,7 +193,7 @@ anim_stop(void)
 	anim_timer = -1;
     }
     gtk_pixmap_set(GTK_PIXMAP(anim),
-    	animPixmaps[0], animMasks[0]);
+    	anim_pixmaps[0], anim_masks[0]);
 }
 
 static void
@@ -206,7 +206,7 @@ anim_start(void)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-reapList(pid_t pid, int status, struct rusage *usg, gpointer user_data)
+reap_list(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 {
     estring *targs = (estring *)user_data;
     char *t, *buf;
@@ -221,23 +221,23 @@ reapList(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     /* 
      * Parse the output of the program into whitespace-separated
      * strings which are targets. Build two lists, predefs (all
-     * the found targets which are also in `predefinedTargets')
-     * and availableTargets (all others).
+     * the found targets which are also in `predefined_targets')
+     * and available_targets (all others).
      */
     buf = targs->data;
     while ((t = strtok(buf, " \t\r\n")) != 0)
     {
     	if (!strcmp(t, "-"))
 	{
-	    uiAddSeparator(buildMenu);	
+	    ui_add_separator(build_menu);	
 	}
 	else
 	{
     	   t = g_strdup(t);
-	   if (g_list_find_str(predefinedTargets, t) != 0)
+	   if (g_list_find_str(predefined_targets, t) != 0)
     	       predefs = g_list_append(predefs, t);
 	   else
-    	       availableTargets = g_list_append(availableTargets, t);
+    	       available_targets = g_list_append(available_targets, t);
     	}
 	buf = 0;
     }
@@ -250,53 +250,53 @@ reapList(pid_t pid, int status, struct rusage *usg, gpointer user_data)
      * will always be visible regardless of its size.
      */
     for (list = predefs ; list != 0 ; list = list->next)
-	uiAddButton(buildMenu, (const char*)list->data, build_cb, list->data,
+	ui_add_button(build_menu, (const char*)list->data, build_cb, list->data,
 		GR_NOTRUNNING);
-    if (predefs != 0 && availableTargets != 0)
-	uiAddSeparator(buildMenu);
-    for (list = availableTargets ; list != 0 ; list = list->next)
-	uiAddButton(buildMenu, (const char*)list->data, build_cb, list->data,
+    if (predefs != 0 && available_targets != 0)
+	ui_add_separator(build_menu);
+    for (list = available_targets ; list != 0 ; list = list->next)
+	ui_add_button(build_menu, (const char*)list->data, build_cb, list->data,
 		GR_NOTRUNNING);
 
     /*
-     * Now prepend predefs to availableTargets, which is now a
+     * Now prepend predefs to available_targets, which is now a
      * list of all the found targets, predefined or not.
      */
-    availableTargets = g_list_concat(predefs, availableTargets);
+    available_targets = g_list_concat(predefs, available_targets);
 
     grey_menu_items();
 }
 
 static void
-inputList(int len, const char *buf, gpointer data)
+input_list(int len, const char *buf, gpointer data)
 {
     estring *targs = (estring *)data;
     
     estring_append_chars(targs, buf, len);
 }
 
-static char *predefTargs[] = {
+static char *predef_targs[] = {
 "all", "install", "uninstall",
 "mostlyclean", "clean", "distclean", "reallyclean",
 0
 };
 
 static void
-listTargets(void)
+list_targets(void)
 {
     char *prog;
     pid_t pid;
     char **t;
     static estring targs;
     
-    for (t = predefTargs ; *t ; t++)
-	predefinedTargets = g_list_prepend(predefinedTargets, *t);
+    for (t = predef_targs ; *t ; t++)
+	predefined_targets = g_list_prepend(predefined_targets, *t);
     
     estring_init(&targs);
     
     prog = expand_prog(prefs.prog_list_targets, 0, 0, 0);
     
-    pid = spawn_with_output(prog, reapList, inputList, (gpointer)&targs,
+    pid = spawn_with_output(prog, reap_list, input_list, (gpointer)&targs,
     	prefs.var_environment);
 #if 0
     if (pid > 0)
@@ -310,7 +310,7 @@ listTargets(void)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-startEdit(LogRec *lr)
+start_edit(LogRec *lr)
 {
     char *prog;
     
@@ -328,35 +328,35 @@ startEdit(LogRec *lr)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-reapMake(pid_t pid, int status, struct rusage *usg, gpointer user_data)
+reap_make(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 {
     char *target = (char *)user_data;
     
     if (WIFEXITED(status) || WIFSIGNALED(status))
     {
-    	char errStr[256];
-    	char warnStr[256];
-	char intStr[256];
+    	char err_str[256];
+    	char warn_str[256];
+	char int_str[256];
 	
-	if (logNumErrors() > 0)
-	    sprintf(errStr, _(", %d errors"), logNumErrors());
+	if (log_num_errors() > 0)
+	    sprintf(err_str, _(", %d errors"), log_num_errors());
 	else
-	    errStr[0] = '\0';
+	    err_str[0] = '\0';
 	    
-	if (logNumWarnings() > 0)
-	    sprintf(warnStr, _(", %d warnings"), logNumWarnings());
+	if (log_num_warnings() > 0)
+	    sprintf(warn_str, _(", %d warnings"), log_num_warnings());
 	else
-	    warnStr[0] = '\0';
+	    warn_str[0] = '\0';
 
 	if (interrupted)
-	    strcpy(intStr, _(" (interrupted)"));
+	    strcpy(int_str, _(" (interrupted)"));
 	else
-	    intStr[0] = '\0';
+	    int_str[0] = '\0';
 	    
-	message(_("Finished making %s%s%s%s"), target, errStr, warnStr, intStr);
+	message(_("Finished making %s%s%s%s"), target, err_str, warn_str, int_str);
 	
-	currentPid = -1;
-	logEndBuild(target);
+	current_pid = -1;
+	log_end_build(target);
 	anim_stop();
 	grey_menu_items();
     }
@@ -366,14 +366,14 @@ reapMake(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 
 
 static void
-handleInput(int len, const char *buf, gpointer data)
+handle_input(int len, const char *buf, gpointer data)
 {
     static char linebuf[1024];
     static int nleftover = 0;
     LogRec *lr;
     
 #if DEBUG   
-    fprintf(stderr, "handleData(): \"");
+    fprintf(stderr, "handle_data(): \"");
     fwrite(buf, len, 1, stderr);
     fprintf(stderr, "\"\n");
 #endif    
@@ -388,19 +388,19 @@ handleInput(int len, const char *buf, gpointer data)
 	    nleftover += len;
 	    return;
 	}
-    	/* got an end-of-line - isolate the line & feed it to handleLine() */
+    	/* got an end-of-line - isolate the line & feed it to handle_line() */
 	*p = '\0';
 	strncpy(&linebuf[nleftover], buf, sizeof(linebuf)-nleftover);
 
-	lr = logAddLine(linebuf);
-	if (prefs.edit_first_error && firstError)
+	lr = log_add_line(linebuf);
+	if (prefs.edit_first_error && first_error)
 	{
 	    if ((lr->res.code == FR_WARNING && prefs.edit_warnings) ||
 	         lr->res.code == FR_ERROR)
 	    {
-	        firstError = FALSE;
-	    	logSetSelected(lr);
-		startEdit(lr);
+	        first_error = FALSE;
+	    	log_set_selected(lr);
+		start_edit(lr);
 	    }
 	}
 	
@@ -411,15 +411,15 @@ handleInput(int len, const char *buf, gpointer data)
 }
 
 void
-buildStart(const char *target)
+build_start(const char *target)
 {
     char *prog;
     
     prog = expand_prog(prefs.prog_make, 0, 0, target);
     
-    currentPid = spawn_with_output(prog, reapMake, handleInput, (gpointer)target,
+    current_pid = spawn_with_output(prog, reap_make, handle_input, (gpointer)target,
     	prefs.var_environment);
-    if (currentPid > 0)
+    if (current_pid > 0)
     {
 	message(_("Making %s"), target);
 	
@@ -428,17 +428,17 @@ buildStart(const char *target)
 	case START_NOTHING:
 	    break;
 	case START_CLEAR:
-	    logClear();
+	    log_clear();
 	    break;
 	case START_COLLAPSE:
-	    logCollapseAll();
+	    log_collapse_all();
 	    break;
 	}
 	
-	lastTarget = target;
+	last_target = target;
 	interrupted = FALSE;
-	firstError = TRUE;
-	logStartBuild(prog);
+	first_error = TRUE;
+	log_start_build(prog);
 	anim_start();
 	grey_menu_items();
     }
@@ -461,7 +461,7 @@ file_open_cb(GtkWidget *w, gpointer data)
     static GtkWidget *filesel = 0;
     
     if (filesel == 0)
-    	filesel = uiCreateFileSel(_("Maketool: Open Log File"), logOpen, "make.log");
+    	filesel = ui_create_file_sel(_("Maketool: Open Log File"), log_open, "make.log");
 
     gtk_widget_show(filesel);
 }
@@ -474,7 +474,7 @@ file_save_cb(GtkWidget *w, gpointer data)
     static GtkWidget *filesel = 0;
     
     if (filesel == 0)
-    	filesel = uiCreateFileSel(_("Maketool: Save Log File"), logSave, "make.log");
+    	filesel = ui_create_file_sel(_("Maketool: Save Log File"), log_save, "make.log");
 
     gtk_widget_show(filesel);
 }
@@ -484,8 +484,8 @@ file_save_cb(GtkWidget *w, gpointer data)
 static void
 build_again_cb(GtkWidget *w, gpointer data)
 {
-    if (lastTarget != 0 && currentPid < 0)
-    	buildStart(lastTarget);
+    if (last_target != 0 && current_pid < 0)
+    	build_start(last_target);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -493,10 +493,10 @@ build_again_cb(GtkWidget *w, gpointer data)
 static void
 build_stop_cb(GtkWidget *w, gpointer data)
 {
-    if (currentPid > 0)
+    if (current_pid > 0)
     {
     	interrupted = TRUE;
-    	kill(currentPid, SIGKILL);
+    	kill(current_pid, SIGKILL);
     }
 }
 
@@ -505,7 +505,7 @@ build_stop_cb(GtkWidget *w, gpointer data)
 static void
 build_cb(GtkWidget *w, gpointer data)
 {
-    buildStart((char *)data);    
+    build_start((char *)data);    
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -529,9 +529,9 @@ view_flags_cb(GtkWidget *w, gpointer data)
     gboolean flags = GPOINTER_TO_INT(data);
     
     if (GTK_CHECK_MENU_ITEM(w)->active)
-	logSetFlags(logGetFlags() | flags);
+	log_set_flags(log_get_flags() | flags);
     else
-	logSetFlags(logGetFlags() & ~flags);
+	log_set_flags(log_get_flags() & ~flags);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -539,13 +539,13 @@ view_flags_cb(GtkWidget *w, gpointer data)
 static void
 view_clear_cb(GtkWidget *w, gpointer data)
 {
-    logClear();
+    log_clear();
 }
 
 static void
 view_collapse_all_cb(GtkWidget *w, gpointer data)
 {
-    logCollapseAll();
+    log_collapse_all();
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -553,10 +553,10 @@ view_collapse_all_cb(GtkWidget *w, gpointer data)
 static void
 view_edit_cb(GtkWidget *w, gpointer data)
 {
-    LogRec *lr = logSelected();
+    LogRec *lr = log_selected();
 
     if (lr != 0)    
-	startEdit(lr);
+	start_edit(lr);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -565,17 +565,17 @@ static void
 view_edit_next_cb(GtkWidget *w, gpointer data)
 {
     gboolean next = GPOINTER_TO_INT(data);
-    LogRec *lr = logSelected();
+    LogRec *lr = log_selected();
     
     do
     {
-	lr = (next ? logNextError(lr) : logPrevError(lr));
+	lr = (next ? log_next_error(lr) : log_prev_error(lr));
     } while (lr != 0 && !(prefs.edit_warnings || lr->res.code == FR_ERROR));
     
     if (lr != 0)
     {	
-	logSetSelected(lr);
-	startEdit(lr);
+	log_set_selected(lr);
+	start_edit(lr);
     }
     else
     {
@@ -586,17 +586,17 @@ view_edit_next_cb(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-log_expand_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gpointer data)
+log_expand_cb(GtkCTree *tree, GtkCTreeNode *tree_node, gpointer data)
 {
-    LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, treeNode);
+    LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, tree_node);
 
     lr->expanded = TRUE;    
 }
 
 static void
-log_collapse_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gpointer data)
+log_collapse_cb(GtkCTree *tree, GtkCTreeNode *tree_node, gpointer data)
 {
-    LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, treeNode);
+    LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, tree_node);
 
     lr->expanded = FALSE;    
 }
@@ -604,10 +604,10 @@ log_collapse_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-log_click_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gint column, gpointer data)
+log_click_cb(GtkCTree *tree, GtkCTreeNode *tree_node, gint column, gpointer data)
 {
 #if DEBUG
-    LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, treeNode);
+    LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, tree_node);
     
     fprintf(stderr, "log_click_cb: code=%d file=\"%s\" line=%d\n",
     	lr->res.code, lr->res.file, lr->res.line);
@@ -620,7 +620,7 @@ log_doubleclick_cb(GtkWidget *w, GdkEvent *event, gpointer data)
 {
     if (event->type == GDK_2BUTTON_PRESS) 
     {
-	LogRec *lr = logSelected();
+	LogRec *lr = log_selected();
 
 	if (lr != 0)
 	{
@@ -628,7 +628,7 @@ log_doubleclick_cb(GtkWidget *w, GdkEvent *event, gpointer data)
 	    fprintf(stderr, "log_doubleclick_cb: code=%d file=\"%s\" line=%d\n",
     		lr->res.code, lr->res.file, lr->res.line);
 #endif
-	    startEdit(lr);
+	    start_edit(lr);
 	}
     }
 }
@@ -644,71 +644,71 @@ unimplemented(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-uiCreateMenus(GtkWidget *menubar)
+ui_create_menus(GtkWidget *menubar)
 {
     GtkWidget *menu;
     
-    menu = uiAddMenu(menubar, _("File"));
-    uiAddTearoff(menu);
-    uiAddButton(menu, _("Open Log..."), file_open_cb, 0, GR_NONE);
-    uiAddButton(menu, _("Save Log..."), file_save_cb, 0, GR_NOTEMPTY);
-    uiAddSeparator(menu);
+    menu = ui_add_menu(menubar, _("File"));
+    ui_add_tearoff(menu);
+    ui_add_button(menu, _("Open Log..."), file_open_cb, 0, GR_NONE);
+    ui_add_button(menu, _("Save Log..."), file_save_cb, 0, GR_NOTEMPTY);
+    ui_add_separator(menu);
 #if 0
-    uiAddButton(menu, _("Change directory..."), unimplemented, 0, GR_NOTRUNNING);
-    uiAddSeparator(menu);
-    uiAddButton(menu, _("Print"), unimplemented, 0, GR_NOTEMPTY);
-    uiAddButton(menu, _("Print Settings..."), unimplemented, 0, GR_NONE);
-    uiAddSeparator(menu);
+    ui_add_button(menu, _("Change directory..."), unimplemented, 0, GR_NOTRUNNING);
+    ui_add_separator(menu);
+    ui_add_button(menu, _("Print"), unimplemented, 0, GR_NOTEMPTY);
+    ui_add_button(menu, _("Print Settings..."), unimplemented, 0, GR_NONE);
+    ui_add_separator(menu);
 #endif
-    uiAddButton(menu, _("Exit"), file_exit_cb, 0, GR_NONE);
+    ui_add_button(menu, _("Exit"), file_exit_cb, 0, GR_NONE);
     
-    menu = uiAddMenu(menubar, _("Build"));
-    buildMenu = menu;
-    uiAddTearoff(menu);
-    uiAddButton(menu, _("Again"), build_again_cb, 0, GR_AGAIN);
-    uiAddButton(menu, _("Stop"), build_stop_cb, 0, GR_RUNNING);
-    uiAddSeparator(menu);
+    menu = ui_add_menu(menubar, _("Build"));
+    build_menu = menu;
+    ui_add_tearoff(menu);
+    ui_add_button(menu, _("Again"), build_again_cb, 0, GR_AGAIN);
+    ui_add_button(menu, _("Stop"), build_stop_cb, 0, GR_RUNNING);
+    ui_add_separator(menu);
 #if 0
-    uiAddButton(menu, "all", build_cb, "all", GR_NOTRUNNING);
-    uiAddButton(menu, "install", build_cb, "install", GR_NOTRUNNING);
-    uiAddButton(menu, "clean", build_cb, "clean", GR_NOTRUNNING);
-    uiAddSeparator(menu);
-    uiAddButton(menu, "random", build_cb, "random", GR_NOTRUNNING);
-    uiAddButton(menu, "delay", build_cb, "delay", GR_NOTRUNNING);
-    uiAddButton(menu, "targets", build_cb, "targets", GR_NOTRUNNING);
+    ui_add_button(menu, "all", build_cb, "all", GR_NOTRUNNING);
+    ui_add_button(menu, "install", build_cb, "install", GR_NOTRUNNING);
+    ui_add_button(menu, "clean", build_cb, "clean", GR_NOTRUNNING);
+    ui_add_separator(menu);
+    ui_add_button(menu, "random", build_cb, "random", GR_NOTRUNNING);
+    ui_add_button(menu, "delay", build_cb, "delay", GR_NOTRUNNING);
+    ui_add_button(menu, "targets", build_cb, "targets", GR_NOTRUNNING);
 #endif
     
-    menu = uiAddMenu(menubar, _("View"));
-    uiAddTearoff(menu);
-    uiAddButton(menu, _("Clear Log"), view_clear_cb, 0, GR_NOTEMPTY);
-    uiAddButton(menu, _("Collapse All"), view_collapse_all_cb, 0, GR_NOTEMPTY);
-    uiAddButton(menu, _("Edit"), view_edit_cb, 0, GR_EDITABLE);
-    uiAddButton(menu, _("Edit Next Error"), view_edit_next_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
-    uiAddButton(menu, _("Edit Prev Error"), view_edit_next_cb, GINT_TO_POINTER(FALSE), GR_NOTEMPTY);
-    uiAddSeparator(menu);
-    uiAddToggle(menu, _("Toolbar"), view_widget_cb, (gpointer)&toolbar, 0, TRUE);
-    uiAddToggle(menu, _("Statusbar"), view_widget_cb, (gpointer)&messagebox, 0, TRUE);
-    uiAddSeparator(menu);
-    uiAddToggle(menu, _("Errors"), view_flags_cb, GINT_TO_POINTER(LF_SHOW_ERRORS),
-    	0, logGetFlags() & LF_SHOW_ERRORS);
-    uiAddToggle(menu, _("Warnings"), view_flags_cb, GINT_TO_POINTER(LF_SHOW_WARNINGS),
-    	0, logGetFlags() & LF_SHOW_WARNINGS);
-    uiAddToggle(menu, _("Information"), view_flags_cb, GINT_TO_POINTER(LF_SHOW_INFO),
-    	0, logGetFlags() & LF_SHOW_INFO);
-    uiAddSeparator(menu);
-    uiAddButton(menu, _("Preferences"), view_preferences_cb, 0, GR_NONE);
+    menu = ui_add_menu(menubar, _("View"));
+    ui_add_tearoff(menu);
+    ui_add_button(menu, _("Clear Log"), view_clear_cb, 0, GR_NOTEMPTY);
+    ui_add_button(menu, _("Collapse All"), view_collapse_all_cb, 0, GR_NOTEMPTY);
+    ui_add_button(menu, _("Edit"), view_edit_cb, 0, GR_EDITABLE);
+    ui_add_button(menu, _("Edit Next Error"), view_edit_next_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
+    ui_add_button(menu, _("Edit Prev Error"), view_edit_next_cb, GINT_TO_POINTER(FALSE), GR_NOTEMPTY);
+    ui_add_separator(menu);
+    ui_add_toggle(menu, _("Toolbar"), view_widget_cb, (gpointer)&toolbar, 0, TRUE);
+    ui_add_toggle(menu, _("Statusbar"), view_widget_cb, (gpointer)&messagebox, 0, TRUE);
+    ui_add_separator(menu);
+    ui_add_toggle(menu, _("Errors"), view_flags_cb, GINT_TO_POINTER(LF_SHOW_ERRORS),
+    	0, log_get_flags() & LF_SHOW_ERRORS);
+    ui_add_toggle(menu, _("Warnings"), view_flags_cb, GINT_TO_POINTER(LF_SHOW_WARNINGS),
+    	0, log_get_flags() & LF_SHOW_WARNINGS);
+    ui_add_toggle(menu, _("Information"), view_flags_cb, GINT_TO_POINTER(LF_SHOW_INFO),
+    	0, log_get_flags() & LF_SHOW_INFO);
+    ui_add_separator(menu);
+    ui_add_button(menu, _("Preferences"), view_preferences_cb, 0, GR_NONE);
     
-    menu = uiAddMenuRight(menubar, _("Help"));
-    uiAddTearoff(menu);
-    uiAddButton(menu, _("About Maketool..."), help_about_cb, 0, GR_NONE);
-    uiAddButton(menu, _("About make..."), help_about_make_cb, 0, GR_NONE);
+    menu = ui_add_menu_right(menubar, _("Help"));
+    ui_add_tearoff(menu);
+    ui_add_button(menu, _("About Maketool..."), help_about_cb, 0, GR_NONE);
+    ui_add_button(menu, _("About make..."), help_about_make_cb, 0, GR_NONE);
 #if 0
-    uiAddSeparator(menu);
-    uiAddButton(menu, _("Help on..."), unimplemented, 0, GR_NONE);
-    uiAddSeparator(menu);
-    uiAddButton(menu, _("Tutorial"), unimplemented, 0, GR_NONE);
-    uiAddButton(menu, _("Reference Index"), unimplemented, 0, GR_NONE);
-    uiAddButton(menu, _("Home Page"), unimplemented, 0, GR_NONE);
+    ui_add_separator(menu);
+    ui_add_button(menu, _("Help on..."), unimplemented, 0, GR_NONE);
+    ui_add_separator(menu);
+    ui_add_button(menu, _("Tutorial"), unimplemented, 0, GR_NONE);
+    ui_add_button(menu, _("Reference Index"), unimplemented, 0, GR_NONE);
+    ui_add_button(menu, _("Home Page"), unimplemented, 0, GR_NONE);
 #endif
 }
 
@@ -722,32 +722,32 @@ uiCreateMenus(GtkWidget *menubar)
 #include "print.xpm"
 
 static void
-uiCreateTools()
+ui_create_tools()
 {
     char tooltip[1024];
     
-    uiToolCreate(toolbar, _("Again"), _("Build last target again"),
+    ui_tool_create(toolbar, _("Again"), _("Build last target again"),
     	again_xpm, build_again_cb, 0, GR_AGAIN);
     
-    uiToolAddSpace(toolbar);
+    ui_tool_add_space(toolbar);
 
     sprintf(tooltip, _("Build `%s'"), "all");
-    uiToolCreate(toolbar, "all", tooltip,
+    ui_tool_create(toolbar, "all", tooltip,
     	all_xpm, build_cb, "all", GR_ALL);
     sprintf(tooltip, _("Build `%s'"), "clean");
-    uiToolCreate(toolbar, "clean", tooltip,
+    ui_tool_create(toolbar, "clean", tooltip,
     	clean_xpm, build_cb, "clean", GR_CLEAN);
     
-    uiToolAddSpace(toolbar);
+    ui_tool_add_space(toolbar);
     
-    uiToolCreate(toolbar, _("Clear"), _("Clear log"),
+    ui_tool_create(toolbar, _("Clear"), _("Clear log"),
     	clear_xpm, view_clear_cb, 0, GR_NOTEMPTY);
-    uiToolCreate(toolbar, _("Next"), _("Edit next error or warning"),
+    ui_tool_create(toolbar, _("Next"), _("Edit next error or warning"),
     	next_xpm, view_edit_next_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
     
-    uiToolAddSpace(toolbar);
+    ui_tool_add_space(toolbar);
     
-    uiToolCreate(toolbar, _("Print"), _("Print log"),
+    ui_tool_create(toolbar, _("Print"), _("Print log"),
     	print_xpm, unimplemented, 0, GR_NOTEMPTY);
 }
 
@@ -771,11 +771,11 @@ uiCreateTools()
 #include "anim8.xpm"
 
 #define ANIM_INIT(nm) \
-    animPixmaps[n] = gdk_pixmap_create_from_xpm_d(toplevel->window, \
-    	&animMasks[n], 0, PASTE3(anim,nm,_xpm)); n++
+    anim_pixmaps[n] = gdk_pixmap_create_from_xpm_d(toplevel->window, \
+    	&anim_masks[n], 0, PASTE3(anim,nm,_xpm)); n++
 
 static void
-uiInitAnimPixmaps(void)
+ui_init_anim_pixmaps(void)
 {
     int n = 0;
     ANIM_INIT(0);
@@ -801,7 +801,7 @@ uiInitAnimPixmaps(void)
 #include "maketool.xpm"
 
 static void
-uiCreate(void)
+ui_create(void)
 {
     GtkWidget *mainvbox, *vbox; /* need 2 for correct spacing */
     GtkWidget *menubar, *logwin;
@@ -838,7 +838,7 @@ uiCreate(void)
 
     menubar = gtk_menu_bar_new();
     gtk_box_pack_start(GTK_BOX(mainvbox), menubar, FALSE, FALSE, 0);
-    uiCreateMenus(menubar);
+    ui_create_menus(menubar);
     gtk_widget_show(GTK_WIDGET(menubar));
         
     vbox = gtk_vbox_new(FALSE, SPACING);
@@ -849,7 +849,7 @@ uiCreate(void)
     gtk_toolbar_set_button_relief(GTK_TOOLBAR(toolbar), GTK_RELIEF_NONE);
     gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
     gtk_widget_show(GTK_WIDGET(toolbar));
-    uiCreateTools(toolbar);
+    ui_create_tools(toolbar);
     
     sw = gtk_scrolled_window_new(0, 0);
     gtk_container_border_width(GTK_CONTAINER(sw), 0);
@@ -880,7 +880,7 @@ uiCreate(void)
     gtk_scrolled_window_set_vadjustment(GTK_SCROLLED_WINDOW(sw),
     	GTK_CLIST(logwin)->vadjustment);
     gtk_widget_show(logwin);
-    logInit(logwin);
+    log_init(logwin);
     
     messagebox = gtk_hbox_new(FALSE, SPACING);
     gtk_box_pack_start(GTK_BOX(vbox), messagebox, FALSE, FALSE, 0);
@@ -893,14 +893,14 @@ uiCreate(void)
     gtk_box_pack_start(GTK_BOX(messagebox), messageent, TRUE, TRUE, 0);   
     gtk_widget_show(messageent);
     
-    uiInitAnimPixmaps();
+    ui_init_anim_pixmaps();
 
-    anim = gtk_pixmap_new(animPixmaps[0], animMasks[0]);
+    anim = gtk_pixmap_new(anim_pixmaps[0], anim_masks[0]);
     gtk_box_pack_start(GTK_BOX(messagebox), anim, FALSE, FALSE, 0);   
     gtk_widget_show(anim);
 
     grey_menu_items();
-    listTargets();
+    list_targets();
 
     gtk_widget_show(GTK_WIDGET(mainvbox));
     gtk_widget_show(GTK_WIDGET(vbox));
@@ -916,7 +916,7 @@ usage(void)
 }
 
 static void
-parseArgs(int argc, char **argv)
+parse_args(int argc, char **argv)
 {
     int i;
     estring targs;
@@ -964,10 +964,10 @@ main(int argc, char **argv)
     
     gtk_init(&argc, &argv);    
     preferences_init();
-    parseArgs(argc, argv);
-    uiCreate();
+    parse_args(argc, argv);
+    ui_create();
     if (targets != 0)
-    	buildStart(targets);
+    	build_start(targets);
     gtk_main();
     return 0;
 }

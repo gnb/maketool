@@ -19,12 +19,12 @@
 
 #include "ui.h"
 
-CVSID("$Id: ui.c,v 1.8 1999-05-30 11:24:40 gnb Exp $");
+CVSID("$Id: ui.c,v 1.9 1999-06-06 17:43:01 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 int
-uiComboGetCurrent(GtkWidget *combo)
+ui_combo_get_current(GtkWidget *combo)
 {
     GtkList *listw = GTK_LIST(GTK_COMBO(combo)->list);
     
@@ -34,7 +34,7 @@ uiComboGetCurrent(GtkWidget *combo)
 }
 
 void
-uiComboSetCurrent(GtkWidget *combo, int n)
+ui_combo_set_current(GtkWidget *combo, int n)
 {
     gtk_list_select_item(GTK_LIST(GTK_COMBO(combo)->list), n);
 }
@@ -42,7 +42,7 @@ uiComboSetCurrent(GtkWidget *combo, int n)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 void
-uiCListGetStrings(GtkWidget *w, int row, int ncols, char *text[])
+ui_cListGetStrings(GtkWidget *w, int row, int ncols, char *text[])
 {
     int i;
     
@@ -51,7 +51,7 @@ uiCListGetStrings(GtkWidget *w, int row, int ncols, char *text[])
 }
 
 void
-uiCListSetStrings(GtkWidget *w, int row, int ncols, char *text[])
+ui_cListSetStrings(GtkWidget *w, int row, int ncols, char *text[])
 {
     int i;
     
@@ -61,27 +61,27 @@ uiCListSetStrings(GtkWidget *w, int row, int ncols, char *text[])
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-static GPtrArray *uiGroups = 0;
+static GPtrArray *ui_groups = 0;
 
 void
-uiGroupAdd(gint group, GtkWidget *w)
+ui_group_add(gint group, GtkWidget *w)
 {
-    if (uiGroups == 0)
-    	uiGroups = g_ptr_array_new();
+    if (ui_groups == 0)
+    	ui_groups = g_ptr_array_new();
 	
-    if (group >= uiGroups->len)
-	g_ptr_array_set_size(uiGroups, group+1);
+    if (group >= ui_groups->len)
+	g_ptr_array_set_size(ui_groups, group+1);
 	
-    g_ptr_array_index(uiGroups, group) = 
-    	g_list_prepend(g_ptr_array_index(uiGroups, group), w);
+    g_ptr_array_index(ui_groups, group) = 
+    	g_list_prepend(g_ptr_array_index(ui_groups, group), w);
 }
 
 void
-uiGroupSetSensitive(gint group, gboolean b)
+ui_group_set_sensitive(gint group, gboolean b)
 {
     GList *list;
     
-    list = g_ptr_array_index(uiGroups, group);
+    list = g_ptr_array_index(ui_groups, group);
     
     for ( ; list != 0 ; list = list->next)
     	gtk_widget_set_sensitive(GTK_WIDGET(list->data), b);
@@ -89,10 +89,10 @@ uiGroupSetSensitive(gint group, gboolean b)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-#define FILESEL_CALLBACK_DATA "uiCallback"
+#define FILESEL_CALLBACK_DATA "ui_callback"
 
 static void
-uiFileSelOkCb(GtkWidget *w, gpointer data)
+ui_file_sel_ok_cb(GtkWidget *w, gpointer data)
 {
     GtkWidget *filesel = GTK_WIDGET(data);
     void (*callback)(const char *filename);
@@ -103,7 +103,7 @@ uiFileSelOkCb(GtkWidget *w, gpointer data)
 }
 
 GtkWidget *
-uiCreateFileSel(
+ui_create_file_sel(
     const char *title,
     void (*callback)(const char *filename),
     const char *filename)
@@ -113,7 +113,7 @@ uiCreateFileSel(
     filesel = gtk_file_selection_new(title);
     gtk_signal_connect(
 	    GTK_OBJECT(GTK_FILE_SELECTION(filesel)->ok_button),
-            "clicked", uiFileSelOkCb,
+            "clicked", ui_file_sel_ok_cb,
 	    (gpointer)filesel);
     gtk_signal_connect_object(
 	    GTK_OBJECT(GTK_FILE_SELECTION(filesel)->cancel_button),
@@ -133,7 +133,7 @@ static GtkWidget *
 _uiAddMenuAux(
     GtkWidget *menubar,
     const char *label,
-    gboolean isRight)
+    gboolean is_right)
 {
     GtkWidget *menu, *item;
 
@@ -145,26 +145,26 @@ _uiAddMenuAux(
 
     gtk_menu_bar_append(GTK_MENU_BAR(menubar), item);
     
-    if (isRight)
+    if (is_right)
     	gtk_menu_item_right_justify(GTK_MENU_ITEM(item));
 
     return menu;
 }
 
 GtkWidget *
-uiAddMenu(GtkWidget *menubar, const char *label)
+ui_add_menu(GtkWidget *menubar, const char *label)
 {
     return _uiAddMenuAux(menubar, label, FALSE);
 }
 
 GtkWidget *
-uiAddMenuRight(GtkWidget *menubar, const char *label)
+ui_add_menu_right(GtkWidget *menubar, const char *label)
 {
     return _uiAddMenuAux(menubar, label, TRUE);
 }
 
 GtkWidget *
-uiAddButton(
+ui_add_button(
     GtkWidget *menu,
     const char *label,
     void (*callback)(GtkWidget*, gpointer),
@@ -178,13 +178,13 @@ uiAddButton(
     gtk_signal_connect(GTK_OBJECT(item), "activate", 
     	GTK_SIGNAL_FUNC(callback), calldata);
     if (group >= 0)
-    	uiGroupAdd(group, item);
+    	ui_group_add(group, item);
     gtk_widget_show(item);
     return item;
 }
 
 GtkWidget *
-uiAddTearoff(GtkWidget *menu)
+ui_add_tearoff(GtkWidget *menu)
 {
     GtkWidget *item;
 
@@ -195,17 +195,17 @@ uiAddTearoff(GtkWidget *menu)
 }
 
 GtkWidget *
-uiAddToggle(
+ui_add_toggle(
     GtkWidget *menu,
     const char *label,
     void (*callback)(GtkWidget*, gpointer),
     gpointer calldata,
-    GtkWidget *radioOther,
+    GtkWidget *radio_other,
     gboolean set)
 {
     GtkWidget *item;
     
-    if (radioOther == 0)
+    if (radio_other == 0)
     {
 	item = gtk_check_menu_item_new_with_label(label);
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), set);
@@ -213,7 +213,7 @@ uiAddToggle(
     else
     {
     	GSList *group;
-	group = gtk_radio_menu_item_group(GTK_RADIO_MENU_ITEM(radioOther));
+	group = gtk_radio_menu_item_group(GTK_RADIO_MENU_ITEM(radio_other));
 	item = gtk_radio_menu_item_new_with_label(group, label);
     }
     
@@ -226,7 +226,7 @@ uiAddToggle(
 
 
 GtkWidget *
-uiAddSeparator(GtkWidget *menu)
+ui_add_separator(GtkWidget *menu)
 {
     GtkWidget *item;
 
@@ -239,7 +239,7 @@ uiAddSeparator(GtkWidget *menu)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 GtkWidget *
-uiToolCreate(
+ui_tool_create(
     GtkWidget *toolbar,
     const char *name,
     const char *tooltip,
@@ -264,12 +264,12 @@ uiToolCreate(
 	callback,
 	user_data);
     if (group >= 0)
-    	uiGroupAdd(group, item);
+    	ui_group_add(group, item);
     return item;
 }
 
 void
-uiToolAddSpace(GtkWidget *toolbar)
+ui_tool_add_space(GtkWidget *toolbar)
 {
     gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
 }
@@ -278,7 +278,7 @@ uiToolAddSpace(GtkWidget *toolbar)
 
 
 GtkWidget *
-uiDialogCreateButton(
+ui_dialog_create_button(
     GtkWidget *dialog,
     const char *label,
     GtkSignalFunc callback,
@@ -295,13 +295,13 @@ uiDialogCreateButton(
 }
 
 static void
-uiDialogOkCb(GtkWidget *w, gpointer data)
+ui_dialog_ok_cb(GtkWidget *w, gpointer data)
 {
     gtk_widget_hide(GTK_WIDGET(data));
 }
 
 GtkWidget *
-uiCreateOkDialog(
+ui_create_ok_dialog(
     GtkWidget *parent,
     const char *title)
 {
@@ -310,14 +310,14 @@ uiCreateOkDialog(
     dialog = gtk_dialog_new();
     gtk_window_set_title(GTK_WINDOW(dialog), title);
     
-    uiDialogCreateButton(dialog, _("OK"), uiDialogOkCb, (gpointer)dialog);
+    ui_dialog_create_button(dialog, _("OK"), ui_dialog_ok_cb, (gpointer)dialog);
     
     return dialog;
 }    
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-#define APPLY_DIALOG_DATA "uiApplyDialog"
+#define APPLY_DIALOG_DATA "ui_apply_dialog"
 
 typedef struct
 {
@@ -330,7 +330,7 @@ typedef struct
 
 
 static void
-uiApplyDialogApplyCb(GtkWidget *w, gpointer data)
+ui_apply_dialog_apply_cb(GtkWidget *w, gpointer data)
 {
     ApplyDialog *ad = (ApplyDialog *)data;
 
@@ -340,7 +340,7 @@ uiApplyDialogApplyCb(GtkWidget *w, gpointer data)
 }
 
 static void
-uiApplyDialogCancelCb(GtkWidget *w, gpointer data)
+ui_apply_dialog_cancel_cb(GtkWidget *w, gpointer data)
 {
     ApplyDialog *ad = (ApplyDialog *)data;
 
@@ -348,14 +348,14 @@ uiApplyDialogCancelCb(GtkWidget *w, gpointer data)
 }
 
 static void
-uiApplyDialogOkCb(GtkWidget *w, gpointer data)
+ui_apply_dialog_ok_cb(GtkWidget *w, gpointer data)
 {
-    uiApplyDialogApplyCb(w, data);
-    uiApplyDialogCancelCb(w, data);
+    ui_apply_dialog_apply_cb(w, data);
+    ui_apply_dialog_cancel_cb(w, data);
 }
 
 GtkWidget *
-uiCreateApplyDialog(
+ui_create_apply_dialog(
     GtkWidget *parent,
     const char *title,
     GtkSignalFunc apply_cb,
@@ -373,17 +373,17 @@ uiCreateApplyDialog(
     gtk_object_set_data(GTK_OBJECT(ad->dialog), APPLY_DIALOG_DATA,
     	(gpointer)ad);
     
-    ad->ok_btn = uiDialogCreateButton(ad->dialog, _("OK"), uiApplyDialogOkCb, (gpointer)ad);
+    ad->ok_btn = ui_dialog_create_button(ad->dialog, _("OK"), ui_apply_dialog_ok_cb, (gpointer)ad);
     gtk_widget_set_sensitive(ad->ok_btn, FALSE);
-    ad->apply_btn = uiDialogCreateButton(ad->dialog, _("Apply"), uiApplyDialogApplyCb, (gpointer)ad);
+    ad->apply_btn = ui_dialog_create_button(ad->dialog, _("Apply"), ui_apply_dialog_apply_cb, (gpointer)ad);
     gtk_widget_set_sensitive(ad->apply_btn, FALSE);
-    uiDialogCreateButton(ad->dialog, _("Cancel"), uiApplyDialogCancelCb, (gpointer)ad);
+    ui_dialog_create_button(ad->dialog, _("Cancel"), ui_apply_dialog_cancel_cb, (gpointer)ad);
     
     return ad->dialog;
 }    
 
 void
-uiDialogChanged(GtkWidget *dialog)
+ui_dialog_changed(GtkWidget *dialog)
 {
     ApplyDialog *ad = (ApplyDialog *)gtk_object_get_data(GTK_OBJECT(dialog), APPLY_DIALOG_DATA);
 

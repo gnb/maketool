@@ -22,7 +22,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: log.c,v 1.12 1999-05-30 11:24:39 gnb Exp $");
+CVSID("$Id: log.c,v 1.13 1999-06-06 17:43:00 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -42,13 +42,13 @@ typedef struct
 } NodeIcons;
 
 static GtkWidget	*logwin;	/* a GtkCTree widget */
-static int		numErrors;
-static int		numWarnings;
+static int		num_errors;
+static int		num_warnings;
 static int		flags = LF_SHOW_INFO|LF_SHOW_WARNINGS|LF_SHOW_ERRORS;
 static GList		*log;		/* list of LogRecs */
-static LogRec		*currentBuildRec = 0;
-/*static GList		*logPendingLines = 0;*/ /*TODO*/
-static GList		*logDirectoryStack = 0;
+static LogRec		*current_build_rec = 0;
+/*static GList		*log_pending_lines = 0;*/ /*TODO*/
+static GList		*log_directory_stack = 0;
 static GdkFont		*fonts[L_MAX];
 static GdkColor		foregrounds[L_MAX];
 static gboolean		foreground_set[L_MAX];
@@ -59,53 +59,53 @@ static NodeIcons	icons[L_MAX];
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-logChangeDir(const char *dir)
+log_change_dir(const char *dir)
 {
-    if (logDirectoryStack == 0)
-	logDirectoryStack = g_list_append(logDirectoryStack, g_strdup(dir));
+    if (log_directory_stack == 0)
+	log_directory_stack = g_list_append(log_directory_stack, g_strdup(dir));
     else
     {
-    	g_free((char*)logDirectoryStack->data);
-	logDirectoryStack->data = g_strdup(dir);
+    	g_free((char*)log_directory_stack->data);
+	log_directory_stack->data = g_strdup(dir);
     }
 }
 
 static void
-logPushDir(const char *dir)
+log_push_dir(const char *dir)
 {
-    logDirectoryStack = g_list_prepend(logDirectoryStack, g_strdup(dir));
+    log_directory_stack = g_list_prepend(log_directory_stack, g_strdup(dir));
 }
 
 static void
-logPopDir(void)
+log_pop_dir(void)
 {
-    if (logDirectoryStack != 0)
+    if (log_directory_stack != 0)
     {
-    	g_free((char*)logDirectoryStack->data);
-	logDirectoryStack = g_list_remove_link(logDirectoryStack, logDirectoryStack);
+    	g_free((char*)log_directory_stack->data);
+	log_directory_stack = g_list_remove_link(log_directory_stack, log_directory_stack);
     }
 }
 
 static void
-logClearDirs(void)
+log_clear_dirs(void)
 {
-    while (logDirectoryStack != 0)
+    while (log_directory_stack != 0)
     {
-    	g_free((char*)logDirectoryStack->data);
-	logDirectoryStack = g_list_remove_link(logDirectoryStack, logDirectoryStack);
+    	g_free((char*)log_directory_stack->data);
+	log_directory_stack = g_list_remove_link(log_directory_stack, log_directory_stack);
     }
 }
 
 static const char *
-logCurrentDir(void)
+log_current_dir(void)
 {
-    return (logDirectoryStack == 0 ? 0 : (const char *)logDirectoryStack->data);
+    return (log_directory_stack == 0 ? 0 : (const char *)log_directory_stack->data);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static LogRec *
-logAddRec(const char *line, const FilterResult *res)
+log_add_rec(const char *line, const FilterResult *res)
 {
     LogRec *lr;
     
@@ -121,10 +121,10 @@ logAddRec(const char *line, const FilterResult *res)
     switch (lr->res.code)
     {
     case FR_WARNING:
-	numWarnings++;
+	num_warnings++;
     	break;
     case FR_ERROR:
-	numErrors++;
+	num_errors++;
     	break;
     default:
     	break;
@@ -136,7 +136,7 @@ logAddRec(const char *line, const FilterResult *res)
 }
 
 static void
-logDelRec(LogRec *lr)
+log_del_rec(LogRec *lr)
 {
     if (lr->res.file != 0)
     	g_free(lr->res.file);
@@ -147,11 +147,11 @@ logDelRec(LogRec *lr)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-logShowRec(LogRec *lr)
+log_show_rec(LogRec *lr)
 {
     gboolean was_empty = GTK_CTREE_IS_EMPTY(logwin);
     LogSeverity sev = L_INFO;
-    GtkCTreeNode *parentNode = (currentBuildRec == 0 ? 0 : currentBuildRec->node);
+    GtkCTreeNode *parent_node = (current_build_rec == 0 ? 0 : current_build_rec->node);
     
     switch (lr->res.code)
     {
@@ -172,8 +172,8 @@ logShowRec(LogRec *lr)
 	    return;
     	break;
     case FR_BUILDSTART:
-	currentBuildRec = lr;
-	parentNode = 0;
+	current_build_rec = lr;
+	parent_node = 0;
     	break;
     default:
     	break;
@@ -181,7 +181,7 @@ logShowRec(LogRec *lr)
 
     /* TODO: freeze & thaw if it redraws the wrong colour 1st */
     lr->node = gtk_ctree_insert_node(GTK_CTREE(logwin),
-    	parentNode,				/* parent */
+    	parent_node,				/* parent */
 	(GtkCTreeNode*)0,			/* sibling */
 	&lr->line,				/* text[] */
 	0,					/* spacing */
@@ -189,7 +189,7 @@ logShowRec(LogRec *lr)
 	icons[sev].closed_mask,			/* pixmap_closed,mask_closed */
 	icons[sev].open_pm,
 	icons[sev].open_mask,			/* pixmap_opened,mask_opened */
-	(parentNode != 0),			/* is_leaf */
+	(parent_node != 0),			/* is_leaf */
 	lr->expanded);				/* expanded */
     gtk_ctree_node_set_row_data(GTK_CTREE(logwin), lr->node, (gpointer)lr);
     /* TODO: support different fonts */
@@ -205,7 +205,7 @@ logShowRec(LogRec *lr)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 LogRec *
-logAddLine(const char *line)
+log_add_line(const char *line)
 {
     FilterResult res;
     LogRec *lr;
@@ -230,21 +230,21 @@ logAddLine(const char *line)
     	res.code = FR_INFORMATION;
     	break;
     case FR_CHANGEDIR:
-    	logChangeDir(res.file);
+    	log_change_dir(res.file);
     	break;
     case FR_PUSHDIR:
-	logPushDir(res.file);
+	log_push_dir(res.file);
     	break;
     case FR_POPDIR:
-	logPopDir();
+	log_pop_dir();
     	break;
     case FR_PENDING:
     	/* TODO: */
     	break;
     default:
-    	if (res.file != 0 && logCurrentDir() != 0)
+    	if (res.file != 0 && log_current_dir() != 0)
 	{
-	    estring_append_string(&fullpath, logCurrentDir());
+	    estring_append_string(&fullpath, log_current_dir());
 	    estring_append_char(&fullpath, '/');
 	    estring_append_string(&fullpath, res.file);
 	    res.file = fullpath.data;
@@ -252,8 +252,8 @@ logAddLine(const char *line)
     	break;
     }
     
-    lr = logAddRec(line, &res);
-    logShowRec(lr);
+    lr = log_add_rec(line, &res);
+    log_show_rec(lr);
     estring_free(&fullpath);
     return lr;
 }
@@ -261,12 +261,12 @@ logAddLine(const char *line)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 void
-logClear(void)
+log_clear(void)
 {
     /* delete all LogRecs */
     while (log != 0)
     {
-    	logDelRec((LogRec *)log->data);
+    	log_del_rec((LogRec *)log->data);
 	log = g_list_remove_link(log, log);
     }
 
@@ -278,13 +278,13 @@ logClear(void)
 }
 
 gboolean
-logIsEmpty(void)
+log_is_empty(void)
 {
     return GTK_CTREE_IS_EMPTY(logwin);
 }
 
 void
-logCollapseAll(void)
+log_collapse_all(void)
 {
     GList *list;
     
@@ -300,21 +300,21 @@ logCollapseAll(void)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-logRepopulate(void)
+log_repopulate(void)
 {
     GList *list;
     
     gtk_clist_freeze(GTK_CLIST(logwin));
     gtk_clist_clear(GTK_CLIST(logwin));
     for (list=log ; list!=0 ; list=list->next)
-	logShowRec((LogRec *)list->data);    	
+	log_show_rec((LogRec *)list->data);    	
     gtk_clist_thaw(GTK_CLIST(logwin));
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 void
-logSave(const char *file)
+log_save(const char *file)
 {
     GList *list;
     FILE *fp;
@@ -339,7 +339,7 @@ logSave(const char *file)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 void
-logOpen(const char *file)
+log_open(const char *file)
 {
     FILE *fp;
     char buf[2048];
@@ -351,7 +351,7 @@ logOpen(const char *file)
     }
     
     sprintf(buf, _("Log file %s"), file);
-    logStartBuild(buf);
+    log_start_build(buf);
     
     while (fgets(buf, sizeof(buf), fp) != 0)
     {
@@ -360,7 +360,7 @@ logOpen(const char *file)
 	    *x = '\0';
 	if ((x = strchr(buf, '\r')) != 0)
 	    *x = '\0';
-    	logAddLine(buf);
+    	log_add_line(buf);
     }
     
     fclose(fp);
@@ -369,7 +369,7 @@ logOpen(const char *file)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 LogRec *
-logSelected(void)
+log_selected(void)
 {
     if (GTK_CLIST(logwin)->selection == 0)
     	return 0;
@@ -379,7 +379,7 @@ logSelected(void)
 }
 
 void
-logSetSelected(LogRec *lr)
+log_set_selected(LogRec *lr)
 {
     gtk_ctree_select(GTK_CTREE(logwin), lr->node);
 }
@@ -388,36 +388,36 @@ logSetSelected(LogRec *lr)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 int
-logGetFlags(void)
+log_get_flags(void)
 {
     return flags;
 }
 
 void
-logSetFlags(int f)
+log_set_flags(int f)
 {
     flags = f;
-    logRepopulate();
+    log_repopulate();
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 int
-logNumErrors(void)
+log_num_errors(void)
 {
-    return numErrors;
+    return num_errors;
 }
 
 int
-logNumWarnings(void)
+log_num_warnings(void)
 {
-    return numWarnings;
+    return num_warnings;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 void
-logInit(GtkWidget *w)
+log_init(GtkWidget *w)
 {
     GdkWindow *win = toplevel->window;
     GdkColormap *colormap = gtk_widget_get_colormap(toplevel);
@@ -460,14 +460,14 @@ logInit(GtkWidget *w)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 void
-logStartBuild(const char *message)
+log_start_build(const char *message)
 {
     FilterResult res;
     
-    logClearDirs();
+    log_clear_dirs();
     
-    numErrors = 0;
-    numWarnings = 0;
+    num_errors = 0;
+    num_warnings = 0;
     filter_init();
     
     res.code = FR_BUILDSTART;
@@ -475,19 +475,19 @@ logStartBuild(const char *message)
     res.line = 0;
     res.column = 0;
 
-    logShowRec(logAddRec(message, &res));
+    log_show_rec(log_add_rec(message, &res));
 }
 
 
 void
-logEndBuild(const char *target)
+log_end_build(const char *target)
 {
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static LogRec *
-logFindErrorAux(LogRec *lr, gboolean forward)
+log_find_error_aux(LogRec *lr, gboolean forward)
 {
     GList *list;
     
@@ -512,15 +512,15 @@ logFindErrorAux(LogRec *lr, gboolean forward)
 }
 
 LogRec *
-logNextError(LogRec *lr)
+log_next_error(LogRec *lr)
 {
-    return logFindErrorAux(lr, TRUE);
+    return log_find_error_aux(lr, TRUE);
 }
 
 LogRec *
-logPrevError(LogRec *lr)
+log_prev_error(LogRec *lr)
 {
-    return logFindErrorAux(lr, FALSE);
+    return log_find_error_aux(lr, FALSE);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

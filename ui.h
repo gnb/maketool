@@ -24,23 +24,23 @@
 #include <gtk/gtk.h>
 
 
-int uiComboGetCurrent(GtkWidget *);
-void uiComboSetCurrent(GtkWidget *, int);
+int ui_combo_get_current(GtkWidget *);
+void ui_combo_set_current(GtkWidget *, int);
 
-void uiCListGetStrings(GtkWidget*, int row, int ncols, char *text[]);
-void uiCListSetStrings(GtkWidget*, int row, int ncols, char *text[]);
+void ui_cListGetStrings(GtkWidget*, int row, int ncols, char *text[]);
+void ui_cListSetStrings(GtkWidget*, int row, int ncols, char *text[]);
 
-void uiGroupAdd(gint group, GtkWidget *w);
-void uiGroupSetSensitive(gint group, gboolean b);
+void ui_group_add(gint group, GtkWidget *w);
+void ui_group_set_sensitive(gint group, gboolean b);
 
-GtkWidget *uiCreateFileSel(
+GtkWidget *ui_create_file_sel(
     const char *title,
     void (*callback)(const char *filename),
     const char *filename);
 
 /* toolbar stuff */
     
-GtkWidget *uiToolCreate(
+GtkWidget *ui_tool_create(
     GtkWidget *toolbar,
     const char *name,
     const char *tooltip,
@@ -48,44 +48,44 @@ GtkWidget *uiToolCreate(
     GtkSignalFunc callback,
     gpointer user_data,
     gint group);
-void uiToolAddSpace(GtkWidget *toolbar);
+void ui_tool_add_space(GtkWidget *toolbar);
 
 /* Menubar stuff */    
 
-GtkWidget *uiAddMenu(GtkWidget *menubar, const char *label);
-GtkWidget *uiAddMenuRight(GtkWidget *menubar, const char *label);
-GtkWidget *uiAddButton(
+GtkWidget *ui_add_menu(GtkWidget *menubar, const char *label);
+GtkWidget *ui_add_menu_right(GtkWidget *menubar, const char *label);
+GtkWidget *ui_add_button(
     GtkWidget *menu,
     const char *label,
     void (*callback)(GtkWidget*, gpointer),
     gpointer calldata,
     gint group);
-GtkWidget *uiAddTearoff(GtkWidget *menu);
-GtkWidget *uiAddToggle(
+GtkWidget *ui_add_tearoff(GtkWidget *menu);
+GtkWidget *ui_add_toggle(
     GtkWidget *menu,
     const char *label,
     void (*callback)(GtkWidget*, gpointer),
     gpointer calldata,
-    GtkWidget *radioOther,
+    GtkWidget *radio_other,
     gboolean set);
-GtkWidget *uiAddSeparator(GtkWidget *menu);
+GtkWidget *ui_add_separator(GtkWidget *menu);
 
 /* dialog stuff */
 
-GtkWidget *uiCreateOkDialog(
+GtkWidget *ui_create_ok_dialog(
     GtkWidget *parent,
     const char *title);
-GtkWidget *uiCreateApplyDialog(
+GtkWidget *ui_create_apply_dialog(
     GtkWidget *parent,
     const char *title,
     GtkSignalFunc apply_cb,
     gpointer data);
-GtkWidget *uiDialogCreateButton(
+GtkWidget *ui_dialog_create_button(
     GtkWidget *dialog,
     const char *label,
     GtkSignalFunc callback,
     gpointer user_data);
-void uiDialogChanged(GtkWidget *dialog);    
+void ui_dialog_changed(GtkWidget *dialog);    
     
     
 #endif /* _UI_H_ */

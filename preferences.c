@@ -21,7 +21,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: preferences.c,v 1.12 1999-06-01 12:43:34 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.13 1999-06-06 17:43:00 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -302,7 +302,7 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     g_free(prefs.prog_edit_source);
     prefs.prog_edit_source = g_strdup(gtk_entry_get_text(GTK_ENTRY(prog_edit_entry)));
     
-    prefs.start_action = uiComboGetCurrent(start_action_combo);
+    prefs.start_action = ui_combo_get_current(start_action_combo);
     
     /* TODO: strip `mf' of whitespace JIC */
     mf = gtk_entry_get_text(GTK_ENTRY(makefile_entry));
@@ -314,7 +314,7 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     nrows = GTK_CLIST(var_clist)->rows;        
     for (row = 0 ; row < nrows ; row++)
     {
-    	uiCListGetStrings(var_clist, row, VC_MAX, text);
+    	ui_cListGetStrings(var_clist, row, VC_MAX, text);
 	prefs_add_variable(text[VC_NAME], text[VC_VALUE],
 		var_str_to_type(text[VC_TYPE]));
     }
@@ -330,7 +330,7 @@ static void
 changed_cb(GtkWidget *w, gpointer data)
 {
     if (!creating)
-	uiDialogChanged(prefs_shell);
+	ui_dialog_changed(prefs_shell);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -339,7 +339,7 @@ static void
 set_makefile(const char *mf)
 {
     gtk_entry_set_text(GTK_ENTRY(makefile_entry), mf);
-    uiDialogChanged(prefs_shell);
+    ui_dialog_changed(prefs_shell);
 }
 
 static void
@@ -349,7 +349,7 @@ browse_makefile_cb(GtkWidget *w, gpointer data)
     char *mf = gtk_entry_get_text(GTK_ENTRY(makefile_entry));
     
     if (filesel == 0)
-    	filesel = uiCreateFileSel(_("Choose Makefile"), set_makefile, mf);
+    	filesel = ui_create_file_sel(_("Choose Makefile"), set_makefile, mf);
     else
     	gtk_file_selection_set_filename(GTK_FILE_SELECTION(filesel), mf);
 
@@ -546,7 +546,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(editw_check), !prefs.edit_warnings);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fail_check), prefs.ignore_failures);
     gtk_entry_set_text(GTK_ENTRY(makefile_entry), (prefs.makefile == 0 ? "" : prefs.makefile));
-    uiComboSetCurrent(start_action_combo, prefs.start_action);
+    ui_combo_set_current(start_action_combo, prefs.start_action);
 
     return table;
 }
@@ -564,12 +564,12 @@ var_select_cb(
 {
     char *text[VC_MAX];
 
-    uiCListGetStrings(var_clist, row, VC_MAX, text);
+    ui_cListGetStrings(var_clist, row, VC_MAX, text);
 
     setting = TRUE;	/* don't ungrey the Apply button */
     gtk_entry_set_text(GTK_ENTRY(var_name_entry), text[VC_NAME]);
     gtk_entry_set_text(GTK_ENTRY(var_value_entry), text[VC_VALUE]);
-    uiComboSetCurrent(var_type_combo, var_str_to_type(text[VC_TYPE]));
+    ui_combo_set_current(var_type_combo, var_str_to_type(text[VC_TYPE]));
     setting = FALSE;
     gtk_widget_set_sensitive(var_set_btn, FALSE);
     gtk_widget_set_sensitive(var_unset_btn, TRUE);
@@ -596,17 +596,17 @@ var_set_cb(GtkWidget *w, gpointer data)
     
     text[VC_NAME] = gtk_entry_get_text(GTK_ENTRY(var_name_entry));
     text[VC_VALUE] = gtk_entry_get_text(GTK_ENTRY(var_value_entry));
-    text[VC_TYPE] = var_type_to_str(uiComboGetCurrent(var_type_combo));
+    text[VC_TYPE] = var_type_to_str(ui_combo_get_current(var_type_combo));
         
     for (row = 0 ; row < nrows ; row++)
     {
-    	uiCListGetStrings(var_clist, row, VC_MAX, rtext);
+    	ui_cListGetStrings(var_clist, row, VC_MAX, rtext);
 	if (!strcmp(rtext[VC_NAME], text[VC_NAME]))
 	{
 	    if (!strcmp(text[VC_VALUE], rtext[VC_VALUE]) &&
 	        !strcmp(text[VC_TYPE], rtext[VC_TYPE]))
 	    	return;	/* same variable, no change to value or type: ignore */
-    	    uiCListGetStrings(var_clist, row, VC_MAX, text);
+    	    ui_cListGetStrings(var_clist, row, VC_MAX, text);
 	    break;
 	}
     }
@@ -615,7 +615,7 @@ var_set_cb(GtkWidget *w, gpointer data)
     gtk_clist_append(GTK_CLIST(var_clist), text);
     gtk_widget_set_sensitive(var_set_btn, FALSE);
     gtk_widget_set_sensitive(var_unset_btn, TRUE);
-    uiDialogChanged(prefs_shell);
+    ui_dialog_changed(prefs_shell);
 }
 
 static void
@@ -643,12 +643,12 @@ var_unset_cb(GtkWidget *w, gpointer data)
     setting = TRUE; 	/* don't ungrey the Apply button */
     gtk_entry_set_text(GTK_ENTRY(var_name_entry), "");
     gtk_entry_set_text(GTK_ENTRY(var_value_entry), "");
-    uiComboSetCurrent(var_type_combo, 0);
+    ui_combo_set_current(var_type_combo, 0);
     setting = FALSE;
     gtk_widget_set_sensitive(var_set_btn, FALSE);
     gtk_widget_set_sensitive(var_unset_btn, FALSE);
     if (changed)
-	uiDialogChanged(prefs_shell);
+	ui_dialog_changed(prefs_shell);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -968,7 +968,7 @@ prefs_create_shell(GtkWidget *toplevel)
     GtkWidget *box;
     GtkWidget *page;
 
-    prefs_shell = uiCreateApplyDialog(toplevel, _("Maketool: Preferences"),
+    prefs_shell = ui_create_apply_dialog(toplevel, _("Maketool: Preferences"),
     	prefs_apply_cb, (gpointer)0);
 
     box = gtk_vbox_new(FALSE, 0);

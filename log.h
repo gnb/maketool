@@ -47,26 +47,26 @@ typedef enum
     LF_SHOW_ERRORS		=1<<2
 } LogFlags;
 
-void logInit(GtkWidget *);
+void log_init(GtkWidget *);
 
-void logClear(void);
-void logCollapseAll(void);
-gboolean logIsEmpty(void);
-void logStartBuild(const char *message);
-void logEndBuild(const char *target);
+void log_clear(void);
+void log_collapse_all(void);
+gboolean log_is_empty(void);
+void log_start_build(const char *message);
+void log_end_build(const char *target);
 
-LogRec *logSelected(void);
-void logSetSelected(LogRec *);
-LogRec *logNextError(LogRec *);
-LogRec *logPrevError(LogRec *);
+LogRec *log_selected(void);
+void log_set_selected(LogRec *);
+LogRec *log_next_error(LogRec *);
+LogRec *log_prev_error(LogRec *);
 
-int logGetFlags(void);
-void logSetFlags(int);
-int logNumErrors(void);
-int logNumWarnings(void);
+int log_get_flags(void);
+void log_set_flags(int);
+int log_num_errors(void);
+int log_num_warnings(void);
 
-void logSave(const char *file);
-void logOpen(const char *file);
-LogRec *logAddLine(const char *line);
+void log_save(const char *file);
+void log_open(const char *file);
+LogRec *log_add_line(const char *line);
 
 #endif /* _LOG_H_ */

@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: help.c,v 1.12 1999-06-06 16:10:42 gnb Exp $");
+CVSID("$Id: help.c,v 1.13 1999-06-06 17:43:00 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -41,7 +41,7 @@ licence_cb(GtkWidget *w, gpointer data)
 	int n;
 	char buf[1024];
 
-	licence_shell = uiCreateOkDialog(toplevel, _("Maketool: Licence"));
+	licence_shell = ui_create_ok_dialog(toplevel, _("Maketool: Licence"));
 	gtk_widget_set_usize(licence_shell, 450, 300);
 
 	hbox = gtk_hbox_new(FALSE, SPACING);
@@ -101,7 +101,7 @@ help_about_cb(GtkWidget *w, gpointer data)
 	GdkPixmap *pm;
 	GdkBitmap *mask;
 
-	about_shell = uiCreateOkDialog(toplevel, _("Maketool: About"));
+	about_shell = ui_create_ok_dialog(toplevel, _("Maketool: About"));
 	
 	hbox = gtk_hbox_new(FALSE, 5);
 	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_shell)->vbox), hbox);
@@ -125,7 +125,7 @@ help_about_cb(GtkWidget *w, gpointer data)
 	gtk_container_add(GTK_CONTAINER(hbox), label);
 	gtk_widget_show(label);
 
-	uiDialogCreateButton(about_shell, _("Licence..."), licence_cb, (gpointer)0);
+	ui_dialog_create_button(about_shell, _("Licence..."), licence_cb, (gpointer)0);
     }
     
     gtk_widget_show(about_shell);
@@ -145,7 +145,7 @@ make_version_reap(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     {
 	GtkWidget *label;
 
-	about_make_shell = uiCreateOkDialog(toplevel, _("Maketool: About Make"));
+	about_make_shell = ui_create_ok_dialog(toplevel, _("Maketool: About Make"));
 
 	/* TODO: logo */
 	label = gtk_label_new(make_version.data);
