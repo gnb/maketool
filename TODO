@@ -26,9 +26,6 @@ x  Allow the Makefile to be built on-demand, with an entry in the
    first part of the Build menu.  Turn off automatically building
    by default.
 
-x  Use config.status if it exists and is not newer than configure
-   or configure.in.
-   
 x  Help: make the browser command configuruable in preferences.
 
 x  Help: organise smart way to generate index at least semi-automatically.
@@ -482,3 +479,6 @@ x  DONE: Change spec file to make the RPM depend on make.
 
 x  DONE: Reduce use of @PACKAGE@ etc in spec file.
 
+x  DONE: Use config.status if it exists and is not newer than configure
+   or configure.in.
+   
