@@ -236,6 +236,7 @@ typedef enum
 EXTERN const char *argv0;
 EXTERN Preferences prefs;
 EXTERN GtkWidget *toplevel;
+EXTERN char *current_dir;
 
 #define SPACING 4
 
