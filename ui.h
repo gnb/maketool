@@ -57,6 +57,7 @@ GtkWidget *ui_add_menu_right(GtkWidget *menubar, const char *label);
 GtkWidget *ui_add_button(
     GtkWidget *menu,
     const char *label,
+    const char *accel,
     void (*callback)(GtkWidget*, gpointer),
     gpointer calldata,
     gint group);

@@ -28,7 +28,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.29 1999-06-10 08:02:38 gnb Exp $");
+CVSID("$Id: main.c,v 1.30 1999-06-10 08:47:57 gnb Exp $");
 
 typedef enum
 {
@@ -256,12 +256,12 @@ reap_list(pid_t pid, int status, struct rusage *usg, gpointer user_data)
      * will always be visible regardless of its size.
      */
     for (list = predefs ; list != 0 ; list = list->next)
-	ui_add_button(build_menu, (const char*)list->data, build_cb, list->data,
+	ui_add_button(build_menu, (const char*)list->data, 0, build_cb, list->data,
 		GR_NOTRUNNING);
     if (predefs != 0 && available_targets != 0)
 	ui_add_separator(build_menu);
     for (list = available_targets ; list != 0 ; list = list->next)
-	ui_add_button(build_menu, (const char*)list->data, build_cb, list->data,
+	ui_add_button(build_menu, (const char*)list->data, 0, build_cb, list->data,
 		GR_NOTRUNNING);
 
     /*
@@ -653,49 +653,55 @@ static void
 ui_create_menus(GtkWidget *menubar)
 {
     GtkWidget *menu;
+    GtkAccelGroup *ag;
+    
+    ag = gtk_accel_group_new();
+    gtk_window_add_accel_group(GTK_WINDOW(toplevel), ag);
+    ui_set_accel_group(ag);
+
     
     menu = ui_add_menu(menubar, _("File"));
     ui_add_tearoff(menu);
-    ui_add_button(menu, _("Open Log..."), file_open_cb, 0, GR_NONE);
-    ui_add_button(menu, _("Save Log..."), file_save_cb, 0, GR_NOTEMPTY);
+    ui_add_button(menu, _("Open Log..."), "<Ctrl>O", file_open_cb, 0, GR_NONE);
+    ui_add_button(menu, _("Save Log..."), "<Ctrl>S", file_save_cb, 0, GR_NOTEMPTY);
     ui_add_separator(menu);
 #if 0
-    ui_add_button(menu, _("Change directory..."), unimplemented, 0, GR_NOTRUNNING);
+    ui_add_button(menu, _("Change directory..."), 0, unimplemented, 0, GR_NOTRUNNING);
     ui_add_separator(menu);
-    ui_add_button(menu, _("Print"), unimplemented, 0, GR_NOTEMPTY);
-    ui_add_button(menu, _("Print Settings..."), unimplemented, 0, GR_NONE);
+    ui_add_button(menu, _("Print"), "<Ctrl>P", unimplemented, 0, GR_NOTEMPTY);
+    ui_add_button(menu, _("Print Settings..."), 0, unimplemented, 0, GR_NONE);
     ui_add_separator(menu);
 #endif
-    ui_add_button(menu, _("Exit"), file_exit_cb, 0, GR_NONE);
+    ui_add_button(menu, _("Exit"), "<Ctrl>X", file_exit_cb, 0, GR_NONE);
     
     menu = ui_add_menu(menubar, _("Edit"));
     ui_add_tearoff(menu);
-    ui_add_button(menu, _("Edit Error"), edit_error_cb, 0, GR_EDITABLE);
-    ui_add_button(menu, _("Edit Next Error"), edit_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
-    ui_add_button(menu, _("Edit Prev Error"), edit_next_error_cb, GINT_TO_POINTER(FALSE), GR_NOTEMPTY);
+    ui_add_button(menu, _("Edit Error"), 0, edit_error_cb, 0, GR_EDITABLE);
+    ui_add_button(menu, _("Edit Next Error"), "<Ctrl>E", edit_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
+    ui_add_button(menu, _("Edit Prev Error"), 0, edit_next_error_cb, GINT_TO_POINTER(FALSE), GR_NOTEMPTY);
     ui_add_separator(menu);
-    ui_add_button(menu, _("Preferences..."), edit_preferences_cb, 0, GR_NONE);
+    ui_add_button(menu, _("Preferences..."), 0, edit_preferences_cb, 0, GR_NONE);
 
     menu = ui_add_menu(menubar, _("Build"));
     build_menu = menu;
     ui_add_tearoff(menu);
-    ui_add_button(menu, _("Again"), build_again_cb, 0, GR_AGAIN);
-    ui_add_button(menu, _("Stop"), build_stop_cb, 0, GR_RUNNING);
+    ui_add_button(menu, _("Again"), "<Ctrl>A", build_again_cb, 0, GR_AGAIN);
+    ui_add_button(menu, _("Stop"), 0, build_stop_cb, 0, GR_RUNNING);
     ui_add_separator(menu);
 #if 0
-    ui_add_button(menu, "all", build_cb, "all", GR_NOTRUNNING);
-    ui_add_button(menu, "install", build_cb, "install", GR_NOTRUNNING);
-    ui_add_button(menu, "clean", build_cb, "clean", GR_NOTRUNNING);
+    ui_add_button(menu, "all", 0, build_cb, "all", GR_NOTRUNNING);
+    ui_add_button(menu, "install", 0, build_cb, "install", GR_NOTRUNNING);
+    ui_add_button(menu, "clean", 0, build_cb, "clean", GR_NOTRUNNING);
     ui_add_separator(menu);
-    ui_add_button(menu, "random", build_cb, "random", GR_NOTRUNNING);
-    ui_add_button(menu, "delay", build_cb, "delay", GR_NOTRUNNING);
-    ui_add_button(menu, "targets", build_cb, "targets", GR_NOTRUNNING);
+    ui_add_button(menu, "random", 0, build_cb, "random", GR_NOTRUNNING);
+    ui_add_button(menu, "delay", 0, build_cb, "delay", GR_NOTRUNNING);
+    ui_add_button(menu, "targets", 0, build_cb, "targets", GR_NOTRUNNING);
 #endif
     
     menu = ui_add_menu(menubar, _("View"));
     ui_add_tearoff(menu);
-    ui_add_button(menu, _("Clear Log"), view_clear_cb, 0, GR_NOTEMPTY);
-    ui_add_button(menu, _("Collapse All"), view_collapse_all_cb, 0, GR_NOTEMPTY);
+    ui_add_button(menu, _("Clear Log"), 0, view_clear_cb, 0, GR_NOTEMPTY);
+    ui_add_button(menu, _("Collapse All"), 0, view_collapse_all_cb, 0, GR_NOTEMPTY);
     ui_add_separator(menu);
     ui_add_toggle(menu, _("Toolbar"), view_widget_cb, (gpointer)&toolbar_hb, 0, TRUE);
     ui_add_toggle(menu, _("Statusbar"), view_widget_cb, (gpointer)&messagebox, 0, TRUE);
@@ -709,15 +715,15 @@ ui_create_menus(GtkWidget *menubar)
     
     menu = ui_add_menu_right(menubar, _("Help"));
     ui_add_tearoff(menu);
-    ui_add_button(menu, _("About Maketool..."), help_about_cb, 0, GR_NONE);
-    ui_add_button(menu, _("About make..."), help_about_make_cb, 0, GR_NONE);
+    ui_add_button(menu, _("About Maketool..."), 0, help_about_cb, 0, GR_NONE);
+    ui_add_button(menu, _("About make..."), 0, help_about_make_cb, 0, GR_NONE);
 #if 0
     ui_add_separator(menu);
-    ui_add_button(menu, _("Help on..."), unimplemented, 0, GR_NONE);
+    ui_add_button(menu, _("Help on..."), 0, unimplemented, 0, GR_NONE);
     ui_add_separator(menu);
-    ui_add_button(menu, _("Tutorial"), unimplemented, 0, GR_NONE);
-    ui_add_button(menu, _("Reference Index"), unimplemented, 0, GR_NONE);
-    ui_add_button(menu, _("Home Page"), unimplemented, 0, GR_NONE);
+    ui_add_button(menu, _("Tutorial"), 0, unimplemented, 0, GR_NONE);
+    ui_add_button(menu, _("Reference Index"), 0, unimplemented, 0, GR_NONE);
+    ui_add_button(menu, _("Home Page"), 0, unimplemented, 0, GR_NONE);
 #endif
 }
 
@@ -951,7 +957,7 @@ Options:\n\
                               Don't start multiple jobs unless load is below N.\n\
   -S, --no-keep-going, --stop\n\
                               Turns off -k.\n\
-  -v, --version               Print the version number of maketool and exit.
+  -v, --version               Print the version number of maketool and exit.\n\
 ";
 
 static const char version_string[] = "\

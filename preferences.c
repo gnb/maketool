@@ -21,7 +21,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: preferences.c,v 1.15 1999-06-10 08:02:38 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.16 1999-06-10 08:47:58 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -314,7 +314,7 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     nrows = GTK_CLIST(var_clist)->rows;        
     for (row = 0 ; row < nrows ; row++)
     {
-    	ui_cListGetStrings(var_clist, row, VC_MAX, text);
+    	ui_clist_get_strings(var_clist, row, VC_MAX, text);
 	prefs_add_variable(text[VC_NAME], text[VC_VALUE],
 		var_str_to_type(text[VC_TYPE]));
     }
@@ -564,7 +564,7 @@ var_select_cb(
 {
     char *text[VC_MAX];
 
-    ui_cListGetStrings(var_clist, row, VC_MAX, text);
+    ui_clist_get_strings(var_clist, row, VC_MAX, text);
 
     setting = TRUE;	/* don't ungrey the Apply button */
     gtk_entry_set_text(GTK_ENTRY(var_name_entry), text[VC_NAME]);
@@ -600,13 +600,13 @@ var_set_cb(GtkWidget *w, gpointer data)
         
     for (row = 0 ; row < nrows ; row++)
     {
-    	ui_cListGetStrings(var_clist, row, VC_MAX, rtext);
+    	ui_clist_get_strings(var_clist, row, VC_MAX, rtext);
 	if (!strcmp(rtext[VC_NAME], text[VC_NAME]))
 	{
 	    if (!strcmp(text[VC_VALUE], rtext[VC_VALUE]) &&
 	        !strcmp(text[VC_TYPE], rtext[VC_TYPE]))
 	    	return;	/* same variable, no change to value or type: ignore */
-    	    ui_cListGetStrings(var_clist, row, VC_MAX, text);
+    	    ui_clist_get_strings(var_clist, row, VC_MAX, text);
 	    break;
 	}
     }

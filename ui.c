@@ -19,7 +19,7 @@
 
 #include "ui.h"
 
-CVSID("$Id: ui.c,v 1.9 1999-06-06 17:43:01 gnb Exp $");
+CVSID("$Id: ui.c,v 1.10 1999-06-10 08:47:58 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -42,7 +42,7 @@ ui_combo_set_current(GtkWidget *combo, int n)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 void
-ui_cListGetStrings(GtkWidget *w, int row, int ncols, char *text[])
+ui_clist_get_strings(GtkWidget *w, int row, int ncols, char *text[])
 {
     int i;
     
@@ -51,7 +51,7 @@ ui_cListGetStrings(GtkWidget *w, int row, int ncols, char *text[])
 }
 
 void
-ui_cListSetStrings(GtkWidget *w, int row, int ncols, char *text[])
+ui_clist_set_strings(GtkWidget *w, int row, int ncols, char *text[])
 {
     int i;
     
@@ -129,8 +129,9 @@ ui_create_file_sel(
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+
 static GtkWidget *
-_uiAddMenuAux(
+_ui_add_menu_aux(
     GtkWidget *menubar,
     const char *label,
     gboolean is_right)
@@ -154,19 +155,28 @@ _uiAddMenuAux(
 GtkWidget *
 ui_add_menu(GtkWidget *menubar, const char *label)
 {
-    return _uiAddMenuAux(menubar, label, FALSE);
+    return _ui_add_menu_aux(menubar, label, FALSE);
 }
 
 GtkWidget *
 ui_add_menu_right(GtkWidget *menubar, const char *label)
 {
-    return _uiAddMenuAux(menubar, label, TRUE);
+    return _ui_add_menu_aux(menubar, label, TRUE);
 }
+
+static GtkAccelGroup *ui_accel_group = 0;
+void
+ui_set_accel_group(GtkAccelGroup *ag)
+{
+    ui_accel_group = ag;
+}
+
 
 GtkWidget *
 ui_add_button(
     GtkWidget *menu,
     const char *label,
+    const char *accel,
     void (*callback)(GtkWidget*, gpointer),
     gpointer calldata,
     gint group)
@@ -179,6 +189,19 @@ ui_add_button(
     	GTK_SIGNAL_FUNC(callback), calldata);
     if (group >= 0)
     	ui_group_add(group, item);
+
+    /* Handle accelerator */
+    if (accel != 0 && ui_accel_group != 0)
+    {
+	GdkModifierType mods = 0;
+	guint key = 0;
+		
+	gtk_accelerator_parse(accel, &key, &mods);
+	gtk_accel_group_add(ui_accel_group,
+		key, mods, GTK_ACCEL_VISIBLE,
+		GTK_OBJECT(item), "activate");
+    }
+
     gtk_widget_show(item);
     return item;
 }
