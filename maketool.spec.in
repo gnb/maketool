@@ -34,7 +34,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/maketool
 /usr/libexec/maketool/maketool_client
 /usr/share/maketool/*.mk
-%doc COPYING COPYRIGHT TODO CHANGES
+%doc COPYING COPYRIGHT TODO ChangeLog
 %docdir /usr/share/maketool/help
 /usr/share/maketool/help
 /usr/share/locale/*/LC_MESSAGES/maketool.mo
@@ -42,6 +42,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/man/man1/maketool.1*
 
 %changelog
+* Tue Sep 30 2003 Greg Banks <gnb@alphalink.com.au>
+- Updates for 0.8
 * Fri Feb 15 2002 Greg Banks <gnb@alphalink.com.au>
 - manpage added to rpm
 * Sun Oct 21 2001 Greg Banks <gnb@alphalink.com.au>
