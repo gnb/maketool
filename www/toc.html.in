@@ -2,7 +2,7 @@
 define(NAVLINK,
 <TR>
   <TD>
-    <B>`ifelse($1,HTMLFILE,$2,<A HREF="$1">$2</A>)'</B></BR>
+    <B>`ifelse($1,HTMLFILE,$2,<A HREF="$1">$2</A>)'</B><BR>
   </TD>
 </TR>
 )
@@ -15,19 +15,19 @@ define(NAVLINK,
   </TR>
   <TR>
     <TD>
-      <TABLE WIDTH=100% BORDER=0 BACKGROUND="" BGCOLOR="#ffffff" CELLSPACING=0 CELLPADDING=5>
+      <TABLE WIDTH="100%" BORDER=0 BACKGROUND="" BGCOLOR="#ffffff" CELLSPACING=0 CELLPADDING=5>
 	NAVLINK(index.html,Features)
 	NAVLINK(download.html,Download)
 	NAVLINK(screenshots.html,Screenshots)
 	NAVLINK(changelog.html,Change Log)
       </TABLE>
-      <TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=2>
+      <TABLE WIDTH="100%" BORDER=0 CELLSPACING=0 CELLPADDING=2>
 	<TR>
 	  <TD>
 	  </TD>
 	</TR>
       </TABLE>
-      <TABLE WIDTH=100% BORDER=0 BACKGROUND="" BGCOLOR="#ffffff" CELLSPACING=0 CELLPADDING=5>
+      <TABLE WIDTH="100%" BORDER=0 BACKGROUND="" BGCOLOR="#ffffff" CELLSPACING=0 CELLPADDING=5>
 	<TR>
 	  <TD>
 	    Watch for new<BR>releases on:<BR>
@@ -44,6 +44,18 @@ define(NAVLINK,
 	    <A HREF="http://www.gimp.org/"><IMG WIDTH=90 HEIGHT=36 BORDER=0 SRC="gimp.gif" ALT="[gimp]"></A>
 	  </TD>
 	</TR>
+
+	<TR>
+	  <TD BGCOLOR="#000000">
+	    <SPAN STYLE="color: #ffffff; text-align: center;">
+	      Rest In Peace<BR><B>DOUGLAS<BR>ADAMS</B><BR>
+	      <SPAN STYLE="font-size: smaller;">
+	      	So long and thanks<BR>for all the fish
+	      </SPAN>
+	    </SPAN>
+	  </TD>
+	</TR>
+	
       </TABLE>
     </TD>
   </TR>
