@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.11 1999-08-10 15:44:39 gnb Exp $");
+CVSID("$Id: filter.c,v 1.12 1999-09-05 05:11:30 gnb Exp $");
 
 typedef struct
 {
@@ -113,7 +113,7 @@ filter_load(void)
 	"",				/* file */
 	"",				/* line */
 	"",				/* col */
-	0,				/* summary */
+	"",				/* summary */
     	"gcc spurious message #1");	/* comment */
 
     filter_add(
@@ -123,48 +123,58 @@ filter_load(void)
 	"",				/* file */
 	"",				/* line */
 	"",				/* col */
-	0,				/* summary */
+	"",				/* summary */
     	"gcc spurious message #2");	/* comment */
 	
     filter_add(
     	"",				/* state */
-	"^([^:]+):([0-9]+): warning:",	/* regexp */
+	"^[^:]+: In function",	    	/* regexp */
+	FR_INFORMATION,			/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	"",				/* summary */
+    	"gcc spurious message #3");	/* comment */
+	
+    filter_add(
+    	"",				/* state */
+	"^([^:]+):([0-9]+): warning:(.*)$",	/* regexp */
 	FR_WARNING,			/* code */
 	"\\1",				/* file */
 	"\\2",				/* line */
 	"",				/* col */
-	0,				/* summary */
+	"\\3",				/* summary */
     	"gcc warnings");		/* comment */
 	
     filter_add(
     	"",				/* state */
-	"^([^:]+):([0-9]+): ",		/* regexp */
+	"^([^:]+):([0-9]+):(.*)$",	/* regexp */
 	FR_ERROR,			/* code */
 	"\\1",				/* file */
 	"\\2",				/* line */
 	"",				/* col */
-	0,				/* summary */
+	"\\3",				/* summary */
     	"gcc errors");			/* comment */
 
 #ifdef __hpux
     filter_add(
     	"",				/* state */
-	"(CC|cpp): \"([^\"]*)\", line ([0-9]+): error", /* regexp */
+	"(CC|cpp): \"([^\"]*)\", line ([0-9]+): error(.*)$", /* regexp */
 	FR_ERROR,			/* code */
 	"\\2",				/* file */
 	"\\3",				/* line */
 	"",				/* col */
-	0,				/* summary */
+	"\\4",				/* summary */
     	"HP-UX old CC/cpp error");	/* comment */
 	
     filter_add(
     	"",				/* state */
-	"(CC|cpp): \"([^\"]*)\", line ([0-9]+): warning", /* regexp */
+	"(CC|cpp): \"([^\"]*)\", line ([0-9]+): warning(.*)$", /* regexp */
 	FR_WARNING,			/* code */
 	"\\2",				/* file */
 	"\\3",				/* line */
 	"",				/* col */
-	0,				/* summary */
+	"\\4",				/* summary */
     	"HP-UX old CC/cpp warning");	/* comment */
 #endif
 
@@ -174,12 +184,12 @@ filter_load(void)
 
     filter_add(
     	"",				/* state */
-	"(Semantic|Syntax|Parser) error at line ([0-9]+), column ([0-9]+), file[ \t]*([^ \t]*):", /* regexp */
+	"(Semantic|Syntax|Parser) error at line ([0-9]+), column ([0-9]+), file[ \t]*([^ \t]*):(.*)$", /* regexp */
 	FR_ERROR,			/* code */
 	"\\4",				/* file */
 	"\\2",				/* line */
 	"\\3",				/* col */
-	0,				/* summary */
+	"\\1 error: \\5",		/* summary */
     	"Oracle Pro/C error");		/* comment */
 	
     /*

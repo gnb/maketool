@@ -22,7 +22,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: log.c,v 1.15 1999-08-10 15:44:39 gnb Exp $");
+CVSID("$Id: log.c,v 1.16 1999-09-05 05:11:30 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -190,10 +190,19 @@ log_show_rec(LogRec *lr)
     default:
     	break;
     }
+
+    text = lr->line;
+    if ((prefs.log_flags & LF_SUMMARISE) && lr->res.summary != 0)
+    {
+	if (*lr->res.summary == '\0')
+	    return; 	/* summary="" allows summarised lines to disappear */
+	else
+	    text = lr->res.summary;
+    }
     
     text = ((prefs.log_flags & LF_SUMMARISE) && lr->res.summary != 0 ?
     		lr->res.summary : lr->line);
-
+    
     /* TODO: freeze & thaw if it redraws the wrong colour 1st */
     lr->node = gtk_ctree_insert_node(GTK_CTREE(logwin),
     	parent_node,				/* parent */
