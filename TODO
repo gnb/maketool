@@ -1,5 +1,5 @@
 
-x  `Variables' tab in Preferences window needs to shrink.
+x  DONE: `Variables' tab in Preferences window needs to shrink.
 
 x  When user presses `Edit Next' the new selected error
    should become visible even if its currently in a collapsed
@@ -13,9 +13,9 @@ x  Implement printing and Print Settings window.
 
 x  Implement File->Change Directory  command.
 
-x  Add icon for non-GNOME w/ms.
+x  DONE: Add icon for non-GNOME w/ms.
 
-x  Implement extraction of targets and generating the Build menu.
+x  DONE: Implement extraction of targets and generating the Build menu.
 
 x  Implement extra stuff in the Help menu.
 
@@ -23,18 +23,18 @@ x  DONE: well expanded - see below. ?? Implement tighter GNOME integration.
 
 x  DONE: Implement setting environment from Variables.
 
-x  Change the `Type' field in the Variables tab in the
+x  DONE: Change the `Type' field in the Variables tab in the
    Preferences window to a combo box.
    
 x  I18N.
 
-x  Provide filters for other compilers thn gcc.
+x  Provide filters for other compilers than gcc.
 
 x  Make filters configurable in Preferences GUI.
 
 x  Save & load preferences.
 
-x  Handle makes over multiple directories - get the filenames right.
+x  DONE: Handle makes over multiple directories - get the filenames right.
 
 x  Use a hashtable of filenames to reduce memory traffic for filenames.
 
@@ -64,6 +64,10 @@ x  GNOME integration: use GNOME URL handling in Help menu.
 
 x  GNOME integration: provide triggers for sounds etc.
 
+x  Improve glib_extra.c so it doesn't require need to care
+   about poll(2) directly and submit to the glib maintainers.
 
+x  Add patchlevel.h
 
+x  Add autoconf support.
 
