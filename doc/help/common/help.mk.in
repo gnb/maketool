@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: help.mk.in,v 1.1 2003-09-01 13:02:29 gnb Exp $
+# $Id: help.mk.in,v 1.2 2003-09-01 13:17:03 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -42,17 +42,15 @@ top_builddir=	../../..
 # all
 all:: html
 
-html: maketool.html
+html: $(OUTDIR)/maketool.html
 
-maketool.html: help.sgml entities.sgml
+$(OUTDIR)/maketool.html: help.sgml entities.sgml
 	$(DB2HTML) --dsl $(HELPCOMMON)/help.dsl help.sgml
 #	$(JADE) -t sgml -i html -d ../help.dsl $(SGMLDIR)/style/dsssl/docbook/docbook.dcl help.sgml
 
 at=@
 entities.sgml: $(HELPCOMMON)/entities.sgml.in
 	sed \
-	    -e 's|${at}prefix${at}|$(prefix)|g' \
-	    -e 's|${at}osname${at}|$(shell uname -s)|g' \
 	    -e 's|${at}LANG${at}|$(LANG)|g' \
 	    -e 's|${at}VERSION${at}|$(VERSION)|g' \
 	    < $(HELPCOMMON)/entities.sgml.in > $@
@@ -115,8 +113,8 @@ clean::
 distdir=	$(top_builddir)/$(PACKAGE)-$(VERSION)/doc/help/$(LANG)
 DISTFILES=	Makefile help.sgml $(INSTALLABLES) $(HTML_MANIFEST)
 
-dist: html
+dist: html entities.sgml
 	for file in $(DISTFILES); do \
 	  ln $$file $(distdir) 2>/dev/null || cp -p $$file $(distdir) 2>/dev/null; \
 	done
-	
+

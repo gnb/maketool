@@ -6,7 +6,7 @@
 ]>
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.14 2003-08-10 07:08:53 gnb Exp $"
+         revision="$Id: help.sgml,v 1.15 2003-09-01 13:17:00 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool</title>
@@ -14,7 +14,7 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2003-08-10 07:08:53 $</pubdate>
+  <pubdate role="cvs">$Date: 2003-09-01 13:17:00 $</pubdate>
   <releaseinfo>This is version &version;</releaseinfo>
   <copyright>
     <year>2000</year>
@@ -2175,9 +2175,9 @@ that maketool expands before running.
 <para>
 Metacharacters are "magical" characters which are interpreted
 in special ways when encountered by a program in it's input.
-Many different &osname; programs implement metacharacters, and
+Many different UNIX programs implement metacharacters, and
 the concept is one the most useful and powerful features of a
-&osname; system.
+UNIX system.
 </para>
 
 <para>
@@ -2206,7 +2206,7 @@ make debugging painful.
 
   <listitem>
     <para>
-    Many different &osname; programs (e.g. the shell, &gmake;,
+    Many different UNIX programs (e.g. the shell, &gmake;,
     <command>sed</command>, <command>m4</command>, <command>awk</command>
     and the C compiler) interpret metacharacters.
     </para>
