@@ -23,7 +23,7 @@
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.26 2000-11-26 06:39:54 gnb Exp $");
+CVSID("$Id: help.c,v 1.27 2000-12-05 15:24:14 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -76,18 +76,21 @@ licence_cb(GtkWidget *w, gpointer data)
 
 #include "maketool_l.xpm"
 
-static const char about_str[] = "\
-Maketool version %s\n\
-\n\
-(c) 1999-2000 Greg Banks\n\
-gnb@alphalink.com.au\n\
-\n\
+static const char warranty_str[] = N_("\
 Maketool comes with ABSOLUTELY NO WARRANTY;\n\
 for details press the Licence button. This is free\n\
 software, and you are welcome to redistribute it\n\
 under certain conditions; press the Licence button\n\
 for details.\
-";
+");
+
+static const char about_str[] = "\
+Maketool version %s\n\
+\n\
+(c) 1999-2000 Greg Banks\n\
+<gnb@alphalink.com.au>\n\
+\n\
+%s";
 
 void
 help_about_cb(GtkWidget *w, gpointer data)
@@ -116,7 +119,7 @@ help_about_cb(GtkWidget *w, gpointer data)
 	gtk_widget_show(icon);
 
 	/* Build the string to display in the About box */
-	abt = g_strdup_printf(_(about_str), VERSION);
+	abt = g_strdup_printf(about_str, VERSION, _(warranty_str));
 	label = gtk_label_new(abt);
 	g_free(abt);
 

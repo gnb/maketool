@@ -40,8 +40,11 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING COPYRIGHT TODO CHANGES
 %docdir /usr/share/@PACKAGE@/help
 /usr/share/@PACKAGE@/help
+/usr/share/locale/ja/LC_MESSAGES/maketool.mo
 
 %changelog
+* Fri Dec 1 2000 Greg Banks <gnb@alphalink.com.au>
+- Japanese translation
 * Sun Nov 26 2000 Greg Banks <gnb@alphalink.com.au>
 - Rationalised documentation with %doc & %docdir.
 * Sun Aug 6 2000 Greg Banks <gnb@alphalink.com.au>

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.31 2000-11-26 10:09:56 gnb Exp $
+# $Id: Makefile.in,v 1.32 2000-12-05 15:24:14 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -202,9 +202,11 @@ dist:
 	tar chozf $(DISTTAR) $(distdir)
 	$(RM) -r $(distdir)
 
+
+RPMBASE=    $(firstword $(wildcard /usr/src/redhat /usr/src/RPM))
 rpm: dist
-	test -d /usr/src/redhat/SOURCES || $(INSTALL) -m 755 -d /usr/src/redhat/SOURCES
-	$(INSTALL) -m 644 $(DISTTAR) /usr/src/redhat/SOURCES/$(DISTTAR)
+	test -d $(RPMBASE)/SOURCES || $(INSTALL) -m 755 -d $(RPMBASE)/SOURCES
+	$(INSTALL) -m 644 $(DISTTAR) $(RPMBASE)/SOURCES/$(DISTTAR)
 	rpm -ba --clean maketool.spec
 		
 ##

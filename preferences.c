@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.42 2000-10-21 06:39:21 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.43 2000-12-05 15:24:14 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -1077,7 +1077,7 @@ prefs_create_variables_page(GtkWidget *toplevel)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-static const char programs_key[] = "\
+static const char programs_key[] = N_("\
 Key\n\
 %f              source filename\n\
 %l              source line number\n\
@@ -1088,7 +1088,7 @@ Key\n\
 %v              make variable overrides\n\
 %t              make target\n\
 %{x:+y}         y if %x is not empty\n\
-";
+");
 
 
 
@@ -1205,7 +1205,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     /*
      * Key
      */
-    label = gtk_label_new(programs_key);
+    label = gtk_label_new(_(programs_key));
     gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 2, row, row+1);
@@ -1526,7 +1526,7 @@ prefs_create_colors_page(GtkWidget *toplevel)
 
 #define MAXLENGTH 7
 
-#define UNITS_NAME _("mm")
+static const char units_name[] = N_("mm");
 #define UNITS_FROM_PSUNITS(x)	    ((x)*25.4/72.0)
 
 static GtkWidget *
@@ -1534,7 +1534,7 @@ prefs_create_units_label(void)
 {
     GtkWidget *label;
     
-    label = gtk_label_new(UNITS_NAME);
+    label = gtk_label_new(_(units_name));
     gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     return label;
@@ -1597,10 +1597,10 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     
     combo = gtk_combo_new();
     list = 0;
-    list = g_list_append(list, "A4");
-    list = g_list_append(list, "B5");
-    list = g_list_append(list, "US letter");
-    list = g_list_append(list, "US legal");
+    list = g_list_append(list, _("A4"));
+    list = g_list_append(list, _("B5"));
+    list = g_list_append(list, _("US letter"));
+    list = g_list_append(list, _("US legal"));
     list = g_list_append(list, _("Custom"));
     gtk_combo_set_popdown_strings(GTK_COMBO(combo), list);
     gtk_entry_set_editable(GTK_ENTRY(GTK_COMBO(combo)->entry), FALSE);

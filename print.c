@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: print.c,v 1.7 2000-08-21 06:19:57 gnb Exp $");
+CVSID("$Id: print.c,v 1.8 2000-12-05 15:24:14 gnb Exp $");
 
 static GtkWidget	*print_shell = 0;
 typedef enum { D_PRINTER, D_FILE, D_NUM_DESTS } DEST;
@@ -270,7 +270,7 @@ print_file_browse_cb(GtkWidget *w, gpointer data)
     {
     	filesel = ui_create_file_sel(
 	    	toplevel,
-	    	_("Maketool: Open Log File"),
+	    	_("Maketool: Choose Output File"),
 		print_file_func,
 		gtk_entry_get_text(GTK_ENTRY(file_entry)));
     	ui_autonull_pointer(&filesel);

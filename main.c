@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.69 2000-11-26 06:39:54 gnb Exp $");
+CVSID("$Id: main.c,v 1.70 2000-12-05 15:24:14 gnb Exp $");
 
 
 /*
@@ -2027,8 +2027,13 @@ static void
 setup_environment(void)
 {
     const char *oldpath;
+    const char *lang;
     char *newvar;
     
+    /*
+     * Ensure $PATH contains the directory which
+     * holds extract_targets & make_makefile.
+     */
     oldpath = getenv("PATH");
     if (oldpath == 0)
     	oldpath = "";	    /* should never happen anyway */
@@ -2037,6 +2042,28 @@ setup_environment(void)
     fprintf(stderr, "putenv(\"%s\")\n", newvar);
 #endif
     putenv(newvar);
+    
+    
+    /*
+     * Do some sanity checking on i18n variables.  Thanks
+     * to SATO Satoru of the Japan GNOME Users Group.
+     */
+    if (getenv("LANG") == 0)
+	putenv("LANG=C");
+
+    lang = getenv("LANG");
+    if (!strcmp(lang, "C") || !strcmp(lang, ""))
+    	unsetenv("XMODIFIERS");
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+setup_i18n(void)
+{
+    bindtextdomain(PACKAGE, LOCALEDIR);
+    textdomain(PACKAGE);
+    gtk_set_locale();    
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -2044,9 +2071,8 @@ setup_environment(void)
 int
 main(int argc, char **argv)
 {
-    bindtextdomain(PACKAGE, LOCALEDIR);
-    textdomain(PACKAGE);
     setup_environment();
+    setup_i18n();
     
     gtk_init(&argc, &argv);    
     preferences_load();

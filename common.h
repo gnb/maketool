@@ -21,7 +21,7 @@
 #define _common_h_
 
 /*
- * $Id: common.h,v 1.8 2000-07-21 06:12:03 gnb Exp $
+ * $Id: common.h,v 1.9 2000-12-05 15:24:14 gnb Exp $
  */
 
 #include <config.h>
@@ -81,6 +81,9 @@ extern char *strrchr(char *);
 
 #ifndef _
 #define _(s)	gettext(s)
+#endif
+#ifndef N_
+#define N_(s)	(s)
 #endif
 
 
