@@ -1,0 +1,41 @@
+smake      default
+smake[2]: Entering directory `/home/gnb/software/banksia/irix/lib/libc/libc_n32_M4'
+	(cd abi; smake default)
+smake[3]: Entering directory `/home/gnb/software/banksia/irix/lib/libc/libc_64_M3/rpc'
+--- svc_tcp.o ---
+	/usr/dist/6.5/LATEST/ptoolroot/usr/bin/cc     -DNDEBUG -U__MATH_HAS_NO_SIDE_EFFECTS -D_SGI_COMPILING_LIBC  -U__INLINE_INTRINSICS -D_SGI_MP_SOURCE   -I../../inc    -fullwarn -diag_error 1-10000 -TENV:zeroinit_in_bss=OFF    -nostdinc -I/home/gnb/software/banksia/proot/usr/include -mips3 -64 -O3 -OPT:Olimit=0  -OPT:IEEE_arithmetic=1 -OPT:roundoff=0  -TENV:X=1 -OPT:wrap_around_unsafe_opt=off  -DEBUG:optimize_space=on -OPT:space=on -CG:unique_exit=on  -OPT:unroll_times=0  -MDupdate Makedepend -woff 1685,803,826,852,1048,1499,1508,1509,1692  -c svc_tcp.c
+cc-1506 cc: ERROR File = svc_tcp.c, Line = 522
+  There is an implicit conversion from "long" to "int"; rounding, sign
+          extension, or loss of accuracy may result.
+
+  		if ((dlen = read(fd, buf, len)) >= 0) {
+  		            ^
+
+cc-1506 cc: ERROR File = svc_tcp.c, Line = 524
+  There is something wrong which I don't feel the need to expound on.
+
+  		if ((yadda = yadd(da, yad, da)) >= 0) {
+  		            ^
+
+cc-1506 cc: WARNING File = svc_tcp.c, Line = 526
+  There is an implicit foo from "futz" to "mumble"; bar, sign
+          bar, or loss of quux may result.
+
+  		if ((fmeh = yibbedah(fd, buf, len)) >= 0) {
+  		            ^
+
+cc-1506 cc: WARNING File = svc_tcp.c, Line = 528
+  There is something slighly fishy but it's not really important.
+
+  		if ((plugh = yabbadah(da, yad, da)) >= 0) {
+  		            ^
+
+2 errors detected in the compilation of "svc_tcp.c".
+*** Error code 2
+/usr/sbin/smake: Error: 1 error
+smake[3]: Leaving directory
+*** Error code 2
+/usr/sbin/smake: Error: 1 error
+smake[2]: Leaving directory
+*** Error code 2
+/usr/sbin/smake: Error: 1 error
