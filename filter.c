@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.36 2003-10-10 09:30:49 gnb Exp $");
+CVSID("$Id: filter.c,v 1.37 2003-10-10 09:31:35 gnb Exp $");
 
 typedef struct
 {
@@ -342,6 +342,16 @@ filter_load(void)
     	"MIPSpro cc/CC warning");   	/* comment */
 
     filter_add(
+    	":mipspro1",			/* state */
+	"^cc-[0-9]+ (cc|CC): REMARK File = ([^ \t,]+), Line = ([0-9]+)", /* regexp */
+	FR_PENDING|FR_WARNING,	    	/* code */
+	"\\2",				/* file */
+	"\\3",				/* line */
+	"",				/* col */
+	0,	    	    	    	/* summary */
+    	"MIPSpro cc/CC remark");   	/* comment */
+
+    filter_add(
     	"mipspro1:mipspro2",		/* state */
 	"^[ \t]+(.*)$",    	    	/* regexp */
 	FR_PENDING|FR_UNDEFINED,    	/* code */
@@ -380,6 +390,16 @@ filter_load(void)
 	"",				/* col */
 	0,	    	    	    	/* summary */
     	"MIPSpro multiline message 2"); /* comment */
+
+    filter_add(
+    	"mipspro3:",		    	/* state */
+	"^$",    	    	    	/* regexp */
+	FR_DONE,    	    	    	/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	0,	    	    	    	/* summary */
+    	"MIPSpro multiline message 3a"); /* comment */
 
     filter_add(
     	"mipspro3:mipspro4",		/* state */
