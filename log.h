@@ -2,6 +2,7 @@
 #define _LOG_H_
 
 #include <gtk/gtk.h>
+#include "filter.h"
 
 typedef struct
 {
@@ -9,6 +10,7 @@ typedef struct
     char *line;
     FilterResult res;
     GtkCTreeNode *node;
+    gboolean expanded;
 } LogRec;
 
 typedef enum
@@ -26,11 +28,10 @@ typedef enum
 } LogFlags;
 
 void logInit(GtkWidget *);
-void logSetStyle(LogSeverity, GdkFont*, GdkColor *fore, GdkColor *back);
 
 void logClear(void);
 gboolean logIsEmpty(void);
-void logStartBuild(const char *target);
+void logStartBuild(const char *message);
 void logEndBuild(const char *target);
 
 LogRec *logSelected(void);

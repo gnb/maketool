@@ -1,12 +1,12 @@
 #
-# $Id: Makefile,v 1.4 1999-05-18 09:36:46 gnb Exp $
+# $Id: Makefile,v 1.5 1999-05-18 18:32:09 gnb Exp $
 #
 # Makefile for maketool.
 #
 
 CC=		gcc -Wall
 CFLAGS=		-g
-CPPFLAGS:=	$(shell gtk-config --cflags) -D_USE_BSD
+CPPFLAGS:=	$(shell gtk-config --cflags) -D_USE_BSD -Iicons
 LDLIBS:=	$(shell gtk-config --libs)
 O=		o.i586-unknown-linux
 

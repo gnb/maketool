@@ -9,7 +9,6 @@
 #include <errno.h>
 #include <signal.h>
 #include "spawn.h"
-#include "filter.h"
 #include "ui.h"
 #include "log.h"
 
@@ -37,16 +36,11 @@ GtkWidget	*toolbar, *messagebox;
 GtkWidget	*messageent;
 pid_t		currentPid = -1;
 gboolean	interrupted = FALSE;
-gint		currentInput;
 
 #define ANIM_MAX 8
 GdkPixmap	*animPixmaps[ANIM_MAX+1];
 GdkBitmap	*animMasks[ANIM_MAX+1];
 GtkWidget	*anim;
-
-GdkFont		*warningFont, *errorFont;
-GdkColor	warningForeground, errorForeground;
-GdkColor	warningBackground, errorBackground;
 
 #define SPACING 4
 
@@ -220,11 +214,11 @@ buildStart(const char *target)
     currentPid = spawn_with_output(buf, reapMake, handleInput, (gpointer)target);
     if (currentPid > 0)
     {
-	message("Making %s", target);
+	sprintf(buf, "Making %s", target);
+	message("%s", buf);
 	lastTarget = target;
 	interrupted = FALSE;
-	filter_init();
-	logStartBuild(target);
+	logStartBuild(buf);
 	anim_start();
 	grey_menu_items();
     }
@@ -356,6 +350,24 @@ help_about_make_cb(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
+log_expand_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gpointer data)
+{
+    LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, treeNode);
+
+    lr->expanded = TRUE;    
+}
+
+static void
+log_collapse_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gpointer data)
+{
+    LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, treeNode);
+
+    lr->expanded = FALSE;    
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
 log_click_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gint column, gpointer data)
 {
     LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, treeNode);
@@ -459,32 +471,37 @@ uiCreateMenus(GtkWidget *menubar)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-#include "new.xpm"
+#include "all.xpm"
+#include "again.xpm"
+#include "clean.xpm"
+#include "clear.xpm"
+#include "next.xpm"
+#include "print.xpm"
 
 static void
 uiCreateTools()
 {
     uiToolCreate(toolbar, "Again", "Build last target again",
-    	new_xpm, build_again_cb, 0, GR_AGAIN);
+    	again_xpm, build_again_cb, 0, GR_AGAIN);
     
     uiToolAddSpace(toolbar);
 
     uiToolCreate(toolbar, "all", "Build `all'",
-    	new_xpm, build_cb, "all", GR_NOTRUNNING);
+    	all_xpm, build_cb, "all", GR_NOTRUNNING);
     uiToolCreate(toolbar, "clean", "Build `clean'",
-    	new_xpm, build_cb, "clean", GR_NOTRUNNING);
+    	clean_xpm, build_cb, "clean", GR_NOTRUNNING);
     
     uiToolAddSpace(toolbar);
     
-    uiToolCreate(toolbar, "Clear", "Clear log of messages",
-    	new_xpm, view_clear_cb, 0, GR_NOTEMPTY);
+    uiToolCreate(toolbar, "Clear", "Clear log",
+    	clear_xpm, view_clear_cb, 0, GR_NOTEMPTY);
     uiToolCreate(toolbar, "Next", "Edit next error or warning",
-    	new_xpm, unimplemented, 0, GR_NOTEMPTY);
+    	next_xpm, unimplemented, 0, GR_NOTEMPTY);
     
     uiToolAddSpace(toolbar);
     
-    uiToolCreate(toolbar, "Print", "Print messages",
-    	new_xpm, unimplemented, 0, GR_NOTEMPTY);
+    uiToolCreate(toolbar, "Print", "Print log",
+    	print_xpm, unimplemented, 0, GR_NOTEMPTY);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -519,35 +536,6 @@ uiInitAnimPixmaps(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-static void
-uiInitFontsAndColors(void)
-{
-    GdkColormap *colormap = gtk_widget_get_colormap(toplevel);
-    GdkColor fg, bg;
-    
-    logSetStyle(L_INFO, 0, 0, 0);
-    
-    
-    gdk_color_parse("yellow", &bg);
-    gdk_colormap_alloc_color(colormap, &bg, FALSE, TRUE);
-
-    gdk_color_parse("black", &fg);
-    gdk_colormap_alloc_color(colormap, &fg, FALSE, TRUE);
-
-    logSetStyle(L_WARNING, 0, &fg, &bg);
-
-
-    gdk_color_parse("red", &bg);
-    gdk_colormap_alloc_color(colormap, &bg, FALSE, TRUE);
-
-    gdk_color_parse("black", &fg);
-    gdk_colormap_alloc_color(colormap, &fg, FALSE, TRUE);
-
-    logSetStyle(L_ERROR, 0, &fg, &bg);
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
 
 static void
 uiCreate(void)
@@ -565,9 +553,7 @@ uiCreate(void)
     	GTK_SIGNAL_FUNC(file_exit_cb), NULL);
     gtk_container_border_width(GTK_CONTAINER(toplevel), 0);
     gtk_widget_show(GTK_WIDGET(toplevel));
-    
-    uiInitFontsAndColors();
-    
+        
     tooltips = gtk_tooltips_new();
 
     mainvbox = gtk_vbox_new(FALSE, 0);
@@ -598,13 +584,20 @@ uiCreate(void)
 
     logwin = gtk_ctree_new_with_titles(1, 0, titles);
     gtk_ctree_set_line_style(GTK_CTREE(logwin), GTK_CTREE_LINES_NONE);
+    gtk_ctree_set_expander_style(GTK_CTREE(logwin), GTK_CTREE_EXPANDER_TRIANGLE);
     gtk_clist_column_titles_hide(GTK_CLIST(logwin));
+    gtk_ctree_set_indent(GTK_CTREE(logwin), 16);
+    gtk_ctree_set_show_stub(GTK_CTREE(logwin), FALSE);
     gtk_clist_set_column_width(GTK_CLIST(logwin), 0, 400);
     gtk_clist_set_column_auto_resize(GTK_CLIST(logwin), 0, TRUE);
     gtk_signal_connect(GTK_OBJECT(logwin), "tree-select-row", 
     	GTK_SIGNAL_FUNC(log_click_cb), 0);
     gtk_signal_connect(GTK_OBJECT(logwin), "button_press_event", 
     	GTK_SIGNAL_FUNC(log_doubleclick_cb), 0);
+    gtk_signal_connect(GTK_OBJECT(logwin), "tree_collapse", 
+    	GTK_SIGNAL_FUNC(log_collapse_cb), 0);
+    gtk_signal_connect(GTK_OBJECT(logwin), "tree_expand", 
+    	GTK_SIGNAL_FUNC(log_expand_cb), 0);
     gtk_container_add(GTK_CONTAINER(sw), logwin);
     gtk_scrolled_window_set_hadjustment(GTK_SCROLLED_WINDOW(sw),
     	GTK_CLIST(logwin)->hadjustment);
@@ -678,7 +671,6 @@ main(int argc, char **argv)
     gtk_init(&argc, &argv);
     parseArgs(argc, argv);
     uiCreate();
-    filter_load();
     gtk_main();
     return 0;
 }

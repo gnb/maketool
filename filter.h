@@ -8,6 +8,7 @@ typedef enum
     FR_INFORMATION,	/* filter has classified as one of these severities */
     FR_WARNING,		/* result_str is "file|line|column" */
     FR_ERROR,
+    FR_BUILDSTART,
     
     FR_CHANGEDIR,	/* result_str is directory to change to */
     FR_PUSHDIR,		/* result_str is directory to push on dir stack */

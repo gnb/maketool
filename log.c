@@ -11,12 +11,24 @@
 	(gtk_ctree_node_nth(GTK_CTREE(_ctree_), 0) == 0)
 #endif
 
+#include "error.xpm"
+#include "warning.xpm"
+#include "info.xpm"
+
+typedef struct
+{
+    GdkPixmap *open_pm;
+    GdkBitmap *open_mask;
+    GdkPixmap *closed_pm;
+    GdkBitmap *closed_mask;
+} NodeIcons;
 
 static GtkWidget	*logwin;	/* a GtkCTree widget */
 static int		numErrors;
 static int		numWarnings;
 static int		flags = LF_SHOW_INFO|LF_SHOW_WARNINGS|LF_SHOW_ERRORS;
 static GList		*log;		/* list of LogRecs */
+static LogRec		*currentBuildRec = 0;
 static GList		*logPendingLines = 0;
 static GList		*logDirectoryStack = 0;
 static GdkFont		*fonts[L_MAX];
@@ -24,6 +36,7 @@ static GdkColor		foregrounds[L_MAX];
 static gboolean		foreground_set[L_MAX];
 static GdkColor		backgrounds[L_MAX];
 static gboolean		background_set[L_MAX];
+static NodeIcons	icons[L_MAX];
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -37,6 +50,7 @@ logAddRec(const char *line, const FilterResult *res)
     if (lr->res.file != 0)
 	lr->res.file = g_strdup(lr->res.file);	/* TODO: hashtable */
     lr->line = g_strdup(line);
+    lr->expanded = TRUE;
 
     switch (lr->res.code)
     {
@@ -49,6 +63,8 @@ logAddRec(const char *line, const FilterResult *res)
     default:
     	break;
     }
+
+    log = g_list_append(log, lr);		/* TODO: fix O(N^2) */
 
     return lr;
 }
@@ -69,7 +85,8 @@ logShowRec(LogRec *lr)
 {
     gboolean was_empty = GTK_CTREE_IS_EMPTY(logwin);
     LogSeverity sev = L_INFO;
-
+    GtkCTreeNode *parentNode = (currentBuildRec == 0 ? 0 : currentBuildRec->node);
+    
     switch (lr->res.code)
     {
     case FR_UNDEFINED:		/* same as INFORMATION */
@@ -100,18 +117,24 @@ logShowRec(LogRec *lr)
     case FR_PENDING:
     	/* TODO: */
     	break;
+    case FR_BUILDSTART:
+	currentBuildRec = lr;
+	parentNode = 0;
+    	break;
     }
 
     /* TODO: freeze & thaw if it redraws the wrong colour 1st */
     lr->node = gtk_ctree_insert_node(GTK_CTREE(logwin),
-    	(GtkCTreeNode*)0,			/* parent */
+    	parentNode,				/* parent */
 	(GtkCTreeNode*)0,			/* sibling */
-	&lr->line,					/* text[] */
+	&lr->line,				/* text[] */
 	0,					/* spacing */
-	(GdkPixmap *)0, (GdkBitmap *)0,		/* pixmap_closed,mask_closed */
-	(GdkPixmap *)0, (GdkBitmap *)0,		/* pixmap_opened,mask_opened */
-	TRUE,					/* is_leaf */
-	TRUE);					/* expanded */
+	icons[sev].closed_pm,
+	icons[sev].closed_mask,			/* pixmap_closed,mask_closed */
+	icons[sev].open_pm,
+	icons[sev].open_mask,			/* pixmap_opened,mask_opened */
+	(parentNode != 0),			/* is_leaf */
+	lr->expanded);				/* expanded */
     gtk_ctree_node_set_row_data(GTK_CTREE(logwin), lr->node, (gpointer)lr);
     /* TODO: support different fonts */
     if (foreground_set[sev] != 0)
@@ -129,7 +152,6 @@ void
 logAddLine(const char *line)
 {
     FilterResult res;
-    LogRec *lr;
 
     res.file = 0;
     res.line = 0;
@@ -141,9 +163,7 @@ logAddLine(const char *line)
 #endif
     if (res.code == FR_UNDEFINED)
     	res.code = FR_INFORMATION;
-    lr = logAddRec(line, &res);
-    log = g_list_append(log, lr);		/* TODO: fix O(N^2) */
-    logShowRec(lr);
+    logShowRec(logAddRec(line, &res));
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -224,6 +244,9 @@ logOpen(const char *file)
 	return;
     }
     
+    sprintf(buf, "Log file %s", file);
+    logStartBuild(buf);
+    
     while (fgets(buf, sizeof(buf), fp) != 0)
     {
     	char *x;
@@ -283,7 +306,43 @@ logNumWarnings(void)
 void
 logInit(GtkWidget *w)
 {
+    GtkWidget *toplevel = gtk_widget_get_ancestor(w, gtk_window_get_type());
+    GdkWindow *win = toplevel->window;
+    GdkColormap *colormap = gtk_widget_get_colormap(toplevel);
+
+    /* L_INFO */
+    fonts[L_INFO] = 0;
+    foreground_set[L_INFO] = FALSE;
+    background_set[L_INFO] = FALSE;
+    icons[L_INFO].closed_pm = gdk_pixmap_create_from_xpm_d(win,
+    			&icons[L_INFO].closed_mask, 0, info_xpm);
+    icons[L_INFO].open_pm = icons[L_INFO].closed_pm;
+    icons[L_INFO].open_mask = icons[L_INFO].closed_mask;
+    
+    /* L_WARNING */
+    fonts[L_WARNING] = 0;
+    gdk_color_parse("#ffffc2", &backgrounds[L_WARNING]);
+    gdk_colormap_alloc_color(colormap, &backgrounds[L_WARNING], FALSE, TRUE);
+    foreground_set[L_WARNING] = FALSE;
+    background_set[L_WARNING] = TRUE;
+    icons[L_WARNING].closed_pm = gdk_pixmap_create_from_xpm_d(win,
+    			&icons[L_WARNING].closed_mask, 0, warning_xpm);
+    icons[L_WARNING].open_pm = icons[L_WARNING].closed_pm;
+    icons[L_WARNING].open_mask = icons[L_WARNING].closed_mask;
+    
+    /* L_ERROR */
+    fonts[L_ERROR] = 0;
+    gdk_color_parse("#ffc2c2", &backgrounds[L_ERROR]);
+    gdk_colormap_alloc_color(colormap, &backgrounds[L_ERROR], FALSE, TRUE);
+    foreground_set[L_ERROR] = FALSE;
+    background_set[L_ERROR] = TRUE;
+    icons[L_ERROR].closed_pm = gdk_pixmap_create_from_xpm_d(win,
+    			&icons[L_ERROR].closed_mask, 0, error_xpm);
+    icons[L_ERROR].open_pm = icons[L_ERROR].closed_pm;
+    icons[L_ERROR].open_mask = icons[L_ERROR].closed_mask;
+			
     logwin = w;
+    filter_load();
 }
 
 void
@@ -315,11 +374,22 @@ logSetStyle(LogSeverity s, GdkFont *font, GdkColor *fore, GdkColor *back)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 void
-logStartBuild(const char *target)
+logStartBuild(const char *message)
 {
+    FilterResult res;
+    
     numErrors = 0;
     numWarnings = 0;
+    filter_init();
+    
+    res.code = FR_BUILDSTART;
+    res.file = 0;
+    res.line = 0;
+    res.column = 0;
+
+    logShowRec(logAddRec(message, &res));
 }
+
 
 void
 logEndBuild(const char *target)

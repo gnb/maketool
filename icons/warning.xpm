@@ -1,0 +1,23 @@
+/* XPM */
+static char * warning_xpm[] = {
+"16 16 4 1",
+" 	c None s None",
+".	c #FFFF00000000",
+"X	c #000000000000",
+"o	c #FFFFFFFF0000",
+"                ",
+"                ",
+"       ..       ",
+"      ....      ",
+"      .XX.      ",
+"     ..XX..     ",
+"     ..XX..     ",
+"    ..oXXo..    ",
+"    ..oXXo..    ",
+"   ..ooXXoo..   ",
+"   ..ooXXoo..   ",
+"  ..oooooooo..  ",
+"  ..oooXXooo..  ",
+" ......XX...... ",
+" .............. ",
+"                "};

@@ -26,6 +26,8 @@ licence_cb(GtkWidget *w, gpointer data)
 
 /* TODO: add GPL text to doco & reference it from this window */
 
+#include "maketool_l.xpm"
+
 static const char about_str[] = "\
 Maketool version 0.1\n\
 \n\
@@ -45,12 +47,25 @@ help_about_show(GtkWidget *toplevel)
     if (about_shell == 0)
     {
 	GtkWidget *label;
+	GtkWidget *icon;
+	GtkWidget *hbox;
+	GdkPixmap *pm;
+	GdkBitmap *mask;
 
 	about_shell = uiCreateOkDialog(toplevel, "About Maketool");
+	
+	hbox = gtk_hbox_new(FALSE, 5);
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_shell)->vbox), hbox);
+	gtk_widget_show(hbox);
+	
+	pm = gdk_pixmap_create_from_xpm_d(toplevel->window,
+    		    &mask, 0, maketool_l_xpm);
+	icon = gtk_pixmap_new(pm, mask);
+	gtk_container_add(GTK_CONTAINER(hbox), icon);
+	gtk_widget_show(icon);
 
-	/* TODO: logo */
 	label = gtk_label_new(about_str);
-	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_shell)->vbox), label);
+	gtk_container_add(GTK_CONTAINER(hbox), label);
 	gtk_widget_show(label);
 
 	uiDialogCreateButton(about_shell, "Licence...", licence_cb, (gpointer)0);
