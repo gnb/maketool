@@ -1,0 +1,16 @@
+*.o
+maketool
+maketool_client
+errs
+config.cache
+config.log
+config.status
+config.h
+licence.c
+Makefile
+maketool.spec
+entities.sgml
+help.mk
+version.m4
+POTFILES
+stylesheet-images
