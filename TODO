@@ -117,10 +117,6 @@ x  Keyboard navigation: Check for std accelerators to collapse,
    expand, collapse all, expand all, navigate up & down, select,
    unselect.
 
-x  Detect (at configure time) whether BSD or SysV signal semantics are
-   in place. Note that on Linux you get SysV semantics with `gcc -ansi'
-   regardless of whether you also request -D_USE_BSD.
-   
 x  Add a GUI for setting CONFIGUREFLAGS based on ./configure --help
 
 x  Printing: figure out default printer for combo box, from preferences
@@ -415,3 +411,7 @@ x  DONE: Bug where maketool crashes if first line of make output is empty,
 x  DONE: In summary mode, need to highlight the `Compiling' lines visually to
    separate them from the usual make clutter.
 
+x  DONE: Detect (at configure time) whether BSD or SysV signal semantics are
+   in place. Note that on Linux you get SysV semantics with `gcc -ansi'
+   regardless of whether you also request -D_USE_BSD.
+   

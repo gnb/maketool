@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.35 2001-07-25 09:16:40 gnb Exp $
+# $Id: Makefile.in,v 1.36 2001-07-26 16:27:20 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -30,12 +30,9 @@ libexecdir=	@libexecdir@/$(PACKAGE)
 helpdir=	$(prefix)/@DATADIRNAME@/$(PACKAGE)/help
 
 CC=		@CC@
-# WARNING: using gcc -ansi on Linux breaks maketool, which
-# relies on BSD signal semantics (which you get with
-# gcc -D_USE_BSD but not with gcc -ansi -D_USE_BSD)
 #CC=		gcc -Wall
 CFLAGS=		@CFLAGS@
-CPPFLAGS=	@GTK_CFLAGS@ -D_USE_BSD -I. -Iicons -Iintl \
+CPPFLAGS=	@GTK_CFLAGS@ -I. -Iicons -Iintl \
 		-DLOCALEDIR=\"$(localedir)\" -DLIBEXECDIR=\"$(libexecdir)\" \
 		-DHELPDIR=\"$(helpdir)\" \
 		@CPPFLAGS@ $(TESTCPPFLAGS)

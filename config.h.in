@@ -21,7 +21,7 @@
 #define _config_h_ 1
 
 /*
- * $Id: config.h.in,v 1.13 2001-07-25 08:35:22 gnb Exp $
+ * $Id: config.h.in,v 1.14 2001-07-26 16:27:20 gnb Exp $
  */
 
 /*
@@ -82,6 +82,16 @@
 
 /* Whether a usable wait3(2) is defined */
 #define HAVE_WAIT3 0
+
+/*
+ * Whether SysV signal semantics apply (handler is 
+ * deregistered at delivery).  Note that you can
+ * have different semantics depending on the compiler
+ * flags as well as platform; on Linux you get BSD
+ * semantics with "gcc" and SysV with "gcc -ansi".
+ */
+#define HAVE_SYSV_SIGNAL 0
+
 
 /* Various standard autoconf defines */
 #define HAVE_MALLOC_H 0

@@ -22,7 +22,7 @@
 #include <signal.h>
 #include <sys/poll.h>
 
-CVSID("$Id: glib_extra.c,v 1.14 2001-07-25 08:35:22 gnb Exp $");
+CVSID("$Id: glib_extra.c,v 1.15 2001-07-26 16:27:20 gnb Exp $");
 
 
 typedef struct
@@ -95,6 +95,10 @@ g_unix_signal_handler(int sig)
     write(2, msg, sizeof(msg)-1);
 #endif
     g_unix_got_signal = TRUE;
+
+#if HAVE_SYSV_SIGNAL
+    signal(SIGCHLD, g_unix_signal_handler);
+#endif
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
