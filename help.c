@@ -24,7 +24,7 @@
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.42 2003-09-28 08:10:20 gnb Exp $");
+CVSID("$Id: help.c,v 1.43 2003-09-28 11:44:09 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*options_shell = 0;
@@ -101,7 +101,7 @@ options_cb(GtkWidget *w, gpointer data)
 	estring options_str;
 
 	options_shell = ui_create_ok_dialog(toplevel, _("Maketool: Compile Options"));
-	ui_set_help_name(options_shell, "options-window");
+	ui_set_help_name(options_shell, "compile-options-window");
 	gtk_widget_set_usize(options_shell, 450, 300);
 
 	hbox = gtk_hbox_new(FALSE, SPACING);
