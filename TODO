@@ -24,9 +24,6 @@ x  Limit the sizes of target names in the Build menu, especially
 
 x  Rationalise use of handle_input()
 
-x  Create dummy N_() macros to seed the PO files with common autoconf
-   help strings.
-   
 x  When the user cancels a ./configure run from the GUI, this should
    show in the log window instead of "*** [config.status] Error 1".
    
@@ -489,4 +486,7 @@ x  DONE: Reduce use of @PACKAGE@ etc in spec file.
 
 x  DONE: Use config.status if it exists and is not newer than configure
    or configure.in.
+   
+x  DONE: Create dummy N_() macros to seed the PO files with common autoconf
+   help strings.
    

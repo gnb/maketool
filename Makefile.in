@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.42 2001-09-21 06:20:23 gnb Exp $
+# $Id: Makefile.in,v 1.43 2001-09-22 00:57:03 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -44,7 +44,7 @@ LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 SOURCES=	main.c filter.c help.c preferences.c log.c print.c ps.c \
 		find.c autoconf.c ui.c uix.c task.c util.c glib_extra.c mqueue.c
 HEADERS=	maketool.h filter.h common.h log.h ui.h \
-		util.h glib_extra.h ps.h task.h mqueue.h
+		util.h glib_extra.h ps.h task.h mqueue.h autoconf_strs.c
 OBJECTS=	$(SOURCES:.c=.o)
 
 top_srcdir=	.

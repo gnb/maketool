@@ -325,25 +325,6 @@ add_option(
     	defval = g_strdup("${prefix}");
     else
     	defval = g_strdup(def);
-	
-#if DEBUG
-    {
-    	char *s;
-	
-	s = benum_describe_bits(opt_flag_desc, flags);
-	fprintf(stderr,
-    	    "OPTION{\n  category=\"%s\"\n  name=\"%s\"\n  argtype=%d\n  flags=%s\n  metavar=\"%s\"\n  help=\"%s\"\n  default=\"%s\"\n}\n\n",
-    	    category_names[category],
-	    name,
-	    argtype,
-    	    s,
-	    metavar,
-	    help,
-	    defval);
-	g_free(s);
-    }
-#endif
-
 
     opt = g_new(option_t, 1);
     memset(opt, 0, sizeof(*opt));
@@ -362,6 +343,24 @@ add_option(
     /* Hack to present help better.  Works for LANG=en. */
     if (islower(opt->help[0]))
     	opt->help[0] = toupper(opt->help[0]);
+
+#if DEBUG
+    {
+    	char *s;
+	
+	s = benum_describe_bits(opt_flag_desc, opt->flags);
+	fprintf(stderr,
+    	    "OPTION{\n  category=\"%s\"\n  name=\"%s\"\n  argtype=%d\n  flags=%s\n  metavar=\"%s\"\n  help=\"%s\"\n  default=\"%s\"\n}\n\n",
+    	    category_names[opt->category],
+	    opt->name,
+	    opt->argtype,
+    	    s,
+	    opt->metavar,
+	    opt->help,
+	    opt->defvalue);
+	g_free(s);
+    }
+#endif
 }
 
     
@@ -458,7 +457,8 @@ parse_option_line(void)
     /* parse help */
     for ( ; *x && *x != '[' ; x++)
 	estring_append_char(&help, *x);
-    
+    estring_chomp(&help);
+        
     /* parse default */
     if (*x == '[')
     {
@@ -491,10 +491,16 @@ ac_handle_line(const char *line)
     /* handle option lines and their continuations */
     if (!strprefix(line, "  --"))
     {
+    	/* parse previous line and its continuations */
     	if (optline.length > 0)
     	    parse_option_line();
+	
+	/* remember the new line in case there are continuations */
 	estring_truncate(&optline);
 	estring_append_string(&optline, line+4);
+
+	/* trim trailing whitespace off new line */
+	estring_chomp(&optline);
     }
     else if (isspace(line[0]) &&
     	     isspace(line[1]) &&
