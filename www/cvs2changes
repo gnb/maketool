@@ -1,26 +1,57 @@
 #!/bin/sh
 #
-# $Id: cvs2changes,v 1.1 1999-10-09 15:22:01 gnb Exp $
+# $Id: cvs2changes,v 1.2 1999-11-07 11:13:21 gnb Exp $
 #
 # Shell script to build a change log for a new release
 # from CVS logs. The change log will still need some
 # manual editing to re-express changes for users, etc.
 #
 
-REV1=${1:-0.3}
-REV2=${2:-0.4}
+REV1=$1
+REV2=$2
 PACKAGE=${3:-maketool}
 #PREVIEW=yes
 #FILES="Makefile.in Makefile configure.in"
 DATE=`date '+%d %b %Y'`
+CHECKFILE="Makefile.in"
+IGNOREDIRS="www po"
 
 LOG=CHANGES
 OLDLOG=CHANGES.$$
 
-TAG1=`echo ${PACKAGE}_${REV1} | tr a-z. A-Z_`
-TAG2=`echo ${PACKAGE}_${REV2} | tr a-z. A-Z_`
+canon_tag ()
+{
+    # Usage: canon_tag rev
+    echo "${PACKAGE}_$1" | tr a-z. A-Z_
+}
 
-echo "Compiling changes from $PACKAGE version $REV1 to $REV2 into $LOG"
+get_last_rev_tag ()
+{
+    TAGPREFIX=`canon_tag ""`
+    cvs log -h $CHECKFILE |\
+    	awk '/^	'$TAGPREFIX'[0-9_]*:/{print substr($1,1,length($1)-1); exit}'
+	
+}
+
+if [ -z "$REV1" ]; then
+    # calculate previous tagged revision by getting
+    # most recent tag of the correct format
+    TAG1=`get_last_rev_tag`
+else
+    TAG1=`canon_tag "$REV1"`
+fi
+
+if [ -z "$REV2" ]; then
+    # Use the magic tag `HEAD' which indicates the
+    # most recent revision on a per-file basis
+    TAG2="HEAD"
+    REV2="latest revision"
+    #PREVIEW=yes
+else    
+    TAG2=`canon_tag "$REV2"`
+fi
+
+echo "Compiling changes from $PACKAGE tags $TAG1 to $TAG2 into $LOG"
 
 # state:
 # 0 = reading log header
@@ -104,9 +135,20 @@ END {
 '
 }
 
+getDirs ()
+{
+    IGNOREEXP=`echo "$IGNOREDIRS" | sed -e 's:[ 	][  ]*:|:g'`
+    find . -type d -name CVS -print |\
+    	sed -e 's:/CVS$::'  -e 's:^\./::' |\
+	egrep -v '^('$IGNOREEXP')$'
+}
+
 gatherChanges ()
 {
     echo "* $REV2  ($DATE)"
+    if [ -z "$FILES" ]; then
+    	FILES="-l "`getDirs`
+    fi
     cvs log -r${TAG1}:${TAG2} $FILES 2>&1 | canonicalise | uniquify
     echo ""
 }
