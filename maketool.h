@@ -144,6 +144,10 @@ void file_print_cb(GtkWidget *, gpointer);
 /* help.c */ 
 void help_about_cb(GtkWidget *, gpointer);
 void help_about_make_cb(GtkWidget *, gpointer);
+/* find.c */
+void edit_find_cb(GtkWidget *w, gpointer data);
+void edit_find_again_cb(GtkWidget *w, gpointer data);
+gboolean find_can_find_again(void);
 /* preferences.c */
 void preferences_load(void);
 void preferences_save(void);

@@ -68,6 +68,13 @@ LogRec *log_add_line(const char *line);
 /* get the text displayed for the given logrec */
 const char *log_get_text(const LogRec *lr);
 
+/* Apply the given function to each line of the log
+ * in turn. Stops prematurely if function returns FALSE.
+ */
+typedef gboolean (*LogApplyFunc)(LogRec *lr, gpointer user_data);
+void log_apply(LogApplyFunc func, gpointer user_data);
+void log_apply_after(LogApplyFunc func, gpointer user_data, LogRec *);
+
 /* Short term hack for colours sample in Preferences window */
 void log_get_icon(LogSeverity level,
     GdkPixmap **open_pm, GdkBitmap **open_mask,

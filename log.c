@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.27 2000-01-04 12:01:46 gnb Exp $");
+CVSID("$Id: log.c,v 1.28 2000-01-07 17:10:07 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -493,6 +493,11 @@ log_repopulate(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+/* TODO: rewrite log_save() and log_open() in terms of the
+ * existing functions log_apply(), log_start_build(), log_add_line()
+ * and new functions log_freeze() and log_thaw().
+ */
+ 
 void
 log_save(const char *file)
 {
@@ -893,6 +898,41 @@ LogRec *
 log_prev_error(LogRec *lr)
 {
     return log_find_error_aux(lr, FALSE);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+void
+log_apply_after(LogApplyFunc func, gpointer user_data, LogRec *start)
+{
+    GList *list;
+    
+    if (start == 0)
+    {
+    	list = log;
+    }
+    else
+    {
+    	list = g_list_find(log, start);
+	if (list == 0)
+	    list = log;
+	else
+	    list = list->next;
+    }
+    
+    for ( ; list!=0 ; list=list->next)
+    {
+    	LogRec *lr = (LogRec *)list->data;
+	
+	if (!(*func)(lr, user_data))
+	    return;
+    }
+}
+
+void
+log_apply(LogApplyFunc func, gpointer user_data)
+{
+    log_apply_after(func, user_data, 0);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.47 1999-12-19 15:13:44 gnb Exp $");
+CVSID("$Id: main.c,v 1.48 2000-01-07 17:10:07 gnb Exp $");
 
 typedef enum
 {
@@ -43,6 +43,7 @@ typedef enum
     GR_AGAIN,
     GR_ALL,
     GR_CLEAN,
+    GR_FIND_AGAIN,
 
     NUM_SETS
 } Groups;
@@ -167,6 +168,7 @@ grey_menu_items(void)
     ui_group_set_sensitive(GR_AGAIN, again);
     ui_group_set_sensitive(GR_ALL, all);
     ui_group_set_sensitive(GR_CLEAN, clean);
+    ui_group_set_sensitive(GR_FIND_AGAIN, !empty && find_can_find_again());
 }
 
 char *
@@ -1059,6 +1061,9 @@ ui_create_menus(GtkWidget *menubar)
     ui_add_button(menu, _("Edit _Prev Error"), 0, edit_next_error_cb, GINT_TO_POINTER(FALSE), GR_NOTEMPTY);
     ui_add_separator(menu);
     ui_add_button(menu, _("_Copy"), "<Ctrl>C", edit_copy_cb, 0, GR_SELECTED);
+    ui_add_separator(menu);
+    ui_add_button(menu, _("_Find"), "<Ctrl>F", edit_find_cb, 0, GR_NOTEMPTY);
+    ui_add_button(menu, _("Find _Again"), "<Ctrl>G", edit_find_again_cb, 0, GR_FIND_AGAIN);
     ui_add_separator(menu);
     ui_add_button(menu, _("Pre_ferences..."), 0, edit_preferences_cb, 0, GR_NONE);
 
