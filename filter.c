@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.12 1999-09-05 05:11:30 gnb Exp $");
+CVSID("$Id: filter.c,v 1.13 1999-10-16 02:07:53 gnb Exp $");
 
 typedef struct
 {
@@ -93,7 +93,7 @@ filter_load(void)
 	"\\1",				/* file */
 	"",				/* line */
 	"",				/* col */
-	0,				/* summary */
+	"Directory \\1",		/* summary */
     	"gmake recursion - push");	/* comment */
 
     filter_add(
@@ -138,7 +138,7 @@ filter_load(void)
 	
     filter_add(
     	"",				/* state */
-	"^([^:]+):([0-9]+): warning:(.*)$",	/* regexp */
+	"^([^: \t]+):([0-9]+): warning:(.*)$",	/* regexp */
 	FR_WARNING,			/* code */
 	"\\1",				/* file */
 	"\\2",				/* line */
@@ -148,13 +148,32 @@ filter_load(void)
 	
     filter_add(
     	"",				/* state */
-	"^([^:]+):([0-9]+):(.*)$",	/* regexp */
+	"^([^: \t]+):([0-9]+):(.*)$",	/* regexp */
 	FR_ERROR,			/* code */
 	"\\1",				/* file */
 	"\\2",				/* line */
 	"",				/* col */
 	"\\3",				/* summary */
     	"gcc errors");			/* comment */
+	
+    filter_add(
+    	"",				/* state */
+	"^In file included from ([^: \t]+):([0-9]+)[,:]$",	/* regexp */
+	FR_INFORMATION,			/* code */  /* TODO: new category ??*/
+	"\\1",				/* file */
+	"\\2",				/* line */
+	"",				/* col */
+	"Included from \\1:\\2",	/* summary */
+    	"gcc inclusion trace 1");	/* comment */
+    filter_add(
+    	"",				/* state */
+	"^[ \t]+from +([^: \t]+):([0-9]+)[,:]$",	/* regexp */
+	FR_INFORMATION,			/* code */  /* TODO: new category ??*/
+	"\\1",				/* file */
+	"\\2",				/* line */
+	"",				/* col */
+	"Included from \\1:\\2",	/* summary */
+    	"gcc inclusion trace 2");	/* comment */
 
 #ifdef __hpux
     filter_add(
