@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.8 1999-05-24 10:06:44 gnb Exp $
+# $Id: Makefile,v 1.9 1999-05-25 15:08:41 gnb Exp $
 #
 # Makefile for maketool.
 #
@@ -52,3 +52,10 @@ targets:
 	
 delay:
 	sleep 10
+
+SUBDIRS= subdir1 subdir2
+recurse:
+	for d in $(SUBDIRS) ; do \
+	    $(MAKE) -C $$d all ;\
+	done
+	

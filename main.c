@@ -8,7 +8,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: main.c,v 1.16 1999-05-25 12:48:02 gnb Exp $");
+CVSID("$Id: main.c,v 1.17 1999-05-25 15:08:41 gnb Exp $");
 
 typedef enum
 {
@@ -530,7 +530,7 @@ log_collapse_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gpointer data)
 static void
 log_click_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gint column, gpointer data)
 {
-#if 0   
+#if 1
     LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, treeNode);
     
     fprintf(stderr, "log_click_cb: code=%d file=\"%s\" line=%d\n",

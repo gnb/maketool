@@ -1,8 +1,9 @@
 #include "maketool.h"
 #include "filter.h"
 #include "log.h"
+#include "util.h"
 
-CVSID("$Id: log.c,v 1.8 1999-05-25 08:02:48 gnb Exp $");
+CVSID("$Id: log.c,v 1.9 1999-05-25 15:08:41 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -38,6 +39,52 @@ static NodeIcons	icons[L_MAX];
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static void
+logChangeDir(const char *dir)
+{
+    if (logDirectoryStack == 0)
+	logDirectoryStack = g_list_append(logDirectoryStack, g_strdup(dir));
+    else
+    {
+    	g_free((char*)logDirectoryStack->data);
+	logDirectoryStack->data = g_strdup(dir);
+    }
+}
+
+static void
+logPushDir(const char *dir)
+{
+    logDirectoryStack = g_list_prepend(logDirectoryStack, g_strdup(dir));
+}
+
+static void
+logPopDir(void)
+{
+    if (logDirectoryStack != 0)
+    {
+    	g_free((char*)logDirectoryStack->data);
+	logDirectoryStack = g_list_remove_link(logDirectoryStack, logDirectoryStack);
+    }
+}
+
+static void
+logClearDirs(void)
+{
+    while (logDirectoryStack != 0)
+    {
+    	g_free((char*)logDirectoryStack->data);
+	logDirectoryStack = g_list_remove_link(logDirectoryStack, logDirectoryStack);
+    }
+}
+
+static const char *
+logCurrentDir(void)
+{
+    return (logDirectoryStack == 0 ? 0 : (const char *)logDirectoryStack->data);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 static LogRec *
 logAddRec(const char *line, const FilterResult *res)
 {
@@ -45,10 +92,12 @@ logAddRec(const char *line, const FilterResult *res)
     
     lr = g_new(LogRec, 1);
     lr->res = *res;
+#if 0
     if (lr->res.file == 0 || *lr->res.file == '\0')
     	lr->res.file = 0;
     else
 	lr->res.file = g_strdup(lr->res.file);	/* TODO: hashtable */
+#endif
     lr->line = g_strdup(line);
     lr->expanded = TRUE;
 
@@ -105,21 +154,11 @@ logShowRec(LogRec *lr)
 	if (!(flags & LF_SHOW_ERRORS))
 	    return;
     	break;
-    case FR_CHANGEDIR:
-    	/* TODO: */
-    	break;
-    case FR_PUSHDIR:
-    	/* TODO: */
-    	break;
-    case FR_POPDIR:
-    	/* TODO: */
-    	break;
-    case FR_PENDING:
-    	/* TODO: */
-    	break;
     case FR_BUILDSTART:
 	currentBuildRec = lr;
 	parentNode = 0;
+    	break;
+    default:
     	break;
     }
 
@@ -162,8 +201,40 @@ logAddLine(const char *line)
     fprintf(stderr, "filter_apply: \"%s\" -> %d \"%s\" %d\n",
     	line, (int)res.code, res.file, res.line);
 #endif
-    if (res.code == FR_UNDEFINED)
+
+    if (res.file != 0 && *res.file == '\0')
+    	res.file = 0;
+	
+    switch (res.code)
+    {
+    case FR_UNDEFINED:
     	res.code = FR_INFORMATION;
+    	break;
+    case FR_CHANGEDIR:
+    	logChangeDir(res.file);
+    	break;
+    case FR_PUSHDIR:
+	logPushDir(res.file);
+    	break;
+    case FR_POPDIR:
+	logPopDir();
+    	break;
+    case FR_PENDING:
+    	/* TODO: */
+    	break;
+    default:
+    	if (res.file != 0 && logCurrentDir() != 0)
+	{
+	    estring fullpath;
+	    
+	    estring_init(&fullpath);
+	    estring_append_string(&fullpath, logCurrentDir());
+	    estring_append_char(&fullpath, '/');
+	    estring_append_string(&fullpath, res.file);
+	    res.file = fullpath.data;
+	}
+    	break;
+    }
     
     lr = logAddRec(line, &res);
     logShowRec(lr);
@@ -375,6 +446,8 @@ void
 logStartBuild(const char *message)
 {
     FilterResult res;
+    
+    logClearDirs();
     
     numErrors = 0;
     numWarnings = 0;

@@ -1,7 +1,7 @@
 #include "filter.h"
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.6 1999-05-25 08:02:47 gnb Exp $");
+CVSID("$Id: filter.c,v 1.7 1999-05-25 15:08:41 gnb Exp $");
 
 typedef struct
 {
@@ -62,6 +62,24 @@ filter_add(
 void
 filter_load(void)
 {
+    filter_add(
+    	"",
+	"^make\\[[0-9]+\\]: Entering directory `([^']+)'",
+	FR_PUSHDIR,
+	"\\1",
+	"",
+	"",
+    	"gmake recursion - push");
+
+    filter_add(
+    	"",
+	"^make\\[[0-9]+\\]: Leaving directory",
+	FR_POPDIR,
+	"",
+	"",
+	"",
+    	"gmake recursion - pop");
+
     filter_add(
     	"",
 	"^[^:]+:[0-9]+: \\(Each undeclared identifier is reported only once",
