@@ -16,9 +16,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile,v 1.2 2003-05-04 06:29:28 gnb Exp $
+# $Id: Makefile,v 1.3 2003-09-01 13:02:31 gnb Exp $
 #
 
 LANG=	la
-include ../help-common.mk
+include ../common/help.mk
 
