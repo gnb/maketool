@@ -79,13 +79,16 @@ g_unix_poll_func(
     
     ret = poll((struct pollfd*)ufds, nfds, timeout);
     
-#if DEBUG
+#if DEBUG > 10
     fprintf(stderr, "g_unix_poll_func(): ret=%d errno=%d g_unix_got_signal=%d\n",
     	ret, errno, g_unix_got_signal);
 #endif
 
     if (g_unix_got_signal > 0)
     {
+#if DEBUG
+	fprintf(stderr, "g_unix_poll_func(): g_unix_got_signal=%d\n", g_unix_got_signal);
+#endif
     	g_idle_add(g_unix_dispatch_reapers, (gpointer)0);
     	g_unix_got_signal = 0;
     }
