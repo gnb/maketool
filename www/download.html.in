@@ -5,7 +5,7 @@ include(_styles.html)
 ENDHEAD
 BEGINBODY
 
-define(LATESTVERSION,0.4)
+define(LATESTVERSION,0.5)
 
 <!-- TODO: mention in the features page that it's released under GPL -->
 <!-- TODO: news... ? -->
