@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 1999-05-18 18:32:09 gnb Exp $
+# $Id: Makefile,v 1.6 1999-05-19 17:51:51 gnb Exp $
 #
 # Makefile for maketool.
 #
@@ -10,7 +10,8 @@ CPPFLAGS:=	$(shell gtk-config --cflags) -D_USE_BSD -Iicons
 LDLIBS:=	$(shell gtk-config --libs)
 O=		o.i586-unknown-linux
 
-SOURCES=	main.c filter.c help.c log.c ui.c spawn.c glib_extra.c
+SOURCES=	main.c filter.c help.c preferences.c log.c ui.c \
+		spawn.c glib_extra.c
 OBJECTS=	$(SOURCES:%.c=$O/%.o)
 
 ###

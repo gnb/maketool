@@ -35,6 +35,10 @@ void logStartBuild(const char *message);
 void logEndBuild(const char *target);
 
 LogRec *logSelected(void);
+void logSetSelected(LogRec *);
+LogRec *logNextError(LogRec *);
+LogRec *logPrevError(LogRec *);
+
 int logGetFlags(void);
 void logSetFlags(int);
 int logNumErrors(void);

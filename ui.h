@@ -49,11 +49,17 @@ GtkWidget *uiAddSeparator(GtkWidget *menu);
 GtkWidget *uiCreateOkDialog(
     GtkWidget *parent,
     const char *title);
+GtkWidget *uiCreateApplyDialog(
+    GtkWidget *parent,
+    const char *title,
+    GtkSignalFunc apply_cb,
+    gpointer data);
 GtkWidget *uiDialogCreateButton(
     GtkWidget *dialog,
     const char *label,
     GtkSignalFunc callback,
     gpointer user_data);
+void uiDialogChanged(GtkWidget *dialog);    
     
     
 #endif /* _UI_H_ */

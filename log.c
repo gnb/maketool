@@ -47,7 +47,9 @@ logAddRec(const char *line, const FilterResult *res)
     
     lr = g_new(LogRec, 1);
     lr->res = *res;
-    if (lr->res.file != 0)
+    if (lr->res.file == 0 || *lr->res.file == '\0')
+    	lr->res.file = 0;
+    else
 	lr->res.file = g_strdup(lr->res.file);	/* TODO: hashtable */
     lr->line = g_strdup(line);
     lr->expanded = TRUE;
@@ -272,6 +274,13 @@ logSelected(void)
     		GTK_CTREE_NODE(GTK_CLIST(logwin)->selection->data));
 }
 
+void
+logSetSelected(LogRec *lr)
+{
+    gtk_ctree_select(GTK_CTREE(logwin), lr->node);
+}
+
+
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 int
@@ -394,6 +403,45 @@ logStartBuild(const char *message)
 void
 logEndBuild(const char *target)
 {
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static LogRec *
+logFindErrorAux(LogRec *lr, gboolean forward)
+{
+    GList *list;
+    
+    if (lr == 0)
+    	/* begin at start or end */
+    	list = (forward ? log : g_list_last(log));
+    else
+    {
+    	/* skip the current logrec */
+    	list = g_list_find(log, lr);
+	list = (forward ? list->next : list->prev);
+    }    
+
+    for ( ; list != 0 ; list = (forward ? list->next : list->prev))
+    {
+    	lr = (LogRec *)list->data;
+	if ((lr->res.code == FR_ERROR || lr->res.code == FR_WARNING) &&
+	     lr->res.file != 0)
+	    return lr;
+    }
+    return 0;
+}
+
+LogRec *
+logNextError(LogRec *lr)
+{
+    return logFindErrorAux(lr, TRUE);
+}
+
+LogRec *
+logPrevError(LogRec *lr)
+{
+    return logFindErrorAux(lr, FALSE);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

@@ -257,4 +257,80 @@ uiCreateOkDialog(
 }    
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+#define APPLY_DIALOG_DATA "uiApplyDialog"
+
+typedef struct
+{
+    GtkWidget *dialog;
+    GtkSignalFunc apply_cb;
+    GtkWidget *ok_btn;
+    GtkWidget *apply_btn;
+    gpointer user_data;
+} ApplyDialog;
+
+
+static void
+uiApplyDialogApplyCb(GtkWidget *w, gpointer data)
+{
+    ApplyDialog *ad = (ApplyDialog *)data;
+
+    (*ad->apply_cb)(ad->dialog, ad->user_data);
+    gtk_widget_set_sensitive(ad->ok_btn, FALSE);
+    gtk_widget_set_sensitive(ad->apply_btn, FALSE);
+}
+
+static void
+uiApplyDialogCloseCb(GtkWidget *w, gpointer data)
+{
+    ApplyDialog *ad = (ApplyDialog *)data;
+
+    gtk_widget_hide(ad->dialog);
+}
+
+static void
+uiApplyDialogOkCb(GtkWidget *w, gpointer data)
+{
+    uiApplyDialogApplyCb(w, data);
+    uiApplyDialogCloseCb(w, data);
+}
+
+GtkWidget *
+uiCreateApplyDialog(
+    GtkWidget *parent,
+    const char *title,
+    GtkSignalFunc apply_cb,
+    gpointer data)
+{
+    ApplyDialog *ad;
+    
+    ad = g_new(ApplyDialog, 1);
+    ad->apply_cb = apply_cb;
+    ad->user_data = data;
+
+    ad->dialog = gtk_dialog_new();
+    gtk_window_set_title(GTK_WINDOW(ad->dialog), title);
+
+    gtk_object_set_data(GTK_OBJECT(ad->dialog), APPLY_DIALOG_DATA,
+    	(gpointer)ad);
+    
+    ad->ok_btn = uiDialogCreateButton(ad->dialog, "OK", uiApplyDialogOkCb, (gpointer)ad);
+    gtk_widget_set_sensitive(ad->ok_btn, FALSE);
+    ad->apply_btn = uiDialogCreateButton(ad->dialog, "Apply", uiApplyDialogApplyCb, (gpointer)ad);
+    gtk_widget_set_sensitive(ad->apply_btn, FALSE);
+    uiDialogCreateButton(ad->dialog, "Close", uiApplyDialogCloseCb, (gpointer)ad);
+    
+    return ad->dialog;
+}    
+
+void
+uiDialogChanged(GtkWidget *dialog)
+{
+    ApplyDialog *ad = (ApplyDialog *)gtk_object_get_data(GTK_OBJECT(dialog), APPLY_DIALOG_DATA);
+
+    gtk_widget_set_sensitive(ad->ok_btn, TRUE);
+    gtk_widget_set_sensitive(ad->apply_btn, TRUE);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 /*END*/

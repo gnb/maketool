@@ -20,7 +20,7 @@ typedef enum
     GR_NOTEMPTY=0,
     GR_NOTRUNNING,
     GR_RUNNING,
-    GR_SELECTED,
+    GR_EDITABLE,
     GR_AGAIN,
 
     NUM_SETS
@@ -48,6 +48,7 @@ GtkWidget	*anim;
 
 extern void help_about_show(GtkWidget *topl);
 extern void help_about_make_show(GtkWidget *topl);
+extern void preferences_show(GtkWidget *topl);
 
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -72,13 +73,14 @@ grey_menu_items(void)
 {
     gboolean running = (currentPid > 0);
     gboolean empty = logIsEmpty();
-    gboolean selected = (logSelected() != 0);
+    LogRec *sel = logSelected();
+    gboolean editable = (sel != 0 && sel->res.file != 0);
     gboolean again = (lastTarget != 0 && !running);
 
     uiGroupSetSensitive(GR_NOTRUNNING, !running);
     uiGroupSetSensitive(GR_RUNNING, running);
     uiGroupSetSensitive(GR_NOTEMPTY, !empty);
-    uiGroupSetSensitive(GR_SELECTED, selected);
+    uiGroupSetSensitive(GR_EDITABLE, editable);
     uiGroupSetSensitive(GR_AGAIN, again);
 }
 
@@ -335,6 +337,34 @@ view_edit_cb(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
+view_edit_next_cb(GtkWidget *w, gpointer data)
+{
+    gboolean next = GPOINTER_TO_INT(data);
+    LogRec *lr = logSelected();
+    
+    lr = (next ? logNextError(lr) : logPrevError(lr));
+    if (lr != 0)
+    {	
+	logSetSelected(lr);
+	startEdit(lr);
+    }
+    else
+    {
+    	message("No more errors in log");
+    } 
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+view_preferences_cb(GtkWidget *w, gpointer data)
+{
+    preferences_show(toplevel);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
 help_about_cb(GtkWidget *w, gpointer data)
 {
     help_about_show(toplevel);
@@ -370,26 +400,28 @@ log_collapse_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gpointer data)
 static void
 log_click_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gint column, gpointer data)
 {
+#if 0   
     LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, treeNode);
     
     fprintf(stderr, "log_click_cb: code=%d file=\"%s\" line=%d\n",
     	lr->res.code, lr->res.file, lr->res.line);
+#endif
     grey_menu_items();
 }
 
 static void
 log_doubleclick_cb(GtkWidget *w, GdkEvent *event, gpointer data)
 {
-    LogRec *lr;
-    
     if (event->type == GDK_2BUTTON_PRESS) 
     {
-	lr = logSelected();
+	LogRec *lr = logSelected();
 
 	if (lr != 0)
 	{
+#if 0
 	    fprintf(stderr, "log_doubleclick_cb: code=%d file=\"%s\" line=%d\n",
     		lr->res.code, lr->res.file, lr->res.line);
+#endif
 	    startEdit(lr);
 	}
     }
@@ -441,9 +473,9 @@ uiCreateMenus(GtkWidget *menubar)
     menu = uiAddMenu(menubar, "View");
     uiAddTearoff(menu);
     uiAddButton(menu, "Clear Log", view_clear_cb, 0, GR_NOTEMPTY);
-    uiAddButton(menu, "Edit", view_edit_cb, 0, GR_SELECTED);
-    uiAddButton(menu, "Edit Next Error", unimplemented, 0, GR_NOTEMPTY);
-    uiAddButton(menu, "Edit Prev Error", unimplemented, 0, GR_NOTEMPTY);
+    uiAddButton(menu, "Edit", view_edit_cb, 0, GR_EDITABLE);
+    uiAddButton(menu, "Edit Next Error", view_edit_next_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
+    uiAddButton(menu, "Edit Prev Error", view_edit_next_cb, GINT_TO_POINTER(FALSE), GR_NOTEMPTY);
     uiAddSeparator(menu);
     uiAddToggle(menu, "Toolbar", view_widget_cb, (gpointer)&toolbar, 0, TRUE);
     uiAddToggle(menu, "Statusbar", view_widget_cb, (gpointer)&messagebox, 0, TRUE);
@@ -455,7 +487,7 @@ uiCreateMenus(GtkWidget *menubar)
     uiAddToggle(menu, "Information", view_flags_cb, GINT_TO_POINTER(LF_SHOW_INFO),
     	0, logGetFlags() & LF_SHOW_INFO);
     uiAddSeparator(menu);
-    uiAddButton(menu, "Preferences", unimplemented, 0, GR_NONE);
+    uiAddButton(menu, "Preferences", view_preferences_cb, 0, GR_NONE);
     
     menu = uiAddMenuRight(menubar, "Help");
     uiAddTearoff(menu);
@@ -496,7 +528,7 @@ uiCreateTools()
     uiToolCreate(toolbar, "Clear", "Clear log",
     	clear_xpm, view_clear_cb, 0, GR_NOTEMPTY);
     uiToolCreate(toolbar, "Next", "Edit next error or warning",
-    	next_xpm, unimplemented, 0, GR_NOTEMPTY);
+    	next_xpm, view_edit_next_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
     
     uiToolAddSpace(toolbar);
     
