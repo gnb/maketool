@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.55 2003-10-19 15:08:57 gnb Exp $");
+CVSID("$Id: log.c,v 1.56 2003-10-19 23:34:33 gnb Exp $");
 
 #ifndef GTK_DTREE_IS_EMPTY
 #define GTK_DTREE_IS_EMPTY(_dtree_) \
@@ -328,7 +328,19 @@ log_get_filenames(LogRec *lr)
     }
 
     if (lr->context == 0 || lr->context->num_dirs == 0)
+    {
+    	/* no directories, but could exist in current directory */
+    	ff = file_normalise(lr->res.file);
+	if (file_exists(ff))
+	{
+	    files = g_new(char*, 2);
+	    files[0] = ff;
+	    files[1] = 0;
+	    return files;
+    	}
+	g_free(ff);
     	return 0;
+    }
 
     files = g_new(char*, lr->context->num_dirs+1);
 
