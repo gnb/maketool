@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.23 2000-07-11 05:46:36 gnb Exp $
+# $Id: Makefile.in,v 1.24 2000-07-13 07:00:03 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -43,7 +43,7 @@ O=		objs
 SOURCES=	main.c filter.c help.c preferences.c log.c print.c ps.c \
 		find.c ui.c task.c util.c glib_extra.c
 HEADERS=	maketool.h filter.h common.h log.h ui.h \
-		util.h glib_extra.h
+		util.h glib_extra.h ps.h task.h
 OBJECTS=	$(SOURCES:%.c=$O/%.o)
 
 top_srcdir=	.
