@@ -30,6 +30,7 @@ typedef enum
 void logInit(GtkWidget *);
 
 void logClear(void);
+void logCollapseAll(void);
 gboolean logIsEmpty(void);
 void logStartBuild(const char *message);
 void logEndBuild(const char *target);

@@ -193,6 +193,20 @@ logIsEmpty(void)
     return GTK_CTREE_IS_EMPTY(logwin);
 }
 
+void
+logCollapseAll(void)
+{
+    GList *list;
+    
+    for (list = log ; list != 0 ; list = list->next)
+    {
+    	LogRec *lr = (LogRec *)list->data;
+	
+	if (lr->res.code == FR_BUILDSTART)
+	    gtk_ctree_collapse(GTK_CTREE(logwin), lr->node);
+    }
+}
+
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
@@ -351,32 +365,6 @@ logInit(GtkWidget *w)
 			
     logwin = w;
     filter_load();
-}
-
-void
-logSetStyle(LogSeverity s, GdkFont *font, GdkColor *fore, GdkColor *back)
-{
-    fonts[s] = font;
-
-    if (fore != 0)
-    {
-    	foreground_set[s] = TRUE;
-	foregrounds[s] = *fore;
-    }
-    else
-    {
-    	foreground_set[s] = FALSE;
-    }
-    
-    if (back != 0)
-    {
-    	background_set[s] = TRUE;
-	backgrounds[s] = *back;
-    }
-    else
-    {
-    	background_set[s] = FALSE;
-    }
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

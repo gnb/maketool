@@ -44,6 +44,7 @@ typedef struct
     gboolean ignore_failures;
     
     enum { START_NOTHING, START_CLEAR, START_COLLAPSE } start_action;
+    char *makefile;
     
     GList *variables;	/* list of Variable structs */
     

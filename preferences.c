@@ -12,7 +12,15 @@ static GtkWidget	*prog_make_entry;
 static GtkWidget	*prog_targets_entry;
 static GtkWidget	*prog_version_entry;
 static GtkWidget	*prog_edit_entry;
-
+static GtkWidget	*start_action_combo;
+static GtkWidget	*makefile_entry;
+static GtkWidget	*var_clist;
+static GtkWidget	*var_name_entry;
+static GtkWidget	*var_value_entry;
+static GtkWidget	*var_type_entry;
+static GtkWidget	*var_set_btn;
+static GtkWidget	*var_unset_btn;
+static gboolean		creating = TRUE, setting = FALSE;
 
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -30,6 +38,63 @@ prefs_add_variable(const char *name, const char *value, int type)
     prefs.variables = g_list_append(prefs.variables, var);
 }
 
+#if 0
+static Variable *
+prefs_find_variable(const char *name)
+{
+    GList *list;
+    
+    for (list = prefs.variables ; list != 0 ; list = list->next)
+    {
+        Variable *var = (Variable *)list->data;
+	
+	if (!strcmp(var->name, name))
+	    return var;
+    }
+    return 0;
+}
+#endif
+
+static void
+variable_delete(Variable *var)
+{
+    g_free(var->name);
+    g_free(var->value);
+    g_free(var);
+}
+
+#if 0
+static void
+prefs_remove_variable(const char *name)
+{
+    GList *list;
+    
+    for (list = prefs.variables ; list != 0 ; list = list->next)
+    {
+        Variable *var = (Variable *)list->data;
+	
+	if (!strcmp(var->name, name))
+	{
+	    variable_delete(var);
+	    prefs.variables = g_list_remove_link(prefs.variables, list);
+	    return;
+	}
+    }
+}
+#endif
+
+static void
+prefs_clear_variables(void)
+{
+    while (prefs.variables != 0)
+    {
+	variable_delete((Variable *)prefs.variables->data);
+        prefs.variables = g_list_remove_link(prefs.variables, prefs.variables);
+    }
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 void
 preferences_init(void)
 {
@@ -42,6 +107,7 @@ preferences_init(void)
     prefs.ignore_failures = FALSE;
     
     prefs.start_action = START_COLLAPSE;
+    prefs.makefile = 0;
     
     prefs.variables = 0;
     prefs_add_variable("VARIABLE_ONE", "The value for 'ONE'", VAR_MAKE);
@@ -74,6 +140,10 @@ preferences_save(void)
 static void
 prefs_apply_cb(GtkWidget *w, gpointer data)
 {
+    char *mf;
+    char *text[3];
+    int row, nrows;
+    
     fprintf(stderr, "prefs_apply_cb()\n");
     
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(run_radio[RUN_PARALLEL_PROC])))
@@ -88,7 +158,7 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     prefs.run_load = gtk_spin_button_get_value_as_float(GTK_SPIN_BUTTON(run_load_sb));
     
     prefs.edit_first_error = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(edit1_check));
-    prefs.edit_warnings = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(editw_check));
+    prefs.edit_warnings = !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(editw_check));
     prefs.ignore_failures = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fail_check));
 
     free(prefs.prog_make);
@@ -103,6 +173,24 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     free(prefs.prog_edit_source);
     prefs.prog_edit_source = strdup(gtk_entry_get_text(GTK_ENTRY(prog_edit_entry)));
     
+    prefs.start_action = uiComboGetCurrent(start_action_combo);
+    
+    /* TODO: strip `mf' of whitespace JIC */
+    mf = gtk_entry_get_text(GTK_ENTRY(makefile_entry));
+    if (prefs.makefile != 0)
+	free(prefs.makefile);
+    prefs.makefile = (mf == 0 || *mf == '\0' ? 0 : strdup(mf));
+    
+    prefs_clear_variables();
+    nrows = GTK_CLIST(var_clist)->rows;        
+    for (row = 0 ; row < nrows ; row++)
+    {
+	gtk_clist_get_text(GTK_CLIST(var_clist), row, 0, &text[0]);
+	gtk_clist_get_text(GTK_CLIST(var_clist), row, 1, &text[1]);
+	gtk_clist_get_text(GTK_CLIST(var_clist), row, 2, &text[2]);
+	prefs_add_variable(text[0], text[1],
+		(!strcmp(text[2], "make") ? VAR_MAKE : VAR_ENVIRON));
+    }
     
     preferences_save();
 }
@@ -112,7 +200,31 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
 static void
 changed_cb(GtkWidget *w, gpointer data)
 {
+    if (!creating)
+	uiDialogChanged(prefs_shell);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+set_makefile(const char *mf)
+{
+    gtk_entry_set_text(GTK_ENTRY(makefile_entry), mf);
     uiDialogChanged(prefs_shell);
+}
+
+static void
+browse_makefile_cb(GtkWidget *w, gpointer data)
+{
+    static GtkWidget *filesel = 0;
+    char *mf = gtk_entry_get_text(GTK_ENTRY(makefile_entry));
+    
+    if (filesel == 0)
+    	filesel = uiCreateFileSel("Choose Makefile", set_makefile, mf);
+    else
+    	gtk_file_selection_set_filename(GTK_FILE_SELECTION(filesel), mf);
+
+    gtk_widget_show(filesel);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -121,17 +233,19 @@ changed_cb(GtkWidget *w, gpointer data)
 static GtkWidget *
 prefs_create_general_page(GtkWidget *toplevel)
 {
-    GtkWidget *table, *table2;
+    GtkWidget *table, *table2, *hbox;
     GtkWidget *frame;
     GtkObject *adj;
     GtkWidget *label;
     GtkWidget *combo;
+    GtkWidget *button;
     GList *list;
     int row = 0;
     
-    table = gtk_table_new(1, 2, FALSE);
+    table = gtk_table_new(6, 2, FALSE);
     gtk_container_border_width(GTK_CONTAINER(table), SPACING);
     gtk_widget_show(table);
+
     
     /*
      * `Parallel' frame
@@ -139,9 +253,9 @@ prefs_create_general_page(GtkWidget *toplevel)
     frame = gtk_frame_new("Make runs commands");
     gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 2, row, row+1);
     gtk_widget_show(frame);
-    row++;
     
     table2 = gtk_table_new(3, 2, FALSE);
+    gtk_container_border_width(GTK_CONTAINER(table2), SPACING);
     gtk_container_add(GTK_CONTAINER(frame), table2);
     gtk_widget_show(table2);
     
@@ -196,11 +310,12 @@ prefs_create_general_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table2), run_load_sb, 1, 2, 2, 3);
     gtk_widget_show(run_load_sb);
+    row++;
 
     /*
      * Edit first detected error.
      */
-    edit1_check = gtk_check_button_new_with_label("Auto edit first error");
+    edit1_check = gtk_check_button_new_with_label("Automatically edit first error");
     gtk_signal_connect(GTK_OBJECT(edit1_check), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), edit1_check, 0, 2, row, row+1);
@@ -210,24 +325,23 @@ prefs_create_general_page(GtkWidget *toplevel)
     /*
      * Auto edit warnings
      */
-    editw_check = gtk_check_button_new_with_label("Auto edit warnings");
-    gtk_table_attach_defaults(GTK_TABLE(table), editw_check, 0, 2, row, row+1);
+    editw_check = gtk_check_button_new_with_label("Edit Next ignores warnings");
     gtk_signal_connect(GTK_OBJECT(editw_check), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
+    gtk_table_attach_defaults(GTK_TABLE(table), editw_check, 0, 2, row, row+1);
     gtk_widget_show(editw_check);
     row++;
     
     /*
      * -k flag
      */
-    /* TODO: better name */
     fail_check = gtk_check_button_new_with_label("Continue despite failures");
     gtk_signal_connect(GTK_OBJECT(fail_check), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), fail_check, 0, 2, row, row+1);
     gtk_widget_show(fail_check);
     row++;
-    
+
     /*
      * Action on starting build.
      */
@@ -248,8 +362,48 @@ prefs_create_general_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 2, row, row+1);
     gtk_widget_show(combo);
+    start_action_combo = combo;
     row++;
 
+
+    /*
+     * Choose Makefile.
+     */
+    
+    label = gtk_label_new("Makefile:");
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
+    gtk_widget_show(label);
+    
+    hbox = gtk_hbox_new(FALSE, 0);
+    gtk_container_border_width(GTK_CONTAINER(hbox), 0);
+    gtk_table_attach_defaults(GTK_TABLE(table), hbox, 1, 2, row, row+1);
+    gtk_widget_show(hbox);
+
+    combo = gtk_combo_new();
+    list = 0;
+    list = g_list_append(list, "(default)");
+    list = g_list_append(list, "Makefile");
+    list = g_list_append(list, "makefile");
+    list = g_list_append(list, "GNUmakefile");
+    gtk_combo_set_popdown_strings(GTK_COMBO(combo), list);
+    gtk_combo_set_item_string(GTK_COMBO(combo),    
+    		GTK_ITEM(gtk_container_children(
+			GTK_CONTAINER(GTK_COMBO(combo)->list))->data),
+		"");
+    gtk_signal_connect(GTK_OBJECT(GTK_COMBO(combo)->entry), "changed", 
+    	GTK_SIGNAL_FUNC(changed_cb), 0);
+    gtk_box_pack_start(GTK_BOX(hbox), combo, FALSE, FALSE, 0);	
+    gtk_widget_show(combo);
+    makefile_entry = GTK_COMBO(combo)->entry;
+
+    button = gtk_button_new_with_label("Browse...");
+    gtk_signal_connect(GTK_OBJECT(button), "clicked", 
+    	GTK_SIGNAL_FUNC(browse_makefile_cb), 0);
+    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, SPACING);	
+    gtk_widget_show(button);
+
+    row++;
 
     /* 
      * Set current values. This is isolated at the bottom
@@ -259,9 +413,116 @@ prefs_create_general_page(GtkWidget *toplevel)
     	GTK_TOGGLE_BUTTON(run_radio[prefs.run_how]), TRUE);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(run_proc_sb), prefs.run_processes);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(run_load_sb), prefs.run_load);
-    uiComboSetCurrent(combo, prefs.start_action);
-    
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(edit1_check), prefs.edit_first_error);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(editw_check), !prefs.edit_warnings);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fail_check), prefs.ignore_failures);
+    gtk_entry_set_text(GTK_ENTRY(makefile_entry), (prefs.makefile == 0 ? "" : prefs.makefile));
+    uiComboSetCurrent(start_action_combo, prefs.start_action);
+
     return table;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+var_select_cb(
+    GtkCList *clist,
+    gint row,
+    gint col,
+    GdkEvent *event, 
+    gpointer data)
+{
+    char *text[3];
+
+    gtk_clist_get_text(GTK_CLIST(var_clist), row, 0, &text[0]);
+    gtk_clist_get_text(GTK_CLIST(var_clist), row, 1, &text[1]);
+    gtk_clist_get_text(GTK_CLIST(var_clist), row, 2, &text[2]);
+    
+    setting = TRUE;
+    gtk_entry_set_text(GTK_ENTRY(var_name_entry), text[0]);
+    gtk_entry_set_text(GTK_ENTRY(var_value_entry), text[1]);
+    gtk_entry_set_text(GTK_ENTRY(var_type_entry), text[2]);
+    setting = FALSE;
+    gtk_widget_set_sensitive(var_set_btn, FALSE);
+    gtk_widget_set_sensitive(var_unset_btn, TRUE);
+}
+
+
+static void
+var_changed_cb(GtkWidget *w, gpointer data)
+{
+    if (!creating && !setting)
+    {
+	gtk_widget_set_sensitive(var_set_btn, TRUE);
+	gtk_widget_set_sensitive(var_unset_btn, TRUE);
+    }
+}
+
+static void
+var_set_cb(GtkWidget *w, gpointer data)
+{
+    int row;
+    char *text[3];
+    char *rtext[3];
+    int nrows = GTK_CLIST(var_clist)->rows;
+    
+    text[0] = gtk_entry_get_text(GTK_ENTRY(var_name_entry));
+    text[1] = gtk_entry_get_text(GTK_ENTRY(var_value_entry));
+    text[2] = gtk_entry_get_text(GTK_ENTRY(var_type_entry));
+        
+    for (row = 0 ; row < nrows ; row++)
+    {
+	gtk_clist_get_text(GTK_CLIST(var_clist), row, 0, &rtext[0]);
+	if (!strcmp(rtext[0], text[0]))
+	{
+	    gtk_clist_get_text(GTK_CLIST(var_clist), row, 1, &rtext[1]);
+	    gtk_clist_get_text(GTK_CLIST(var_clist), row, 2, &rtext[2]);
+	    if (!strcmp(text[1], rtext[1]) && !strcmp(text[2], rtext[2]))
+	    	return;	/* same variable, no change to value or type: ignore */
+	    gtk_clist_set_text(GTK_CLIST(var_clist), row, 1, text[1]);
+	    gtk_clist_set_text(GTK_CLIST(var_clist), row, 2, text[2]);
+	    break;
+	}
+    }
+    /* got here, so must not be any row with same variable name */
+    
+    gtk_clist_append(GTK_CLIST(var_clist), text);
+    gtk_widget_set_sensitive(var_set_btn, FALSE);
+    gtk_widget_set_sensitive(var_unset_btn, TRUE);
+    uiDialogChanged(prefs_shell);
+}
+
+static void
+var_unset_cb(GtkWidget *w, gpointer data)
+{
+    int row;
+    char *name;
+    char *rname;
+    gboolean changed = FALSE;
+    int nrows = GTK_CLIST(var_clist)->rows;
+    
+    name = gtk_entry_get_text(GTK_ENTRY(var_name_entry));
+        
+    for (row = 0 ; row < nrows ; row++)
+    {
+	gtk_clist_get_text(GTK_CLIST(var_clist), row, 0, &rname);
+	if (!strcmp(rname, name))
+	{
+	    gtk_clist_remove(GTK_CLIST(var_clist), row);
+	    changed = TRUE;
+	    break;
+	}
+    }
+
+    setting = TRUE;
+    gtk_entry_set_text(GTK_ENTRY(var_name_entry), "");
+    gtk_entry_set_text(GTK_ENTRY(var_value_entry), "");
+    gtk_entry_set_text(GTK_ENTRY(var_type_entry), "");
+    setting = FALSE;
+    gtk_widget_set_sensitive(var_set_btn, FALSE);
+    gtk_widget_set_sensitive(var_unset_btn, FALSE);
+    if (changed)
+	uiDialogChanged(prefs_shell);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -283,11 +544,11 @@ prefs_create_variables_page(GtkWidget *toplevel)
     char *text[3];
     int row = 0;
     
-    vbox = gtk_vbox_new(SPACING, FALSE);
+    vbox = gtk_vbox_new(FALSE, SPACING);
     gtk_container_border_width(GTK_CONTAINER(vbox), SPACING);
     gtk_widget_show(vbox);
     
-    hbox = gtk_hbox_new(0, FALSE);
+    hbox = gtk_hbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
     gtk_widget_show(hbox);
 
@@ -298,7 +559,10 @@ prefs_create_variables_page(GtkWidget *toplevel)
     gtk_clist_set_column_auto_resize(GTK_CLIST(clist), 1, TRUE);
     gtk_clist_set_column_auto_resize(GTK_CLIST(clist), 2, TRUE);
     gtk_box_pack_start(GTK_BOX(hbox), clist, TRUE, TRUE, 0);
+    gtk_signal_connect(GTK_OBJECT(clist), "select_row", 
+    	GTK_SIGNAL_FUNC(var_select_cb), 0);
     gtk_widget_show(clist);
+    var_clist = clist;
     
     sb = gtk_vscrollbar_new(GTK_CLIST(clist)->vadjustment);
     gtk_box_pack_start(GTK_BOX(hbox), sb, FALSE, FALSE, 0);
@@ -321,7 +585,10 @@ prefs_create_variables_page(GtkWidget *toplevel)
     
     entry = gtk_entry_new();
     gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    gtk_signal_connect(GTK_OBJECT(entry), "changed", 
+    	GTK_SIGNAL_FUNC(var_changed_cb), 0);
     gtk_widget_show(entry);
+    var_name_entry = entry;
     
     row++;
     
@@ -335,7 +602,10 @@ prefs_create_variables_page(GtkWidget *toplevel)
     
     entry = gtk_entry_new();
     gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    gtk_signal_connect(GTK_OBJECT(entry), "changed", 
+    	GTK_SIGNAL_FUNC(var_changed_cb), 0);
     gtk_widget_show(entry);
+    var_value_entry = entry;
     
     row++;
     
@@ -349,7 +619,10 @@ prefs_create_variables_page(GtkWidget *toplevel)
     
     entry = gtk_entry_new();
     gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    gtk_signal_connect(GTK_OBJECT(entry), "changed", 
+    	GTK_SIGNAL_FUNC(var_changed_cb), 0);
     gtk_widget_show(entry);
+    var_type_entry = entry;
     
     row++;
     
@@ -357,17 +630,25 @@ prefs_create_variables_page(GtkWidget *toplevel)
     /*
      * Set & Unset buttons
      */
-    hbox = gtk_hbox_new(SPACING, FALSE);
+    hbox = gtk_hbox_new(FALSE, SPACING);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
     gtk_widget_show(hbox);
     
     button = gtk_button_new_with_label("Set");
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked", 
+    	GTK_SIGNAL_FUNC(var_set_cb), 0);
+    gtk_widget_set_sensitive(button, FALSE);
     gtk_widget_show(button);
+    var_set_btn = button;
 
     button = gtk_button_new_with_label("Unset");
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+    gtk_signal_connect(GTK_OBJECT(button), "clicked", 
+    	GTK_SIGNAL_FUNC(var_unset_cb), 0);
+    gtk_widget_set_sensitive(button, FALSE);
     gtk_widget_show(button);
+    var_unset_btn = button;
 
 
     /* TODO: do this for real in a separate fn */
@@ -382,7 +663,6 @@ prefs_create_variables_page(GtkWidget *toplevel)
 	    text[1] = var->value;
 	    text[2] = (var->type == VAR_MAKE ? "make" : "environ");
 	    r = gtk_clist_append(GTK_CLIST(clist), text);
-	    gtk_clist_set_row_data(GTK_CLIST(clist), r, (gpointer)var);
 	}
     }
 
@@ -417,6 +697,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     
     table = gtk_table_new(4, 2, FALSE);
     gtk_container_border_width(GTK_CONTAINER(table), SPACING);
+    gtk_table_set_row_spacings(GTK_TABLE(table), SPACING);
     gtk_widget_show(table);
     
     /*
@@ -479,7 +760,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     combo = gtk_combo_new();
     list = 0;
     list = g_list_append(list, "gnome-edit %{l:++%l} %f");
-    list = g_list_append(list, "gnome-terminal -e '${VISUAL:-vi} %{l:++%l} %f'");
+    list = g_list_append(list, "gnome-terminal -e \"${VISUAL:-vi} %{l:++%l} %f\"");
     list = g_list_append(list, "xterm -e ${VISUAL:-vi} %{l:++%l} %f");
     list = g_list_append(list, "nc -noask %{l:+-line %l} %f");
     list = g_list_append(list, "emacsclient %{l:++%l} %f");
@@ -559,7 +840,7 @@ prefs_create_shell(GtkWidget *toplevel)
     prefs_shell = uiCreateApplyDialog(toplevel, "Maketool: Preferences",
     	prefs_apply_cb, (gpointer)0);
 
-    box = gtk_vbox_new(0, FALSE);
+    box = gtk_vbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(prefs_shell)->vbox), box);
     gtk_container_border_width(GTK_CONTAINER(box), SPACING);
     gtk_widget_show(box);
@@ -591,6 +872,8 @@ prefs_create_shell(GtkWidget *toplevel)
     				gtk_label_new("Styles"));
     gtk_widget_show(page);
 #endif
+
+    creating = FALSE;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

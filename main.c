@@ -117,6 +117,7 @@ expand_prog(
     char *out;
     const char *expands[256];
     char *vars;
+    estring fflag;
     char linebuf[32];
     char runflags[32];
         
@@ -131,7 +132,13 @@ expand_prog(
 	expands['l'] = linebuf;
     }
     
-    expands['m'] = "-f Makefile";
+    estring_init(&fflag);
+    if (prefs.makefile != 0)
+    {
+    	estring_append_string(&fflag, "-f ");
+	estring_append_string(&fflag, prefs.makefile);
+	expands['m'] = fflag.data;
+    }
     
     switch (prefs.run_how)
     {
@@ -157,6 +164,7 @@ expand_prog(
     out = expand_string(prog, expands);
     
     free(vars);
+    estring_free(&fflag);
     
     return out;
 }
@@ -309,6 +317,19 @@ buildStart(const char *target)
     if (currentPid > 0)
     {
 	message("Making %s", target);
+	
+	switch (prefs.start_action)
+	{
+	case START_NOTHING:
+	    break;
+	case START_CLEAR:
+	    logClear();
+	    break;
+	case START_COLLAPSE:
+	    logCollapseAll();
+	    break;
+	}
+	
 	lastTarget = target;
 	interrupted = FALSE;
 	firstError = TRUE;
@@ -416,6 +437,12 @@ view_clear_cb(GtkWidget *w, gpointer data)
     logClear();
 }
 
+static void
+view_collapse_all_cb(GtkWidget *w, gpointer data)
+{
+    logCollapseAll();
+}
+
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
@@ -435,7 +462,11 @@ view_edit_next_cb(GtkWidget *w, gpointer data)
     gboolean next = GPOINTER_TO_INT(data);
     LogRec *lr = logSelected();
     
-    lr = (next ? logNextError(lr) : logPrevError(lr));
+    do
+    {
+	lr = (next ? logNextError(lr) : logPrevError(lr));
+    } while (lr != 0 && !(prefs.edit_warnings || lr->res.code == FR_ERROR));
+    
     if (lr != 0)
     {	
 	logSetSelected(lr);
@@ -444,7 +475,7 @@ view_edit_next_cb(GtkWidget *w, gpointer data)
     else
     {
     	message("No more errors in log");
-    } 
+    }
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -517,7 +548,6 @@ uiCreateMenus(GtkWidget *menubar)
     uiAddButton(menu, "Open Log...", file_open_cb, 0, GR_NONE);
     uiAddButton(menu, "Save Log...", file_save_cb, 0, GR_NOTEMPTY);
     uiAddSeparator(menu);
-    uiAddButton(menu, "Change Makefile...", unimplemented, 0, GR_NOTRUNNING);
     uiAddButton(menu, "Change directory...", unimplemented, 0, GR_NOTRUNNING);
     uiAddSeparator(menu);
     uiAddButton(menu, "Print", unimplemented, 0, GR_NOTEMPTY);
@@ -543,6 +573,7 @@ uiCreateMenus(GtkWidget *menubar)
     menu = uiAddMenu(menubar, "View");
     uiAddTearoff(menu);
     uiAddButton(menu, "Clear Log", view_clear_cb, 0, GR_NOTEMPTY);
+    uiAddButton(menu, "Collapse All", view_collapse_all_cb, 0, GR_NOTEMPTY);
     uiAddButton(menu, "Edit", view_edit_cb, 0, GR_EDITABLE);
     uiAddButton(menu, "Edit Next Error", view_edit_next_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
     uiAddButton(menu, "Edit Prev Error", view_edit_next_cb, GINT_TO_POINTER(FALSE), GR_NOTEMPTY);

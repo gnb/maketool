@@ -47,6 +47,17 @@ estring_append_char(estring *e, char c)
     e->data[e->length] = '\0';
 }
 
+void
+estring_free(estring *e)
+{
+   if (e->data != 0)
+   {
+   	free(e->data);
+	e->length = 0;
+	e->available = 0;
+   }
+}
+
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 #define LEFT_CURLY '{'
