@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.11 1999-09-05 04:41:34 gnb Exp $
+# $Id: Makefile.in,v 1.12 1999-10-16 16:36:55 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -72,12 +72,6 @@ clean::
 
 # extract_targets shell script
 
-all:: extract_targets
-
-extract_targets: extract_targets.sh
-	cp $< $@
-	chmod 755 $@
-	
 install:: $(BINDIR)/extract_targets
 
 $(BINDIR)/extract_targets: extract_targets
@@ -87,9 +81,6 @@ $(BINDIR)/extract_targets: extract_targets
 uninstall::
 	$(RM) $(BINDIR)/extract_targets
 	
-clean::
-	$(RM) extract_targets
-		
 ###
 
 # C infrastructure

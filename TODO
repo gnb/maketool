@@ -128,3 +128,5 @@ x  Change the preferences so that the actual make executable used is
    Use %M as the name of the executable in those cases.
    
 x  Allow setting of make variables using VAR=val syntax on command line.
+
+x  Make the default text editor configurable, figured out in configure.

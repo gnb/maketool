@@ -21,7 +21,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: preferences.c,v 1.22 1999-09-05 11:39:31 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.23 1999-10-16 16:36:56 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -274,9 +274,9 @@ preferences_load(void)
     prefs_set_var_environment();
     prefs_set_var_make_flags();
     
-    prefs.prog_make = ui_config_get_string("prog_make", "make %n %m %k %p %v %t");
+    prefs.prog_make = ui_config_get_string("prog_make", GMAKE " %n %m %k %p %v %t");
     prefs.prog_list_targets = ui_config_get_string("prog_list_targets", "extract_targets %m %v");
-    prefs.prog_list_version = ui_config_get_string("prog_list_version", "make --version");
+    prefs.prog_list_version = ui_config_get_string("prog_list_version", GMAKE " --version");
     prefs.prog_edit_source = ui_config_get_string("prog_edit_source", "nc -noask %{l:+-line %l} %f");
 
     prefs.win_width = ui_config_get_int("win_width", 300);

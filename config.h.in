@@ -21,7 +21,7 @@
 #define _config_h_ 1
 
 /*
- * $Id: config.h.in,v 1.3 1999-06-14 02:30:01 gnb Exp $
+ * $Id: config.h.in,v 1.4 1999-10-16 16:36:56 gnb Exp $
  */
 
 /*
@@ -38,6 +38,21 @@
  * Define as non-zero to turn on debugging prints.
  */
 #define DEBUG 0
+
+/*
+ * Executable name for GNU make. Can be a full pathname
+ * or a basename to be looked up in $PATH at runtime,
+ * but may *not* contain flags.
+ *
+ * BTW if anyone tries to use maketool with ClearCase's
+ * make in GNU-make emulation mode, I'd be interested to
+ * hear how you fared - Greg.
+ */
+#define GMAKE "make"
+/*
+ * Basename of GMAKE. Used in filters.
+ */
+#define GMAKEBASE "make"
 
 /* Various standard autoconf defines */
 #define HAVE_MALLOC_H 0

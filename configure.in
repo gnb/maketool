@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
-dnl $Id: configure.in,v 1.8 1999-09-11 05:03:34 gnb Exp $
+dnl $Id: configure.in,v 1.9 1999-10-16 16:36:56 gnb Exp $
 dnl
 
 AC_INIT(main.c)
@@ -35,6 +35,10 @@ dnl Checks for programs.
 AC_PROG_INSTALL
 AC_PROG_AWK
 AC_PROG_CC
+
+dnl Get name of GNU make
+AC_CHECK_PROGS(GMAKE, gmake make, make)dnl
+GMAKEBASE=`basename "$GMAKE"`
 
 dnl Stuff for gettext
 ALL_LINGUAS="la"
@@ -62,6 +66,8 @@ AM_PATH_GTK(1.2.0)
 
 AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE")
 AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
+AC_DEFINE_UNQUOTED(GMAKE, "$GMAKE")
+AC_DEFINE_UNQUOTED(GMAKEBASE, "$GMAKEBASE")
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
-AC_OUTPUT(Makefile maketool.spec intl/Makefile po/Makefile.in icons/Makefile)
+AC_OUTPUT(Makefile extract_targets maketool.spec intl/Makefile po/Makefile.in icons/Makefile)

@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.13 1999-10-16 02:07:53 gnb Exp $");
+CVSID("$Id: filter.c,v 1.14 1999-10-16 16:36:56 gnb Exp $");
 
 typedef struct
 {
@@ -88,17 +88,17 @@ filter_load(void)
 {
     filter_add(
     	"",				/* state */
-	"^make\\[[0-9]+\\]: Entering directory `([^']+)'", /* regexp */
+	"^" GMAKEBASE "\\[[0-9]+\\]: Entering directory `([^']+)'", /* regexp */
 	FR_PUSHDIR,			/* code */
 	"\\1",				/* file */
 	"",				/* line */
 	"",				/* col */
-	"Directory \\1",		/* summary */
+	0,				/* summary */
     	"gmake recursion - push");	/* comment */
 
     filter_add(
     	"",				/* state */
-	"^make\\[[0-9]+\\]: Leaving directory", /* regexp */
+	"^" GMAKEBASE "\\[[0-9]+\\]: Leaving directory", /* regexp */
 	FR_POPDIR,			/* code */
 	"",				/* file */
 	"",				/* line */
@@ -138,7 +138,7 @@ filter_load(void)
 	
     filter_add(
     	"",				/* state */
-	"^([^: \t]+):([0-9]+): warning:(.*)$",	/* regexp */
+	"^([^:]+):([0-9]+): warning:(.*)$",	/* regexp */
 	FR_WARNING,			/* code */
 	"\\1",				/* file */
 	"\\2",				/* line */
@@ -148,32 +148,13 @@ filter_load(void)
 	
     filter_add(
     	"",				/* state */
-	"^([^: \t]+):([0-9]+):(.*)$",	/* regexp */
+	"^([^:]+):([0-9]+):(.*)$",	/* regexp */
 	FR_ERROR,			/* code */
 	"\\1",				/* file */
 	"\\2",				/* line */
 	"",				/* col */
 	"\\3",				/* summary */
     	"gcc errors");			/* comment */
-	
-    filter_add(
-    	"",				/* state */
-	"^In file included from ([^: \t]+):([0-9]+)[,:]$",	/* regexp */
-	FR_INFORMATION,			/* code */  /* TODO: new category ??*/
-	"\\1",				/* file */
-	"\\2",				/* line */
-	"",				/* col */
-	"Included from \\1:\\2",	/* summary */
-    	"gcc inclusion trace 1");	/* comment */
-    filter_add(
-    	"",				/* state */
-	"^[ \t]+from +([^: \t]+):([0-9]+)[,:]$",	/* regexp */
-	FR_INFORMATION,			/* code */  /* TODO: new category ??*/
-	"\\1",				/* file */
-	"\\2",				/* line */
-	"",				/* col */
-	"Included from \\1:\\2",	/* summary */
-    	"gcc inclusion trace 2");	/* comment */
 
 #ifdef __hpux
     filter_add(
@@ -217,7 +198,7 @@ filter_load(void)
      */
     filter_add(
     	"",				/* state */
-	"^(cc|c89|gcc|CC|c++|g++).*[ \t]*-c[ \t]*.*[ \t]([^ \t]*\\.)(c|C|cc|c++|cpp)", /* regexp */
+	"^(cc|c89|gcc|CC|c\\+\\+|g\\+\\+).*[ \t]*-c[ \t]*.*[ \t]([^ \t]*\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
 	FR_INFORMATION,			/* code */
 	"\\2\\3",			/* file */
 	"",				/* line */
@@ -235,7 +216,7 @@ filter_load(void)
     	"Java compile line");		/* comment */
     filter_add(
     	"",				/* state */
-	"^(cc|c89|gcc|CC|c++|g++|ld).*[ \t]*-o[ \t]*([^ \t]*)", /* regexp */
+	"^(cc|c89|gcc|CC|c\\+\\+|g\\+\\+|ld).*[ \t]*-o[ \t]*([^ \t]*)", /* regexp */
 	FR_INFORMATION,			/* code */
 	"",				/* file */
 	"",				/* line */

@@ -17,10 +17,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: extract_targets.sh,v 1.6 1999-07-14 06:15:01 gnb Exp $
+# $Id: extract_targets.in,v 1.1 1999-10-16 16:36:56 gnb Exp $
 #
 
-make -n -p "$@" _no_such_target_ 2>/dev/null | awk '
+@GMAKE@ -n -p "$@" _no_such_target_ 2>/dev/null | awk '
 BEGIN {
     isTarget = 1
     isFile = 0
