@@ -10,7 +10,7 @@ Here's a screenshot of the maketool main window. Note the colour coding
 of the errors and warnings from the make run.
 </P>
 <CENTER>
-<IMG WIDTH=430 HEIGHT=287 SRC="mainw.gif" ALT="main window">
+<IMG WIDTH=433 HEIGHT=293 SRC="mainw.gif" ALT="main window">
 </CENTER>
 
 <P>
@@ -51,19 +51,20 @@ changequote([,])
 	<I>configure.in</I> which is newer than the Makefile.])
 
   SCREENSHOT_R(acgui,gif,autoconf gui,[
-	Maketool now provides a GUI for choosing options for the
+	Maketool provides a GUI for choosing options for the
 	automake/autoconf configure script.  This image shows the
 	GUI running on maketool's own configure script.])
 
   SCREENSHOT_L(ja,gif,japanese,[
-	Complete Japanese and Czech translations now provided.  The
+	Complete Japanese and Czech translations provided.  The
 	image shows Japanese.])
 
   SCREENSHOT_R(kernel,gif,kernel,[
-	Maketool can now be usefully used to compile Linux kernels. The
-	new <I>Indent Directories</I> option, plus a feature which automatically
+	Maketool can be usefully used to compile large
+	multiple-directory projects like the Linux kernel.  The
+	<I>Indent Directories</I> option, plus a feature which automatically
 	splits the Build menu if it would be too long, mean maketool takes
-	large, multiple-directory projects in its stride.])
+	such projects in its stride.])
 
   SCREENSHOT_L(colors,jpg,colours,[
 	You can configure the colours maketool uses to colour-code
