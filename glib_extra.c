@@ -22,7 +22,7 @@
 #include <signal.h>
 #include <sys/poll.h>
 
-CVSID("$Id: glib_extra.c,v 1.9 1999-11-14 01:23:07 gnb Exp $");
+CVSID("$Id: glib_extra.c,v 1.10 2000-01-03 12:25:17 gnb Exp $");
 
 
 typedef struct
@@ -153,6 +153,14 @@ g_unix_source_dispatch,
 g_unix_source_destroy
 };
 
+/*
+ * TODO: there is some bizarre subtle problem with either my code
+ * or one of gtk or gdk which causes strange display bugs when
+ * this priority is made equal to 1. This needs to be properly
+ * tracked down and exterminated, but for the time being making
+ * the priority equal to G_PRIORITY_DEFAULT works -- Greg, 3Jan2000.
+ */
+#define G_UNIX_REAP_PRIORITY	G_PRIORITY_DEFAULT
 
 void
 g_unix_reap_init(void)
@@ -163,7 +171,7 @@ g_unix_reap_init(void)
     {
     	first = FALSE;
 	g_source_add(
-		1,			/* priority */
+		G_UNIX_REAP_PRIORITY,	/* priority */
 		TRUE,			/* can_recurse */
 		&reaper_source_funcs,
 		(gpointer)0,		/* source_data */
