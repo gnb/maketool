@@ -1,3 +1,41 @@
+* 0.6.2  (26 Nov 2000)
+x  Added an option to disable make_makefile.
+x  Added an option to scroll to end on make child output.
+x  Added preferences option to beep, show a dialog, or run a command
+   at the end of build runs.   
+x  Added button to edit the first error or warning in the next file
+   (thanks to Albert T Hofkamp).
+x  Added command File->Edit Makefile to edit the makefile in the current
+   directory; the trick is to figure out which file to edit (thanks to
+   Albert T Hofkamp).
+x  Added first stirrings of on-line help, temporarily disabled for release.
+x  General UI improvements to Find window (thanks to Albert T Hofkamp).
+x  Maketool remembers previous directories in config file, not only during
+   one session (thanks to Vaclav Slavik).
+x  Scripts make_makefile and extract_targets now live in
+   $prefix/libexec/maketool not $prefix/bin (thanks to Albert T Hofkamp).
+x  Removed the configure-time test for /usr/doc.  Installing the basic
+   doco (COPYRIGHT etc) is now handled by RPM following a %doc directive
+   in the spec file. This is a far cleaner technique.
+x  Tweaked maketool logo so that the small icon looks better when
+   scaled down in modern GNOME's taskbar.
+x  Renamed source tarball from .tgz to .tar.gz to allow Apache to
+   get the mime type right.
+x  Updated copyright messages for the new millennium.
+x  Pruned out obsolete and superfluous inline TODOs.
+x  Fixed bug which SEGVd if make output contained empty lines.
+x  Fixed bug where all dialogs did not properly handle the user closing them
+   via the window manager rather than using the Close or Cancel button.
+x  Fixed bug where changes to widgets in the Preferences windows were
+   not forgotten when the Cancel button is pressed.
+x  Fixed bug which caused GTK warnings to be printed out when a regexp
+   was searched in the Find window (thanks to Albert T Hofkamp).
+x  Fixed harmless bug in 0.6.1 which issued spurious ioctl(FIONREAD) on
+   nonexistant pipe fd for editor child processes (thanks to Albert T Hofkamp).
+x  Fixed bug where changing any of the log flags causes the current scroll
+   position in the log to be lost as the log is repopulated.
+x  Fixed Solaris compile problem (thanks to David T Bath).
+
 * 0.6.1  (19 Jul 2000)
 x  Fixed bug with glib 1.2.7 and the glib 1.2.6-7 in RH 6.2.
 
