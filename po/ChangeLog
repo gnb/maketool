@@ -1,3 +1,9 @@
+2002-09-20  gettextize  <bug-gnu-utils@gnu.org>
+
+	* Makefile.in.in: Upgrade to gettext-0.10.40.
+	* cat-id-tbl.c: Remove file.
+	* stamp-cat-id: Remove file.
+
 1999-05-31  Greg Banks  <gnb@alphalink.com.au>
 
 	* first release with i18n.
