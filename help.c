@@ -23,7 +23,7 @@
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.29 2001-07-25 08:35:22 gnb Exp $");
+CVSID("$Id: help.c,v 1.30 2001-07-25 11:48:12 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -87,7 +87,7 @@ for details.\
 static const char about_str[] = "\
 Maketool version %s\n\
 \n\
-(c) 1999-2000 Greg Banks\n\
+(c) 1999-2001 Greg Banks\n\
 <gnb@alphalink.com.au>\n\
 \n\
 %s";
