@@ -34,7 +34,7 @@ x  Make filters configurable in Preferences GUI.
 
 x  Save & load preferences, window geom etc.
 
-x  TODO: Override preferences with -f -j -k and -l options from commandline.
+x  DONE: Override preferences with -f -j -k and -l options from commandline.
 
 x  DONE: Handle makes over multiple directories - get the filenames right.
 
