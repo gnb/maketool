@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.35 2000-07-21 06:12:03 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.36 2000-07-22 09:30:59 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -57,6 +57,8 @@ static gboolean     	color_from_selector;
 static GtkWidget    	*color_sample_ctree;
 static GtkCTreeNode 	*color_sample_node[L_MAX];
 static int  	    	page_setup_index;
+static GtkWidget    	*paper_name_combo;
+static GtkWidget    	*paper_orientation_combo;
 static GtkWidget    	*paper_width_entry;
 static GtkWidget    	*paper_height_entry;
 static GtkWidget    	*margin_left_entry;
@@ -707,21 +709,6 @@ prefs_create_general_page(GtkWidget *toplevel)
 
     row++;
 
-    /* 
-     * Set current values. This is isolated at the bottom
-     * of this function in case it needs to be separated later.
-     */
-    gtk_toggle_button_set_active(
-    	GTK_TOGGLE_BUTTON(run_radio[prefs.run_how]), TRUE);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(run_proc_sb), prefs.run_processes);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(run_load_sb), (gfloat)prefs.run_load / 10.0);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(edit1_check), prefs.edit_first_error);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(editw_check), !prefs.edit_warnings);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fail_check), prefs.ignore_failures);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(emm_check), prefs.enable_make_makefile);
-    gtk_entry_set_text(GTK_ENTRY(makefile_entry), (prefs.makefile == 0 ? "" : prefs.makefile));
-    ui_combo_set_current(start_action_combo, prefs.start_action);
-
     return table;
 }
 
@@ -970,15 +957,6 @@ prefs_create_variables_page(GtkWidget *toplevel)
     gtk_widget_show(button);
     var_unset_btn = button;
 
-    for (list = prefs.variables ; list != 0 ; list = list->next)
-    {
-	Variable *var = (Variable *)list->data;
-	text[VC_NAME] = var->name;
-	text[VC_VALUE] = var->value;
-	text[VC_TYPE] = var_type_to_str(var->type);
-	gtk_clist_append(GTK_CLIST(clist), text);
-    }
-
     return vbox;
 }
 
@@ -1118,18 +1096,6 @@ prefs_create_programs_page(GtkWidget *toplevel)
     gtk_widget_show(label);
     row++;
     
-    /* 
-     * Set current values. This is isolated at the bottom
-     * of this function in case it needs to be separated later.
-     */
-    
-    gtk_entry_set_text(GTK_ENTRY(prog_make_entry), prefs.prog_make);
-    gtk_entry_set_text(GTK_ENTRY(prog_targets_entry), prefs.prog_list_targets);
-    gtk_entry_set_text(GTK_ENTRY(prog_version_entry), prefs.prog_list_version);
-    gtk_entry_set_text(GTK_ENTRY(prog_edit_entry), prefs.prog_edit_source);
-    gtk_entry_set_text(GTK_ENTRY(prog_make_makefile_entry), prefs.prog_make_makefile);
-
-
     return table;
 }
 
@@ -1524,7 +1490,7 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 3, row, row+1);
     gtk_widget_show(combo);
-    /* start_action_combo = combo; */
+    paper_name_combo = combo;
     
     row++;
     
@@ -1544,7 +1510,7 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 3, row, row+1);
     gtk_widget_show(combo);
-    /* start_action_combo = combo; */
+    paper_orientation_combo = combo;
     
     row++;
     
@@ -1695,14 +1661,6 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     
     row++;
 
-    /* prefs.paper_name */
-    prefs_set_units_entry(paper_width_entry, prefs.paper_width);
-    prefs_set_units_entry(paper_height_entry, prefs.paper_height);
-    prefs_set_units_entry(margin_left_entry, prefs.margin_left);
-    prefs_set_units_entry(margin_right_entry, prefs.margin_right);
-    prefs_set_units_entry(margin_top_entry, prefs.margin_top);
-    prefs_set_units_entry(margin_bottom_entry, prefs.margin_bottom);
-
     return hbox;
 }
 
@@ -1738,6 +1696,64 @@ prefs_create_styles_page(GtkWidget *toplevel)
     return table;
 }
 #endif
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+/*
+ * Show the current preferences values in the GUI widgets
+ */
+
+static void
+prefs_show(void)
+{
+    GList *list;
+
+    color_reset_old_cb(0, 0);
+
+    gtk_toggle_button_set_active(
+    	GTK_TOGGLE_BUTTON(run_radio[prefs.run_how]), TRUE);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(run_proc_sb), prefs.run_processes);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(run_load_sb), (gfloat)prefs.run_load / 10.0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(edit1_check), prefs.edit_first_error);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(editw_check), !prefs.edit_warnings);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fail_check), prefs.ignore_failures);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(emm_check), prefs.enable_make_makefile);
+    gtk_entry_set_text(GTK_ENTRY(makefile_entry), (prefs.makefile == 0 ? "" : prefs.makefile));
+    ui_combo_set_current(start_action_combo, prefs.start_action);
+
+    gtk_clist_freeze(GTK_CLIST(var_clist));
+    gtk_clist_clear(GTK_CLIST(var_clist));
+    for (list = prefs.variables ; list != 0 ; list = list->next)
+    {
+	Variable *var = (Variable *)list->data;
+	char *text[VC_MAX];
+
+	text[VC_NAME] = var->name;
+	text[VC_VALUE] = var->value;
+	text[VC_TYPE] = var_type_to_str(var->type);
+	gtk_clist_append(GTK_CLIST(var_clist), text);
+    }
+    gtk_clist_thaw(GTK_CLIST(var_clist));
+    gtk_entry_set_text(GTK_ENTRY(var_name_entry), "");
+    gtk_entry_set_text(GTK_ENTRY(var_value_entry), "");
+    ui_combo_set_current(var_type_combo, 0);
+
+    gtk_entry_set_text(GTK_ENTRY(prog_make_entry), prefs.prog_make);
+    gtk_entry_set_text(GTK_ENTRY(prog_targets_entry), prefs.prog_list_targets);
+    gtk_entry_set_text(GTK_ENTRY(prog_version_entry), prefs.prog_list_version);
+    gtk_entry_set_text(GTK_ENTRY(prog_edit_entry), prefs.prog_edit_source);
+    gtk_entry_set_text(GTK_ENTRY(prog_make_makefile_entry), prefs.prog_make_makefile);
+
+    /* TODO: need to set these 2 combos to the current values */
+    ui_combo_set_current(paper_name_combo, 0);
+    ui_combo_set_current(paper_orientation_combo, 0);
+    prefs_set_units_entry(paper_width_entry, prefs.paper_width);
+    prefs_set_units_entry(paper_height_entry, prefs.paper_height);
+    prefs_set_units_entry(margin_left_entry, prefs.margin_left);
+    prefs_set_units_entry(margin_right_entry, prefs.margin_right);
+    prefs_set_units_entry(margin_top_entry, prefs.margin_top);
+    prefs_set_units_entry(margin_bottom_entry, prefs.margin_bottom);
+}
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -1804,7 +1820,7 @@ edit_preferences_cb(GtkWidget *w, gpointer data)
     if (prefs_shell == 0)
 	prefs_create_shell(toplevel);
 	    
-    color_reset_old_cb(0, 0);
+    prefs_show();
     gtk_widget_show(prefs_shell);
 }
 
@@ -1814,7 +1830,7 @@ print_page_setup_cb(GtkWidget *w, gpointer data)
     if (prefs_shell == 0)
 	prefs_create_shell(toplevel);
 	    
-    color_reset_old_cb(0, 0);
+    prefs_show();
     gtk_notebook_set_page(GTK_NOTEBOOK(notebook), page_setup_index);
     gtk_widget_show(prefs_shell);
 }

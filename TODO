@@ -199,7 +199,7 @@ x  Handle files & line numbers in Java exception report.
 
 x  Handle column in Java errors.
 
-x  Fix bug where unsaved edits in various parts of Pereferences
+x  DONE: Fix bug where unsaved edits in various parts of Pereferences
    window are not reverted when the window is popped up again.
 
 x  Handle files & line numbers in Java exception report.
@@ -354,3 +354,7 @@ x  DONE: A.T. Hofkamp says: Please make it possibe to edit the Makefile
 
 x  Vaclav Slavik says:  let maketool remember previous directories in
    config file, not only during one session.
+
+x  Fix the page name and page orientation combos in the Preferences
+   window to behave correctly and actually be used.
+   
