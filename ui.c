@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.33 2003-07-25 14:20:19 gnb Exp $");
+CVSID("$Id: ui.c,v 1.34 2003-07-25 15:21:20 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -105,6 +105,8 @@ ui_group_set_sensitive(guint group, gboolean b)
 {
     GList *list;
     
+    if (ui_groups == 0 || group >= ui_groups->len)
+    	return;
     list = g_ptr_array_index(ui_groups, group);
     
     for ( ; list != 0 ; list = list->next)
@@ -168,6 +170,8 @@ ui_set_accel_group(GtkAccelGroup *ag)
     ui_accel_group = ag;
 }
 
+#if !GTK2
+
 static GtkWidget *
 _ui_create_label(
     GtkWidget *item,
@@ -186,6 +190,7 @@ _ui_create_label(
     return label_w;
 }    
 
+#endif /* !GTK2 */
 
 static GtkWidget *
 _ui_add_menu_aux(
@@ -196,15 +201,26 @@ _ui_add_menu_aux(
     gint position)
 {
     GtkWidget *menu, *item;
+#if !GTK2
     guint uline_key = 0;
+#endif
     
+#if GTK2
+    if (douline)
+	item = gtk_menu_item_new_with_mnemonic(label);
+    else
+	item = gtk_menu_item_new_with_label(label);
+#else /* !GTK2 */
     item = gtk_menu_item_new();
     _ui_create_label(item, label, (douline ? &uline_key : 0));
+#endif /* !GTK2 */
     gtk_widget_show(item);
     
+#if !GTK2
     if (douline && uline_key != 0)
 	gtk_widget_add_accelerator(item, "activate", 
 				ui_accel_group, uline_key, GDK_MOD1_MASK, 0);
+#endif /* !GTK2 */
 
     menu = gtk_menu_new();
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), menu);
@@ -248,6 +264,7 @@ ui_add_submenu(GtkWidget *menu, gboolean douline, const char *label)
     return _ui_add_menu_aux(menu, label, douline, FALSE, -1);
 }
 
+#if !GTK2
 
 static void
 _ui_add_menu_accel(
@@ -265,19 +282,16 @@ _ui_add_menu_accel(
 			    UI_MENU_ACCEL_GROUP);
     if (menu_accel_grp == 0)
     {
-	menu_accel_grp = gtk_accel_group_new();
 	menu_shell = gtk_widget_get_ancestor(menu, gtk_menu_shell_get_type());
-#if GTK2
-	_gtk_accel_group_attach(menu_accel_grp, GTK_OBJECT(menu_shell));
-#else
+	menu_accel_grp = gtk_accel_group_new();
 	gtk_accel_group_attach(menu_accel_grp, GTK_OBJECT(menu_shell));
-#endif
 	gtk_object_set_data(GTK_OBJECT(menu), UI_MENU_ACCEL_GROUP,
 	    	   	     menu_accel_grp);
     }
     gtk_widget_add_accelerator(item, "activate", 
 			    menu_accel_grp, uline_key, 0, 0);
 }
+#endif /* !GTK2 */
 
 
 static void
@@ -315,10 +329,19 @@ ui_add_button_2(
     gint position)
 {
     GtkWidget *item;
+#if !GTK2
     guint uline_key = 0;
-    
+#endif
+
+#if GTK2
+    if (douline)
+	item = gtk_menu_item_new_with_mnemonic(label);
+    else
+	item = gtk_menu_item_new_with_label(label);
+#else
     item = gtk_menu_item_new();
     _ui_create_label(item, label, (douline ? &uline_key : 0));
+#endif
 
     if (position < 0)
 	gtk_menu_append(GTK_MENU(menu), item);
@@ -329,9 +352,11 @@ ui_add_button_2(
     if (group >= 0)
     	ui_group_add(group, item);
 	
+#if !GTK2
     /* Handle underline accelerator */
     if (douline)
 	_ui_add_menu_accel(menu, item, uline_key);
+#endif
 
     /* Handle accelerator */
     if (accel != 0)
@@ -376,8 +401,23 @@ ui_add_toggle(
     gboolean set)
 {
     GtkWidget *item;
+#if !GTK2
     guint uline_key;
+#endif
     
+#if GTK2
+    if (radio_other == 0)
+    {
+	item = gtk_check_menu_item_new_with_mnemonic(label);
+	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), set);
+    }
+    else
+    {
+    	GSList *group;
+	group = gtk_radio_menu_item_group(GTK_RADIO_MENU_ITEM(radio_other));
+	item = gtk_radio_menu_item_new_with_mnemonic(group, label);
+    }
+#else /* !GTK2 */
     if (radio_other == 0)
     {
 	item = gtk_check_menu_item_new();
@@ -391,13 +431,16 @@ ui_add_toggle(
     }
 
     _ui_create_label(item, label, &uline_key);
+#endif /* !GTK2 */
     
     gtk_menu_append(GTK_MENU(menu), item);
     gtk_signal_connect(GTK_OBJECT(item), "activate", 
     	GTK_SIGNAL_FUNC(callback), calldata);
     
+#if !GTK2
     /* Handle underline accelerator */
     _ui_add_menu_accel(menu, item, uline_key);
+#endif /* !GTK2 */
 
     /* Handle accelerator */
     if (accel != 0)
@@ -484,7 +527,7 @@ ui_tool_create(
 	tooltip,
 	0,				/* tooltip_private_text */
     	gtk_pixmap_new(pm, mask),
-	callback,
+    	GTK_SIGNAL_FUNC(callback),
 	user_data);
     if (group >= 0)
     	ui_group_add(group, item);
