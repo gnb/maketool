@@ -4,3 +4,5 @@ x  `Variables' tab in Preferences window needs to shrink.
 x  When user presses `Edit Next' the new selected error
    should become visible even if its currently in a collapsed
    build or it has scrolled out of sight.
+   
+x  Show a different icon on error lines which have been edited.
