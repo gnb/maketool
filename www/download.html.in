@@ -31,9 +31,15 @@ Maketool has also been ported to NetBSD, you can
 </P>
 
 <P>
-Bambang "Purnomosidi D. P." has kindly provided
-<a href="http://zax.3wsi.net/download/maketool/">Debian packages</a> for
-maketool.  <B>Disclaimer:</B> I don't control that site, please don't complain to me if anything goes wrong.
+Maketool has also been ported to FreeBSD, see
+<A HREF="http://www.freebsd.org/cgi/ports.cgi?query=maketool&stype=name&release=5.1-CURRENT%2Fi386" TARGET="_top">here</A>.
+<B>Disclaimer:</B> I don't control that site, please don't complain to me if anything goes wrong.
+</P>
+
+<P>
+There used to be a link to Debian packages here, but that page
+seems to have disappeared.  I'd be happy to hear about anyone
+creating Debian packages for maketool.
 </P>
 
 <P>
