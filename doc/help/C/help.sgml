@@ -4,7 +4,7 @@
 ]>
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.6 2001-08-28 13:50:38 gnb Exp $"
+         revision="$Id: help.sgml,v 1.7 2001-08-28 13:54:03 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool online help</title>
@@ -12,8 +12,8 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2001-08-28 13:50:38 $</pubdate>
-  <releaseinfo>This is version VERSION</releaseinfo>
+  <pubdate role="cvs">$Date: 2001-08-28 13:54:03 $</pubdate>
+  <releaseinfo>This is version &version;</releaseinfo>
   <copyright>
     <year>2000</year>
     <year>2001</year>

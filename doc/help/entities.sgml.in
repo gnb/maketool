@@ -1,3 +1,4 @@
 <!ENTITY prefix "@prefix@">
 <!ENTITY osname "@osname@">
-<!ENTITY lang "@lang@">
+<!ENTITY lang "@LANG@">
+<!ENTITY version "@VERSION@">
