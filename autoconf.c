@@ -160,14 +160,14 @@ static const benum_t opt_flag_desc[] =
 #endif
 
 
-GtkWidget *autoconf_shell;
-GtkWidget *advanced_btn;
-GtkWidget *notebook;
-GtkWidget *category_pages[NUM_CATEGORIES];
-GtkWidget *preview_page;
-GtkWidget *preview_text;
-GtkTooltips *tooltips;
-gboolean advanced = FALSE;
+static GtkWidget *autoconf_shell;
+static GtkWidget *advanced_btn;
+static GtkWidget *notebook;
+static GtkWidget *category_pages[NUM_CATEGORIES];
+static GtkWidget *preview_page;
+static GtkWidget *preview_text;
+static GtkTooltips *tooltips;
+static gboolean advanced = FALSE;
 static const char metachars[] = "'`\"&|$(){};<>\\#*?";
 
 #define ismetachar(c)	(strchr(metachars, (c)) != 0)
@@ -258,36 +258,6 @@ benum_describe_bits(const benum_t *be, int val)
     return e.data;
 }
 #endif
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-
-/* TODO: merge into ui.c */
-static int
-gtk_container_num_visible_children(GtkContainer *con)
-{
-    GList *kids = gtk_container_children(con);
-    int nvis = 0;
-    
-    while (kids != 0)
-    {
-    	if (GTK_WIDGET_VISIBLE(kids->data))
-	    nvis++;
-    	kids = g_list_remove_link(kids, kids);
-    }
-    
-    return nvis;
-}
-
-/* TODO: merge into ui.c */
-static void
-gtk_widget_set_visible(GtkWidget *w, gboolean b)
-{
-    if (b)
-    	gtk_widget_show(w);
-    else
-    	gtk_widget_hide(w);
-}
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -831,7 +801,7 @@ apply_advanced(void)
     {
     	option_t *opt = (option_t *)list->data;
 	
-	gtk_widget_set_visible(opt->hbox, (!(opt->flags & OPT_ADVANCED) || advanced));
+	ui_widget_set_visible(opt->hbox, (!(opt->flags & OPT_ADVANCED) || advanced));
 	if (opt->widgets[W_TEXT] != 0 && GTK_WIDGET_VISIBLE(opt->widgets[W_TEXT]))
 	    gtk_widget_set_sensitive(opt->widgets[W_TEXT], (opt->flags & OPT_PRESENT));
     }
@@ -842,8 +812,8 @@ apply_advanced(void)
 	GtkWidget *sw = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), cat-1);
 	GtkWidget *page = category_pages[cat];
 
-    	gtk_widget_set_visible(sw,
-	    (gtk_container_num_visible_children(GTK_CONTAINER(page)) > 0));
+    	ui_widget_set_visible(sw,
+	    (ui_container_num_visible_children(GTK_CONTAINER(page)) > 0));
     }
 }
 
@@ -1134,7 +1104,7 @@ create_autoconf_shell(void)
      * Create the action area.
      */
     button = ui_dialog_create_button(autoconf_shell,
-    	    	    	    _("Ok"),
+    	    	    	    _("OK"),
     	    	    	    autoconf_ok_cb, 0);
     gtk_window_set_default(GTK_WINDOW(autoconf_shell), button);
     advanced_btn = ui_dialog_create_button(autoconf_shell,

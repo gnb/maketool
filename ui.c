@@ -20,7 +20,18 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.26 2001-07-25 12:02:44 gnb Exp $");
+CVSID("$Id: ui.c,v 1.27 2001-09-02 12:41:49 gnb Exp $");
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+void
+ui_widget_set_visible(GtkWidget *w, gboolean b)
+{
+    if (b)
+    	gtk_widget_show(w);
+    else
+    	gtk_widget_hide(w);
+}
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -407,6 +418,24 @@ ui_delete_menu_items(GtkWidget *menu)
 	    
 	gtk_widget_destroy(child);	
     }
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+int
+ui_container_num_visible_children(GtkContainer *con)
+{
+    GList *kids = gtk_container_children(con);
+    int nvis = 0;
+    
+    while (kids != 0)
+    {
+    	if (GTK_WIDGET_VISIBLE(kids->data))
+	    nvis++;
+    	kids = g_list_remove_link(kids, kids);
+    }
+    
+    return nvis;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

@@ -23,6 +23,7 @@
 #include "common.h"
 #include <gtk/gtk.h>
 
+void ui_widget_set_visible(GtkWidget *w, gboolean b);
 
 int ui_combo_get_current(GtkWidget *);
 void ui_combo_set_current(GtkWidget *, int);
@@ -84,6 +85,7 @@ GtkWidget *ui_add_toggle(
     gboolean set);
 GtkWidget *ui_add_separator(GtkWidget *menu);
 void ui_delete_menu_items(GtkWidget *menu);
+int ui_container_num_visible_children(GtkContainer *con);
 
 /* dialog stuff */
 
@@ -108,12 +110,6 @@ void ui_dialog_changed(GtkWidget *dialog);
 void ui_set_help_name(GtkWidget *w, const char *str);
 const char *ui_get_help_name(GtkWidget *w);
   
-/*
- * Makes a widget-pointer magical in that it will be
- * set to null when the widget it points to is destroyed
- */
-void ui_autonull_pointer(GtkWidget **);
-
 /* config stuff */
 typedef struct
 {
