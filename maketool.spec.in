@@ -40,8 +40,21 @@ rm -rf $RPM_BUILD_ROOT
 /usr/doc/@PACKAGE@-@VERSION@/COPYRIGHT
 /usr/doc/@PACKAGE@-@VERSION@/TODO
 /usr/doc/@PACKAGE@-@VERSION@/CHANGES
+/usr/share/@PACKAGE@/help/C/apply.gif
+/usr/share/@PACKAGE@/help/C/apply.html
+/usr/share/@PACKAGE@/help/C/cancel.gif
+/usr/share/@PACKAGE@/help/C/cancel.html
+/usr/share/@PACKAGE@/help/C/dialog.gif
+/usr/share/@PACKAGE@/help/C/maketool.html
+/usr/share/@PACKAGE@/help/C/ok.gif
+/usr/share/@PACKAGE@/help/C/ok.html
+/usr/share/@PACKAGE@/help/C/prefs-kflag.html
+/usr/share/@PACKAGE@/help/C/tools-again.gif
+/usr/share/@PACKAGE@/help/C/tools-again.html
 
 %changelog
+* Sun Aug 6 2000 Greg Banks <gnb@alphalink.com.au>
+- Added online help.
 * Sun Nov 7 1999 Greg Banks <gnb@alphalink.com.au>
 - Next development version; see CHANGES file.
 * Wed Jul 14 1999 Greg Banks <gnb@alphalink.com.au>
