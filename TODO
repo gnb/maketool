@@ -2,7 +2,9 @@
 
 x  The Indent Directories option relies on filtering gmake output
    for 'Entering directory' messages.  When running in a non-English
-   locale, these may be translated by gmake's gettext.
+   locale, these may be translated by gmake's gettext, breaking
+   maketool.  Likewise the target extraction relies on magic strings
+   in "gmake -n -p" output, which also may be translated.
 
 x  In work_ended(), check whether the makefile has been modified
    since the last time we read the list of targets from make, and if
