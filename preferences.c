@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.63 2003-09-28 10:21:42 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.64 2003-09-28 10:35:34 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -329,7 +329,7 @@ preferences_load(void)
 {
     int i;
 
-    ui_config_init("maketool");
+    prefs.found_old = (ui_config_init("maketool") > 0);
     prefs.upgraded = FALSE;
     prefs.run_how = ui_config_get_enum("run_how", RUN_SERIES, run_how_enum_def);
     prefs.run_processes = ui_config_get_int("run_processes", 2);
@@ -458,7 +458,7 @@ preferences_load(void)
 	prefs.dir_history = g_list_append(prefs.dir_history, g_strdup(val));
     }
     
-    if (prefs.upgraded)
+    if (prefs.upgraded && prefs.found_old)
     {
     	ui_config_backup();
     	preferences_save();

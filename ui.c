@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.35 2003-09-24 10:28:46 gnb Exp $");
+CVSID("$Id: ui.c,v 1.36 2003-09-28 10:35:34 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -833,12 +833,13 @@ ui_config_set(const char *name, const char *value)
 }
 
 
-void
+int
 ui_config_init(const char *pkg)
 {
     estring name, value, filename;
     FILE *fp;
     int c;
+    int nread = 0;
 
     ui_config_data = g_hash_table_new(g_str_hash, g_str_equal);
 
@@ -856,7 +857,7 @@ ui_config_init(const char *pkg)
     {
     	if (errno != ENOENT)
 	    perror(ui_config_filename);
-	return;
+	return -1;
     }
 
     for (;;) 
@@ -889,11 +890,13 @@ ui_config_init(const char *pkg)
 
 	/* got name, value */
 	ui_config_set(name.data, value.data);
+	nread++;
     }
    
     fclose(fp);
     estring_free(&name);
     estring_free(&value);
+    return nread;
 }
 
 static UiEnumRec ui_boolean_enum_def[] = {

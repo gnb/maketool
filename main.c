@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.96 2003-09-27 04:15:37 gnb Exp $");
+CVSID("$Id: main.c,v 1.97 2003-09-28 10:35:34 gnb Exp $");
 
 
 /*
@@ -1974,7 +1974,7 @@ ui_create(void)
     gtk_widget_show(GTK_WIDGET(table));
 
 
-    if (prefs.upgraded)
+    if (prefs.upgraded && prefs.found_old)
     {
     	GtkWidget *msg;
 	

@@ -143,7 +143,11 @@ typedef struct
    int value;
 } UiEnumRec;
 
-void ui_config_init(const char *pkg);
+/*
+ * Initialise config database.  Returns number of variables
+ * read from old persistent database, or -1 for error
+ */
+int ui_config_init(const char *pkg);
 char *ui_config_get_string(const char *name, const char *defv);
 int ui_config_get_int(const char *name, int defv);
 int ui_config_get_enum(const char *name, int defv, UiEnumRec *enumdef);
