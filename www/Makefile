@@ -6,10 +6,11 @@ IMAGES=		maketool_n.gif mainw.gif fm.mini.jpg tocbg.gif \
 		autoconf.gif autoconf_t.gif kernel.gif kernel_t.gif \
 		colors.jpg colors_t.jpg about_make.gif about_make_t.gif \
 		arrow_l2.gif arrow_r2.gif
+BINARIES:=	$(shell m4 list-binaries.m4)		
 
 # TODO: link to screen2.jpg from somewhere
 
-DELIVERABLES=	$(PAGES) $(IMAGES)
+DELIVERABLES=	$(PAGES) $(IMAGES) $(BINARIES)
 
 ############################################################
 
@@ -37,5 +38,10 @@ install:: $(addprefix $(INSTALLDIR)/,$(notdir $(DELIVERABLES)))
 $(INSTALLDIR)/%: %
 	$(INSTALL) -m 644 $< $@
 
-$(INSTALLDIR)/%: ../%
-	$(INSTALL) -m 644 $< $@
+#$(INSTALLDIR)/%: ../%
+#	$(INSTALL) -m 644 $< $@
+
+############################################################
+
+upload: install
+	weex maketool
