@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.39 2003-10-10 09:33:04 gnb Exp $");
+CVSID("$Id: filter.c,v 1.40 2003-10-10 09:34:11 gnb Exp $");
 
 typedef struct
 {
@@ -497,7 +497,7 @@ filter_load(void)
     /* new style assembler and pre-processor errors */
     filter_add(
     	"",			    	/* state */
-	"^cfe: Error: ([^ \t,]+):[ \t]*[0-9]+: (.*)$", /* regexp */
+	"^cfe: Error: ([^ \t,]+):[ \t]*([0-9]+): (.*)$", /* regexp */
 	FR_ERROR,	    	    	/* code */
 	"\\1",				/* file */
 	"\\2",				/* line */
@@ -507,7 +507,7 @@ filter_load(void)
 
     filter_add(
     	"",			    	/* state */
-	"^cfe: Warning [0-9]+: ([^ \t,]+):[ \t]*[0-9]+: (.*)$", /* regexp */
+	"^cfe: Warning [0-9]+: ([^ \t,]+):[ \t]*([0-9]+): (.*)$", /* regexp */
 	FR_WARNING,	    	    	/* code */
 	"\\1",				/* file */
 	"\\2",				/* line */
@@ -517,12 +517,12 @@ filter_load(void)
 
     filter_add(
     	"",			    	/* state */
-	"^as1: Warning: ([^ \t,]+), line [0-9]+: (.*)$", /* regexp */
+	"^(as|as1): Warning: ([^ \t,]+), line ([0-9]+): (.*)$", /* regexp */
 	FR_WARNING,	    	    	/* code */
-	"\\1",				/* file */
-	"\\2",				/* line */
+	"\\2",				/* file */
+	"\\3",				/* line */
 	"",				/* col */
-	"\\3",	    	    	    	/* summary */
+	"\\4",	    	    	    	/* summary */
     	"new MIPSpro as warning");	/* comment */
 #endif /* ENABLE_FILTER_MIPSPRO */
 
