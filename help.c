@@ -23,7 +23,7 @@
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.30 2001-07-25 11:48:12 gnb Exp $");
+CVSID("$Id: help.c,v 1.31 2001-07-25 12:02:44 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -48,7 +48,6 @@ licence_cb(GtkWidget *w, gpointer data)
 	GtkWidget *hbox, *text, *sb;
 
 	licence_shell = ui_create_ok_dialog(toplevel, _("Maketool: Licence"));
-	ui_autonull_pointer(&licence_shell);
 	gtk_widget_set_usize(licence_shell, 450, 300);
 
 	hbox = gtk_hbox_new(FALSE, SPACING);
@@ -105,7 +104,6 @@ help_about_cb(GtkWidget *w, gpointer data)
 	char *abt;
 
 	about_shell = ui_create_ok_dialog(toplevel, _("Maketool: About"));
-	ui_autonull_pointer(&about_shell);
 	
 	hbox = gtk_hbox_new(FALSE, 5);
 	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_shell)->vbox), hbox);
@@ -160,7 +158,6 @@ create_about_make_shell(void)
     GdkBitmap *mask;
 
     about_make_shell = ui_create_ok_dialog(toplevel, _("Maketool: About Make"));
-    ui_autonull_pointer(&about_make_shell);
 
     hbox = gtk_hbox_new(FALSE, 5);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_make_shell)->vbox), hbox);

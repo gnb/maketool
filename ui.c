@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.25 2001-07-25 11:49:08 gnb Exp $");
+CVSID("$Id: ui.c,v 1.26 2001-07-25 12:02:44 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -453,6 +453,14 @@ ui_tool_add_space(GtkWidget *toolbar)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+/* prevents the dialog being inconveniently destroyed rather than hidden */
+static void
+ui_dialog_delete_cb(GtkWidget *w, void *user_data)
+{
+    gtk_widget_hide(w);
+}
+
+
 GtkWidget *
 ui_create_dialog(
     GtkWidget *parent,
@@ -466,6 +474,8 @@ ui_create_dialog(
     gtk_window_set_transient_for(GTK_WINDOW(dialog),
     	    GTK_WINDOW(parent));
     gtk_container_set_border_width(GTK_CONTAINER(GTK_DIALOG(dialog)->action_area), 4);
+    gtk_signal_connect(GTK_OBJECT(dialog), "delete_event", 
+    	GTK_SIGNAL_FUNC(ui_dialog_delete_cb), 0);
 
     bbox = gtk_hbutton_box_new();
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->action_area), bbox);
@@ -598,23 +608,6 @@ ui_dialog_changed(GtkWidget *dialog)
     gtk_widget_set_sensitive(ad->ok_btn, TRUE);
     gtk_widget_set_sensitive(ad->apply_btn, TRUE);
     gtk_window_set_default(GTK_WINDOW(ad->dialog), ad->ok_btn);
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static void
-ui_autonull_destroy_cb(GtkWidget *w, void *user_data)
-{
-    GtkWidget **wpp = (GtkWidget **)user_data;
-    
-    *wpp = 0;
-}
-
-void
-ui_autonull_pointer(GtkWidget **wpp)
-{
-    gtk_signal_connect(GTK_OBJECT(*wpp), "destroy", 
-    	GTK_SIGNAL_FUNC(ui_autonull_destroy_cb), (void*)wpp);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

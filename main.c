@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.72 2001-07-25 09:17:48 gnb Exp $");
+CVSID("$Id: main.c,v 1.73 2001-07-25 12:02:44 gnb Exp $");
 
 
 /*
@@ -698,7 +698,6 @@ finished_dialog(const char *target)
 	GdkBitmap *mask;
 
 	finished_shell = ui_create_ok_dialog(toplevel, _("Maketool: Finished"));
-	ui_autonull_pointer(&finished_shell);
 	
 	hbox = gtk_hbox_new(FALSE, 5);
 	gtk_container_border_width(GTK_CONTAINER(hbox), SPACING);
@@ -913,7 +912,6 @@ file_open_cb(GtkWidget *w, gpointer data)
 	    _("Maketool: Open Log File"),
 	    file_open_file_func,
 	    "make.log");
-	ui_autonull_pointer(&filesel);
     }
 
     gtk_widget_show(filesel);
@@ -941,7 +939,6 @@ file_save_cb(GtkWidget *w, gpointer data)
 	    _("Maketool: Save Log File"),
 	    file_save_file_func,
 	    "make.log");
-	ui_autonull_pointer(&filesel);
     }
 
     gtk_widget_show(filesel);
@@ -1078,7 +1075,6 @@ file_change_dir_cb(GtkWidget *w, gpointer data)
 	    _("Maketool: Change Directory"),
 	    file_change_dir_func,
 	    ".");
-	ui_autonull_pointer(&filesel);
     }
 
     /*

@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: print.c,v 1.9 2001-07-25 08:35:22 gnb Exp $");
+CVSID("$Id: print.c,v 1.10 2001-07-25 12:02:44 gnb Exp $");
 
 static GtkWidget	*print_shell = 0;
 typedef enum { D_PRINTER, D_FILE, D_NUM_DESTS } DEST;
@@ -273,7 +273,6 @@ print_file_browse_cb(GtkWidget *w, gpointer data)
 	    	_("Maketool: Choose Output File"),
 		print_file_func,
 		gtk_entry_get_text(GTK_ENTRY(file_entry)));
-    	ui_autonull_pointer(&filesel);
     }
 
     /* TODO: set current filename from file_entry *every* time */
@@ -309,7 +308,6 @@ create_print_shell(void)
     lpr_init();
     
     print_shell = ui_create_dialog(toplevel, _("Maketool: Print"));
-    ui_autonull_pointer(&print_shell);
 
     gtk_container_border_width(GTK_CONTAINER(GTK_DIALOG(print_shell)->vbox), SPACING);
 
