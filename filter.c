@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.42 2003-10-12 22:52:33 gnb Exp $");
+CVSID("$Id: filter.c,v 1.43 2003-10-13 12:43:21 gnb Exp $");
 
 typedef struct
 {
@@ -941,8 +941,15 @@ filter_apply_one(
     if (strcmp(filter_state, f->instate))
 	return FALSE;
 
+    f->stats.ntries++;
+    total_stats.ntries++;
+
     if (regexec(&f->regexp, line, NUM_MATCHES, matches, 0))
 	return FALSE;
+
+    f->stats.nmatches++;
+    total_stats.nmatches++;
+
     filter_state = f->outstate;
 
     /*
@@ -1066,9 +1073,6 @@ filter_apply(const char *line, FilterResult *result)
     {
 	Filter *f = (Filter*)fl->data;
 
-	f->stats.ntries++;
-	total_stats.ntries++;
-
 	matched = filter_apply_one(f, line, result);
 #if DEBUG > 2
 	fprintf(stderr, "filter [%s] on \"%s\" -> %s %d (%s) state=\"%s\"\n",
@@ -1092,8 +1096,6 @@ filter_apply(const char *line, FilterResult *result)
 	    default:
 	    }
 #endif
-	    f->stats.nmatches++;
-	    total_stats.nmatches++;
 	    return;
 	}
     }
