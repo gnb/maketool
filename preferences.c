@@ -2,6 +2,8 @@
 #include "maketool.h"
 #include "util.h"
 
+CVSID("$Id");
+
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
 static GtkWidget	*run_load_sb;

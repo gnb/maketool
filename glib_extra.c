@@ -5,6 +5,8 @@
 #include <signal.h>
 #include <sys/poll.h>
 
+CVSID("$Id");
+
 
 typedef struct
 {

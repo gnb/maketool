@@ -1,6 +1,8 @@
 #include "filter.h"
 #include <regex.h>	/* POSIX regular expression fns */
 
+CVSID("$Id");
+
 typedef struct
 {
     char *instate;

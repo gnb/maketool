@@ -8,6 +8,7 @@
 #include "log.h"
 #include "util.h"
 
+CVSID("$Id");
 
 typedef enum
 {

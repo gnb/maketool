@@ -2,6 +2,8 @@
 #include "filter.h"
 #include "log.h"
 
+CVSID("$Id");
+
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
 	(gtk_ctree_node_nth(GTK_CTREE(_ctree_), 0) == 0)

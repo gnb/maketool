@@ -4,6 +4,8 @@
 #include "spawn.h"
 #include "ui.h"
 
+CVSID("$Id");
+
 static GtkWidget	*about_shell = 0;
 static GtkWidget	*about_make_shell = 0;
 
