@@ -21,7 +21,7 @@
 #define _common_h_
 
 /*
- * $Id: common.h,v 1.15 2003-09-28 10:42:52 gnb Exp $
+ * $Id: common.h,v 1.16 2003-10-03 12:14:38 gnb Exp $
  */
 
 #define SIGNAL_SEMANTICS_BSD	    0	/* BSD: handler automatically re-registered */
@@ -69,6 +69,10 @@ extern char *strrchr(char *);
 
 #if HAVE_SYS_TIME_H
 #include <sys/time.h>
+#endif
+
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
 #endif
 
 /*

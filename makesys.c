@@ -19,9 +19,8 @@
 
 #include "maketool.h"
 #include "util.h"
-#include <sys/stat.h>
 
-CVSID("$Id: makesys.c,v 1.3 2003-07-25 14:19:44 gnb Exp $");
+CVSID("$Id: makesys.c,v 1.4 2003-10-03 12:15:34 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 

@@ -19,9 +19,8 @@
 
 #include "util.h"
 #include <stdarg.h>
-#include <sys/stat.h>
 
-CVSID("$Id: util.c,v 1.18 2003-09-27 04:15:37 gnb Exp $");
+CVSID("$Id: util.c,v 1.19 2003-10-03 12:18:33 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
