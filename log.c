@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.50 2003-10-02 05:54:13 gnb Exp $");
+CVSID("$Id: log.c,v 1.51 2003-10-03 12:15:04 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -830,10 +830,11 @@ log_repopulate(void)
  */
  
 void
-log_save(const char *file)
+log_save(const char *file, Progress *p)
 {
     GList *list;
     FILE *fp;
+    int n = 0;
     
     if ((fp = fopen(file, "w")) == 0)
     {
@@ -842,27 +843,36 @@ log_save(const char *file)
 	return;
     }
     
+    progress_start(p, g_list_length(log));
     for (list=log ; list!=0 ; list=list->next)
     {
     	LogRec *lr = (LogRec *)list->data;
 	
 	fputs(lr->line, fp);
 	fputc('\n', fp);
+	if (++n == 32)
+	{
+	    progress_delta(p, n);
+	    n = 0;
+	}
     }
+    progress_delta(p, n);
     
     fclose(fp);
+    progress_end(p);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 void
-log_open(const char *file)
+log_open(const char *file, Progress *p)
 {
     FILE *fp;
     char *dfile;
     int len;
     estring leftover;
     char *startstr, buf[1025];
+    struct stat sb;
 
     
     if ((fp = fopen(file, "r")) == 0)
@@ -872,6 +882,13 @@ log_open(const char *file)
 	return;
     }
     
+    if (fstat(fileno(fp), &sb) < 0)
+    {
+    	message("can't fstat %s: %s", file, g_strerror(errno));
+	return;
+    }
+
+    progress_start(p, sb.st_size);    
     gtk_clist_freeze(GTK_CLIST(logwin));
     dfile = file_denormalise(file, DEN_HOME);
     startstr = g_strdup_printf(_("Log file %s"), dfile);
@@ -886,6 +903,7 @@ log_open(const char *file)
     	char *start = buf, *end;
 
     	buf[len] = '\0';
+	progress_delta(p, len);
 	while (len > 0)
 	{
 	    end = strchr(start, '\n');
@@ -910,12 +928,15 @@ log_open(const char *file)
 	}
     }
     /* handle case where last line is not terminated with '\n' */
-    if (leftover.length > 0)
+    if (leftover.length > 0) {
+	progress_delta(p, leftover.length);
     	log_add_line(leftover.data);
+    }
     
     estring_free(&leftover);
     fclose(fp);
     gtk_clist_thaw(GTK_CLIST(logwin));
+    progress_end(p);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

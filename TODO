@@ -2,8 +2,6 @@
 
 x  Investigate performance of regexec() in IRIX libc vs glibc.
 
-x  Provide a progress indicator during the open of large log files.
-
 x  Help->Help On reports "main-window" if clicked on the background of
    any dialog, and only reports the right dialog if clicked on some
    other widget in the dialog.
@@ -293,6 +291,8 @@ x  When ./configure is run from make_makefile(), config.status is also
    run afterward, redundantly.
 
 --- closed ---
+
+x  Provide a progress indicator during the open of large log files.
 
 x  memleak:
 ==5761== 3074 bytes in 222 blocks are definitely lost in loss record 73 of 82

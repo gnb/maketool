@@ -23,6 +23,7 @@
 #include "common.h"
 #include <gtk/gtk.h>
 #include "filter.h"
+#include "progress.h"
 #include "maketool_task.h"
 
 typedef struct
@@ -74,8 +75,8 @@ void log_set_flags(int);
 int log_num_errors(void);
 int log_num_warnings(void);
 
-void log_save(const char *file);
-void log_open(const char *file);
+void log_save(const char *file, Progress *);
+void log_open(const char *file, Progress *);
 /* generates PostScript on given FILE* */
 void log_print(FILE *fp);
 /*
