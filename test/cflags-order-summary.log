@@ -1,0 +1,14 @@
+# compiling -- various permutations
+gcc -c crud.c
+gcc -c -o crud.o crud.c
+gcc -c -ansi -Wall crud.c
+gcc -c -ansi -Wall -o crud.o crud.c
+gcc -ansi -Wall -c crud.c
+gcc -ansi -Wall -c -o crud.o crud.c
+# cross-compiling -- various permutations
+sh-linux-gnu-gcc -c crud.c
+sh-linux-gnu-gcc -c -o crud.o crud.c
+sh-linux-gnu-gcc -c -ansi -Wall crud.c
+sh-linux-gnu-gcc -c -ansi -Wall -o crud.o crud.c
+sh-linux-gnu-gcc -ansi -Wall -c crud.c
+sh-linux-gnu-gcc -ansi -Wall -c -o crud.o crud.c

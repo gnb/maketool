@@ -1,0 +1,481 @@
+sh-linux-gnu-gcc -D__ASSEMBLY__ -traditional -m4 -ml -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -c -o entry.o entry.S
+entry.S: Assembler messages:
+entry.S:68: Warning: '$' prefix removed from register
+entry.S:69: Warning: '$' prefix removed from register
+entry.S:70: Warning: '$' prefix removed from register
+entry.S:70: Warning: '$' prefix removed from register
+entry.S:75: Warning: '$' prefix removed from register
+entry.S:76: Warning: '$' prefix removed from register
+entry.S:91: Warning: '$' prefix removed from register
+entry.S:92: Warning: '$' prefix removed from register
+entry.S:92: Warning: '$' prefix removed from register
+entry.S:96: Warning: '$' prefix removed from register
+entry.S:97: Warning: '$' prefix removed from register
+entry.S:98: Warning: '$' prefix removed from register
+entry.S:98: Warning: '$' prefix removed from register
+entry.S:106: Warning: '$' prefix removed from register
+entry.S:106: Warning: '$' prefix removed from register
+entry.S:109: Warning: '$' prefix removed from register
+entry.S:109: Warning: '$' prefix removed from register
+entry.S:112: Warning: '$' prefix removed from register
+entry.S:113: Warning: '$' prefix removed from register
+entry.S:113: Warning: '$' prefix removed from register
+entry.S:116: Warning: '$' prefix removed from register
+entry.S:117: Warning: '$' prefix removed from register
+entry.S:117: Warning: '$' prefix removed from register
+entry.S:121: Warning: '$' prefix removed from register
+entry.S:122: Warning: '$' prefix removed from register
+entry.S:123: Warning: '$' prefix removed from register
+entry.S:124: Warning: '$' prefix removed from register
+entry.S:125: Warning: '$' prefix removed from register
+entry.S:125: Warning: '$' prefix removed from register
+entry.S:127: Warning: '$' prefix removed from register
+entry.S:127: Warning: '$' prefix removed from register
+entry.S:131: Warning: '$' prefix removed from register
+entry.S:132: Warning: '$' prefix removed from register
+entry.S:142: Warning: '$' prefix removed from register
+entry.S:143: Warning: '$' prefix removed from register
+entry.S:173: Warning: '$' prefix removed from register
+entry.S:175: Warning: '$' prefix removed from register
+entry.S:175: Warning: '$' prefix removed from register
+entry.S:182: Warning: '$' prefix removed from register
+entry.S:184: Warning: '$' prefix removed from register
+entry.S:184: Warning: '$' prefix removed from register
+entry.S:189: Warning: '$' prefix removed from register
+entry.S:191: Warning: '$' prefix removed from register
+entry.S:191: Warning: '$' prefix removed from register
+entry.S:200: Warning: '$' prefix removed from register
+entry.S:200: Warning: '$' prefix removed from register
+entry.S:202: Warning: '$' prefix removed from register
+entry.S:202: Warning: '$' prefix removed from register
+entry.S:204: Warning: '$' prefix removed from register
+entry.S:205: Warning: '$' prefix removed from register
+entry.S:206: Warning: '$' prefix removed from register
+entry.S:207: Warning: '$' prefix removed from register
+entry.S:208: Warning: '$' prefix removed from register
+entry.S:208: Warning: '$' prefix removed from register
+entry.S:209: Warning: '$' prefix removed from register
+entry.S:209: Warning: '$' prefix removed from register
+entry.S:210: Warning: '$' prefix removed from register
+entry.S:210: Warning: '$' prefix removed from register
+entry.S:212: Warning: '$' prefix removed from register
+entry.S:212: Warning: '$' prefix removed from register
+entry.S:213: Warning: '$' prefix removed from register
+entry.S:213: Warning: '$' prefix removed from register
+entry.S:214: Warning: '$' prefix removed from register
+entry.S:214: Warning: '$' prefix removed from register
+entry.S:215: Warning: '$' prefix removed from register
+entry.S:216: Warning: '$' prefix removed from register
+entry.S:217: Warning: '$' prefix removed from register
+entry.S:217: Warning: '$' prefix removed from register
+entry.S:218: Warning: '$' prefix removed from register
+entry.S:218: Warning: '$' prefix removed from register
+entry.S:219: Warning: '$' prefix removed from register
+entry.S:219: Warning: '$' prefix removed from register
+entry.S:220: Warning: '$' prefix removed from register
+entry.S:221: Warning: '$' prefix removed from register
+entry.S:221: Warning: '$' prefix removed from register
+entry.S:292: Warning: '$' prefix removed from register
+entry.S:293: Warning: '$' prefix removed from register
+entry.S:293: Warning: '$' prefix removed from register
+entry.S:294: Warning: '$' prefix removed from register
+entry.S:294: Warning: '$' prefix removed from register
+entry.S:295: Warning: '$' prefix removed from register
+entry.S:295: Warning: '$' prefix removed from register
+entry.S:296: Warning: '$' prefix removed from register
+entry.S:296: Warning: '$' prefix removed from register
+entry.S:297: Warning: '$' prefix removed from register
+entry.S:297: Warning: '$' prefix removed from register
+entry.S:298: Warning: '$' prefix removed from register
+entry.S:298: Warning: '$' prefix removed from register
+entry.S:299: Warning: '$' prefix removed from register
+entry.S:299: Warning: '$' prefix removed from register
+entry.S:300: Warning: '$' prefix removed from register
+entry.S:300: Warning: '$' prefix removed from register
+entry.S:301: Warning: '$' prefix removed from register
+entry.S:301: Warning: '$' prefix removed from register
+entry.S:302: Warning: '$' prefix removed from register
+entry.S:302: Warning: '$' prefix removed from register
+entry.S:303: Warning: '$' prefix removed from register
+entry.S:303: Warning: '$' prefix removed from register
+entry.S:304: Warning: '$' prefix removed from register
+entry.S:304: Warning: '$' prefix removed from register
+entry.S:305: Warning: '$' prefix removed from register
+entry.S:305: Warning: '$' prefix removed from register
+entry.S:306: Warning: '$' prefix removed from register
+entry.S:306: Warning: '$' prefix removed from register
+entry.S:307: Warning: '$' prefix removed from register
+entry.S:307: Warning: '$' prefix removed from register
+entry.S:308: Warning: '$' prefix removed from register
+entry.S:308: Warning: '$' prefix removed from register
+entry.S:309: Warning: '$' prefix removed from register
+entry.S:309: Warning: '$' prefix removed from register
+entry.S:310: Warning: '$' prefix removed from register
+entry.S:310: Warning: '$' prefix removed from register
+entry.S:311: Warning: '$' prefix removed from register
+entry.S:311: Warning: '$' prefix removed from register
+entry.S:312: Warning: '$' prefix removed from register
+entry.S:313: Warning: '$' prefix removed from register
+entry.S:313: Warning: '$' prefix removed from register
+entry.S:314: Warning: '$' prefix removed from register
+entry.S:315: Warning: '$' prefix removed from register
+entry.S:315: Warning: '$' prefix removed from register
+entry.S:316: Warning: '$' prefix removed from register
+entry.S:316: Warning: '$' prefix removed from register
+entry.S:317: Warning: '$' prefix removed from register
+entry.S:317: Warning: '$' prefix removed from register
+entry.S:318: Warning: '$' prefix removed from register
+entry.S:318: Warning: '$' prefix removed from register
+entry.S:319: Warning: '$' prefix removed from register
+entry.S:319: Warning: '$' prefix removed from register
+entry.S:320: Warning: '$' prefix removed from register
+entry.S:320: Warning: '$' prefix removed from register
+entry.S:321: Warning: '$' prefix removed from register
+entry.S:321: Warning: '$' prefix removed from register
+entry.S:322: Warning: '$' prefix removed from register
+entry.S:322: Warning: '$' prefix removed from register
+entry.S:323: Warning: '$' prefix removed from register
+entry.S:324: Warning: '$' prefix removed from register
+entry.S:325: Warning: '$' prefix removed from register
+entry.S:325: Warning: '$' prefix removed from register
+entry.S:326: Warning: '$' prefix removed from register
+entry.S:327: Warning: '$' prefix removed from register
+entry.S:327: Warning: '$' prefix removed from register
+entry.S:328: Warning: '$' prefix removed from register
+entry.S:329: Warning: '$' prefix removed from register
+entry.S:331: Warning: '$' prefix removed from register
+entry.S:331: Warning: '$' prefix removed from register
+entry.S:342: Warning: '$' prefix removed from register
+entry.S:343: Warning: '$' prefix removed from register
+entry.S:343: Warning: '$' prefix removed from register
+entry.S:344: Warning: '$' prefix removed from register
+entry.S:344: Warning: '$' prefix removed from register
+entry.S:345: Warning: '$' prefix removed from register
+entry.S:345: Warning: '$' prefix removed from register
+entry.S:346: Warning: '$' prefix removed from register
+entry.S:346: Warning: '$' prefix removed from register
+entry.S:347: Warning: '$' prefix removed from register
+entry.S:347: Warning: '$' prefix removed from register
+entry.S:348: Warning: '$' prefix removed from register
+entry.S:348: Warning: '$' prefix removed from register
+entry.S:349: Warning: '$' prefix removed from register
+entry.S:349: Warning: '$' prefix removed from register
+entry.S:350: Warning: '$' prefix removed from register
+entry.S:350: Warning: '$' prefix removed from register
+entry.S:351: Warning: '$' prefix removed from register
+entry.S:351: Warning: '$' prefix removed from register
+entry.S:352: Warning: '$' prefix removed from register
+entry.S:352: Warning: '$' prefix removed from register
+entry.S:353: Warning: '$' prefix removed from register
+entry.S:353: Warning: '$' prefix removed from register
+entry.S:354: Warning: '$' prefix removed from register
+entry.S:354: Warning: '$' prefix removed from register
+entry.S:355: Warning: '$' prefix removed from register
+entry.S:355: Warning: '$' prefix removed from register
+entry.S:356: Warning: '$' prefix removed from register
+entry.S:356: Warning: '$' prefix removed from register
+entry.S:357: Warning: '$' prefix removed from register
+entry.S:357: Warning: '$' prefix removed from register
+entry.S:358: Warning: '$' prefix removed from register
+entry.S:358: Warning: '$' prefix removed from register
+entry.S:359: Warning: '$' prefix removed from register
+entry.S:359: Warning: '$' prefix removed from register
+entry.S:360: Warning: '$' prefix removed from register
+entry.S:360: Warning: '$' prefix removed from register
+entry.S:361: Warning: '$' prefix removed from register
+entry.S:361: Warning: '$' prefix removed from register
+entry.S:362: Warning: '$' prefix removed from register
+entry.S:362: Warning: '$' prefix removed from register
+entry.S:363: Warning: '$' prefix removed from register
+entry.S:363: Warning: '$' prefix removed from register
+entry.S:364: Warning: '$' prefix removed from register
+entry.S:364: Warning: '$' prefix removed from register
+entry.S:365: Warning: '$' prefix removed from register
+entry.S:366: Warning: '$' prefix removed from register
+entry.S:366: Warning: '$' prefix removed from register
+entry.S:367: Warning: '$' prefix removed from register
+entry.S:367: Warning: '$' prefix removed from register
+entry.S:368: Warning: '$' prefix removed from register
+entry.S:369: Warning: '$' prefix removed from register
+entry.S:370: Warning: '$' prefix removed from register
+entry.S:370: Warning: '$' prefix removed from register
+entry.S:371: Warning: '$' prefix removed from register
+entry.S:371: Warning: '$' prefix removed from register
+entry.S:372: Warning: '$' prefix removed from register
+entry.S:372: Warning: '$' prefix removed from register
+entry.S:374: Warning: '$' prefix removed from register
+entry.S:374: Warning: '$' prefix removed from register
+entry.S:378: Warning: '$' prefix removed from register
+entry.S:379: Warning: '$' prefix removed from register
+entry.S:379: Warning: '$' prefix removed from register
+entry.S:385: Warning: '$' prefix removed from register
+entry.S:386: Warning: '$' prefix removed from register
+entry.S:386: Warning: '$' prefix removed from register
+entry.S:387: Warning: '$' prefix removed from register
+entry.S:387: Warning: '$' prefix removed from register
+entry.S:389: Warning: '$' prefix removed from register
+entry.S:390: Warning: '$' prefix removed from register
+entry.S:399: Warning: '$' prefix removed from register
+entry.S:400: Warning: '$' prefix removed from register
+entry.S:400: Warning: '$' prefix removed from register
+entry.S:401: Warning: '$' prefix removed from register
+entry.S:401: Warning: '$' prefix removed from register
+entry.S:402: Warning: '$' prefix removed from register
+entry.S:402: Warning: '$' prefix removed from register
+entry.S:403: Warning: '$' prefix removed from register
+entry.S:404: Warning: '$' prefix removed from register
+entry.S:405: Warning: '$' prefix removed from register
+entry.S:405: Warning: '$' prefix removed from register
+entry.S:406: Warning: '$' prefix removed from register
+entry.S:408: Warning: '$' prefix removed from register
+entry.S:408: Warning: '$' prefix removed from register
+entry.S:417: Warning: '$' prefix removed from register
+entry.S:418: Warning: '$' prefix removed from register
+entry.S:418: Warning: '$' prefix removed from register
+entry.S:420: Warning: '$' prefix removed from register
+entry.S:420: Warning: '$' prefix removed from register
+entry.S:423: Warning: '$' prefix removed from register
+entry.S:424: Warning: '$' prefix removed from register
+entry.S:424: Warning: '$' prefix removed from register
+entry.S:425: Warning: '$' prefix removed from register
+entry.S:425: Warning: '$' prefix removed from register
+entry.S:426: Warning: '$' prefix removed from register
+entry.S:426: Warning: '$' prefix removed from register
+entry.S:427: Warning: '$' prefix removed from register
+entry.S:427: Warning: '$' prefix removed from register
+entry.S:428: Warning: '$' prefix removed from register
+entry.S:429: Warning: '$' prefix removed from register
+entry.S:429: Warning: '$' prefix removed from register
+entry.S:431: Warning: '$' prefix removed from register
+entry.S:431: Warning: '$' prefix removed from register
+entry.S:437: Warning: '$' prefix removed from register
+entry.S:438: Warning: '$' prefix removed from register
+entry.S:438: Warning: '$' prefix removed from register
+entry.S:440: Warning: '$' prefix removed from register
+entry.S:440: Warning: '$' prefix removed from register
+entry.S:441: Warning: '$' prefix removed from register
+entry.S:442: Warning: '$' prefix removed from register
+entry.S:444: Warning: '$' prefix removed from register
+entry.S:444: Warning: '$' prefix removed from register
+entry.S:445: Warning: '$' prefix removed from register
+entry.S:445: Warning: '$' prefix removed from register
+entry.S:446: Warning: '$' prefix removed from register
+entry.S:459: Warning: '$' prefix removed from register
+entry.S:460: Warning: '$' prefix removed from register
+entry.S:460: Warning: '$' prefix removed from register
+entry.S:461: Warning: '$' prefix removed from register
+entry.S:462: Warning: '$' prefix removed from register
+entry.S:462: Warning: '$' prefix removed from register
+entry.S:463: Warning: '$' prefix removed from register
+entry.S:463: Warning: '$' prefix removed from register
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr \
+	--adjust-vma=0xE0000000 \
+	-O srec sh-stub.exe sh-stub.srec
+srec2msbin --verbose sh-stub.srec sh-stub.msbin
+MSBIN: padding sections to 4 bytes
+SREC: 1002 good records processed(including 1000 S3 recs).  0 bad records
+MSBIN: wrote section   0 0x00003e80 bytes @ 0x80100100 - 0x80103f7f
+MSBIN: 1 sections
+MSBIN: bound address 0x80100100 length 0x00003e80
+MSBIN: launch address 0x80101000
+test -d prebuilt || mkdir prebuilt
+for offset in 0x00100000 0x00200000 0x00300000 0x00400000 0x00500000 0x00600000 0x00700000 0x00800000 0x00900000 0x00a00000 0x00b00000 0x00c00000 0x00d00000 0x00e00000 0x00f00000 0x01000000 0x01100000 0x01200000 0x01300000 0x01400000 0x01500000 0x01600000 0x01700000 0x01800000 0x01900000 0x01a00000 0x01b00000 0x01c00000 0x01d00000 0x01e00000 0x01f00000 ; do \
+    rm -f sh-stub.bin sh-stub.exe sh-stub.lds ;\
+    gmake FLASH_OFFSET=$offset sh-stub.bin || exit 1;\
+    mv sh-stub.bin prebuilt/sh-stub.${offset}.bin ;\
+done
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x00100000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x00200000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x00300000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x00400000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x00500000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x00600000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x00700000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x00800000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x00900000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x00a00000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x00b00000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x00c00000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x00d00000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x00e00000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x00f00000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01000000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01100000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01200000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01300000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01400000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01500000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01600000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01700000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01800000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01900000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01a00000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01b00000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01c00000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01d00000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01e00000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+gmake[1]: Entering directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-gcc -E -C -P -traditional -DBUILD_DATE=\"09-Jan-2001\" -I. -Iconfig/dmida -DFLASH_OFFSET=0x01f00000 sh-stub.lds.S > sh-stub.lds
+sh-linux-gnu-ld -EL -T sh-stub.lds -e start entry.o main.o sh-stub.o boot.o sed1355.o init.o sh-sci.o setjmp.o string.o  -o sh-stub.exe
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin
+gmake[1]: Leaving directory `/sh3/wrk.done/sh-ipl+g-bootmon123'
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr \
+	--adjust-vma=0xE0000000 \
+	sh-stub.exe sh-stub.elf
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr \
+	--adjust-vma=0xE0000000 -O ihex \
+	sh-stub.exe sh-stub.hex
+sh-linux-gnu-objcopy -S -R .data -R .stack -R .bss -R .comment -R .bootmonhdr -O binary \
+	sh-stub.exe sh-stub.bin

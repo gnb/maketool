@@ -1,0 +1,43 @@
+gmake[1]: Entering directory `/home/gnb/LeOS/BUILD/kernel.work/drivers/char'
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -DEXPORT_SYMTAB -c tty_io.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -c -o n_tty.o n_tty.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -c -o tty_ioctl.o tty_ioctl.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -c -o mem.o mem.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -c -o raw.o raw.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -DEXPORT_SYMTAB -c pty.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -DEXPORT_SYMTAB -c misc.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -DEXPORT_SYMTAB -c random.c
+random.c:531: warning: `free_entropy_store' defined but not used
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -c -o vt.o vt.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -c -o vc_screen.o vc_screen.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -c -o consolemap.o consolemap.c
+gcc -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -o conmakehash conmakehash.c
+./conmakehash cp437.uni > consolemap_deftbl.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -c -o consolemap_deftbl.o consolemap_deftbl.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -DEXPORT_SYMTAB -c console.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -DEXPORT_SYMTAB -c selection.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -DEXPORT_SYMTAB -c keyboard.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -c -o defkeymap.o defkeymap.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -c -o sh-sci.o sh-sci.c
+sh-sci.c:60: warning: `sci_init_pins_sci' declared `static' but never defined
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -c -o generic_serial.o generic_serial.c
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe    -c -o dmida-params.o dmida-params.c
+rm -f char.o
+sh-linux-gnu-ld -EL  -r -o char.o tty_io.o n_tty.o tty_ioctl.o mem.o raw.o pty.o misc.o random.o vt.o vc_screen.o consolemap.o consolemap_deftbl.o console.o selection.o keyboard.o defkeymap.o sh-sci.o generic_serial.o dmida-params.o
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe -DMODULE    -DEXPORT_SYMTAB -c serial.c
+{standard input}: Assembler messages:
+{standard input}:26: Warning: Ignoring changed section attributes for .modinfo
+sh-linux-gnu-gcc -D__KERNEL__ -I/home/gnb/LeOS/BUILD/kernel.work/include -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -fno-strict-aliasing -ml -m4-nofpu -pipe -DMODULE    -c -o dmida-leds.o dmida-leds.c
+{standard input}: Assembler messages:
+{standard input}:6: Warning: Ignoring changed section attributes for .modinfo
+gmake[1]: Leaving directory `/home/gnb/LeOS/BUILD/kernel.work/drivers/char'
+sh-linux-gnu-gcc -E -traditional -C -P -I/home/gnb/LeOS/BUILD/kernel.work/include -Ush arch/sh/vmlinux.lds.S >arch/sh/vmlinux.lds
+sh-linux-gnu-ld -EL -T arch/sh/vmlinux.lds -e _stext arch/sh/kernel/head.o arch/sh/kernel/init_task.o init/main.o init/version.o \
+	--start-group \
+	arch/sh/kernel/kernel.o arch/sh/mm/mm.o kernel/kernel.o mm/mm.o fs/fs.o ipc/ipc.o \
+	drivers/block/block.o drivers/char/char.o drivers/misc/misc.o drivers/net/net.o drivers/media/media.o  drivers/ide/idedriver.o drivers/video/video.o \
+	net/network.o \
+	/home/gnb/LeOS/BUILD/kernel.work/arch/sh/lib/lib.a /home/gnb/LeOS/BUILD/kernel.work/lib/lib.a /home/gnb/LeOS/BUILD/kernel.work/arch/sh/lib/lib.a /opt/LeOS-1.0/sdk/lib/gcc-lib/sh-linux-gnu/2.97/libgcc.a \
+	--end-group \
+	-o vmlinux
+sh-linux-gnu-nm vmlinux | grep -v '\(compiled\)\|\(\.o$\)\|\( [aUw] \)\|\(\.\.ng$\)\|\(LASH[RL]DI\)' | sort > System.map
