@@ -18,14 +18,10 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
-dnl $Id: configure.in,v 1.38 2001-09-28 05:19:08 gnb Exp $
+dnl $Id: configure.in,v 1.39 2002-09-24 14:19:01 gnb Exp $
 dnl
 
 AC_INIT(main.c)
-sinclude(/usr/share/aclocal/gettext.m4)dnl
-sinclude(/usr/share/aclocal/lcmessage.m4)dnl
-sinclude(/usr/share/aclocal/progtest.m4)dnl
-sinclude(/usr/share/aclocal/gtk.m4)dnl
 AC_CONFIG_HEADER(config.h)
 
 PACKAGE=maketool
@@ -102,7 +98,7 @@ dnl Checks for library functions.
 AC_PROG_GCC_TRADITIONAL
 AC_TYPE_SIGNAL
 AC_FUNC_WAIT3
-AC_CHECK_FUNCS(putenv regcomp strchr)
+AC_CHECK_FUNCS(putenv regcomp strchr unsetenv)
 
 
 dnl ===============================
@@ -146,6 +142,31 @@ main(int argc, char **argv)
 ],AC_DEFINE(HAVE_SYSV_SIGNAL,1) AC_MSG_RESULT(sysv),
 AC_DEFINE(HAVE_SYSV_SIGNAL,0) AC_MSG_RESULT(bsd),
 AC_DEFINE(HAVE_SYSV_SIGNAL,0) AC_MSG_RESULT(assuming bsd))
+dnl ===============================
+
+
+dnl ===============================
+dnl Test for system make programs which need to be wrapped to
+dnl provide gmake-style directory enter/leave messages.
+AC_MSG_CHECKING(for non-GNU make programs)
+
+_TD=/tmp/ac-maketool-$$
+/bin/rm -rf $_TD
+mkdir $_TD
+
+NON_GNU_MAKES=
+for dir in /bin /sbin /usr/bin /usr/sbin /usr/ccs/bin ; do
+    for exe in make pmake smake ; do
+    	test -x $dir/$exe || continue
+	(cd $_TD ; $dir/$exe --version 2>&1) | grep 'GNU Make' > /dev/null \
+	    || NON_GNU_MAKES="$NON_GNU_MAKES $dir/$exe"
+    done
+done
+
+/bin/rm -rf $_TD
+
+AC_SUBST(NON_GNU_MAKES)
+AC_MSG_RESULT($NON_GNU_MAKES)
 dnl ===============================
 
 
