@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999 Greg Banks
+ * Copyright (c) 1999-2000 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include <signal.h>
 #include <sys/poll.h>
 
-CVSID("$Id: glib_extra.c,v 1.12 2000-07-18 17:55:40 gnb Exp $");
+CVSID("$Id: glib_extra.c,v 1.13 2000-07-21 06:12:03 gnb Exp $");
 
 
 typedef struct

@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999 Greg Banks
+ * Copyright (c) 1999-2000 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.56 2000-07-21 05:54:57 gnb Exp $");
+CVSID("$Id: main.c,v 1.57 2000-07-21 06:12:03 gnb Exp $");
 
 typedef enum
 {
@@ -1604,7 +1604,7 @@ Options:\n\
 
 static const char version_string[] = "\
 Maketool " VERSION "\n\
-(c) 1999 Greg Banks <gnb@alphalink.com.au>\n\
+(c) 1999-2000 Greg Banks <gnb@alphalink.com.au>\n\
 Maketool comes with ABSOLUTELY NO WARRANTY.\n\
 You may redistribute copies of this software\n\
 under the terms of the GNU General Public\n\

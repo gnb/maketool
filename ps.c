@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999 Greg Banks
+ * Copyright (c) 1999-2000 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include "util.h"
 #include <time.h>
 
-CVSID("$Id: ps.c,v 1.3 2000-01-08 04:26:56 gnb Exp $");
+CVSID("$Id: ps.c,v 1.4 2000-07-21 06:12:03 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 

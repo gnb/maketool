@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999 Greg Banks
+ * Copyright (c) 1999-2000 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #include <regex.h>	/* POSIX regular expression fns */
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: find.c,v 1.5 2000-06-13 14:20:48 gnb Exp $");
+CVSID("$Id: find.c,v 1.6 2000-07-21 06:12:03 gnb Exp $");
 
 static GtkWidget	*find_shell = 0;
 typedef enum { FD_FORWARDS, FD_BACKWARDS, FD_MAX_DIRECTIONS } FindDirections;

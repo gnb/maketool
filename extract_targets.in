@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # Maketool - GTK-based front end for gmake
-# Copyright (c) 1999 Greg Banks
+# Copyright (c) 1999-2000 Greg Banks
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: extract_targets.in,v 1.2 1999-11-07 10:27:00 gnb Exp $
+# $Id: extract_targets.in,v 1.3 2000-07-21 06:12:03 gnb Exp $
 #
 
 @GMAKE@ -n -p "$@" _no_such_target_ 2>/dev/null | awk '

@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999 Greg Banks
+ * Copyright (c) 1999-2000 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: help.c,v 1.20 2000-04-16 08:31:31 gnb Exp $");
+CVSID("$Id: help.c,v 1.21 2000-07-21 06:12:03 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -79,7 +79,7 @@ licence_cb(GtkWidget *w, gpointer data)
 static const char about_str[] = "\
 Maketool version %s\n\
 \n\
-(c) 1999 Greg Banks\n\
+(c) 1999-2000 Greg Banks\n\
 gnb@alphalink.com.au\n\
 \n\
 Maketool comes with ABSOLUTELY NO WARRANTY;\n\

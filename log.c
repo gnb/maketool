@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999 Greg Banks
+ * Copyright (c) 1999-2000 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.31 2000-01-24 10:39:49 gnb Exp $");
+CVSID("$Id: log.c,v 1.32 2000-07-21 06:12:03 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \

@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999 Greg Banks
+ * Copyright (c) 1999-2000 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.21 2000-06-21 11:03:26 gnb Exp $");
+CVSID("$Id: filter.c,v 1.22 2000-07-21 06:12:03 gnb Exp $");
 
 typedef struct
 {

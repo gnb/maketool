@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999 Greg Banks
+ * Copyright (c) 1999-2000 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #define _common_h_
 
 /*
- * $Id: common.h,v 1.7 1999-12-19 15:13:44 gnb Exp $
+ * $Id: common.h,v 1.8 2000-07-21 06:12:03 gnb Exp $
  */
 
 #include <config.h>

@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999 Greg Banks
+ * Copyright (c) 1999-2000 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 #include <sys/filio.h>
 #endif
 
-CVSID("$Id: task.c,v 1.4 2000-07-18 17:55:40 gnb Exp $");
+CVSID("$Id: task.c,v 1.5 2000-07-21 06:12:03 gnb Exp $");
 
 static GList *task_all = 0;
 static void (*task_work_start_cb)(void) = 0;

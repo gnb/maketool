@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999 Greg Banks
+ * Copyright (c) 1999-2000 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #define _patchlevel_h 1
 
 /*
- * $Id: patchlevel.h,v 1.1 1999-05-28 17:06:34 gnb Exp $
+ * $Id: patchlevel.h,v 1.2 2000-07-21 06:12:03 gnb Exp $
  */
 
 #define VERSION "0.1"
