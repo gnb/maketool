@@ -48,6 +48,13 @@ estring_append_char(estring *e, char c)
 }
 
 void
+estring_truncate(estring *e)
+{
+    e->length = 0;
+    e->data[0] = '\0';
+}
+
+void
 estring_free(estring *e)
 {
    if (e->data != 0)

@@ -13,6 +13,7 @@ typedef struct
 void estring_init(estring *e);
 void estring_append_string(estring *e, const char *str);
 void estring_append_char(estring *e, char c);
+void estring_truncate(estring *e);
 void estring_free(estring *e);
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
