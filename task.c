@@ -31,7 +31,7 @@
 #include <sys/filio.h>
 #endif
 
-CVSID("$Id: task.c,v 1.16 2003-09-27 13:36:42 gnb Exp $");
+CVSID("$Id: task.c,v 1.17 2003-10-29 12:39:18 gnb Exp $");
 
 /*
  * TODO: GDK is used only for the gdk_input_*() functions, which
@@ -170,12 +170,24 @@ task_reap_func(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 {
     Task *task = (Task *)user_data;
     gboolean was_enqueued = task->enqueued;
-    
-    if (!(WIFEXITED(status) || WIFSIGNALED(status)))
-    	return;
+
 #if DEBUG
-    fprintf(stderr, "reaped \"%s\", pid %d\n", task->command, (int)pid);
+    fprintf(stderr, "Task \"%s\" pid %d ", task->command, (int)pid);
+    if (WIFEXITED(status))
+    	fprintf(stderr, "exited with code %d\n", WEXITSTATUS(status));
+    else if (WIFSIGNALED(status))
+    	fprintf(stderr, "terminated by signal %d\n", WTERMSIG(status));
+    else if (WIFSTOPPED(status))
+    	fprintf(stderr, "stopped on signal %d\n", WSTOPSIG(status));
 #endif
+
+    if (!(WIFEXITED(status) || WIFSIGNALED(status)))
+    {
+    	if (WIFSTOPPED(status) && WSTOPSIG(status) == SIGSTOP)
+	    task->flags |= TASK_PAUSED;
+    	return;
+    }
+
     if (task->pid != pid)
     {
     	/* it's not paranoia when they're really out to get you */
@@ -454,6 +466,40 @@ task_kill_current(void)
     if (curr != 0)
     	kill(curr->pid, SIGKILL);
 }
+
+
+#if HAVE_BSD_JOB_CONTROL
+
+void
+task_pause_current(void)
+{
+    Task *curr = task_current();
+    
+    if (curr != 0)
+    	killpg(curr->pid, SIGSTOP);
+}
+
+void
+task_resume_current(void)
+{
+    Task *curr = task_current();
+    
+    if (curr != 0)
+    {
+    	killpg(curr->pid, SIGCONT);
+	curr->flags &= ~TASK_PAUSED;
+    }
+}
+
+gboolean
+task_is_paused(void)
+{
+    Task *curr = task_current();
+    
+    return (curr != 0 && (curr->flags & TASK_PAUSED));
+}
+
+#endif
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 /*END*/

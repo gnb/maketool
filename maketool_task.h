@@ -46,6 +46,8 @@ struct _Task
 /* Possible Task flags */
 #define TASK_GROUPLEADER    (1<<0)  /* is process group leader */
 #define TASK_LINEMODE	    (1<<1)  /* input is split into lines, no newline */
+/* internal flags only */
+#define TASK_PAUSED	    (1<<10) /* task currently paused by job control */
 
 struct _TaskOps
 {    
@@ -107,6 +109,18 @@ gboolean task_is_running(void);
  * Kill the currently running task.
  */
 void task_kill_current(void);
+
+#if HAVE_BSD_JOB_CONTROL
+/*
+ * Pause the currently running task.
+ */
+void task_pause_current(void);
+/*
+ * Resume executing the currently running task.
+ */
+void task_resume_current(void);
+gboolean task_is_paused(void);
+#endif
 
 /*
  * Returns TRUE iff the task succeeded (exit(0) called).

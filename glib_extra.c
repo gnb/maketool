@@ -22,7 +22,7 @@
 #include <signal.h>
 #include <sys/poll.h>
 
-CVSID("$Id: glib_extra.c,v 1.19 2003-10-03 00:12:01 gnb Exp $");
+CVSID("$Id: glib_extra.c,v 1.20 2003-10-29 12:39:18 gnb Exp $");
 
 
 typedef struct
@@ -126,11 +126,17 @@ g_unix_dispatch_reapers(void)
     
     for (;;)
     {
+    	int flags = WNOHANG;
+
+#if HAVE_BSD_JOB_CONTROL
+    	flags |= WUNTRACED;
+#endif
+
 #if HAVE_WAIT3    
-	pid = wait3(&status, WNOHANG, &usage);
+	pid = wait3(&status, flags, &usage);
 #else
 	memset(&usage, 0, sizeof(usage));	/* nothing to see here */
-	pid = waitpid(-1, &status, WNOHANG);
+	pid = waitpid(-1, &status, flags);
 #endif
 	
 #if DEBUG

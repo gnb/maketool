@@ -32,7 +32,7 @@
 #include "mqueue.h"
 #include "progress.h"
 
-CVSID("$Id: main.c,v 1.108 2003-10-21 14:36:59 gnb Exp $");
+CVSID("$Id: main.c,v 1.109 2003-10-29 12:39:18 gnb Exp $");
 
 
 /*
@@ -71,6 +71,13 @@ GtkWidget   	*again_menu_item, *again_tool_item;
 GtkWidget   	*target_history_menu;
 const char * const again_menu_label[2] = { N_("_Again"), N_("_Again (%s)") };
 const char * const again_tool_tooltip[2] = { N_("Build last target again"), N_("Build `%s' again") };
+#if HAVE_BSD_JOB_CONTROL
+GtkWidget   	*pause_tool_item;
+const char * const pause_tool_tooltip[2] = {
+    N_("Pause current build"),
+    N_("Resume current build")
+};
+#endif
 gint	    	about_make_position;
 GtkWidget   	*about_make_menu_item;
 GtkWidget   	*about_make_menu;
@@ -558,12 +565,18 @@ logged_task_reap, 	    	/* reap */
 Task *
 logged_task(char *command)
 {
+    int flags = TASK_LINEMODE;
+
+#if HAVE_BSD_JOB_CONTROL
+    flags |= TASK_GROUPLEADER;
+#endif
+
     return task_create(
     	(Task *)g_new(Task, 1),
 	command,
 	prefs.var_environment,
 	&logged_task_ops,
-	TASK_LINEMODE);
+	flags);
 }
 
 
@@ -1060,6 +1073,11 @@ static Task *
 make_task(const char *target)
 {
     MakeTask *mt = g_new(MakeTask, 1);
+    int flags = TASK_LINEMODE;
+    
+#if HAVE_BSD_JOB_CONTROL
+    flags |= TASK_GROUPLEADER;
+#endif
 
     mt->target = target;
     return task_create(
@@ -1067,7 +1085,7 @@ make_task(const char *target)
 	expand_prog(prefs.prog_make, 0, 0, target),
 	prefs.var_environment,
 	&make_ops,
-	TASK_LINEMODE);
+	flags);
 }
 
 
@@ -1449,6 +1467,34 @@ build_stop_cb(GtkWidget *w, gpointer data)
 	task_kill_current();
     }
 }
+
+#if HAVE_BSD_JOB_CONTROL
+static void
+build_pause_cb(GtkWidget *w, gpointer data)
+{
+    gboolean paused;
+
+    if (!task_is_running())
+    	return;
+
+    if (task_is_paused())
+    {
+	message(_("Resuming..."));
+	task_resume_current();
+	paused = FALSE;
+    }
+    else
+    {
+	task_pause_current();
+	message(_("Paused"));
+	paused = TRUE;
+    }
+
+    /* Update the tooltip on the Pause tool */
+    gtk_tooltips_set_tip(GTK_TOOLBAR(toolbar)->tooltips, pause_tool_item,
+    	_(pause_tool_tooltip[paused]), 0);
+}
+#endif /*HAVE_BSD_JOB_CONTROL*/
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -1839,6 +1885,7 @@ ui_create_menus(GtkWidget *menubar)
 #include "all.xpm"
 #include "again.xpm"
 #include "stop.xpm"
+#include "pause.xpm"
 #include "clean.xpm"
 #include "clear.xpm"
 #include "next.xpm"
@@ -1858,6 +1905,12 @@ ui_create_tools(GtkWidget *toolbar)
 
     ui_tool_create(toolbar, _("Stop"), _("Stop current build"),
     	stop_xpm, build_stop_cb, 0, GR_RUNNING, "stop-tool");
+    
+#if HAVE_BSD_JOB_CONTROL
+    pause_tool_item = ui_tool_create(toolbar, _("Pause"),
+    	    _(pause_tool_tooltip[task_is_paused()]), pause_xpm,
+	    build_pause_cb, 0, GR_RUNNING, "pause-tool");
+#endif
     
     ui_tool_add_space(toolbar);
 

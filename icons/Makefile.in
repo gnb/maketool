@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.12 2003-09-01 13:41:56 gnb Exp $
+# $Id: Makefile.in,v 1.13 2003-10-29 12:39:35 gnb Exp $
 #
 
 PACKAGE=	@PACKAGE@
@@ -35,7 +35,8 @@ PIXMAPS=	\
 		maketool.xpm maketool_l.xpm next.xpm \
 		print.xpm warning.xpm stop.xpm \
 		babygnu_l.xpm BSD-daemon.xpm file_next.xpm \
-		help_cursor.xbm help_cursor_mask.xbm gnome-info.xpm
+		help_cursor.xbm help_cursor_mask.xbm gnome-info.xpm \
+		pause.xpm
 ###
 
 # Nothing to do here except package up source for distribution.

@@ -21,7 +21,7 @@
 #define _common_h_
 
 /*
- * $Id: common.h,v 1.16 2003-10-03 12:14:38 gnb Exp $
+ * $Id: common.h,v 1.17 2003-10-29 12:39:18 gnb Exp $
  */
 
 #define SIGNAL_SEMANTICS_BSD	    0	/* BSD: handler automatically re-registered */
@@ -73,6 +73,16 @@ extern char *strrchr(char *);
 
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
+#endif
+
+#ifdef HAVE_SIGNAL_H
+#include <signal.h>
+#endif
+
+#if defined(SIGCONT) && defined(SIGSTOP) && defined(HAVE_KILLPG)
+#define HAVE_BSD_JOB_CONTROL 1
+#else
+#define HAVE_BSD_JOB_CONTROL 0
 #endif
 
 /*
