@@ -21,3 +21,65 @@ Procedure to update the Change Log web page on new release.
 9.  Install the web pages on alphalink
     make -C www install
     make -C www upload
+
+
+
+Description of release procedure for maketool
+------------------------------------------
+
+1.  Be in the maketool directory
+    cd ~/proj/maketool
+
+2.  Ensure all changes are checked in
+
+3.  Choose a release number, e.g. 0.5 and hence tag MAKETOOL_0_5
+
+4.  Bump revision number in configure.in 
+    nc configure.in
+    # edit the VERSION= line
+    cvs ci configure.in
+    
+5.  Tag the source:
+    cvs tag MAKETOOL_0_5
+
+6.  Build a list of change from the previous release (e.g. 0.4)
+    ./cvs2changelog 0.4 0.5
+    
+7.  Manually edit the ChangeLog file to remove, re-express and
+    re-order the change log items in the first section (just
+    created by the cvs2changelog script). Maintain the formatting.
+
+8.  Checkin and re-tag ChangeLog
+    cvs ci ChangeLog
+    cvs tag -d MAKETOOL_0_5 ChangeLog
+    cvs tag MAKETOOL_0_5 ChangeLog
+
+9.  Build a new RH7.3 tarball and RPM
+    ./buildrpm --cvs-update=MAKETOOL_0_8_1 --copy-tarball
+
+10. Build a new RH9 RPM on gozer
+    ./buildrpm --cvs-update=MAKETOOL_0_8_1 --build-host=gozer
+
+11. In website directory
+    cd www
+
+12. Update local install of web pages
+    make clean install
+    
+13. Manually check pages; point browser at
+    http://localhost/gnb/maketool/
+
+14. Connect to alphalink
+
+15. Install the web pages on alphalink
+    make upload
+    
+16. Manually check pages for updates, Valid HTML, downloadables
+    http://www.alphalink.com.au/~gnb/maketool/
+
+17. Notify freshmeat.net
+
+18. Archive the binaries
+    cd ..
+    mv *.rpm *.tar.gz archive
+
