@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.45 1999-11-26 07:35:16 gnb Exp $");
+CVSID("$Id: main.c,v 1.46 1999-11-26 13:05:43 gnb Exp $");
 
 typedef enum
 {
@@ -38,6 +38,7 @@ typedef enum
     GR_NOTEMPTY=0,
     GR_NOTRUNNING,
     GR_RUNNING,
+    GR_SELECTED,
     GR_EDITABLE,
     GR_AGAIN,
     GR_ALL,
@@ -45,6 +46,20 @@ typedef enum
 
     NUM_SETS
 } Groups;
+
+
+/*
+ * How amazingly confusing that make and X11 selections
+ * both use the terminology `target' for completely
+ * different concepts. Sigh.
+ */
+typedef enum
+{
+    SEL_TARGET_STRING,
+    SEL_TARGET_TEXT,
+    SEL_TARGET_COMPOUND_TEXT
+} SelectionTargets;
+
 
 char		*targets;		/* targets on commandline */
 const char	*last_target = 0;	/* last target built, for `again' */
@@ -64,6 +79,10 @@ GdkBitmap	*anim_masks[ANIM_MAX+1];
 GtkWidget	*anim;
 GtkWidget   	*toolbar;
 GtkWidget   	*again_menu_item, *again_tool_item;
+
+GdkAtom     	clipboard_atom = GDK_NONE;
+char  	    	*clipboard_text = 0;
+GtkWidget   	*clipboard_widget;
 
 /*
  * These are the targets specifically mentioned in the
@@ -134,6 +153,7 @@ grey_menu_items(void)
     gboolean running = (current_pid > 0);
     gboolean empty = log_is_empty();
     LogRec *sel = log_selected();
+    gboolean selected = (sel != 0);
     gboolean editable = (sel != 0 && sel->res.file != 0);
     gboolean again = (last_target != 0 && !running);
     gboolean all = (!running && g_list_find_str(available_targets, "all") != 0);
@@ -142,6 +162,7 @@ grey_menu_items(void)
     ui_group_set_sensitive(GR_NOTRUNNING, !running);
     ui_group_set_sensitive(GR_RUNNING, running);
     ui_group_set_sensitive(GR_NOTEMPTY, !empty);
+    ui_group_set_sensitive(GR_SELECTED, selected);
     ui_group_set_sensitive(GR_EDITABLE, editable);
     ui_group_set_sensitive(GR_AGAIN, again);
     ui_group_set_sensitive(GR_ALL, all);
@@ -928,6 +949,27 @@ edit_next_error_cb(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
+edit_copy_cb(GtkWidget *w, gpointer data)
+{
+    LogRec *lr = log_selected();
+    const char *text;
+
+    assert(lr != 0);
+
+    if (clipboard_text != 0)
+    	g_free(clipboard_text);
+    clipboard_text = g_strdup_printf("%s\n", log_get_text(lr));
+#if DEBUG
+    fprintf(stderr, "Copying `%s'\n", clipboard_text);
+#endif
+
+    gtk_selection_owner_set(GTK_WIDGET(clipboard_widget), clipboard_atom,
+    	    GDK_CURRENT_TIME);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
 log_expand_cb(GtkCTree *tree, GtkCTreeNode *tree_node, gpointer data)
 {
     LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, tree_node);
@@ -945,6 +987,9 @@ log_collapse_cb(GtkCTree *tree, GtkCTreeNode *tree_node, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+/*
+ * Called when a ctree row is selected or unselected
+ */
 static void
 log_click_cb(GtkCTree *tree, GtkCTreeNode *tree_node, gint column, gpointer data)
 {
@@ -1015,6 +1060,8 @@ ui_create_menus(GtkWidget *menubar)
     ui_add_button(menu, _("Edit _Error"), 0, edit_error_cb, 0, GR_EDITABLE);
     ui_add_button(menu, _("Edit _Next Error"), "<Ctrl>E", edit_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
     ui_add_button(menu, _("Edit _Prev Error"), 0, edit_next_error_cb, GINT_TO_POINTER(FALSE), GR_NOTEMPTY);
+    ui_add_separator(menu);
+    ui_add_button(menu, _("_Copy"), "<Ctrl>C", edit_copy_cb, 0, GR_SELECTED);
     ui_add_separator(menu);
     ui_add_button(menu, _("Pre_ferences..."), 0, edit_preferences_cb, 0, GR_NONE);
 
@@ -1162,6 +1209,60 @@ ui_init_anim_pixmaps(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static void
+clipboard_get(GtkWidget *w, GtkSelectionData *seldata, guint info, guint time)
+{
+#if DEBUG
+    fprintf(stderr, "clipboard_get(info=%d)\n", info);
+#endif
+
+    switch (info)
+    {
+    case SEL_TARGET_STRING:
+    	gtk_selection_data_set(seldata,
+		    GDK_SELECTION_TYPE_STRING, 8,
+		    (guchar*)clipboard_text, strlen(clipboard_text));
+    	break;
+    case SEL_TARGET_TEXT:
+    case SEL_TARGET_COMPOUND_TEXT:
+	{
+	    guchar *ctext;
+	    GdkAtom encoding;
+	    gint format;
+	    gint new_length;
+
+	    gdk_string_to_compound_text((char*)clipboard_text, &encoding, &format, &ctext, &new_length);
+	    gtk_selection_data_set(seldata, encoding, format, ctext, new_length);
+	    gdk_free_compound_text(ctext);
+	}
+    	break;
+    default:
+    	fprintf(stderr, "clipboard_get: unknown info %d\n", info);
+	return;
+    }
+}
+
+
+static void
+clipboard_init(GtkWidget *w)
+{
+    static const GtkTargetEntry targets[] = {
+    { "STRING", 0, SEL_TARGET_STRING },
+    { "TEXT",   0, SEL_TARGET_TEXT }, 
+    { "COMPOUND_TEXT", 0, SEL_TARGET_COMPOUND_TEXT }
+    };
+
+    clipboard_widget = w;
+    clipboard_atom = gdk_atom_intern("CLIPBOARD", FALSE);
+    gtk_selection_add_targets(GTK_WIDGET(w), clipboard_atom,
+			 targets, ARRAYLEN(targets));
+
+    gtk_signal_connect(GTK_OBJECT(w), "selection_get", 
+    	GTK_SIGNAL_FUNC(clipboard_get), NULL);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 #include "maketool.xpm"
 
 static void
@@ -1254,6 +1355,8 @@ ui_create(void)
     gtk_clist_set_column_auto_resize(GTK_CLIST(logwin), 0, TRUE);
     gtk_signal_connect(GTK_OBJECT(logwin), "tree-select-row", 
     	GTK_SIGNAL_FUNC(log_click_cb), 0);
+    gtk_signal_connect(GTK_OBJECT(logwin), "tree-unselect-row", 
+    	GTK_SIGNAL_FUNC(log_click_cb), 0);
     gtk_signal_connect(GTK_OBJECT(logwin), "button_press_event", 
     	GTK_SIGNAL_FUNC(log_doubleclick_cb), 0);
     gtk_signal_connect(GTK_OBJECT(logwin), "tree_collapse", 
@@ -1265,6 +1368,7 @@ ui_create(void)
     	GTK_CLIST(logwin)->hadjustment);
     gtk_scrolled_window_set_vadjustment(GTK_SCROLLED_WINDOW(sw),
     	GTK_CLIST(logwin)->vadjustment);
+    clipboard_init(logwin);
     gtk_widget_show(logwin);
     log_init(logwin);
     

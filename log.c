@@ -22,7 +22,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: log.c,v 1.22 1999-11-07 08:50:00 gnb Exp $");
+CVSID("$Id: log.c,v 1.23 1999-11-26 13:05:43 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -242,6 +242,15 @@ log_del_rec(LogRec *lr)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+const char *
+log_get_text(const LogRec *lr)
+{
+    return ((prefs.log_flags & LF_SUMMARISE) && lr->res.summary != 0 ?
+    		lr->res.summary : lr->line);
+}
+		
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 static void
 log_show_rec(LogRec *lr)
 {
@@ -306,8 +315,7 @@ log_show_rec(LogRec *lr)
 	    text = lr->res.summary;
     }
     
-    text = ((prefs.log_flags & LF_SUMMARISE) && lr->res.summary != 0 ?
-    		lr->res.summary : lr->line);
+    text = (char *)log_get_text(lr);
     
     /* TODO: freeze & thaw if it redraws the wrong colour 1st */
     lr->node = gtk_ctree_insert_node(GTK_CTREE(logwin),

@@ -30,7 +30,8 @@ x  DONE: I18N.
 
 x  Provide filters for other compilers than gcc.
 
-x  Make filters configurable in Preferences GUI.
+x  Make filters configurable in Preferences GUI. This implies making
+   the changes persistent too!
 
 x  DONE: Save & load preferences, window geom etc.
 
@@ -42,7 +43,7 @@ x  Use a hashtable of filenames to reduce memory traffic for filenames.
 
 x  DONE: Make a nicer animation for when make is running.
 
-x  Add menu item Edit->Copy for filling the clipboard from the selected
+x  DONE: Add menu item Edit->Copy for filling the clipboard from the selected
    line(s?) of the log window. Implies adding an Edit menu & moving some
    of the View menu items into it.
 
@@ -182,8 +183,9 @@ x  DONE: Should be able to edit main.c by clicking on "    from main.c" in gcc
 
 x  Provide facility to search the log text.
 
-x  Fix bug where sometimes list_targets doesn't finish, or isn't reaped,
-   or something.
+x  DONE: Fix bug where sometimes list_targets doesn't finish, or isn't reaped,
+   or something. This was a race condition between spawning the first make
+   process and registering the SIGCHLD signal handler.
 
 x  Fix bug where build start line, updated to reflect number of errors,
    is displayed at wrong horizontal position (as if it had lost an indent).
@@ -209,3 +211,12 @@ x  ability to recursively delete a node from the log window
 x  DONE: tooltip for `again' icon, and possibly menu item, should mention
    what the actual last target is.
    
+x  Fix bug where changing any of the log flags causes the current scroll
+   position in the log to be lost as the log is repopulated.
+   
+x  Keyboard navigation: ENTER should be same as double-click.   
+
+x  Keyboard navigation: Check for std accelerators to collapse,
+   expand, collapse all, expand all, navigate up & down, select,
+   unselect.
+

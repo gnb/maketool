@@ -63,6 +63,9 @@ void log_save(const char *file);
 void log_open(const char *file);
 LogRec *log_add_line(const char *line);
 
+/* get the text displayed for the given logrec */
+const char *log_get_text(const LogRec *lr);
+
 /* Short term hack for colours sample in Preferences window */
 void log_get_icon(LogSeverity level,
     GdkPixmap **open_pm, GdkBitmap **open_mask,
