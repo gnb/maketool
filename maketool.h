@@ -79,7 +79,7 @@ typedef struct
     
     gboolean edit_first_error;
     gboolean edit_warnings;
-    gboolean ignore_failures;
+    gboolean keep_going;
     gboolean enable_make_makefile;
     gboolean scroll_on_output;
     
@@ -124,17 +124,72 @@ typedef struct
 
 typedef struct
 {
-    char *name;
-    gboolean automatic;     /* can do useful automatic update */
-    char *makefile; 	    /* usually "Makefile" */
-    char *deps[32]; 	    /* all filenames on which Makefile depends */
-    struct
-    {
-    	char *label;
-	char *command;
-	void (*handler)(GtkWidget *, gpointer);
-    } commands[32]; 	    /* specific commands for Build menu */
-} MakeSystem;
+    const char *label;
+    const char *command;
+    void (*handler)(GtkWidget *, gpointer);
+} MakeCommand;
+
+typedef struct MakeSystem_s MakeSystem;
+
+struct MakeSystem_s
+{
+    const char *name;
+    const char *label;
+    gboolean (*probe)(void);
+    const MakeSystem *parent;	    /* points up inheritance hierarchy */
+    gboolean automatic;     	    /* can do useful automatic update */
+    char *makefile; 	    	    /* usually "Makefile" */
+    const char * const *makefile_deps;     /* all filenames on which Makefile depends */
+    const char * const *standard_targets;  /* standard targets, or NULL for GNU defaults */
+    const MakeCommand *commands;    /* specific commands for Build menu */
+};
+
+
+typedef struct
+{
+    const char *name;
+    const char *label;
+    /*
+     * Standard default filenames for the makefile in the same order
+     * searched by the make program, e.g. GNUmakefile, makefile, Makefile.
+     */
+    const char * const *makefiles;
+    /*
+     * Construct one or more flags to implement prefs.makefile.
+     */
+    void (*makefile_flags)(estring *);
+    /*
+     * Construct one or more flags to implement the best approximation
+     * available to the policy described by prefs.run_{how,processes,load}.
+     */
+    void (*parallel_flags)(estring *);
+    /*
+     * Construct one or more flags to implement prefs.ignore_failures.
+     */
+    void (*keep_going_flags)(estring *);
+    /*
+     * Construct one or more flags to implement prefs.dryrun.
+     */
+    void (*dryrun_flags)(estring *);
+    /*
+     * Construct one or more flags which emit version/copyright info
+     * on stdout and/or stderr.
+     */
+    void (*version_flags)(estring *);
+    /*
+     * Construct one or more flags which emit a list of targets on
+     * stdout and/or stderr.
+     */
+    void (*list_targets_flags)(estring *);
+    /*
+     * Return a new Task which expands and runs the given command,
+     * (which will contain the list_targets flags) filtering the output
+     * for targets and calling add_target() on each one.
+     */
+    Task *(*list_targets_task)(char *cmd);
+    
+} MakeProgram;
+
 
 typedef enum
 {
@@ -153,8 +208,6 @@ typedef enum
     GR_NEVER,	    	/* never active */
     GR_PRINT_PRINTER,
     GR_PRINT_FILE,
-    GR_AUTOCONF,
-    GR_CONFIGURE,
 
     NUM_SETS
 } Groups;
@@ -189,6 +242,11 @@ void message(const char *fmt, ...);
 void grey_menu_items(void);
 char *expand_prog(const char *prog, const char *file, int line, const char *target);
 void handle_line(Task *task, int len, const char *line);
+void set_targets(unsigned int ntargs, char **targs);
+void list_targets_error(const char *errmsg);
+gboolean filter_target(const char *targ);
+extern const MakeSystem *makesys;
+extern const MakeProgram *makeprog;
 /* print.c */ 
 void file_print_cb(GtkWidget *, gpointer);
 /* help.c */ 
@@ -211,11 +269,18 @@ void preferences_set_dryrun(gboolean d);
 void preferences_add_variable(const char *name, const char *value, int type);
 void edit_preferences_cb(GtkWidget *, gpointer);
 void print_page_setup_cb(GtkWidget *, gpointer);
+/* makesys.c */
+gboolean ms_makefile_needs_update(const MakeSystem *ms);
+gboolean ms_is_standard_target(const MakeSystem *ms, const char *targ);
+const MakeSystem *ms_probe(void);
+extern const MakeSystem * const makesystems[];
+/* makeprog.c */
+const char *mp_which_makefile(const MakeProgram *mp);
+extern const MakeProgram * const makeprograms[];
 /* autoconf.c */
 long show_configure_window(gboolean from_client);
-void build_configure_cb(GtkWidget *w, gpointer data);
-gboolean check_for_configure_in(void);
-gboolean check_for_configure(void);
+/* filter.c */
+void filter_describe_all(estring *e, int lod, const char *indent);
 
 
 #define g_list_find_str(l, s) \
