@@ -1,7 +1,5 @@
-*.bck
 maketool
 objs
-make.log
 config.log
 configure
 config.cache
@@ -20,4 +18,3 @@ examples
 maketool_client
 BUILD
 i386
-errs
