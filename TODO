@@ -122,3 +122,8 @@ x  DONE: Fix bug which loses last line of child process' output if the
    line doesn't end in a '\n' (worse, it prepends that to the output
    of the next child process).
    
+x  Change the preferences so that the actual make executable used is
+   specified in exactly one place instead of three (prog_make,
+   prog_make_version, and inside the shell script extract_targets).
+   Use %M as the name of the executable in those cases.
+   
