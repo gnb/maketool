@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.65 2000-08-01 15:37:30 gnb Exp $");
+CVSID("$Id: main.c,v 1.66 2000-08-06 11:05:46 gnb Exp $");
 
 
 /*
@@ -1577,7 +1577,7 @@ ui_create(void)
     gtk_signal_connect(GTK_OBJECT(toplevel), "configure_event", 
     	GTK_SIGNAL_FUNC(toplevel_resize_cb), NULL);
     gtk_container_border_width(GTK_CONTAINER(toplevel), 0);
-    ui_set_help_name(toplevel, "index");
+    ui_set_help_name(toplevel, "maketool");
     gtk_widget_show(GTK_WIDGET(toplevel));
 
     /* gtk_widget_realize(toplevel); */
