@@ -28,7 +28,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.23 1999-06-01 13:21:56 gnb Exp $");
+CVSID("$Id: main.c,v 1.24 1999-06-01 13:28:49 gnb Exp $");
 
 typedef enum
 {
@@ -606,7 +606,7 @@ log_collapse_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gpointer data)
 static void
 log_click_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gint column, gpointer data)
 {
-#if 1
+#if DEBUG
     LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, treeNode);
     
     fprintf(stderr, "log_click_cb: code=%d file=\"%s\" line=%d\n",
