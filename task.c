@@ -31,7 +31,7 @@
 #include <sys/filio.h>
 #endif
 
-CVSID("$Id: task.c,v 1.5 2000-07-21 06:12:03 gnb Exp $");
+CVSID("$Id: task.c,v 1.6 2000-07-21 07:22:22 gnb Exp $");
 
 static GList *task_all = 0;
 static void (*task_work_start_cb)(void) = 0;
@@ -111,7 +111,8 @@ task_reap_func(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     /* Hack to cause any pending input from the pipe to
      * be processed before the reap function tries to use it.
      */
-    task_input_func(user_data, task->fd, GDK_INPUT_READ);
+    if (task->fd > 0)
+	task_input_func(user_data, task->fd, GDK_INPUT_READ);
 
     task->pid = -1; 	/* so task_is_running() == FALSE in reap fn */
     task_all = g_list_remove(task_all, task);

@@ -343,8 +343,10 @@ x  DONE: Add an option to disable make_makefile
 
 x  Add an editor choice for "gvim +%l %f"
 
-x  A.T. Hofkamp says running gvim works but he gets
+x  DONE: A.T. Hofkamp says running gvim works but he gets
    ioctl(FIONREAD): Bad file descriptor
+   This was a side effect of the 0.6.1 anti-hack.  Now it checks for
+   task->fd before calling task_input_func.
 
 x  A.T. Hofkamp says: add a button to edit the first error in the next file.
 
