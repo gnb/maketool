@@ -1,3 +1,51 @@
+* 0.5  (07 Nov 1999)
+x  Added feature which builds a new Makefile if it is out of date. Handles
+   autoconf and imake.
+x  Added feature to map directory level to tree indent level.
+x  Added feature to allow make variables to be overriden on the commandline.
+x  Added feature where the number of errors and warnings in a build run
+   or log file is displayed in the start line, updated as lines are parsed.
+x  Added a small sample window showing colours & icons in the
+   Colors tab of the Preferences window.
+x  Added `Reset to Old' and `Reset to Defaults' buttons in the
+   Colors tab of the Preferences window.
+x  Added filter to detect gcc inclusion trace and allow clicking on
+   those lines to edit those files.
+x  Loading a long error log file now does minimal updates to the log
+   window scrollbar, and issues a message beforehand.
+x  The Edit Next & Edit Prev commands now scroll to the error if its
+   not fully visible onscreen.
+x  Added `babygnu' GNU logo to About Make window.
+x  Handles makefiles with large numbers of targets (e.g. the Linux
+   kernel makefile with over 50 targets which survive the extract_targets
+   filter) by splitting the Build menu into multiple submenus.
+x  "tags" is now considered a standard target.
+x  Solaris port: include the right header to define FIONREAD. Thanks to
+   Alistair Crooks.
+x  Made GNU make executable name configurable. Configure now has a
+   --with-gmake=CMD argument, whose value may contain a full pathname
+   or name to be looked up in $PATH, and optionally flags. Thanks to
+   Frederick Bruckman.
+x  Configure checks for presence of /usr/doc at configure time, and if
+   absent comments out targets for installation of TODO etc files.
+   This makes life easier for non-Linux folks. Thanks to Frederick Bruckman.
+x  The GPL text is compiled into the executable now, so there's no
+   need for it to be installed anywhere. Thanks to Frederick Bruckman.
+x  Fixed bug with unescaped +s in filter regexps. Thanks to Frederick Bruckman.
+x  Fixed layout bug in General and Colors tabs of the Preferences window
+   which resulted in oversized buttons.
+x  Be a little bit less verbose at low values of DEBUG.
+x  Fixed the bug which coredumped if editing next error in summary
+   mode and next error is `   from fred.c:9:'
+x  Fixed bug where after editing colours and clicking Cancel, the
+   next time the Preferences window is brought up it shows the
+   abandoned edited colours instead of the current colours.
+x  Updated tests to exercise some previously fixed bugs.
+x  Fixed bug which allowed whitespace in filenames on error lines.
+x  Fixed bug where the run load spinbox in the Preferences window would
+   sometimes save an incorrect value due to a float rounding problem.
+
+
 * 0.4  (11 Sep 1999)
 x  Added the ability to summarise lines in the make log, e.g.
    a long compile line becomes `Compiling fred.c'. Handles
