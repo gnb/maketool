@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.49 2000-01-08 04:26:56 gnb Exp $");
+CVSID("$Id: main.c,v 1.50 2000-01-24 11:02:10 gnb Exp $");
 
 typedef enum
 {
@@ -1076,15 +1076,6 @@ ui_create_menus(GtkWidget *menubar)
     ui_add_toggle(menu, _("_Dryrun Only"), "<Ctrl>D", build_dryrun_cb, 0,
     	0, prefs.dryrun);
     ui_add_separator(menu);
-#if 0
-    ui_add_button(menu, "all", 0, build_cb, "all", GR_NOTRUNNING);
-    ui_add_button(menu, "install", 0, build_cb, "install", GR_NOTRUNNING);
-    ui_add_button(menu, "clean", 0, build_cb, "clean", GR_NOTRUNNING);
-    ui_add_separator(menu);
-    ui_add_button(menu, "random", 0, build_cb, "random", GR_NOTRUNNING);
-    ui_add_button(menu, "delay", 0, build_cb, "delay", GR_NOTRUNNING);
-    ui_add_button(menu, "targets", 0, build_cb, "targets", GR_NOTRUNNING);
-#endif
     
     menu = ui_add_menu(menubar, _("_View"));
     ui_add_tearoff(menu);
@@ -1265,6 +1256,43 @@ clipboard_init(GtkWidget *w)
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+/*
+ * Set the title of the main window to
+ * reflect maketool's current directory.
+ */
+ 
+static void
+set_main_title(void)
+{
+    char pwd[1024];
+    char *base;
+    char *title;
+    const char *title_prefix = _("Maketool");
+    
+    if (getcwd(pwd, sizeof(pwd)) == 0)
+    {
+    	perror("getcwd");
+    	base = 0;
+    }
+    else
+    {
+    	base = strrchr(pwd, '/');
+	if (base != 0 && base != pwd)   /* handle pwd=="/" */
+	    base++;
+    }
+    /*
+     * At this point, `base' is a readable representation
+     * of the basename of the current working directory, or 0.
+     */
+    if (base == 0)
+	title = g_strdup_printf("%s %s", title_prefix, VERSION);
+    else
+	title = g_strdup_printf("%s %s: %s", title_prefix, VERSION, base);
+    gtk_window_set_title(GTK_WINDOW(toplevel), title);
+    g_free(title);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 #include "maketool.xpm"
 
@@ -1281,12 +1309,7 @@ ui_create(void)
     static char *titles[1] = { "Log" };
     
     toplevel = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    {
-        char *title;
-    	title = g_strdup_printf(_("Maketool %s"), VERSION);
-	gtk_window_set_title(GTK_WINDOW(toplevel), title);
-	g_free(title);
-    }
+    set_main_title();
     gtk_window_set_default_size(GTK_WINDOW(toplevel),
     	prefs.win_width, prefs.win_height);
     gtk_signal_connect(GTK_OBJECT(toplevel), "destroy", 
