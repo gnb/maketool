@@ -1,6 +1,6 @@
 /*
  * Maketool - GTK-based front end for gmake
- * Copyright (c) 1999-2000 Greg Banks
+ * Copyright (c) 1999-2001 Greg Banks
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: print.c,v 1.8 2000-12-05 15:24:14 gnb Exp $");
+CVSID("$Id: print.c,v 1.9 2001-07-25 08:35:22 gnb Exp $");
 
 static GtkWidget	*print_shell = 0;
 typedef enum { D_PRINTER, D_FILE, D_NUM_DESTS } DEST;
