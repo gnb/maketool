@@ -34,8 +34,8 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 /usr/bin/maketool
-/usr/bin/extract_targets
-/usr/bin/make_makefile
+/usr/libexec/maketool/extract_targets
+/usr/libexec/maketool/make_makefile
 /usr/doc/@PACKAGE@-@VERSION@/COPYING
 /usr/doc/@PACKAGE@-@VERSION@/COPYRIGHT
 /usr/doc/@PACKAGE@-@VERSION@/TODO
