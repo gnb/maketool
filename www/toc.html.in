@@ -47,8 +47,15 @@ include(_styles.html)
 	  </TD>
 	</TR>
       </TABLE>
-    </TR>
-  </TD>
+      <TABLE COLS=1 ROWS=1 BORDER=0 BACKGROUND="" BGCOLOR="#ffffff" CELLSPACING=0 CELLPADDING=5>
+	<TR>
+	  <TD>
+	    <A HREF="http://www.caube.org.au/"><IMG WIDTH=85 HEIGHT=32 BORDER=0 SRC="caubutt1.gif" ALT="[nospam]"></A>
+	  </TD>
+	</TR>
+      </TABLE>
+    </TD>
+  </TR>
 </TABLE>
 
 </BODY></HTML>
