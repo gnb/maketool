@@ -1,0 +1,37 @@
+<?
+    global $REQUEST_URI;
+
+    $r = 0;
+    $already = "NO";
+    $what = basename($REQUEST_URI);
+    $input = $what;
+    $size = (filesize($input)/1024);
+    $load = file("LOGAPO");
+    $c = count($load);
+    for ($ln = 0 ; $ln < $c ; $ln++)
+    {
+	$now = split("_zeta_", $load[$ln]);
+	$this = trim($now[0]);
+	$num = trim($now[2]);
+	if ($input == $this)
+	{
+	    $go[] = $what."_zeta_".$size."_zeta_".($num+1);
+	    $already = "YES";
+	}
+	else
+	{
+	    $go[] = trim($load[$ln]); 
+	}
+    }
+    if ($already == "NO")
+    	$go[] = $what."_zeta_".$size."_zeta_1";
+    $fp = fopen("LOGAPO", "w");
+    $ct = count($go);
+    for ($x = 0 ; $x < $ct ; $x++)
+    {
+	if ($go[$x] != "")
+	    fputs($fp, $go[$x]."\n");
+    }
+    header("Location: downloads/".$what);
+?>
+

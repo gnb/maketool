@@ -1,0 +1,9 @@
+<Files *.rpm>
+ForceType application/x-rpm
+</Files>
+<Files *.tar.gz>
+ForceType application/x-tar
+</Files>
+<Files *.tar.bz2>
+ForceType application/x-tar
+</Files>

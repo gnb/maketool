@@ -1,0 +1,9 @@
+<Files *.rpm>
+ForceType application/x-httpd-php
+</Files>
+<Files *.tar.gz>
+ForceType application/x-httpd-php
+</Files>
+<Files *.tar.bz2>
+ForceType application/x-httpd-php
+</Files>
