@@ -1,7 +1,7 @@
 <!DOCTYPE ARTICLE PUBLIC "-//OASIS//DTD DocBook V3.1//EN">
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.4 2000-11-26 10:16:10 gnb Exp $"
+         revision="$Id: help.sgml,v 1.5 2001-08-02 08:20:39 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool online help</title>
@@ -9,10 +9,11 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2000-11-26 10:16:10 $</pubdate>
+  <pubdate role="cvs">$Date: 2001-08-02 08:20:39 $</pubdate>
   <releaseinfo>This is version VERSION</releaseinfo>
   <copyright>
     <year>2000</year>
+    <year>2001</year>
     <holder role="mailto:gnb@alphalink.com.au">Greg Banks</holder> 
   </copyright>
   <legalnotice>
@@ -41,6 +42,112 @@ document.
 </sect1>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="main-window" xreflabel="Main window">
+<title>Main window</title>
+
+<graphic format=GIF fileref="mainwin.gif"></graphic>
+
+<para>
+Maketool is a GUI program for running the GNU make utility, or
+<command>gmake</command>, to build software.  GNU make is a powerful
+utility for organising the process of compiling and linking
+software, and is widely used in Open Source and commercial
+software.
+</para>
+
+<para>
+This is maketool's main window.  The various parts of the main window are:
+</para>
+
+
+<variablelist>
+
+  <varlistentry>
+    <term>menubar</term>
+    <listitem>
+      <para>
+      Each menu contains commands which allow you to drive maketool.
+      The menubar can be detached from maketool by dragging the handle
+      at the left.  Each menu can be detached from maketool by selecting
+      the dashed line at it's top.
+      </para>
+      <para>
+      See also <xref linkend="file-menu">, <xref linkend="edit-menu">,
+      <xref linkend="build-menu">, <xref linkend="view-menu">, and
+      <xref linkend="help-menu">.
+      </para>
+    </listitem>
+  </varlistentry>
+  
+  <varlistentry>
+    <term>toolbar</term>
+    <listitem>
+      <para>
+      Each tool is a shortcut to a menu item, arranged for your
+      convenience.  The toolbar can be detached from maketool
+      by dragging the handle at the left.
+      </para>
+      <para>
+      See also <xref linkend="again-tool">,
+      <xref linkend="stop-tool">, <xref linkend="all-tool">,
+      <xref linkend="clean-tool">, <xref linkend="clear-tool">,
+      <xref linkend="edit-next-tool">, <xref linkend="edit-file-next-tool">,
+      <xref linkend="print-tool">.
+      </para>
+    </listitem>
+  </varlistentry>
+  
+  <varlistentry>
+    <term>log window<anchor id="log-window" xreflabel="Log window"></term>
+    <listitem>
+      <para>
+      This window shows the output of <command>gmake</command>.
+      As shown in the example, errors and warnings are highlighted;
+      double-clicking on an error or warning will start an editor
+      showing you the line in the source file which caused the
+      error or warning.
+      </para>
+      <para>
+      Errors and warnings are distinguished by both colors and icons.
+      You can change the colors in the <xref linkend="colors-pane">.
+      </para>
+      <para>
+      The presentation of text in the log window is controlled by
+      various options in the <xref linkend="view-menu">.
+      </para>
+    </listitem>
+  </varlistentry>
+  
+  <varlistentry>
+    <term>status bar</term>
+    <listitem>
+      <para>
+      Messages from maketool itself (rather than <command>gmake</command>)
+      are displayed here.
+      </para>
+    </listitem>
+  </varlistentry>
+  
+  <varlistentry>
+    <term>progress indicator</term>
+    <listitem>
+      <para>
+      When <command>gmake</command> is running, this area displays
+      an animation of a brick wall building itself, to show you 
+      that something is happening.
+      </para>
+    </listitem>
+  </varlistentry>
+  
+</variablelist>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
 <sect1 id="ok" xreflabel="Ok Button">
 <title>Ok Button</title>
 
@@ -53,7 +160,7 @@ dialog window and close the window.
 
 <para>
 See also:
-<xref linkend="apply">
+<xref linkend="apply">,
 <xref linkend="cancel">
 </para>
 
@@ -76,7 +183,7 @@ dialog window, without closing the dialog window.
 
 <para>
 See also:
-<xref linkend="ok">
+<xref linkend="ok">,
 <xref linkend="cancel">
 </para>
 
@@ -99,7 +206,7 @@ dialog window and close the dialog.
 
 <para>
 See also:
-<xref linkend="ok">
+<xref linkend="ok">,
 <xref linkend="apply">
 </para>
 
@@ -110,27 +217,358 @@ See also:
 </sect1>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="tools-again" xreflabel="Again tool">
+<sect1 id="file-menu" xreflabel="File menu">
+<title>File menu</title>
+
+<graphic format=GIF fileref="file-menu.gif"></graphic>
+
+<variablelist>
+
+  <varlistentry>
+    <term><guibutton>Open Log...</guibutton></term>
+    <listitem>
+      <para>
+      Shows the <xref linkend="open-log-file-window"> which allows you
+      to choose a filename of <command>gmake</command> output to be opened
+      and displayed in maketool.  This file can be a file saved by
+      the <guibutton>Save Log...</guibutton> menu item, or a file
+      generated from the command line using a command like:
+      </para>
+      <programlisting>
+gmake some-target 2>&1 | tee <emphasis>make.log</emphasis>
+      </programlisting>
+      <para>
+      or
+      </para>
+      <programlisting>
+gmake some-target > <emphasis>make.log</emphasis> 2>&1
+      </programlisting>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Save Log...</guibutton></term>
+    <listitem>
+      <para>
+      Shows the <xref linkend="save-log-file-window"> which allows you
+      to choose a filename to which the text in the <xref linkend="log-window">
+      will be saved.  The file will contain raw text, exactly as
+      <command>gmake</command> emitted it.  The file can later be loaded
+      into maketool again using the <guibutton>Open Log...</guibutton> 
+      menu item.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Change Directory...</guibutton></term>
+    <listitem>
+      <para>
+      <anchor id="change-directory" xreflabel="Change Directory menu item">
+      Shows the <xref linkend="change-directory-window"> which allows you
+      to choose a directory.  Maketool will make that directory it's
+      current directory.  Maketool will then scan any Makefile present
+      in the directory and show the targets defined by the Makefile
+      in the <xref linkend="build-menu">.  Finally, maketool will
+      add the old directory to the <guibutton>Previous Directories</guibutton>
+      menu.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Previous Directories</guibutton></term>
+    <listitem>
+      <para>
+      Lists the last directories in which maketool has been used.
+      Select a directory, and maketool will change to that directory
+      as if you had used the <guibutton>Change Directory...</guibutton>
+      menu item.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Edit Makefile...</guibutton></term>
+    <listitem>
+      <para>
+      Starts up an editor session editing the Makefile in the current
+      directory.  If the current directory uses a system like
+      <command>autoconf</command> or <command>Imake</command> to
+      generate the Makefile from another source file, that other
+      source file will be edited instead.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Print...</guibutton></term>
+    <listitem>
+      <para>
+      Shows the <xref linkend="print-window"> to allow you to print
+      the contents of the <xref linkend="log-window"> to a printer.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Exit</guibutton></term>
+    <listitem>
+      <para>
+      Quits maketool.
+      </para>
+      <para>
+      Note, if you haven't saved the contents of the
+      <xref linkend="log-window">, maketool will <emphasis>NOT</emphasis>
+      ask you if you want to save.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="edit-menu" xreflabel="Edit menu">
+<title>Edit menu</title>
+
+<graphic format=GIF fileref="edit-menu.gif"></graphic>
+
+<variablelist>
+
+  <varlistentry>
+    <term><guibutton>Edit Error</guibutton></term>
+    <listitem>
+      <para>
+      Starts an editor session editing the source file and line
+      mentioned in the line currently selected in the
+      <xref linkend="log-window">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Edit Next Error</guibutton></term>
+    <listitem>
+      <para>
+      Searches forwards in the <xref linkend="log-window"> for the next
+      error or warning message, starting at the currently selected
+      line, and starts an editor session editing the source file and line
+      mentioned in that line.
+      </para>
+      <para>
+      If the <xref linkend="edit-next-ignores-warnings"> option is set,
+      <guibutton>Edit Next Error</guibutton> will ignore warnings and
+      only find errors.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Edit Prev Error</guibutton></term>
+    <listitem>
+      <para>
+      Like <guibutton>Edit Next Error</guibutton> but searches backwards.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Edit Next File Error</guibutton></term>
+    <listitem>
+      <para>
+      Like <guibutton>Edit Next Error</guibutton> but first skips to
+      the next source file.  This is useful when an error early in a
+      source file confuses the compiler and generates many spurious errors.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Copy</guibutton></term>
+    <listitem>
+      <para>
+      Copies the text of the currently selected line in the
+      <xref linkend="log-window"> to the clipboard, from where it can
+      be pasted into a text editor.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Find...</guibutton></term>
+    <listitem>
+      <para>
+      Shows the <xref linkend="find-window"> which allows you to
+      search the contents of the <xref linkend="log-window">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Find Again...</guibutton></term>
+    <listitem>
+      <para>
+      Repeats the last search (from the <xref linkend="find-window">).
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Preferences...</guibutton></term>
+    <listitem>
+      <para>
+      Shows the <xref linkend="preferences-window"> which allows you
+      to edit maketool's various options and parameters.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="build-menu" xreflabel="Build menu">
+<title>Build menu</title>
+
+<graphic format=GIF fileref="build-menu.gif"></graphic>
+
+<variablelist>
+
+  <varlistentry>
+    <term><guibutton>Again</guibutton></term>
+    <listitem>
+      <para>
+      Runs <command>gmake</command> with the same
+      target you used last time you ran <command>gmake</command> (from the
+      <guimenu>Build</guimenu> menu, the <xref linkend="all-tool">,
+      or the <xref linkend="clean-tool">).  The target is shown in
+      brackets.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Stop</guibutton></term>
+    <listitem>
+      <para>
+      Stops a running <command>gmake</command>.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Dryrun Only</guibutton></term>
+    <listitem>
+      <para>
+      While this option is on, <command>gmake</command> does not
+      perform any building, and instead only shows the commands it
+      would use for building.  This is useful for debugging Makefiles.
+      </para>
+      <para>
+      This option uses the <option>-n</option> flag to <command>gmake</command>.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>standard targets</term>
+    <listitem>
+      <para>
+      The section of the menu between the first and second separators
+      shows all the targets defined by the Makefile in the current
+      directory, which are standard targets defined by the GNU
+      Makefile Standards.  Those targets, and their standard meanings
+      are described in <xref linkend="standard-targets">.
+      This section is updated when the current directory is changed
+      using the <xref linkend="change-directory">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>non-standard targets</term>
+    <listitem>
+      <para>
+      The section of the menu after the second separator
+      shows all the targets defined by the Makefile in the current
+      directory, excepting those which are standard targets,
+      and excepting certain targets which maketool considers
+      "internal" to the Makefile.
+      This section is updated when the current directory is changed
+      using the <xref linkend="change-directory">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="view-menu" xreflabel="View menu">
+<title>View menu</title>
+
+<graphic format=GIF fileref="view-menu.gif"></graphic>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="help-menu" xreflabel="Help menu">
+<title>Help menu</title>
+
+<graphic format=GIF fileref="help-menu.gif"></graphic>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="again-tool" xreflabel="Again tool">
 <title>Again tool</title>
 
 <graphic format=GIF fileref="tools-again.gif"></graphic>
 
 <para>
-Click this toolbar button to repeat the last <command>gmake</command> run,
-i.e. run <command>gmake</command> with the same target you used last time
-you ran <command>gmake</command>.  Look at the tooltip to see which
-target will be built.
+Click this tool to run <command>gmake</command> with the same target
+you used last time you ran <command>gmake</command> (from the
+<guimenu>Build</guimenu> menu, the <xref linkend="all-tool">,
+or the <xref linkend="clean-tool">).  The tooltip shows
+you which target this will be.
 </para>
 
 <para>
-This toolbar button becomes available once you have done at least
+This tool becomes available once you have started at least
 one <command>gmake</command> run.
 </para>
 
 <para>
 See also:
-<xref linkend="tools-all">
-<xref linkend="tools-clean">
+<xref linkend="all-tool">,
+<xref linkend="clean-tool">
 <!-- <xref linkend="menu-build"> -->
 </para>
 
@@ -141,24 +579,24 @@ See also:
 </sect1>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="tools-stop" xreflabel="Stop tool">
+<sect1 id="stop-tool" xreflabel="Stop tool">
 <title>Stop tool</title>
 
 <graphic format=GIF fileref="tools-stop.gif"></graphic>
 
 <para>
-Click this toolbar button to stop the current <command>gmake</command> run.
+Click this tool to stop the current <command>gmake</command> run.
 </para>
 
 <para>
-This toolbar button becomes available only during a <command>gmake</command>
+This tool becomes available only during a <command>gmake</command>
 run.
 </para>
 
 <para>
 See also:
-<xref linkend="tools-all">
-<xref linkend="tools-clean">
+<xref linkend="all-tool">,
+<xref linkend="clean-tool">
 <!-- <xref linkend="menu-build"> -->
 </para>
 
@@ -169,33 +607,28 @@ See also:
 </sect1>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="tools-all" xreflabel="Build All tool">
+<sect1 id="all-tool" xreflabel="Build All tool">
 <title>Build All tool</title>
 
 <graphic format=GIF fileref="tools-all.gif"></graphic>
 
 <para>
-Click this toolbar button to run <command>gmake</command> with the
+Click this tool to run <command>gmake</command> with the
 target <varname>all</varname>.  Makefiles which adhere to GNU
-Makefile standards define this target thus:
+Makefile standards will compile and link all programs
+and libraries (but not necessarily any documentation).
 </para>
 
-<blockquote>
-  <para>
-    Compile the entire program.  This should be the default target.
-    This target need not rebuild any documentation files.
-  </para>
-</blockquote>
-
 <para>
-This toolbar button becomes available if the <filename>Makefile</filename>
-in the current directory defines an <varname>all</varname> target, and
-remains available while <command>gmake</command> is not running.
+This tool becomes available if the <filename>Makefile</filename>
+in the current directory defines an <varname>all</varname> target.
+Like all build tools and menu items, it becomes unavailable while
+<command>gmake</command> is running.
 </para>
 
 <para>
 See also:
-<xref linkend="tools-clean">
+<xref linkend="clean-tool">.
 </para>
 
 <para>
@@ -205,36 +638,36 @@ See also:
 </sect1>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="tools-clean" xreflabel="Build Clean tool">
-<title>Build Clean tool</title>
+<sect1 id="clean-tool" xreflabel="Clean tool">
+<title>Clean tool</title>
 
 <graphic format=GIF fileref="tools-clean.gif"></graphic>
 
 <para>
-Click this toolbar button to run <command>gmake</command> with the
+Click this tool to run <command>gmake</command> with the
 target <varname>clean</varname>.  Makefiles which adhere to GNU
-Makefile standards define this target thus:
+Makefile standards will delete all files which are normally
+created by building, such as programs, libraries, and object
+files, but not files which record the configuration.
 </para>
 
-<blockquote>
-  <para>
-    Delete all files from the current directory that are normally
-    created by building the program.  Don't delete the files that
-    record the configuration.  Also preserve files that could be
-    made by building, but normally aren't because the distribution
-    comes with them.
-  </para>
-</blockquote>
+<para>
+Use this to force a complete rebuild after changing the
+configuration, or after setting variables like
+<varname>CFLAGS</varname> or <varname>CC</varname>
+in the <xref linkend="variables-pane">.
+</para>
 
 <para>
-This toolbar button becomes available if the <filename>Makefile</filename>
-in the current directory defines a <varname>clean</varname> target, and
-remains available while <command>gmake</command> is not running.
+This tool becomes available if the <filename>Makefile</filename>
+in the current directory defines a <varname>clean</varname> target.
+Like all build tools and menu items, it becomes unavailable while
+<command>gmake</command> is running.
 </para>
 
 <para>
 See also:
-<xref linkend="tools-all">
+<xref linkend="all-tool">
 </para>
 
 <para>
@@ -244,14 +677,13 @@ See also:
 </sect1>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="tools-clear" xreflabel="Clear Log tool">
+<sect1 id="clear-tool" xreflabel="Clear Log tool">
 <title>Clear Log tool</title>
 
 <graphic format=GIF fileref="tools-clear.gif"></graphic>
 
 <para>
-Click this toolbar button to clear the log window, i.e. delete
-all text in the window.
+Click this tool to delete all text in the window.
 </para>
 
 <para>
@@ -265,89 +697,25 @@ This toolbar button becomes available when the log window contains text.
 </sect1>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="tools-edit-next" xreflabel="Edit Next Error tool">
+<sect1 id="edit-next-tool" xreflabel="Edit Next Error tool">
 <title>Edit Next Error tool</title>
 
 <graphic format=GIF fileref="tools-edit-next.gif"></graphic>
 
 <para>
-  Click this toolbar button to edit the next error or warning after the
-  currently selected line in the log window.  If the <guilabel>Edit Next
-  ignores warnings</guilabel> toggle in the <guilabel>Preferences</guilabel>
-  window is set, this button will skip over warnings and only find errors.
+Click this tool to edit the next error or warning after the
+currently selected line in the log window.  If the <guilabel>Edit Next
+ignores warnings</guilabel> toggle in the <guilabel>Preferences</guilabel>
+window is set, this button will skip over warnings and only find errors.
 </para>
 
 <para>
-  This toolbar button becomes available when the log window contains text.
-</para>
-
-<para>
-  See also:
-  <xref linkend="tools-edit-file-next">
-</para>
-
-<para>
-  <xref linkend="index">
-</para>
-
-</sect1>
-
-<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="tools-edit-file-next" xreflabel="Edit File Next Error tool">
-<title>Edit File Next Error tool</title>
-
-<graphic format=GIF fileref="tools-edit-file-next.gif"></graphic>
-
-<para>
-  Click this toolbar button to edit the next error or warning after the
-  currently selected line in the log window.  Unlike the
-  <xref linkend="tools-edit-next">, this button first skips all errors
-  and warnings in the same file as the selected line; this is useful
-  when
-  
-  If the <guilabel>Edit Next
-  ignores warnings</guilabel> toggle in the <guilabel>Preferences</guilabel>
-  window is set, this button will skip over warnings and only find errors.
-</para>
-
-<para>
-  This toolbar button becomes available when the log window contains text.
-</para>
-
-<para>
-  See also:
-  <xref linkend="tools-edit-next">
-</para>
-
-<para>
-  <xref linkend="index">
-</para>
-
-</sect1>
-
-<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="tools-print" xreflabel="Print tool">
-<title>Print tool</title>
-
-<graphic format=GIF fileref="tools-print.gif"></graphic>
-
-<para>
-Click this toolbar button to repeat the last make run, i.e. run
-<command>gmake</command> with the same target you used last time
-you ran <command>gmake</command>.  Look at the tooltip to see which
-target will be built.
-</para>
-
-<para>
-This toolbar button becomes available once you have done at least
-one <command>gmake</command> run.
+This tool becomes available when the log window contains text.
 </para>
 
 <para>
 See also:
-<xref linkend="tools-all">
-<xref linkend="tools-clean">
-<!-- <xref linkend="menu-build"> -->
+<xref linkend="edit-file-next-tool">
 </para>
 
 <para>
@@ -357,9 +725,139 @@ See also:
 </sect1>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="prefs-kflag" xreflabel="Continue despite failures">
-<title>Continue despite failures</title>
+<sect1 id="edit-file-next-tool" xreflabel="Edit File Next Error tool">
+<title>Edit File Next Error tool</title>
 
+<graphic format=GIF fileref="tools-edit-file-next.gif"></graphic>
+
+<para>
+Click this tool to edit the next error or warning after the
+currently selected line in the log window.  Unlike the
+<xref linkend="edit-next-tool">, this tool first skips all errors
+and warnings in the same file (compilation unit) as the selected
+line.  This is useful when an error early in the file confuses
+the compiler.  If the <xref linkend="edit-next-ignores-warnings">
+option is set, this tool will skip over warnings and only find errors.
+</para>
+
+<para>
+This tool becomes available when the log window contains text.
+</para>
+
+<para>
+See also:
+<xref linkend="edit-next-tool">
+</para>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="print-tool" xreflabel="Print tool">
+<title>Print tool</title>
+
+<graphic format=GIF fileref="tools-print.gif"></graphic>
+
+<para>
+Click this tool to pop up the <xref linkend="print-window">
+which you can use to print the text in the log window.
+</para>
+
+<para>
+This tool becomes available when the log window contains text.
+</para>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="open-log-file-window" xreflabel="Open Log File window">
+<title>Open Log File window</title>
+
+<graphic format=GIF fileref="open-log-file-window.gif"></graphic>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="save-log-file-window" xreflabel="Save Log File window">
+<title>Save Log File window</title>
+
+
+<graphic format=GIF fileref="save-log-file-window.gif"></graphic>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="change-directory-window" xreflabel="Change Directory window">
+<title>Change Directory window</title>
+
+
+<graphic format=GIF fileref="change-directory-window.gif"></graphic>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="print-window" xreflabel="Print window">
+<title>Print window</title>
+
+
+<graphic format=GIF fileref="print-window.gif"></graphic>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="find-window" xreflabel="Find window">
+<title>Find window</title>
+
+
+<graphic format=GIF fileref="find-window.gif"></graphic>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="preferences-window" xreflabel="Preferences window">
+<title>Preferences window</title>
+
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="general-pane" xreflabel="General pane">
+<title>General pane</title>
+
+<graphic format=GIF fileref="general-pane.gif"></graphic>
+
+<anchor id="continue-despite-failures" xreflabel="Continue despite failures">
 <para>
 Select this toggle to have <command>gmake</command> continue building
 targets after a target fails to be built.  The normal behaviour of
@@ -369,6 +867,251 @@ targets after a target fails to be built.  The normal behaviour of
 <para>
 This toggle sets the <option>-k</option> flag to <command>gmake</command>.
 </para>
+
+<anchor id="edit-next-ignores-warnings" xreflabel="Edit Next ignores warnings">
+
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="variables-pane" xreflabel="Variables pane">
+<title>Variables pane</title>
+
+
+<graphic format=GIF fileref="variables-pane.gif"></graphic>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="programs-pane" xreflabel="Programs pane">
+<title>Programs pane</title>
+
+
+<graphic format=GIF fileref="programs-pane.gif"></graphic>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="colors-pane" xreflabel="Colors pane">
+<title>Colors pane</title>
+
+
+<graphic format=GIF fileref="colors-pane.gif"></graphic>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="page-setup-pane" xreflabel="Page Setup pane">
+<title>Page Setup pane</title>
+
+
+<graphic format=GIF fileref="page-setup-pane.gif"></graphic>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="about-maketool-window" xreflabel="About Maketool window">
+<title>About Maketool window</title>
+
+
+<graphic format=GIF fileref="about-maketool-window.gif"></graphic>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="licence-window" xreflabel="Licence window">
+<title>Licence window</title>
+
+
+<graphic format=GIF fileref="licence-window.gif"></graphic>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="about-make-window" xreflabel="About Make window">
+<title>About Make window</title>
+
+
+<graphic format=GIF fileref="about-make-window.gif"></graphic>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="standard-targets" xreflabel="Standard Targets">
+<title>Standard Targets</title>
+
+<variablelist>
+
+  <varlistentry>
+    <term>all</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>check</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>clean</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>dist</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>distclean</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>dvi</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>info</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>install</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>installcheck</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>installdirs</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>install-strip</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>maintainer-clean</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>mostlyclean</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>reallyclean</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>TAGS</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>tags</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>uninstall</term>
+    <listitem>
+      <para>
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+
 
 <para>
 <xref linkend="index">

@@ -1,3 +1,5 @@
 *.html
-HTML.manifest
+*.xcf
 *.bck
+help
+help.junk
