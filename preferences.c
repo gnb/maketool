@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.43 2000-12-05 15:24:14 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.44 2001-03-09 17:15:45 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -852,12 +852,42 @@ var_select_cb(
 
 
 static void
+var_handle_equal(void)
+{
+    const char *namex;
+    const char *valuex;
+    char *name;
+    char *value;
+    
+    namex = gtk_entry_get_text(GTK_ENTRY(var_name_entry));
+    if (namex == 0 || strchr(namex, '=') == 0)
+    	return;
+    namex = safe_str(namex);
+    
+    valuex = gtk_entry_get_text(GTK_ENTRY(var_value_entry));
+    valuex = safe_str(valuex);
+
+    name = g_strconcat(namex, valuex, 0);
+    value = strchr(name, '=');
+    *value++ = '\0';
+    
+    gtk_entry_set_text(GTK_ENTRY(var_name_entry), name);
+    gtk_entry_set_text(GTK_ENTRY(var_value_entry), value);
+    gtk_widget_grab_focus(var_value_entry);
+    
+    g_free(name);
+}
+
+static void
 var_changed_cb(GtkWidget *w, gpointer data)
 {
     if (!creating && !setting)
     {
 	gtk_widget_set_sensitive(var_set_btn, TRUE);
 	gtk_widget_set_sensitive(var_unset_btn, TRUE);
+	
+	if (w == var_name_entry)
+	    var_handle_equal();
     }
 }
 
