@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.51 2003-10-03 12:15:04 gnb Exp $");
+CVSID("$Id: log.c,v 1.52 2003-10-04 00:50:38 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -48,6 +48,7 @@ static GtkWidget	*logwin;	/* a GtkCTree widget */
 static int		num_errors;
 static int		num_warnings;
 static gboolean     	num_ew_changed = FALSE;
+static void 	    	(*log_count_callback)(int, int);
 static GList		*log;		/* list of LogRecs */
 
 static GHashTable   	*dir_hash;  	/* hashtable of all normalised directories */
@@ -631,6 +632,10 @@ log_update_build_start(void)
     gtk_ctree_node_set_text(GTK_CTREE(logwin), bs->node, /*column*/0, text.data);
 
     estring_free(&text);
+    
+    if (log_count_callback)
+    	(*log_count_callback)(num_errors, num_warnings);
+    
     num_ew_changed = FALSE;
 }
 
@@ -1221,6 +1226,13 @@ log_init(GtkWidget *w)
     
     dir_hash = g_hash_table_new(g_str_hash, g_str_equal);
     dir_stack = g_ptr_array_new();
+}
+
+
+void
+log_set_count_callback(void (*callback)(int, int))
+{
+    log_count_callback = callback;
 }
 
 void

@@ -32,7 +32,7 @@
 #include "mqueue.h"
 #include "progress.h"
 
-CVSID("$Id: main.c,v 1.101 2003-10-03 12:15:45 gnb Exp $");
+CVSID("$Id: main.c,v 1.102 2003-10-04 00:50:38 gnb Exp $");
 
 
 /*
@@ -56,6 +56,8 @@ GtkWidget	*build_menu;
 GtkWidget	*toolbar_hb, *messagebox;
 GtkWidget	*messageent;
 GtkWidget   	*progressbar;
+GtkWidget   	*warning_count;
+GtkWidget   	*error_count;
 gboolean	interrupted = FALSE;
 gboolean	first_error = TRUE;
 
@@ -418,6 +420,31 @@ work_ended(void)
 {
     anim_stop();
     grey_menu_items();
+    gtk_widget_hide(error_count->parent);
+    gtk_widget_hide(warning_count->parent);
+}
+
+/*
+ * Called when the number of errors or warnings in the log changes.
+ */
+static void
+count_changed(int nerrors, int nwarnings)
+{
+    char buf[32];
+
+    if (nerrors > 0)
+    {
+    	snprintf(buf, sizeof(buf), "%d", nerrors);
+	gtk_label_set_text(GTK_LABEL(error_count), buf);
+	gtk_widget_show(error_count->parent);
+    }
+    
+    if (nwarnings > 0)
+    {
+    	snprintf(buf, sizeof(buf), "%d", nwarnings);
+	gtk_label_set_text(GTK_LABEL(warning_count), buf);
+	gtk_widget_show(warning_count->parent);
+    }
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -1893,6 +1920,29 @@ set_main_title(void)
 
 #include "maketool.xpm"
 
+static GtkWidget *
+create_log_count(GtkWidget *parentbox, LogSeverity level)
+{
+    GtkWidget *box, *icon, *label;
+    GdkPixmap *pm = 0;
+    GdkBitmap *mask = 0;
+
+    box = gtk_hbox_new(FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(parentbox), box, FALSE, TRUE, 0);   
+    /* box hidden by default */
+    
+    log_get_icon(level, &pm, &mask, 0, 0);
+    icon = gtk_pixmap_new(pm, mask);
+    gtk_box_pack_start(GTK_BOX(box), icon, FALSE, TRUE, 0);   
+    gtk_widget_show(icon);
+
+    label = gtk_label_new("");
+    gtk_box_pack_start(GTK_BOX(box), label, FALSE, TRUE, 0);   
+    gtk_widget_show(label);
+    
+    return label;
+}
+
 static void
 ui_create(void)
 {
@@ -2001,6 +2051,7 @@ ui_create(void)
     clipboard_init(logwin);
     gtk_widget_show(logwin);
     log_init(logwin);
+    log_set_count_callback(count_changed);
     
     messagebox = gtk_hbox_new(FALSE, SPACING);
     gtk_table_attach(GTK_TABLE(table), messagebox, 0, 1, 3, 4,
@@ -2023,6 +2074,9 @@ ui_create(void)
     gtk_box_pack_start(GTK_BOX(messagebox), progressbar, FALSE, TRUE, 0);   
     /* hidden by default */
     
+    error_count = create_log_count(messagebox, L_ERROR);
+    warning_count = create_log_count(messagebox, L_WARNING);
+
     ui_init_anim_pixmaps();
 
     anim = gtk_pixmap_new(anim_pixmaps[0], anim_masks[0]);

@@ -6,10 +6,6 @@ x  Help->Help On reports "main-window" if clicked on the background of
    any dialog, and only reports the right dialog if clicked on some
    other widget in the dialog.
    
-x  Display in the statusbar, between the message and the progress
-   indicator, running counts of number of warnings and errors found
-   since last build start.
-
 x  When using autoconf there seems to be a race condition between
    creation of "configure" and running it, because "configure" creates
    a file "conftestfile" and tests the order of file modification
@@ -293,6 +289,10 @@ x  When ./configure is run from make_makefile(), config.status is also
 --- closed ---
 
 x  Provide a progress indicator during the open of large log files.
+
+x  Display in the statusbar, between the message and the progress
+   indicator, running counts of number of warnings and errors found
+   since last build start.
 
 x  memleak:
 ==5761== 3074 bytes in 222 blocks are definitely lost in loss record 73 of 82
