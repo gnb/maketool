@@ -44,7 +44,13 @@ EOF
     	test $flag = _dummy && continue
 	case " $CFLAGS " in
 	*[[\ \	]]$flag[[\ \	]]*) ;;
-	*) CEXTRAWARNFLAGS="$CEXTRAWARNFLAGS $flag" ;;
+	*)
+	    CEXTRAWARNFLAGS="$CEXTRAWARNFLAGS $flag"
+	    # some flags need side effects to minimise spurious warnings.
+	    case "$flag" in
+	    -pedantic) AC_DEFINE_UNQUOTED(inline, __inline__) ;;
+	    esac
+	    ;;
 	esac
     done
     CFLAGS="$CFLAGS $CEXTRAWARNFLAGS"
