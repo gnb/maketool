@@ -28,11 +28,11 @@
 #if HAVE_SIGNAL_H
 #include <signal.h>
 #endif
-#include <sys/stat.h>
 #include <errno.h>
 #include "mqueue.h"
+#include "progress.h"
 
-CVSID("$Id: main.c,v 1.100 2003-10-03 00:12:01 gnb Exp $");
+CVSID("$Id: main.c,v 1.101 2003-10-03 12:15:45 gnb Exp $");
 
 
 /*
@@ -55,6 +55,7 @@ GList		*available_targets = 0;	/* all possible targets, for menu */
 GtkWidget	*build_menu;
 GtkWidget	*toolbar_hb, *messagebox;
 GtkWidget	*messageent;
+GtkWidget   	*progressbar;
 gboolean	interrupted = FALSE;
 gboolean	first_error = TRUE;
 
@@ -132,6 +133,52 @@ message_flush(void)
 {
     while (g_main_pending())
     	g_main_iteration(/*may_block*/FALSE);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+main_progress_start(Progress *p)
+{
+#if DEBUG
+    fprintf(stderr, "main_progress_start()\n");
+#endif
+    gtk_progress_bar_update(GTK_PROGRESS_BAR(progressbar), 0.0);
+    gtk_widget_show(progressbar);
+    message_flush();
+}
+
+static void
+main_progress_end(Progress *p)
+{
+#if DEBUG
+    fprintf(stderr, "main_progress_end()\n");
+#endif
+    gtk_widget_hide(progressbar);
+}
+
+static void
+main_progress_changed(Progress *p, int pc)
+{
+#if DEBUG
+    fprintf(stderr, "main_progress_changed(%d)\n", pc);
+#endif
+    gtk_progress_bar_update(GTK_PROGRESS_BAR(progressbar), (gfloat)pc/100.0);
+    message_flush();
+}
+
+static Progress *
+main_progress(void)
+{
+    static const ProgressOps ops = 
+    {
+	main_progress_start,
+	main_progress_changed,
+	main_progress_end
+    };
+    static Progress prog = { &ops };
+    
+    return &prog;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -998,7 +1045,7 @@ file_open_file_func(const char *filename)
 {
     message("Opening log file %s", filename);
     message_flush();
-    log_open(filename);
+    log_open(filename, main_progress());
 }
 
 static void
@@ -1026,7 +1073,7 @@ file_save_file_func(const char *filename)
 {
     message("Saving log file %s", filename);
     message_flush();
-    log_save(filename);
+    log_save(filename, main_progress());
 }
 
 static void
@@ -1967,6 +2014,14 @@ ui_create(void)
     gtk_entry_set_text(GTK_ENTRY(messageent), _("Welcome to Maketool"));
     gtk_box_pack_start(GTK_BOX(messagebox), messageent, TRUE, TRUE, 0);   
     gtk_widget_show(messageent);
+    
+    progressbar = gtk_progress_bar_new();
+    gtk_progress_bar_set_orientation(GTK_PROGRESS_BAR(progressbar),
+    	    	    	    	     GTK_PROGRESS_LEFT_TO_RIGHT);
+    gtk_progress_bar_set_bar_style(GTK_PROGRESS_BAR(progressbar),
+				   GTK_PROGRESS_CONTINUOUS);
+    gtk_box_pack_start(GTK_BOX(messagebox), progressbar, FALSE, TRUE, 0);   
+    /* hidden by default */
     
     ui_init_anim_pixmaps();
 
