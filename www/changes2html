@@ -1,47 +1,73 @@
 #!/usr/bin/awk -f
 #
-# $Id: changes2html,v 1.1 1999-10-09 15:22:01 gnb Exp $
+# $Id: changes2html,v 1.2 2003-09-30 03:01:07 gnb Exp $
 #
-# Awk script to convert the change log into HTML for the Web page
+# Awk script to convert a GNU ChangeLog into HTML for the Web page
 #
 BEGIN {
-    listlevel=0
-    parcount=0
+    # \1=date \2=name \3@\4=email
+    header_re = "([A-Z][a-z][a-z] [A-Z][a-z][a-z] [ 0-9][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9] [12][0-9][0-9][0-9]) +([^<]+) +<([^@>]+)@([^@>]+)>";
+    in_item = 0;
+    in_list = 0;
 }
-function set_list_level(lev)
-{
-    while (listlevel < lev)
+function end_item () {
+    in_item = 0;
+}
+function end_list () {
+    end_item();
+    if (in_list)
     {
-    	print "<UL>"
-    	listlevel++;
+	print "</ul>";
+	in_list = 0;
     }
-    while (listlevel > lev)
+}
+function start_list () {
+    if (!in_list)
     {
-    	print "</UL>"
-    	listlevel--;
+    	print "<ul>";
+    	in_list = 1;
+	in_item = 0;
     }
-    listlevel = lev
 }
-/^\* / {
-    set_list_level(0)
-    print "<H2>"substr($0,2,length($0))"</H2>"
-    next
+function start_item () {
+    end_item();
+    start_list();
+    print "<li>";
+    in_item = 1;
 }
-/^x  / {
-    set_list_level(1)
-    print "<LI>"substr($0,4,length($0))
-    next
+function spacer () {
+    if (in_item)
+    	print "<li style=\"list-style-type:none;\">&nbsp;";
 }
-#/^$/ {
-#    set_list_level(0)
-#    if (parcount > 0) print "</P>"
-#    print "<P>"
-#    parcount++;
-#    next;
-#}
+function quote_meta (str) {
+    x = str;
+    x = gensub("&", "\\&amp;", "g", x);
+    x = gensub("<", "\\&lt;", "g", x);
+    x = gensub(">", "\\&gt;", "g", x);
+    return x;
+}
+/^[A-Z]/ {
+    # Header lines
+    end_list();
+    print gensub(header_re, "<p><b>\\1 \\2</b></p>", "g");
+    start_list();
+    next;
+}
+/^[ \t]*$/ {
+    # empty line
+    spacer();
+    next;
+}
+/^[ \t]+\*[ \t]+/ {
+    # first line of record.
+    start_item();
+    print quote_meta(gensub("^[ \t]+\\*[ \t]+", "", "g"));
+    next;
+}
 {
-    print $0
+    # subsequent line of record
+    print quote_meta(gensub("^[ \t]*", "", "g"));
 }
 END {
-    set_list_level(0)
+    end_list();
 }
