@@ -21,7 +21,9 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: irix-makesys.c,v 1.2 2003-05-24 05:48:20 gnb Exp $");
+CVSID("$Id: irix-makesys.c,v 1.3 2003-09-01 12:36:12 gnb Exp $");
+
+extern const MakeProgram makeprog_irix_smake;
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 /*
