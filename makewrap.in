@@ -40,8 +40,7 @@ if [ $MAKELEVEL -gt 1 ]; then
 fi
 
 define(<smake_hack>,ifelse(
-    base-host_os,<smake-irix>,<yes>,
-    base-host_os,<smake-irix64>,<yes>,
+    base-host_os,<smake-irix6.5>,<yes>,
     <no>))
 ifelse(smake_hack,<yes>,<
 # Bloody smake will only accept arguments in the order:
@@ -49,9 +48,9 @@ ifelse(smake_hack,<yes>,<
 # parse and rebuild the options to override $MAKE.
 # Fortunately on IRIX we know /bin/sh is ksh so we can
 # use ksh arrays to preserve whitespace.
-declare -a OPTS
-declare -a VOVER
-declare -a TARGS
+set -A OPTS
+set -A VOVER
+set -A TARGS
 while [ $# -gt 0 ]; do
     case "$1" in
     -J*|-n|-k|-q)
