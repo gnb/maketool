@@ -1,5 +1,6 @@
 #include "ui.h"
 #include "maketool.h"
+#include "util.h"
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -95,6 +96,78 @@ prefs_clear_variables(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+/*
+ * Update the two data structures most useful for
+ * running make from the list of Variables.
+ */
+
+static void
+prefs_set_var_environment(void)
+{
+    estring e;
+    GList *list;
+    int i;
+    
+    if (prefs.var_environment != 0)
+    {
+    	for (i=0 ; prefs.var_environment[i] != 0 ; i++)
+	    g_free(prefs.var_environment[i]);
+    	g_free(prefs.var_environment);
+    }
+    prefs.var_environment = g_new(char*, g_list_length(prefs.variables)+1);
+    
+    for (list = prefs.variables, i = 0 ; list != 0 ; list = list->next)
+    {
+    	Variable *var = (Variable *)list->data;
+	
+	if (var->type != VAR_ENVIRON)
+	    continue;
+	
+	estring_init(&e);	/* data from previous it'n is in array */
+	estring_append_string(&e, var->name);
+	estring_append_char(&e, '=');
+	estring_append_string(&e, var->value);
+	prefs.var_environment[i++] = e.data;
+    }
+    prefs.var_environment[i++] = 0;
+}
+
+
+static void
+prefs_set_var_make_flags(void)
+{
+    estring out;
+    GList *list;
+    static const char shell_metas[] = " \t\n\r\"'\\*;><?";
+    
+    estring_init(&out);
+    for (list = prefs.variables ; list != 0 ; list = list->next)
+    {
+    	Variable *var = (Variable *)list->data;
+	const char *p;
+	
+	if (var->type != VAR_MAKE)
+	    continue;
+	
+    	if (out.length > 0)
+	    estring_append_char(&out, ' ');
+	estring_append_string(&out, var->name);
+	estring_append_char(&out, '=');
+	for (p = var->value ; *p ; p++)
+	{
+	    if (strchr(shell_metas, *p))
+		estring_append_char(&out, '\\');
+	    estring_append_char(&out, *p);
+	}
+    }
+    
+    if (prefs.var_make_flags != 0)
+    	g_free(prefs.var_make_flags);
+    prefs.var_make_flags = out.data;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 void
 preferences_init(void)
 {
@@ -116,7 +189,8 @@ preferences_init(void)
     prefs_add_variable("VARIABLE_FOUR", "The value for FOUR", VAR_MAKE);
     prefs_add_variable("VARIABLE_FIVE", "The value for 'FIVE'", VAR_ENVIRON);
     prefs_add_variable("VARIABLE_SIX", "The value for SIX", VAR_MAKE);
-
+    prefs_set_var_environment();
+    prefs_set_var_make_flags();
     
     prefs.prog_make = g_strdup("make %m %k %p %v %t");
     prefs.prog_list_targets = g_strdup("extract_targets %m %v");
@@ -191,7 +265,9 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
 	prefs_add_variable(text[0], text[1],
 		(!strcmp(text[2], "make") ? VAR_MAKE : VAR_ENVIRON));
     }
-    
+    prefs_set_var_environment();
+    prefs_set_var_make_flags();
+      
     preferences_save();
 }
 

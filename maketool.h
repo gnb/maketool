@@ -46,7 +46,9 @@ typedef struct
     enum { START_NOTHING, START_CLEAR, START_COLLAPSE } start_action;
     char *makefile;
     
-    GList *variables;	/* list of Variable structs */
+    GList *variables;		/* list of Variable structs */
+    char *var_make_flags;	/* Variables as make commandline N=V options */
+    char **var_environment;	/* Variables as array of env "N=V" strings */
     
     char *prog_make;
     char *prog_list_targets;

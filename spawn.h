@@ -20,6 +20,7 @@ spawn_with_output(
     const char *command,
     GUnixReapFunc reaper,	/* may be 0 */
     SpawnInputFunc input,
-    gpointer user_data);
+    gpointer user_data,
+    char **environ);		/* environment overrides may be 0 */
 
 #endif /* _SPAWN_H_ */

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.7 1999-05-20 08:43:08 gnb Exp $
+# $Id: Makefile,v 1.8 1999-05-24 10:06:44 gnb Exp $
 #
 # Makefile for maketool.
 #
@@ -45,7 +45,10 @@ targets:
 	yes ' ' | head -20 | awk '{print NR}'
 	: VARIABLE_ONE = $(VARIABLE_ONE)
 	: VARIABLE_TWO = $(VARIABLE_TWO)
+	: VARIABLE_THREE = $(VARIABLE_THREE)
 	: VARIABLE_FOUR = $(VARIABLE_FOUR)
+	: VARIABLE_FIVE = $(VARIABLE_FIVE)
+	: VARIABLE_SIX = $(VARIABLE_SIX)
 	
 delay:
 	sleep 10

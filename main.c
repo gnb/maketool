@@ -74,38 +74,6 @@ grey_menu_items(void)
     uiGroupSetSensitive(GR_AGAIN, again);
 }
 
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static char *
-variable_make_flags(void)
-{
-    estring out;
-    GList *list;
-    static const char shell_metas[] = " \t\n\r\"'\\*;><?";
-    
-    estring_init(&out);
-    for (list = prefs.variables ; list != 0 ; list = list->next)
-    {
-    	Variable *var = (Variable *)list->data;
-	const char *p;
-	
-	if (var->type != VAR_MAKE)
-	    continue;
-	
-    	if (out.length > 0)
-	    estring_append_char(&out, ' ');
-	estring_append_string(&out, var->name);
-	estring_append_char(&out, '=');
-	for (p = var->value ; *p ; p++)
-	{
-	    if (strchr(shell_metas, *p))
-		estring_append_char(&out, '\\');
-	    estring_append_char(&out, *p);
-	}
-    }
-    return out.data;
-}
-
 char *
 expand_prog(
     const char *prog,
@@ -116,7 +84,6 @@ expand_prog(
     int i;
     char *out;
     const char *expands[256];
-    char *vars;
     estring fflag;
     char linebuf[32];
     char runflags[32];
@@ -157,13 +124,12 @@ expand_prog(
     if (prefs.ignore_failures)
     	expands['k'] = "-k";
 
-    expands['v'] = (vars = variable_make_flags());
+    expands['v'] = prefs.var_make_flags;
     
     expands['t'] = target;
     
     out = expand_string(prog, expands);
     
-    free(vars);
     estring_free(&fflag);
     
     return out;
@@ -313,7 +279,8 @@ buildStart(const char *target)
     
     prog = expand_prog(prefs.prog_make, 0, 0, target);
     
-    currentPid = spawn_with_output(prog, reapMake, handleInput, (gpointer)target);
+    currentPid = spawn_with_output(prog, reapMake, handleInput, (gpointer)target,
+    	prefs.var_environment);
     if (currentPid > 0)
     {
 	message("Making %s", target);

@@ -129,7 +129,7 @@ help_about_make_cb(GtkWidget *w, gpointer data)
 	char *prog;
 	prog = expand_prog(prefs.prog_list_version, 0, 0, 0);
 	spawn_with_output(prog, make_version_reap,
-		make_version_input, (gpointer)toplevel);
+		make_version_input, (gpointer)toplevel, 0);
 	free(prog);
     }
     else if (about_make_shell != 0)

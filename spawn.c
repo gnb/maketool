@@ -2,12 +2,13 @@
 #include <stdio.h>
 #include <signal.h>
 #include <errno.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/poll.h>
 #include <sys/ioctl.h>
 #include <gtk/gtk.h>
 
-#define DEBUG 0
+#define DEBUG 1
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -102,7 +103,8 @@ spawn_with_output(
     const char *command,
     GUnixReapFunc reaper,
     SpawnInputFunc input,	/* called with data from child's std{err,out} */
-    gpointer user_data)
+    gpointer user_data,
+    char **environ)		/* may be 0 */
 {
     pid_t pid;
     int pipefds[2];
@@ -128,8 +130,19 @@ spawn_with_output(
 	dup2(pipefds[WRITE], STDERR);
 	close(pipefds[WRITE]);
 	
-	execlp("/bin/sh", "/bin/sh", "-c", command, 0);
-	perror("execlp");
+	if (environ != 0)
+	{
+	    /* TODO: do a merge of the current env & Variables
+	     *       in preferences.c when changes are applied.
+	     *       That's more efficient but more complex, 'cos
+	     *       here putenv() handles the uniquifying for us.
+	     */
+	    for ( ; *environ != 0 ; environ++)
+	    	putenv(*environ);
+	}
+
+	execl("/bin/sh", "/bin/sh", "-c", command, 0);
+	perror("execl");
 	exit(1);
     }
     else
