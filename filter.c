@@ -100,6 +100,39 @@ filter_load(void)
 	"\\2",
 	"",
     	"gcc errors");
+
+#ifdef __hpux
+    filter_add(
+    	"",				/* state */
+	"(CC|cpp): \"([^\"]*)\", line ([0-9]+): error", /* regexp */
+	FR_ERROR,			/* code */
+	"\\2",				/* file */
+	"\\3",				/* line */
+	"",				/* col */
+    	"HP-UX old CC/cpp error");	/* comment */
+	
+    filter_add(
+    	"",				/* state */
+	"(CC|cpp): \"([^\"]*)\", line ([0-9]+): warning", /* regexp */
+	FR_WARNING,			/* code */
+	"\\2",				/* file */
+	"\\3",				/* line */
+	"",				/* col */
+    	"HP-UX old CC/cpp warning");	/* comment */
+#endif
+
+#ifdef __sun
+    /*TODO: Solaris compilers*/
+#endif
+
+    filter_add(
+    	"",				/* state */
+	"(Semantic|Syntax|Parser) error at line ([0-9]+), column ([0-9]+), file[ \t]*([^ \t]*):", /* regexp */
+	FR_ERROR,			/* code */
+	"\\4",				/* file */
+	"\\2",				/* line */
+	"\\3",				/* col */
+    	"Oracle Pro/C error");		/* comment */
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
