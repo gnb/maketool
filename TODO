@@ -1,5 +1,9 @@
 --- open ---
 
+x  In all the info compile line filters, replace regexp portions like
+   (|/[^ \t:#]+/) with (/[^ \t:#]+/)*  to avoid regcomp() errors on
+   FreeBSD.
+
 x  Sometimes targets fail to be built without recognised error
    messages.  In this case gmake says "gmake ***[target] Error 1"
    and exit(1)s but maketool does not notice there's a problem
