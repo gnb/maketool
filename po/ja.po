@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: maketool 0.6.2\n"
-"POT-Creation-Date: 2001-09-22 13:24+1000\n"
+"POT-Creation-Date: 2001-09-22 22:48+1000\n"
 "PO-Revision-Date: 2000-12-01 19:53+09:00\n"
 "Last-Translator: SATO Satoru <ss@gnome.gr.jp>\n"
 "Language-Team: Japanese <translation@gnome.gr.jp>\n"
@@ -14,44 +14,42 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: autoconf.c:99
-#, fuzzy
 msgid "Configuration"
-msgstr "情報(_I)"
+msgstr "設定"
 
 #: autoconf.c:100
 msgid "Directory and file names"
-msgstr ""
+msgstr "ディレクトリとファイル名"
 
 #: autoconf.c:101
 msgid "Host type"
-msgstr ""
+msgstr "ホストタイプ"
 
 #: autoconf.c:102
 msgid "Features and packages"
-msgstr ""
+msgstr "特徴とパッケージ"
 
 #: autoconf.c:146
 msgid "Advanced..."
-msgstr ""
+msgstr "発展..."
 
 #: autoconf.c:147
 msgid "Basic..."
-msgstr ""
+msgstr "基本..."
 
 #: autoconf.c:984
 msgid ""
 "The command line of the configure script will appear like this, according to "
 "the options you have chosen."
-msgstr ""
+msgstr "あなたが選択したオプションについて、設定スクリプトのコマンド行はこのようになります"
 
 #: autoconf.c:998
-#, fuzzy
 msgid "Maketool: Configure Options"
-msgstr "Maketool: 出力ファイルを選択"
+msgstr "Maketool: オプションを設定"
 
 #: autoconf.c:1055
 msgid "Preview"
-msgstr ""
+msgstr "プレビュー"
 
 #: autoconf.c:1068 print.c:371 ui.c:554 ui.c:619
 msgid "OK"
@@ -59,162 +57,162 @@ msgstr "了解"
 
 #: autoconf.c:1075 print.c:375 ui.c:625
 msgid "Cancel"
-msgstr "キャンセル"
+msgstr "取り消し"
 
 #. cache-file
 #: autoconf_strs.c:31
 msgid "Cache test results in FILE"
-msgstr ""
+msgstr "FILEN内のキャッシュテスト結果"
 
 #. no-create
 #: autoconf_strs.c:33
 msgid "Do not create output files"
-msgstr ""
+msgstr "出力ファイルを生成しない"
 
 #. prefix
 #: autoconf_strs.c:35
 msgid "Install architecture-independent files in PREFIX"
-msgstr ""
+msgstr "PREFIX内にアーキテクチャ依存のファイルをインストール"
 
 #. exec-prefix
 #: autoconf_strs.c:37
 msgid "Install architecture-dependent files in EPREFIX"
-msgstr ""
+msgstr "EPREFIX内にアーキテクチャ依存のファイルをインストール"
 
 #. bindir
 #: autoconf_strs.c:39
 msgid "User executables in DIR"
-msgstr ""
+msgstr "DIR内のユーザ実行可能ファイル"
 
 #. sbindir
 #: autoconf_strs.c:41
 msgid "System admin executables in DIR"
-msgstr ""
+msgstr "DIR内のシステム管理用実行ファイル"
 
 #. libexecdir
 #: autoconf_strs.c:43
 msgid "Program executables in DIR"
-msgstr ""
+msgstr "DIR内のプログラム実行可能ファイル"
 
 #. datadir
 #: autoconf_strs.c:45
 msgid "Read-only architecture-independent data in DIR"
-msgstr ""
+msgstr "DIR内の読み込みのみのアーキテクチャ依存データ"
 
 #. sysconfdir
 #: autoconf_strs.c:47
 msgid "Read-only single-machine data in DIR"
-msgstr ""
+msgstr "DIR内の読み込みのみの単一マシンデータ"
 
 #. sharedstatedir
 #: autoconf_strs.c:49
 msgid "Modifiable architecture-independent data in DIR"
-msgstr ""
+msgstr "DIR内の変更可能アーキテクチャ依存データ"
 
 #. localstatedir
 #: autoconf_strs.c:51
 msgid "Modifiable single-machine data in DIR"
-msgstr ""
+msgstr "DIR内の変更可能単一マシンデータ"
 
 #. libdir
 #: autoconf_strs.c:53
 msgid "Object code libraries in DIR"
-msgstr ""
+msgstr "DIR内のオブジェクトコードライブラリ"
 
 #. includedir
 #: autoconf_strs.c:55
 msgid "C header files in DIR"
-msgstr ""
+msgstr "DIR内のCヘッダーファイル"
 
 #. oldincludedir
 #: autoconf_strs.c:57
 msgid "C header files for non-gcc in DIR"
-msgstr ""
+msgstr "DIR内の非GCC向けCヘッダーファイル"
 
 #. infodir
 #: autoconf_strs.c:59
 msgid "Info documentation in DIR"
-msgstr ""
+msgstr "DIR内のInfo文書"
 
 #. mandir
 #: autoconf_strs.c:61
 msgid "Man documentation in DIR"
-msgstr ""
+msgstr "DIR内のMan文書"
 
 #. srcdir
 #: autoconf_strs.c:63
 msgid "Find the sources in DIR"
-msgstr ""
+msgstr "DIR内のソースを検索"
 
 #. program-prefix
 #: autoconf_strs.c:65
 msgid "Prepend PREFIX to installed program names"
-msgstr ""
+msgstr "インストールされるプログラム名にPREFIXを付加"
 
 #. program-suffix
 #: autoconf_strs.c:67
 msgid "Append SUFFIX to installed program names"
-msgstr ""
+msgstr "インストールされるプログラム名にSUFFIXを付加"
 
 #. program-transform-name
 #: autoconf_strs.c:69
 msgid "Run sed PROGRAM on installed program names"
-msgstr ""
+msgstr "インストールされるプログラム名についてsed PROGRAMを実行"
 
 #. build
 #: autoconf_strs.c:71
 msgid "Configure for building on BUILD"
-msgstr ""
+msgstr "BUILD時の構築方法について設定"
 
 #. host
 #: autoconf_strs.c:73
 msgid "Configure for HOST"
-msgstr ""
+msgstr "HOSTについて設定"
 
 #. target
 #: autoconf_strs.c:75
 msgid "Configure for TARGET"
-msgstr ""
+msgstr "TARGETについて設定"
 
 #. x-includes
 #: autoconf_strs.c:77
 msgid "X include files are in DIR"
-msgstr ""
+msgstr "DIR内のXヘッダーファイル"
 
 #. x-libraries
 #: autoconf_strs.c:79
 msgid "X library files are in DIR"
-msgstr ""
+msgstr "DIR内のXライブラリファイル"
 
 #. disable-nls
 #: autoconf_strs.c:81
 msgid "Do not use Native Language Support"
-msgstr ""
+msgstr "母国語サポートを利用しない"
 
 #. with-included-gettext
 #: autoconf_strs.c:83
 msgid "Use the GNU gettext library included here"
-msgstr ""
+msgstr "ここでincludeされるGNU gettextライブラリを利用"
 
 #. with-catgets
 #: autoconf_strs.c:85
 msgid "Use catgets functions if available"
-msgstr ""
+msgstr "利用可能ならcatgets関数を利用"
 
 #. with-gtk-prefix
 #: autoconf_strs.c:87
 msgid "Prefix where GTK is installed (optional)"
-msgstr ""
+msgstr "GTK+のインストールされている場所のprefix(オプション)"
 
 #. with-gtk-exec-prefix
 #: autoconf_strs.c:89
 msgid "Exec prefix where GTK is installed (optional)"
-msgstr ""
+msgstr "GTK+のインストールされている場所のexec_prefix(オプション)"
 
 #. disable-gtktest
 #: autoconf_strs.c:91
 msgid "Do not try to compile and run a test GTK program"
-msgstr ""
+msgstr "GTK+テストプログラムをコンパイルしようとしない"
 
 #. TODO: decent error reporting mechanism
 #: filter.c:65 find.c:132
@@ -330,37 +328,37 @@ msgstr "再度 `%s' をビルド"
 
 #: main.c:383
 msgid "Run auto_make..."
-msgstr ""
+msgstr "automakeを実行(_m)..."
 
 #: main.c:384 main.c:422
 msgid "Run a_utoconf..."
-msgstr ""
+msgstr "autoconfを実行(_u)..."
 
 #: main.c:385 main.c:403 main.c:423
 msgid "_Remove config.cache..."
-msgstr ""
+msgstr "config.cacheを削除(_R)..."
 
 #: main.c:386 main.c:404 main.c:424
 msgid "Run _configure..."
-msgstr ""
+msgstr "configureを実行(_c)..."
 
 #: main.c:387 main.c:405 main.c:425
 msgid "Run config._status..."
-msgstr ""
+msgstr "config.statusを実行(_s)..."
 
 #: main.c:439
 msgid "Run _xmkmf..."
-msgstr ""
+msgstr "xmkmfを実行(_x)..."
 
 #. Oh dear, something went wrong.  We have no targets.
 #: main.c:617
 #, c-format
 msgid "Error listing targets: %s"
-msgstr ""
+msgstr "ターゲット一覧エラー: %s"
 
 #: main.c:619
 msgid "No targets found"
-msgstr ""
+msgstr "ターゲットがみつかりません"
 
 #: main.c:754
 #, c-format
@@ -810,7 +808,6 @@ msgstr "設定を解除"
 
 #. -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #: preferences.c:1122
-#, fuzzy
 msgid ""
 "Key\n"
 "%f              source filename\n"
@@ -829,13 +826,14 @@ msgstr ""
 "%f              ソースファイル名\n"
 "%l              ソース行番号\n"
 "%m              -f で指定する makefile\n"
-"%n              ドライラン(実際には実行しない)\n"
-"                フラグ(-n)を指定\n"
+"%n              ドライラン(-n)                \n"
 "%p              並列処理フラグ (-j あるいは -l)\n"
 "%k              続行フラグ (-k) を指定\n"
 "%v              上書き指定する make 変数\n"
 "%t              make ターゲット\n"
 "%{x:+y}         %x が空でなければ y\n"
+"%D              maketoolデータディレクトリ\n"
+"%S              makesystem名\n"
 
 #.
 #. * Make program
@@ -906,14 +904,12 @@ msgid "Error Foreground:"
 msgstr "[エラー]の前景色:"
 
 #: preferences.c:1490
-#, fuzzy
 msgid "Summary Background:"
-msgstr "[警告]の背景色:"
+msgstr "[概要]の背景色:"
 
 #: preferences.c:1491
-#, fuzzy
 msgid "Summary Foreground:"
-msgstr "[警告]の前景色:"
+msgstr "[概要]の前景色:"
 
 #: preferences.c:1496
 msgid "Sample"
@@ -933,7 +929,7 @@ msgstr "エラー: ごめんよ Dave、それはできない"
 
 #: preferences.c:1525
 msgid "Executive Summary"
-msgstr ""
+msgstr "実行概要"
 
 #: preferences.c:1558
 msgid "Reset to Old"
