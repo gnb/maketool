@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.32 2003-09-24 10:23:00 gnb Exp $");
+CVSID("$Id: filter.c,v 1.33 2003-09-27 15:04:50 gnb Exp $");
 
 typedef struct
 {
@@ -303,7 +303,7 @@ filter_load(void)
 	"\\2",				/* file */
 	"\\3",				/* line */
 	"",				/* col */
-	"",	    	    	    	/* summary */
+	0,	    	    	    	/* summary */
     	"MIPSpro cc/CC error");   	/* comment */
 	
     filter_add(
@@ -313,7 +313,7 @@ filter_load(void)
 	"\\2",				/* file */
 	"\\3",				/* line */
 	"",				/* col */
-	"",	    	    	    	/* summary */
+	0,	    	    	    	/* summary */
     	"MIPSpro cc/CC warning");   	/* comment */
 
     filter_add(
@@ -327,13 +327,33 @@ filter_load(void)
     	"MIPSpro multiline message 1"); /* comment */
 
     filter_add(
+    	"mipspro2:mipspro2a",		/* state */
+	"^[ \t]+(.*)$",    	    	/* regexp */
+	FR_PENDING|FR_UNDEFINED,    	/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	"\\1",	    	    	    	/* summary */
+    	"MIPSpro multiline message 2"); /* comment */
+
+    filter_add(
+    	"mipspro2a:mipspro3",		/* state */
+	"^$",    	    	    	/* regexp */
+	FR_PENDING|FR_UNDEFINED,    	/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	0,	    	    	    	/* summary */
+    	"MIPSpro multiline message 2"); /* comment */
+
+    filter_add(
     	"mipspro2:mipspro3",		/* state */
 	"^$",    	    	    	/* regexp */
 	FR_PENDING|FR_UNDEFINED,    	/* code */
 	"",				/* file */
 	"",				/* line */
 	"",				/* col */
-	"",	    	    	    	/* summary */
+	0,	    	    	    	/* summary */
     	"MIPSpro multiline message 2"); /* comment */
 
     filter_add(
@@ -343,7 +363,7 @@ filter_load(void)
 	"",				/* file */
 	"",				/* line */
 	"",				/* col */
-	"",	    	    	    	/* summary */
+	0,	    	    	    	/* summary */
     	"MIPSpro multiline message 3"); /* comment */
 
     filter_add(
@@ -353,7 +373,7 @@ filter_load(void)
 	"",				/* file */
 	"",				/* line */
 	"",				/* col */
-	"",	    	    	    	/* summary */
+	0,	    	    	    	/* summary */
     	"MIPSpro multiline message 4"); /* comment */
 
     filter_add(
@@ -363,7 +383,7 @@ filter_load(void)
 	"",				/* file */
 	"",				/* line */
 	"",				/* col */
-	"",	    	    	    	/* summary */
+	0,	    	    	    	/* summary */
     	"MIPSpro multiline message 5"); /* comment */
 
     /* IRIX linker errors */
@@ -688,7 +708,33 @@ filter_apply_one(
 	{
 	    filter_replace_matches(f->summary_str, &buf, line, matches);
 	    if (buf.data != 0 && *buf.data != '\0')
-		result->summary = g_strdup(buf.data);
+	    {
+	    	if (result->summary != 0 &&
+		    ((f->code & FR_PENDING) || f->code == FR_DONE))
+		{
+		    /* append to the summary */
+		    char *sum = g_strconcat(result->summary, " ", buf.data, 0);
+#if DEBUG
+	    	    fprintf(stderr, "filter_apply_one: appending summary \"%s\" to \"%s\"\n",
+			result->summary, sum);
+#endif
+		    g_free(result->summary);
+		    result->summary = sum;
+		}
+		else
+		{
+		    /* replace or start the summary */
+		    if (result->summary != 0)
+		    {
+#if DEBUG
+	    		fprintf(stderr, "filter_apply_one: replacing summary \"%s\" with \"%s\"\n",
+			    result->summary, buf.data);
+#endif
+			g_free(result->summary);
+		    }
+		    result->summary = g_strdup(buf.data);
+		}
+	    }
 	}
     }
 
