@@ -21,7 +21,7 @@
 #define _common_h_
 
 /*
- * $Id: common.h,v 1.1 1999-05-25 07:54:33 gnb Exp $
+ * $Id: common.h,v 1.2 1999-05-28 17:06:34 gnb Exp $
  */
 
 /* #include <config.h> */
@@ -42,6 +42,7 @@
 #include <malloc.h>
 #include <stdio.h>
 #include <libintl.h>
+#include "patchlevel.h"
 
 
 #if STDC_HEADERS

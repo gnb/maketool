@@ -34,11 +34,13 @@ x  Make filters configurable in Preferences GUI.
 
 x  Save & load preferences.
 
+x  Override preferences with -f -j -k and -l options from commandline.
+
 x  DONE: Handle makes over multiple directories - get the filenames right.
 
 x  Use a hashtable of filenames to reduce memory traffic for filenames.
 
-x  Make a nicer animation for when make is running.
+x  DONE: Make a nicer animation for when make is running.
 
 x  Add menu item Edit->Copy for filling the clipboard from the selected
    line(s?) of the log window. Implies adding an Edit menu & moving some
@@ -70,4 +72,6 @@ x  Improve glib_extra.c so it doesn't require need to care
 x  Add patchlevel.h
 
 x  Add autoconf support.
+
+x  Implement the FR_PENDING filter result.
 

@@ -8,7 +8,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: main.c,v 1.17 1999-05-25 15:08:41 gnb Exp $");
+CVSID("$Id: main.c,v 1.18 1999-05-28 17:06:34 gnb Exp $");
 
 typedef enum
 {
@@ -33,7 +33,7 @@ pid_t		currentPid = -1;
 gboolean	interrupted = FALSE;
 gboolean	firstError = FALSE;
 
-#define ANIM_MAX 8
+#define ANIM_MAX 15
 GdkPixmap	*animPixmaps[ANIM_MAX+1];
 GdkBitmap	*animMasks[ANIM_MAX+1];
 GtkWidget	*anim;
@@ -674,27 +674,42 @@ uiCreateTools()
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 #include "anim0.xpm"
+#include "anim0a.xpm"
 #include "anim1.xpm"
+#include "anim1a.xpm"
+#include "anim1b.xpm"
 #include "anim2.xpm"
+#include "anim2a.xpm"
 #include "anim3.xpm"
+#include "anim3a.xpm"
+#include "anim3b.xpm"
 #include "anim4.xpm"
+#include "anim4a.xpm"
 #include "anim5.xpm"
 #include "anim6.xpm"
 #include "anim7.xpm"
 #include "anim8.xpm"
 
-#define ANIM_INIT(n) \
+#define ANIM_INIT(nm) \
     animPixmaps[n] = gdk_pixmap_create_from_xpm_d(toplevel->window, \
-    	&animMasks[n], 0, PASTE3(anim,n,_xpm));
+    	&animMasks[n], 0, PASTE3(anim,nm,_xpm)); n++
 
 static void
 uiInitAnimPixmaps(void)
 {
+    int n = 0;
     ANIM_INIT(0);
+    ANIM_INIT(0a);
     ANIM_INIT(1);
+    ANIM_INIT(1a);
+    ANIM_INIT(1b);
     ANIM_INIT(2);
+    ANIM_INIT(2a);
     ANIM_INIT(3);
+    ANIM_INIT(3a);
+    ANIM_INIT(3b);
     ANIM_INIT(4);
+    ANIM_INIT(4a);
     ANIM_INIT(5);
     ANIM_INIT(6);
     ANIM_INIT(7);
@@ -717,7 +732,11 @@ uiCreate(void)
     static char *titles[1] = { "Log" };
     
     toplevel = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(toplevel), "Maketool 0.1");
+    {
+        char buf[512];
+    	sprintf(buf, _("Maketool %s"), VERSION);
+	gtk_window_set_title(GTK_WINDOW(toplevel), buf);
+    }
     gtk_widget_set_usize(toplevel, 300, 500);
     gtk_signal_connect(GTK_OBJECT(toplevel), "destroy", 
     	GTK_SIGNAL_FUNC(file_exit_cb), NULL);

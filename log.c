@@ -3,7 +3,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: log.c,v 1.10 1999-05-28 13:42:48 gnb Exp $");
+CVSID("$Id: log.c,v 1.11 1999-05-28 17:06:34 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -28,7 +28,7 @@ static int		numWarnings;
 static int		flags = LF_SHOW_INFO|LF_SHOW_WARNINGS|LF_SHOW_ERRORS;
 static GList		*log;		/* list of LogRecs */
 static LogRec		*currentBuildRec = 0;
-static GList		*logPendingLines = 0;
+/*static GList		*logPendingLines = 0;*/ /*TODO*/
 static GList		*logDirectoryStack = 0;
 static GdkFont		*fonts[L_MAX];
 static GdkColor		foregrounds[L_MAX];

@@ -1,5 +1,5 @@
 /* XPM */
-static char * anim2_xpm[] = {
+static char * anim1b_xpm[] = {
 "24 24 3 1",
 " 	c None s None",
 ".	c #CF3CBAEAAEBA",
@@ -19,12 +19,12 @@ static char * anim2_xpm[] = {
 "                        ",
 "                        ",
 "                        ",
-"XXXXX  XXXXXXXXXX  XXXXX",
-"XXXXX..XXXXXXXXXX..XXXXX",
-"XXXXX..XXXXXXXXXX..XXXXX",
-"XXXXX..XXXXXXXXXX..XXXXX",
-"........................",
-".XXXXXXXXXX..XXXXXXXXXX.",
+"XXXXX  XXXXXXXXXX       ",
+"XXXXX..XXXXXXXXXX       ",
+"XXXXX..XXXXXXXXXX       ",
+"XXXXX..XXXXXXXXXX       ",
+".................       ",
+".XXXXXXXXXX..XXXXXXXXXX ",
 ".XXXXXXXXXX..XXXXXXXXXX.",
 ".XXXXXXXXXX..XXXXXXXXXX.",
 ".XXXXXXXXXX..XXXXXXXXXX."};

@@ -4,7 +4,7 @@
 #include "spawn.h"
 #include "ui.h"
 
-CVSID("$Id: help.c,v 1.8 1999-05-25 08:02:48 gnb Exp $");
+CVSID("$Id: help.c,v 1.9 1999-05-28 17:06:34 gnb Exp $");
 
 static GtkWidget	*about_shell = 0;
 static GtkWidget	*about_make_shell = 0;
@@ -25,7 +25,7 @@ licence_cb(GtkWidget *w, gpointer data)
 #include "maketool_l.xpm"
 
 static const char about_str[] = "\
-Maketool version 0.1\n\
+Maketool version %s\n\
 \n\
 (c) 1999 Greg Banks\n\
 gnb@alphalink.com.au\n\
@@ -60,7 +60,15 @@ help_about_cb(GtkWidget *w, gpointer data)
 	gtk_container_add(GTK_CONTAINER(hbox), icon);
 	gtk_widget_show(icon);
 
-	label = gtk_label_new(_(about_str));
+	{
+	    /* Build the string to display in the About box */
+	    const char *fmt = _(about_str);
+	    const char *version = VERSION;
+	    char *buf = g_new(char, strlen(fmt) + strlen(version) + 1);
+	    sprintf(buf, fmt, version);
+	    label = gtk_label_new(buf);
+	    g_free(buf);
+	}
 	gtk_container_add(GTK_CONTAINER(hbox), label);
 	gtk_widget_show(label);
 
