@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.47 2003-09-27 13:35:03 gnb Exp $");
+CVSID("$Id: log.c,v 1.48 2003-09-27 15:03:08 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -313,9 +313,6 @@ log_show_rec(LogRec *lr)
 	{
     	    log_push_node(lr);
 	    is_leaf = FALSE;
-	    if (lr->res.summary != 0)
-	    	g_free(lr->res.summary);
-	    lr->res.summary = file_denormalise(lr->res.file, DEN_ALL);
 	}
 	break;
     case FR_POPDIR:
@@ -440,6 +437,9 @@ log_add_line(const char *line)
     	break;
     case FR_PUSHDIR:
 	log_push_dir(res.file);
+	if (res.summary != 0)
+	    g_free(res.summary);
+	res.summary = file_denormalise(res.file, DEN_ALL);
     	break;
     case FR_POPDIR:
 	log_pop_dir();
