@@ -93,9 +93,6 @@ x  Handle column in Java errors.
 
 x  ability to recursively delete a node from the log window
 
-x  Fix bug where changing any of the log flags causes the current scroll
-   position in the log to be lost as the log is repopulated.
-   
 x  Keyboard navigation: ENTER should be same as double-click.   
 
 x  Keyboard navigation: Check for std accelerators to collapse,
@@ -361,3 +358,6 @@ x  DONE: Vaclav Slavik says:  let maketool remember previous directories in
    config file, not only during one session.
 
 x  DONE: Option to always scroll to end on make output
+
+x  DONE: Fix bug where changing any of the log flags causes the current scroll
+   position in the log to be lost as the log is repopulated.

@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.34 2000-07-31 02:17:11 gnb Exp $");
+CVSID("$Id: log.c,v 1.35 2000-08-01 07:57:53 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -479,15 +479,68 @@ log_collapse_all(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+/* BEGIN: pinched from gtkclist.c */
+/* this defigns the base grid spacing */
+#define CELL_SPACING 1
+/* returns the row index from a y pixel location in the 
+ * context of the clist's voffset */
+#define ROW_FROM_YPIXEL(clist, y)  (((y) - (clist)->voffset) / \
+				    ((clist)->row_height + CELL_SPACING))
+/* END: pinched from gtkclist.c */
+
 static void
 log_repopulate(void)
 {
     GList *list;
+    LogRec *first = 0;
     
     gtk_clist_freeze(GTK_CLIST(logwin));
+    
+    /* figure out which log record is the first-visible in the ctree */
+    if (!log_is_empty())
+    {
+	first = (LogRec *)gtk_ctree_node_get_row_data(
+    		GTK_CTREE(logwin),
+		gtk_ctree_node_nth(
+    		    GTK_CTREE(logwin),
+		    ROW_FROM_YPIXEL(GTK_CLIST(logwin), 0)));
+#if DEBUG > 10
+	fprintf(stderr, "old first = \"%s\"\n", first->line);
+#endif
+    }
+    
+    /* remove all the rows and build new ones according to new flags */
     gtk_clist_clear(GTK_CLIST(logwin));
     for (list=log ; list!=0 ; list=list->next)
-	log_show_rec((LogRec *)list->data);    	
+	log_show_rec((LogRec *)list->data);
+	
+    if (first != 0)
+    {
+	/* figure out which row is to be the new first-visible */
+	GList *firstl = g_list_find(log, first);
+	
+	for (list = firstl ;
+	     list != 0 && ((LogRec *)list->data)->node == 0 ;
+	     list = list->next)
+	    ;
+	if (list == 0)
+	    for (list = firstl ;
+		 list != 0 && ((LogRec *)list->data)->node == 0 ;
+		 list = list->prev)
+		;
+	if (list != 0)
+	{
+    	    first = (LogRec *)list->data;
+#if DEBUG > 10
+	    fprintf(stderr, "new first = \"%s\"\n", first->line);
+#endif
+    	    gtk_ctree_node_moveto(GTK_CTREE(logwin), first->node, 0,
+	    	/* row_align */0.0, /* col_align */0.0);
+	    
+	}
+	    
+    }
+    
     gtk_clist_thaw(GTK_CLIST(logwin));
 }
 
