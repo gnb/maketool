@@ -32,7 +32,7 @@
 #include "mqueue.h"
 #include "progress.h"
 
-CVSID("$Id: main.c,v 1.102 2003-10-04 00:50:38 gnb Exp $");
+CVSID("$Id: main.c,v 1.103 2003-10-05 09:03:17 gnb Exp $");
 
 
 /*
@@ -404,6 +404,39 @@ anim_start(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 /*
+ * Called when the number of errors or warnings in the log changes.
+ */
+
+static void
+count_changed(int nerrors, int nwarnings)
+{
+    char buf[32];
+
+    if (nerrors > 0)
+    {
+    	snprintf(buf, sizeof(buf), "%d", nerrors);
+	gtk_label_set_text(GTK_LABEL(error_count), buf);
+	gtk_widget_show(error_count->parent);
+    }
+    else
+    {
+	gtk_widget_hide(error_count->parent);
+    }
+    
+    if (nwarnings > 0)
+    {
+    	snprintf(buf, sizeof(buf), "%d", nwarnings);
+	gtk_label_set_text(GTK_LABEL(warning_count), buf);
+	gtk_widget_show(warning_count->parent);
+    }
+    else
+    {
+	gtk_widget_hide(warning_count->parent);
+    }
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+/*
  * These 2 fns are called when the task queue
  * is started or emptied.
  */
@@ -420,31 +453,7 @@ work_ended(void)
 {
     anim_stop();
     grey_menu_items();
-    gtk_widget_hide(error_count->parent);
-    gtk_widget_hide(warning_count->parent);
-}
-
-/*
- * Called when the number of errors or warnings in the log changes.
- */
-static void
-count_changed(int nerrors, int nwarnings)
-{
-    char buf[32];
-
-    if (nerrors > 0)
-    {
-    	snprintf(buf, sizeof(buf), "%d", nerrors);
-	gtk_label_set_text(GTK_LABEL(error_count), buf);
-	gtk_widget_show(error_count->parent);
-    }
-    
-    if (nwarnings > 0)
-    {
-    	snprintf(buf, sizeof(buf), "%d", nwarnings);
-	gtk_label_set_text(GTK_LABEL(warning_count), buf);
-	gtk_widget_show(warning_count->parent);
-    }
+    count_changed(0, 0);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -1073,6 +1082,7 @@ file_open_file_func(const char *filename)
     message("Opening log file %s", filename);
     message_flush();
     log_open(filename, main_progress());
+    count_changed(0, 0);
 }
 
 static void
