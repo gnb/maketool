@@ -19,8 +19,9 @@
 
 #include "util.h"
 #include <stdarg.h>
+#include <sys/stat.h>
 
-CVSID("$Id: util.c,v 1.12 2000-07-21 06:12:03 gnb Exp $");
+CVSID("$Id: util.c,v 1.13 2000-07-21 07:35:32 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -165,6 +166,16 @@ expand_string(const char *in, const char *expands[256])
     fprintf(stderr, "expand_string(): \"%s\" -> \"%s\"\n", in, out.data);
 #endif
     return out.data;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+gboolean
+file_exists(const char *pathname)
+{
+    struct stat sb;
+    
+    return (stat(pathname, &sb) >= 0 && S_ISREG(sb.st_mode));
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

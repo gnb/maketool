@@ -47,6 +47,8 @@ void estring_free(estring *e);
 /* Result needs to be free()d */
 char *expand_string(const char *in, const char *expands[256]);
 
+gboolean file_exists(const char *pathname);
+
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 #endif /* _UTIL_H_ */

@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.57 2000-07-21 06:12:03 gnb Exp $");
+CVSID("$Id: main.c,v 1.58 2000-07-21 07:35:32 gnb Exp $");
 
 typedef enum
 {
@@ -945,6 +945,13 @@ change_directory(const char *dir)
     if (toplevel != 0)
 	set_main_title();
 	
+    if (messageent != 0)
+    {
+    	char *curr = g_get_current_dir();
+	message("Directory %s", curr);
+	g_free(curr);
+    }
+	
     if (build_menu != 0)
     	list_targets();
     
@@ -988,6 +995,67 @@ file_change_dir_cb(GtkWidget *w, gpointer data)
     g_free(fakefile);
     
     gtk_widget_show(filesel);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+file_edit_makefile_cb(GtkWidget *w, gpointer data)
+{
+    const char *makefile = 0;
+    
+    /*
+     * Have to do a little dance to figure out what
+     * filename gmake will use for the makefile.
+     * First check explicit -f option set in preferences.
+     */
+    if (prefs.makefile != 0)
+    	makefile = prefs.makefile;
+    else
+    {
+    	/*
+	 * Now we have to do it the hard way, attempting to
+	 * reproduce the filename search behaviour of gmake.
+	 */
+	static const char *search_filenames[] = {
+	"GNUmakefile", "makefile", "Makefile", 0
+	};
+	const char **fn;
+	
+	for (fn = search_filenames ; *fn != 0 ; fn++)
+	{
+	    if (file_exists(*fn))
+	    {
+	    	makefile = *fn;
+		break;
+	    }
+	}
+	
+	if (makefile == 0 || !strcmp(makefile, "Makefile"))
+	{
+	    /* attempt to deal with autoconf, automake, and imake */
+	    static const char *meta_makefiles[] = {
+	    "Makefile.am", "Makefile.in", "Imakefile", 0
+	    };
+	    for (fn = meta_makefiles ; *fn != 0 ; fn++)
+	    {
+		if (file_exists(*fn))
+		{
+	    	    makefile = *fn;
+		    break;
+		}
+	    }
+	}
+    }
+    
+    if (makefile == 0)
+    {
+    	message(_("No makefile appears to be present in this directory"));
+	return;
+    }
+     
+    message(_("Editing %s"), makefile, 1);
+    task_spawn(editor_task(makefile, 1));	
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -1216,6 +1284,8 @@ ui_create_menus(GtkWidget *menubar)
     dir_previous_menu = ui_add_submenu(menu, TRUE, _("_Previous Directories"));
     ui_add_tearoff(dir_previous_menu);
     construct_dir_previous_menu();
+    ui_add_separator(menu);
+    ui_add_button(menu, _("_Edit Makefile..."), 0, file_edit_makefile_cb, 0, GR_NOTRUNNING);
     ui_add_separator(menu);
     ui_add_button(menu, _("_Print..."), "<Ctrl>P", file_print_cb, 0, GR_NOTEMPTY);
     ui_add_separator(menu);
