@@ -225,3 +225,34 @@ x  Detect (at configure time) whether BSD or SysV signal semantics are
    regardless of whether you also request -D_USE_BSD.
    
 x  Add a GUI for setting CONFIGUREFLAGS based on ./configure --help
+
+x  Printing: figure out default printer for combo box, from preferences
+   else named "ps".
+
+x  Printing: add notebook page to edit paper size, orientation, and
+   margins to Preferences dialog.
+   
+x  Printing: add support for landscape mode.
+
+x  Printing: Print window's Page Setup button should pop up the Page Setup
+   notebook page of the Preferences dialog.
+   
+x  Printing: page numbers
+
+x  Printing: colours/icons for errors & warnings
+
+x  Printing: clip text.
+
+x  Printing: title line on every page.
+
+x  Printing: modal dialogs.
+
+x  Printing: dialogs come up at sensible locations, e.g. centred over
+   the toplevel shell. Set transient-for flag too.
+   
+x  Printing: option to print entire log file or just descendants of
+   selected node.
+   
+x  Printing: option to print using collapsed status of log lines or
+   just entire log.
+   
