@@ -6,7 +6,7 @@
 ]>
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.15 2003-09-01 13:17:00 gnb Exp $"
+         revision="$Id: help.sgml,v 1.16 2003-09-28 07:23:02 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool</title>
@@ -14,7 +14,7 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2003-09-01 13:17:00 $</pubdate>
+  <pubdate role="cvs">$Date: 2003-09-28 07:23:02 $</pubdate>
   <releaseinfo>This is version &version;</releaseinfo>
   <copyright>
     <year>2000</year>
@@ -2163,9 +2163,276 @@ about that make program instead.
 <title>% Escape Characters</title>
 
 <para>
-TODO: this section describes the % escape sequences in commands
-that maketool expands before running.
+Percent escapes are used when constructing various shell commands
+which are run by maketool at various times.  The command strings
+are scanned for the escape sequences described below, which are
+replaced with their expanded text as described below.
 </para>
+
+<para>
+The various context in which escapes are expanded are:
+</para>
+
+<variablelist>
+
+  <varlistentry>
+    <term>build target</term>
+    <listitem>
+      <para>
+      The make program is being run to build a target.  This happens
+      when a menu item from the <xref linkend="build-menu"> is selected
+      or the <xref linkend="all-tool"> tool or <xref linkend="clean-tool">
+      tool is clicked.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>list targets</term>
+    <listitem>
+      <para>
+      The make program is being run to generate the list of available targets
+      in the current directory.  This happens automatically when maketool
+      starts or when the current directory is changed using the
+      <xref linkend="file-change-directory"> menu item or the
+      <xref linkend="file-previous-directories"> menu item.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>list version</term>
+    <listitem>
+      <para>
+      The make program is being run to emit text describing itself, e.g.
+      copyright and version messages.  This happens the first time
+      the About GNU make dialog is opened, and subsequently after the make
+      program is changed in the <xref linkend="programs-pane"> in the
+      <xref linkend="preferences-window">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>edit source</term>
+    <listitem>
+      <para>
+      A source file is being edited.  This happens when an error or
+      warning line in the <xref linkend="log-window"> is double-clicked,
+      or the <xref linkend="file-edit-makefile"> item is selected.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>build makefile</term>
+    <listitem>
+      <para>
+      The Makefile in the current directory is out of date and the
+      make program is being run to rebuild it.  This happens automatically
+      before any target is built if the
+      <xref linkend="general-enable-make-makefile"> option is enabled.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>finished build</term>
+    <listitem>
+      <para>
+      A build has just finished and the command specified in the 
+      <xref linkend="general-finish-build-action"> item is being
+      run to inform the user.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+
+<para>
+The available percent escapes are:
+</para>
+
+
+<table frame="none">
+    <title>Percent Escapes</title>
+    <tgroup cols="3">
+    	<colspec colwidth="1*">
+    	<colspec colwidth="2*">
+    	<colspec colwidth="10*">
+	<thead>
+	    <row>
+		<entry>Escape</entry>
+		<entry>Context</entry>
+		<entry>Meaning</entry>
+	    </row>
+	</thead>
+	<tbody>
+	    <row>
+		<entry>%D</entry>
+		<entry>all</entry>
+		<entry>
+  		    maketool's data directory, e.g.
+		    <filename>/usr/local/share/maketool</filename>.
+		</entry>
+	    </row>
+	    <row>
+		<entry>%M</entry>
+		<entry>all</entry>
+		<entry>
+    	    	    the make program currently selected in the
+    	    	    <xref linkend="programs-pane">, e.g.
+		    <option>gmake</option>
+		</entry>
+	    </row>
+	    <row>
+		<entry>%S</entry>
+		<entry>all</entry>
+		<entry>
+    	    	    the name of the makefile system automatically
+    	    	    detected when maketool is started or the current
+		    directory is changed, e.g.
+		    <option>automake</option>.
+		</entry>
+	    </row>
+	    <row>
+		<entry>%V</entry>
+		<entry>all</entry>
+		<entry>
+    	    	    the flags which cause make to print its version
+    	    	    to stdout or stderr and exit, e.g.
+		    <option>--version</option>.
+		</entry>
+	    </row>
+	    <row>
+		<entry>%f</entry>
+		<entry>edit source</entry>
+		<entry>
+    	    	    the source file name
+		</entry>
+	    </row>
+	    <row>
+		<entry>%k</entry>
+		<entry>all</entry>
+		<entry>
+    	    	    the flag which causes make to keep
+    	    	    on building targets when targets fail, e.g.
+		    <option>-k</option>.
+		</entry>
+	    </row>
+	    <row>
+		<entry>%l</entry>
+		<entry>edit source</entry>
+		<entry>
+    	    	    the source line number
+		</entry>
+	    </row>
+	    <row>
+		<entry>%m</entry>
+		<entry>all</entry>
+		<entry>
+    	    	    if a makefile is defined in the
+    	    	    <xref linkend="general-pane">, expands to the
+		    make flags necessary to use that makefile,
+		    e.g. <option>-f /my/makefile</option>.
+		</entry>
+	    </row>
+	    <row>
+		<entry>%n</entry>
+		<entry>all</entry>
+		<entry>
+    	    	    flags which cause make to print the commands it
+    	    	    would run instead of running them, e.g.
+		    <option>-n</option>.
+		</entry>
+	    </row>
+	    <row>
+		<entry>%p</entry>
+		<entry>all</entry>
+		<entry>
+    	    	    to the flags which implement the
+    	    	    parallelism policy controlled by the 
+		    <xref linkend="general-parallelism"> options,
+		    e.g. <option>-j8</option>
+		</entry>
+	    </row>
+	    <row>
+		<entry>%q</entry>
+		<entry>all</entry>
+		<entry>
+    	    	    the flags which cause make to dump
+    	    	    its internal database to stdout or stderr, e.g.
+		    <option>-n -p</option>.  Useful only for listing
+		    available targets.
+		</entry>
+	    </row>
+	    <row>
+		<entry>%t</entry>
+		<entry>build target</entry>
+		<entry>
+    	    	    target to be built
+		</entry>
+	    </row>
+	    <row>
+		<entry>%t</entry>
+		<entry>list targets</entry>
+		<entry>
+    	    	    the string <option>_no_such_target_</option>
+		</entry>
+	    </row>
+	    <row>
+		<entry>%t</entry>
+		<entry>finished build</entry>
+		<entry>
+    	    	    target which has just been built
+		</entry>
+	    </row>
+	    <row>
+		<entry>%t</entry>
+		<entry>build makefile</entry>
+		<entry>
+    	    	    filename of the makefile to be built
+		</entry>
+	    </row>
+	    <row>
+		<entry>%v</entry>
+		<entry>all</entry>
+		<entry>
+    	    	    set of make arguments of the form
+    	    	    <option>VAR=VALUE</option> for all the variables
+		    of type Make in the <xref linkend="variables-pane">,
+		    e.g. <option>CC=cc</option>.  Values have whitespace
+		    and shell metacharacters protected with quoting, but
+		    see <xref linkend="metacharacters"> for why shell
+		    metacharacters should be avoided.
+		</entry>
+	    </row>
+	    <row>
+	    	<!-- empty row for spacing -->
+		<entry></entry>
+		<entry></entry>
+		<entry></entry>
+	    </row>
+	    <row>
+		<entry>%{x:+y}</entry>
+		<entry>all</entry>
+		<entry>
+    	    	    if the simple expansion <option>%x</option> has a
+    	    	    non-empty value, expands to the expansion of
+		    <option>y</option>, otherwise expands to
+		    an empty string.  For example,
+		    <option>%{l:+-line %l}</option> expands
+		    to <option>-line 23</option> if <option>%l</option>
+		    is 23, and expands to the empty string if
+		    <option>%l</option> is not defined.  Note that while
+		    <option>y</option> may contain other simple % escapes
+		    the <option>%{x:+y}</option> compound escape cannot
+		    be nested.
+		</entry>
+	    </row>
+	</tbody>
+    </tgroup>
+</table>
 
 </section>
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
