@@ -16,19 +16,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.7 1999-06-14 02:30:01 gnb Exp $
+# $Id: Makefile.in,v 1.8 1999-07-04 00:56:05 gnb Exp $
 #
 
 prefix=		@prefix@
-run_prefix=	$(prefix)
 exec_prefix=	@exec_prefix@
 BINDIR=		@bindir@
 INSTALL=	@INSTALL@
 PACKAGE=	@PACKAGE@
 VERSION=	@VERSION@
 DOCDIR=		$(prefix)/doc/$(PACKAGE)-$(VERSION)
-LICENCE=	$(run_prefix)/doc/$(PACKAGE)-$(VERSION)/COPYING
-localedir=	$(run_prefix)/@DATADIRNAME@/locale
+LICENCE=	$(prefix)/doc/$(PACKAGE)-$(VERSION)/COPYING
+localedir=	$(prefix)/@DATADIRNAME@/locale
 
 CC=		@CC@
 CFLAGS=		@CFLAGS@

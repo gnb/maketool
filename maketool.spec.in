@@ -4,15 +4,15 @@ Version: @VERSION@
 Release: 1
 Copyright: GPL
 Group: Development/Building
-Source: http://www.alphalink.com.au/~gnb/maketool/@PACKAGE@-@VERSION@-src.tgz
-BuildRoot: /var/tmp/maketool-root
+Source: http://www.alphalink.com.au/~gnb/@PACKAGE@/@PACKAGE@-@VERSION@-src.tgz
+BuildRoot: /var/tmp/@PACKAGE@-root
 Vendor: Greg Banks
 
 %description
 Maketool is a simple GUI front end for the GNU make program,
 written using the GTK toolkit. It presents a menu of targets
 and detects compiler error messages in the output of make.
-Clicking on an error message starts an editor.
+Double-clicking on an error message starts an editor.
 
 %prep
 %setup -q
@@ -26,7 +26,7 @@ make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install prefix=$RPM_BUILD_ROOT/usr run_prefix=/usr
+make install prefix=$RPM_BUILD_ROOT/usr
 
 %clean
 rm -rf $RPM_BUILD_ROOT
