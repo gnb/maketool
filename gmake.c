@@ -26,7 +26,7 @@
 #error Why are you even bothering to compile with POSIX regular expressions?
 #endif
 
-CVSID("$Id: gmake.c,v 1.1 2003-02-09 04:59:19 gnb Exp $");
+CVSID("$Id: gmake.c,v 1.2 2003-05-04 04:12:57 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -267,10 +267,14 @@ static const char * const gmake_makefiles[] =
     0
 };
 
+#include "babygnu_l.xpm"
+
 MakeProgram makeprog_gmake = 
 {
     "gmake",
+    GMAKE,
     N_("GNU make"),
+    babygnu_l_xpm,
     gmake_makefiles,
     gmake_makefile_flags,
     gmake_parallel_flags,
