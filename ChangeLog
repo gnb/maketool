@@ -1,0 +1,347 @@
+Tue Sep 30 03:00:40 2003  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.8
+
+	* [FEA] Configures, builds and runs with GTK2.
+
+	* [FEA] Added full online HTML help (English only).
+
+	* [FEA] Implemented an abstraction for make programs.  Now handles GNU make
+	(the default), BSD 4.4 pmake, Sun make, IRIX smake.  Selectable in Preferences
+	window and saved to .maketoolrc.  All features abstracted, including -j,
+	-k, -n, target listing, indenting directories for recursive makes.  About Make
+	window shows blurb and logo from current make program.
+	* [FEA] Removed the extract_targets script, it's logic is now implemented
+	in per-make program C code.
+
+	* [FEA] Window title shows full current working directory, normalised to $HOME
+	(shown as ~/...) when possible.  Likewise top level log entry for opened log files.
+	* [FEA] Summary line for start of recursive sub-makes shows the path relative
+	to the current working directory.
+
+	* [FEA] Added a Compile Options window, accessible from the Options button
+	in the About window, which shows a bunch of information about filters,
+	makefile systems, and make programs.
+	* [FEA] Added a FilterSet abstraction whose sole purpose is to make the
+	Compile Options window look more interesting.
+
+	* [FEA] Make the Licence window wide enough to show the GPL without line wrap.
+
+	* [FEA] Targets "all" and "clean" have accelerators.
+
+	* [FEA] The standard targets list is now per-makesystem.
+
+	* [FRA] Ported to IRIX.  Handle MIPSpro error and warning messages, including
+	multiline ones.  Renamed task.h -> maketool_task.h to avoid conflict with
+	IRIX <task.h>
+
+	* [FEA] Loading .maketoolrc will detect old format and automatically upgrade
+	the file, with a warning message and a backup copy.
+
+	* [BUG] Fixed regression which broke summary mode.
+	* [BUG] Fixed regex matching bug in pmake list targets code which broke
+	targets.
+	* [BUG] Fixed memleak when generating log entry filenames.
+	* [BUG] Fixed minor compiler warnings.
+	* [BUG] Fixed FMR in task_run() by delaying free of Task objects using
+	a refcounting scheme.
+	* [BUG] Fixed memleak of summarised log lines.
+	* [BUG] Fixed bug where a Task object was leaked if it failed to spawn.
+	* [BUG] Fixed bug where changing directory free()d the last_target string
+	but did not forget the pointer or update the GUI.
+	* [BUG] Lines which are highlighted because summarised in the log also appear
+	that way in the print output.
+	* [BUG] Fixed FMR in filter_target().
+	* [BUG] When changing a directory fails, generate a statusbar message.
+	* [BUG] Fixed bug which caused GTK assert failure message when a log record
+	without a visible line in the log window was added to the log.
+	* [BUG] Made generic recognition patterns more robust wrt whitespace.
+	* [BUG] Build menu is limited in width as well as length to avoid automake
+	Makefile blowing out the menu to huuuuge proportions.
+	* [BUG] Fixed bug which SEGVed on startup with glib2's GPtrArray.
+
+	* [NVC] Used aclocal.m4 the way it was supposed to be used.  It is now possible
+	to run "autoconf" on a machine other than my development machine.
+	* [NVC] The config.h.in file is now generated with autoheader.
+	* [NVC] Configure emits a warning when falling back to gtk 1.2.
+	* [NVC] Configure script figures out which OS-specific source to build.
+	* [NVC] Updated to newer version of gettext.
+	* [NVC] Do not autoconf when building the rpm.
+	* [NVC] Reduced build time dependency on gmake & gcc.
+	* [NVC] Centralised lists of editors and browsers.
+	* [NVC] Reduce warnings on LP64 compilation models.
+	* [NVC] Replaced the rpm: makefile target with the buildrpm script from ggcov.
+	* [NVC] Replaced global variable current_dir with a function current_directory()
+	which makes it easier to initialise.
+	* [NVC] Improved configure-time detection of platform signal semantics.
+	* [NVC] Store the current working directory in a global variable to minimise
+	overhead of g_get_current_dir().
+	* [NVC] Changed the ifdefs used to enable various OS-specific filters from
+	#ifdef __sgi etc to using proper autoconf symbols.
+	* [NVC] Configure now automatically detects whether "inline" works.
+	* [NVC] Added and distributed an excludes file for diffing.
+
+
+Fri Sep 28 00:00:00 2001  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.7
+	* [FEA] There is now a GUI for choosing options to ./configure scripts when
+	building a Makefile in directories which use autoconf.
+	* [FEA] Added support for automake.
+	* [FEA] Added a menu item to allow the user to manually rebuild the Makefile
+	when using autoconf, automake or imake.
+	* [FEA] Added menu items to run configure, run autoconf, etc.
+	* [FEA] Added filters to recognise configure script's "creating" lines, so the user
+	can double-click on those lines.
+	* [FEA] The make_makefile program has been replaced, partly with in-process
+	code, partly with several fixed Makefile fragments.  Automatically
+	building the Makefile is now much cleaner and more reliable.
+	* [FEA] In summarise mode, summarised lines are shown in a configurable colour,
+	which defaults to a very light grey.  This shows where the "Compiling"
+	etc lines are when there is lots of un-summarisable rubbish.
+	* [FEA] Added support for summaries of cross-compilation and cross-linking.
+	* [FEA] Japanese translation, thanks to SATO Satoru of the Japan GNOME Users Group.
+	* [FEA] Added Czech translation (thanks to Vaclav Slavik).
+	* [FEA] No longer depends on BSD signal semantics; instead BSD and SysV semantics
+	are checked for at configure time.
+	* [FEA] The binary RPM now depends on make.
+	* [FEA] Add email address to Vendor: in spec file.
+	* [FEA] Correct GNOME-like appearance and behaviour of buttons in dialogs.
+	* [FEA] Considerable work on the documentation, which is not released yet.
+	* [BUG] Widgets update (e.g. mouse-over animations) during help click-on sequence.
+	* [BUG] Fixed bug which broke summaries of some compile lines.
+	* [BUG] Improved failure mode when extract_targets is not found: a single
+	insensitive menu entry is added, and the error output is shown to
+	the user in the message bar.
+	* [BUG] Work around problem with mouse-over highlights of toolbar "all" & "clean".
+	* [BUG] Typing `=' in variable name entry in Preferences window advances
+	to the value entry.  This avoids the user accidentally typing `='
+	in variable names.
+	* [NVC] Got rid of stupid autonull hack.  Dialogs are now not destroyed when the
+	user closes them with WM_DELETE.
+	* [NVC] Source now also compiles with "gcc -ansi".
+	* [NVC] Don't try to distribute aclocal.m4 which doesn't exist anymore.
+	* [NVC] Maketool's own Makefiles now have GNU standard usage of $top_srcdir,
+	$top_builddir, $pkgdatadir and $pkglibexecdir.
+	* [NVC] Reduce use of @PACKAGE@ etc in spec file.
+	* [NVC] Removed some RH-specific $OS stuff in spec file.
+	* [NVC] Building maketool with DEBUG=n now adds -Wall and removes -O2 from $CFLAGS.
+	* Building maketool RPMs no longer uses the system /usr/src/RPM directory,
+	instead using --define to do everything in the local directory.  This
+	enables someone without root privilege to build an RPM.
+	* [NVC] Removed "Latin" translation -- have real ones to test now!
+	* [NVC] Various small tweaks found by -Wall.
+	* [NVC] Various code rationalisations, notably in starting child processes
+	and handling their output.
+	* [NVC] No longer use an objs/ directory for object files.
+
+
+Sun Nov 26 00:00:00 2000  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.6.2
+	* Added an option to disable make_makefile.
+	* Added an option to scroll to end on make child output.
+	* Added preferences option to beep, show a dialog, or run a command
+	at the end of build runs.   
+	* Added button to edit the first error or warning in the next file
+	(thanks to Albert T Hofkamp).
+	* Added command File->Edit Makefile to edit the makefile in the current
+	directory; the trick is to figure out which file to edit (thanks to
+	Albert T Hofkamp).
+	* Added first stirrings of on-line help, temporarily disabled for release.
+	* General UI improvements to Find window (thanks to Albert T Hofkamp).
+	* Maketool remembers previous directories in config file, not only during
+	one session (thanks to Vaclav Slavik).
+	* Scripts make_makefile and extract_targets now live in
+	$prefix/libexec/maketool not $prefix/bin (thanks to Albert T Hofkamp).
+	* Removed the configure-time test for /usr/doc.  Installing the basic
+	doco (COPYRIGHT etc) is now handled by RPM following a %doc directive
+	in the spec file. This is a far cleaner technique.
+	* Tweaked maketool logo so that the small icon looks better when
+	scaled down in modern GNOME's taskbar.
+	* Renamed source tarball from .tgz to .tar.gz to allow Apache to
+	get the mime type right.
+	* Updated copyright messages for the new millennium.
+	* Pruned out obsolete and superfluous inline TODOs.
+	* Fixed bug which SEGVd if make output contained empty lines.
+	* Fixed bug where all dialogs did not properly handle the user closing them
+	via the window manager rather than using the Close or Cancel button.
+	* Fixed bug where changes to widgets in the Preferences windows were
+	not forgotten when the Cancel button is pressed.
+	* Fixed bug which caused GTK warnings to be printed out when a regexp
+	was searched in the Find window (thanks to Albert T Hofkamp).
+	* Fixed harmless bug in 0.6.1 which issued spurious ioctl(FIONREAD) on
+	nonexistant pipe fd for editor child processes (thanks to Albert T Hofkamp).
+	* Fixed bug where changing any of the log flags causes the current scroll
+	position in the log to be lost as the log is repopulated.
+	* Fixed Solaris compile problem (thanks to David T Bath).
+
+Wed Jul 19 00:00:00 2000  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.6.1
+	* Fixed bug with glib 1.2.7 and the glib 1.2.6-7 in RH 6.2.
+
+Thu Jul 13 00:00:00 2000  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.6
+	* Initial implementation of printing the make log.  Prints to PostScript.
+	Preferences entries exist (e.g. paper size, margins) but there is no GUI
+	for them yet. Reads list of printers from /etc/printcap or `lpstat -c`
+	(decided at configure time).
+	* Initial implementation of a Find window. Still several rough edges. Can
+	enter a literal or a regexp, and find or find-again. Stack of historical
+	search cases, navigable with PgUp/PgDn.  No case-insensitive literals yet.
+	* Implemented a File->Change Directory command, and a menu of previous
+	directories.  Shows basename of current directory in main window title bar.
+	* Dialogs are properly marked as transient so that the window manager
+	handles them correctly.
+	* Dialogs are positioned over the main window instead of letting
+	the window manager choose a random and inconvenient position.
+	* Rewrote the process spawning code.  This made the code a lot more
+	orthogonal and also fixed a bug whereby the Stop button was broken.
+	* Tooltip for Again toolbar button, and the Again menu item, now mention
+	what the last target is. This avoids nasty surprises.
+	* Implemented Edit->Copy command which copies the selected line to the
+	clipboard.
+	* Added filter support for the MWOS xcc cross-compiler.
+	* Added filter support for bison.
+	* Added filter support for flex.
+	* Dependencies are built using makedepend rather than hardcoded.
+	* Can now build debugging version using DEBUG=n on make commandline.
+	* Solaris debugging & Purifying patches for Makefile.
+	* NetBSD port makefile fixes.
+	* configure checks for <sys/filio.h> for Solaris.
+	* Worked around incompatibility with GDK/GTK 1.2.6.  I still don't know why
+	this change actually matters, and I still think it's a GDK or GLIB bug,
+	but for the time being this change fixes maketool. This obsoletes the
+	gtk-1.2.6 patch.
+	* Fixed bug introduced in the gtk-1.2.6 patch which lost the output
+	of `gmake --version' when building the Help->About make dialog.
+	* Fixed bug where an error message specifying an absolute pathname,
+	when found in a recursive make, would result in maketool attempting
+	to edit sub_dir/abs_path instead of abs_path.
+	* Fixed bug which caused coredump when pressing Clear Log during
+	build -- by greying out the Clear Log item.
+	* Fixed alignment of labels in Preferences window.
+	* Fixed a few minor warnings -Wall found.
+	* Fixed bug which caused menu item greying to be done prematurely
+	when child make processes were started.
+
+Sun Nov 14 00:00:00 1999  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.5.1
+	* Fixed race condition which caused the first process spawned to sometimes
+	not be reaped properly if it finished quickly. This sometimes lead to
+	an empty Build menu.
+
+Sun Nov 07 00:00:00 1999  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.5
+	* Added feature which builds a new Makefile if it is out of date. Handles
+	autoconf and imake.
+	* Added feature to map directory level to tree indent level.
+	* Added feature to allow make variables to be overriden on the commandline.
+	* Added feature where the number of errors and warnings in a build run
+	or log file is displayed in the start line, updated as lines are parsed.
+	* Added a small sample window showing colours & icons in the
+	Colors tab of the Preferences window.
+	* Added `Reset to Old' and `Reset to Defaults' buttons in the
+	Colors tab of the Preferences window.
+	* Added filter to detect gcc inclusion trace and allow clicking on
+	those lines to edit those files.
+	* Loading a long error log file now does minimal updates to the log
+	window scrollbar, and issues a message beforehand.
+	* The Edit Next & Edit Prev commands now scroll to the error if its
+	not fully visible onscreen.
+	* Added `babygnu' GNU logo to About Make window.
+	* Handles makefiles with large numbers of targets (e.g. the Linux
+	kernel makefile with over 50 targets which survive the extract_targets
+	filter) by splitting the Build menu into multiple submenus.
+	* "tags" is now considered a standard target.
+	* Solaris port: include the right header to define FIONREAD. Thanks to
+	Alistair Crooks.
+	* Made GNU make executable name configurable. Configure now has a
+	--with-gmake=CMD argument, whose value may contain a full pathname
+	or name to be looked up in $PATH, and optionally flags. Thanks to
+	Frederick Bruckman.
+	* Configure checks for presence of /usr/doc at configure time, and if
+	absent comments out targets for installation of TODO etc files.
+	This makes life easier for non-Linux folks. Thanks to Frederick Bruckman.
+	* The GPL text is compiled into the executable now, so there's no
+	need for it to be installed anywhere. Thanks to Frederick Bruckman.
+	* Fixed bug with unescaped +s in filter regexps. Thanks to Frederick Bruckman.
+	* Fixed layout bug in General and Colors tabs of the Preferences window
+	which resulted in oversized buttons.
+	* Be a little bit less verbose at low values of DEBUG.
+	* Fixed the bug which coredumped if editing next error in summary
+	mode and next error is `   from fred.c:9:'
+	* Fixed bug where after editing colours and clicking Cancel, the
+	next time the Preferences window is brought up it shows the
+	abandoned edited colours instead of the current colours.
+	* Updated tests to exercise some previously fixed bugs.
+	* Fixed bug which allowed whitespace in filenames on error lines.
+	* Fixed bug where the run load spinbox in the Preferences window would
+	sometimes save an incorrect value due to a float rounding problem.
+
+Sat Sep 11 00:00:00 1999  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.4
+	* Added the ability to summarise lines in the make log, e.g.
+	a long compile line becomes `Compiling fred.c'. Handles
+	compiling C/C++, compiling Java, linking C/C++, and building
+	an archive library. Error & warning lines have their initial
+	part (filename & line number) removed. Also gcc-produced
+	lines which are spurious in the maketool context are removed entirely.
+	* Added a dryrun option.
+	* Log flags are saved to preferences.
+	* Preferences now include foreground and background colors for
+	info, error, and warning lines. Saved into ~/.maketoolrc.
+	* Fixed bug where Variables list in Preferences window got confused
+	after user sets the same variable to two different values.
+	* Fixed estring bug which caused Purify error if estring
+	is used after estring_free().
+	* Fixed bug which mis-handled the last line of a child process'
+	output or a logfile if the line wasn't terminated with \n.
+	* Fixed bug which leaked the key of a config string which
+	was set for the 2nd or subsequent time.
+	* Made a debugging print properly conditional.
+	* Made the sinclude()s in configure.in use full path names so that
+	autoconf does not need to be invoked with any arguments. Now I
+	don't need the special configure: make target.
+	* Rationalised code which puts version number into about string.
+	* Removed as many line length/buffer overflow conditions as
+	I could find. Tested with a line longer than 1024 chars.
+
+
+Wed Jul 14 00:00:00 1999  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.3
+	* The Licence button now pops up a window which
+	shows the GPL in a text widget. Text is loaded
+	at runtime from the installed doc dir.
+	* All dialogs are titled "Maketool: foo"
+	* Added --version option.
+	* Implemented the following arguments with gmake's syntax:
+	-C --directory -f --file --makefile -h, --help -j --jobs -k
+	--keep-going  -l --load-average --max-load -S --no-keep-going
+	--stop -v --version
+	* Fixed bugs which broke compile on systems which need
+	the included gettext.
+	* Makefile no longer needs separate $run_prefix.
+	* Preferences and window size are loaded on startup and saved
+	when changed, in the file ~/.maketoolrc.
+	* Fixed various minor bugs.
+	* Removed the test initial values of variables in the Preferences.
+	* No longer relies on OS having poll(2).
+	* Added accelerators.
+	* Toolbar and menubar are now dockable (in a limited way).
+	* Main window can resize down vertically.
+	* aclocal.m4 is much neater now.
+	* Moved icons and test stuff into their own directories.
+	* Split the View menu into View and Edit menus.
+	* Refined extract_targets heuristics a little.
+	* All C converted to GNU-standard identifiers.
+	* Added a `Stop' button to the toolbar.
+	* Improved detection of GNU standard targets. Now detects all
+	the standard targets mentioned in the doc.
+	* Toolbar icons are a lot less subtle in colour, so that their
+	insensitive state can be easily distinguished.
+
+Sat Jun 06 00:00:00 1999  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.2   (1 Jun 1999)
+	* First public release.
+
+Wed May 05 00:00:00 1999  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.1
+	* Started work.
