@@ -23,7 +23,7 @@ define(ENDBODY,
 </BODY></HTML>
 )dnl
 define(EMAILME,
-<A HREF="mailto:gnb@alphalink.com.au?Subject=maketool">$1</A>
+$1 <A HREF="mailto:gnb@alphalink.com.au?Subject=maketool">gnb@alphalink.com.au</A>
 )dnl
 dnl Usage: THUMBNAIL(some/dir/fred,gif,[alternate text])
 define(THUMBNAIL,
