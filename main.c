@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.41 1999-11-04 07:22:35 gnb Exp $");
+CVSID("$Id: main.c,v 1.42 1999-11-07 05:33:10 gnb Exp $");
 
 typedef enum
 {
@@ -1438,9 +1438,22 @@ parse_args(int argc, char **argv)
 	}
 	else
 	{
-	    if (targs.length > 0)
-	    	estring_append_char(&targs, ' ');
-	    estring_append_string(&targs, argv[i]);
+	    if (strchr(argv[i], '=') != 0)
+	    {
+	    	/* variable override */
+		char *buf = g_strdup(argv[i]);
+		char *value = strchr(buf, '=');
+		*value++ = '\0';
+		preferences_add_variable(buf, value, VAR_MAKE);
+		g_free(buf);
+	    }
+	    else
+	    {
+	    	/* target */
+		if (targs.length > 0)
+	    	    estring_append_char(&targs, ' ');
+		estring_append_string(&targs, argv[i]);
+	    }
 	}
     }
     

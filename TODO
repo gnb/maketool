@@ -172,4 +172,7 @@ x  Provide a Preferences setting to control what happens when a make
    run finishes. Nothing; Sound Bell; Flash Window; Run Program.
    
 x  Add timestamp to log start line, either current time for normal builds
-   or file modification time for log files.
+   or file modification time for log files. Also number of errors & warnings.
+
+x  Should be able to edit main.c by clicking on "    from main.c" in gcc
+   inclusion trace.

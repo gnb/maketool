@@ -137,6 +137,7 @@ void preferences_load(void);
 void preferences_save(void);
 void preferences_resize(int width, int height);
 void preferences_set_dryrun(gboolean d);
+void preferences_add_variable(const char *name, const char *value, int type);
 void edit_preferences_cb(GtkWidget *, gpointer);
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

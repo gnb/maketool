@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.25 1999-11-03 02:42:27 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.26 1999-11-07 05:33:10 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -91,8 +91,8 @@ var_str_to_type(const char *str)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-static void
-prefs_add_variable(const char *name, const char *value, int type)
+void
+preferences_add_variable(const char *name, const char *value, int type)
 {
     Variable *var;
     
@@ -425,7 +425,7 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     for (row = 0 ; row < nrows ; row++)
     {
     	ui_clist_get_strings(var_clist, row, VC_MAX, text);
-	prefs_add_variable(text[VC_NAME], text[VC_VALUE],
+	preferences_add_variable(text[VC_NAME], text[VC_VALUE],
 		var_str_to_type(text[VC_TYPE]));
     }
     prefs_set_var_environment();
