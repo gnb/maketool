@@ -20,7 +20,7 @@
 #include "util.h"
 #include <stdarg.h>
 
-CVSID("$Id: util.c,v 1.19 2003-10-03 12:18:33 gnb Exp $");
+CVSID("$Id: util.c,v 1.20 2004-11-07 02:16:49 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -244,6 +244,16 @@ file_exists(const char *pathname)
     struct stat sb;
     
     return (stat(pathname, &sb) >= 0 && S_ISREG(sb.st_mode));
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+gboolean
+file_is_directory(const char *pathname)
+{
+    struct stat sb;
+    
+    return (stat(pathname, &sb) >= 0 && S_ISDIR(sb.st_mode));
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

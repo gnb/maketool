@@ -66,6 +66,7 @@ char *strescape(const char *s);
 char *expand_string(const char *in, const char *expands[256]);
 
 gboolean file_exists(const char *pathname);
+gboolean file_is_directory(const char *pathname);
 
 /* Returns the user's home directory.  Never returns NULL */
 const char *file_home(void);
