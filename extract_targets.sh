@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: extract_targets.sh,v 1.5 1999-06-01 13:19:05 gnb Exp $
+# $Id: extract_targets.sh,v 1.6 1999-07-14 06:15:01 gnb Exp $
 #
 
 make -n -p "$@" _no_such_target_ 2>/dev/null | awk '
@@ -46,6 +46,8 @@ BEGIN {
 	if (substr(targ, 0, 1) == "/")
 	    suitable = 0
 	if (substr(targ, 0, 3) == "../")
+	    suitable = 0
+	if (substr(targ, length(targ)-1, 2) == ".o")
 	    suitable = 0
 	if (suitable)
     	    print targ
