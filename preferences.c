@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.36 2000-07-22 09:30:59 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.37 2000-07-22 12:48:21 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -281,6 +281,8 @@ static UiEnumRec log_flags_def[] = {
 void
 preferences_load(void)
 {
+    int i;
+
     ui_config_init("maketool");
     prefs.run_how = ui_config_get_enum("run_how", RUN_SERIES, run_how_enum_def);
     prefs.run_processes = ui_config_get_int("run_processes", 2);
@@ -327,11 +329,31 @@ preferences_load(void)
     prefs.margin_right = ui_config_get_int("margin_right", 36);
     prefs.margin_top = ui_config_get_int("margin_top", 72);
     prefs.margin_bottom = ui_config_get_int("margin_bottom", 72);
+
+
+    /* Load directory history list from config file */
+    i = 0;
+    while (g_list_length(prefs.dir_history) < MAX_DIR_HISTORY)
+    {
+    	char *val, varname[20];
+	
+	g_snprintf(varname, sizeof(varname), "dir_history_%d", i);
+	i++;
+	if ((val = ui_config_get_string(varname, 0)) == 0)
+	    break;
+	/* ensure list is unique */
+	if (g_list_find_str(prefs.dir_history, val) != 0)
+	    continue;
+	prefs.dir_history = g_list_append(prefs.dir_history, g_strdup(val));
+    }
 }
 
 void
 preferences_save(void)
 {
+    int i;
+    GList *list;
+    
     ui_config_set_enum("run_how", prefs.run_how, run_how_enum_def);
     ui_config_set_int("run_processes", prefs.run_processes);
     ui_config_set_int("run_load", prefs.run_load);
@@ -374,6 +396,16 @@ preferences_save(void)
     ui_config_set_int("margin_right", prefs.margin_right);
     ui_config_set_int("margin_top", prefs.margin_top);
     ui_config_set_int("margin_bottom", prefs.margin_bottom);
+    
+    
+    for (list = prefs.dir_history, i = 0 ; list != 0 ; list = list->next, i++)
+    {
+    	char *dir = (char *)list->data;
+    	char varname[20];
+	
+	g_snprintf(varname, sizeof(varname), "dir_history_%d", i);
+	ui_config_set_string(varname, dir);
+    }
 
     ui_config_sync();
 }

@@ -352,7 +352,7 @@ x  A.T. Hofkamp says: add a button to edit the first error in the next file.
 
 x  DONE: A.T. Hofkamp says: Please make it possibe to edit the Makefile
 
-x  Vaclav Slavik says:  let maketool remember previous directories in
+x  DONE: Vaclav Slavik says:  let maketool remember previous directories in
    config file, not only during one session.
 
 x  Fix the page name and page orientation combos in the Preferences

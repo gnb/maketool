@@ -110,6 +110,10 @@ typedef struct
     int margin_right;
     int margin_top;
     int margin_bottom;
+
+#define MAX_DIR_HISTORY 16
+    GList *dir_history;	    	/* list of strings */
+
 } Preferences;
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -157,6 +161,9 @@ void preferences_set_dryrun(gboolean d);
 void preferences_add_variable(const char *name, const char *value, int type);
 void edit_preferences_cb(GtkWidget *, gpointer);
 void print_page_setup_cb(GtkWidget *, gpointer);
+
+#define g_list_find_str(l, s) \
+	g_list_find_custom((l), (s), (GCompareFunc)strcmp)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 

@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.58 2000-07-21 07:35:32 gnb Exp $");
+CVSID("$Id: main.c,v 1.59 2000-07-22 12:48:21 gnb Exp $");
 
 typedef enum
 {
@@ -86,8 +86,6 @@ char  	    	*clipboard_text = 0;
 GtkWidget   	*clipboard_widget;
 
 GtkWidget   	*dir_previous_menu;
-#define MAX_DIR_HISTORY 16
-GList	    	*dir_history;	    	/* of strings */
 
 /*
  * These are the targets specifically mentioned in the
@@ -115,8 +113,6 @@ static void set_main_title(void);
 static void construct_build_menu_basic_items(void);
 static void dir_previous_cb(GtkWidget *w, gpointer data);
 
-#define g_list_find_str(l, s) \
-	g_list_find_custom((l), (s), (GCompareFunc)strcmp)
 
 /*
  * Number of non-standard targets to be present before
@@ -864,7 +860,7 @@ dump_dir_history(const char *str)
     GList *list;
     
     fprintf(stderr, "%s dir_history = {\n", str);
-    for (list = dir_history ; list != 0 ; list = list->next)
+    for (list = prefs.dir_history ; list != 0 ; list = list->next)
 	fprintf(stderr, "   %s\n", (char*)list->data);
     fprintf(stderr, "}\n");
 }
@@ -882,7 +878,7 @@ construct_dir_previous_menu(void)
     ui_delete_menu_items(dir_previous_menu);
 
     /* now construct a new menu */    
-    for (list = dir_history, i = 0 ; list != 0 ; list = list->next, i++)
+    for (list = prefs.dir_history, i = 0 ; list != 0 ; list = list->next, i++)
     {
     	char *dir = (char *)list->data;
 	
@@ -892,7 +888,7 @@ construct_dir_previous_menu(void)
 	    	dir_previous_cb, dir, GR_NOTRUNNING);
     }
     
-    if (dir_history == 0)
+    if (prefs.dir_history == 0)
 	ui_add_button(dir_previous_menu, _("No previous directories"), 0, 0, 0, GR_NEVER);
 }
 
@@ -916,7 +912,7 @@ change_directory(const char *dir)
     /*
      * Update directory history
      */
-    if (g_list_find_str(dir_history, olddir) != 0)
+    if (g_list_find_str(prefs.dir_history, olddir) != 0)
     {
     	/* already in list */
 	g_free(olddir);
@@ -924,16 +920,19 @@ change_directory(const char *dir)
     else
     {
 	/* not already in history list, prepend it */
-	dir_history = g_list_prepend(dir_history, olddir);
+	prefs.dir_history = g_list_prepend(prefs.dir_history, olddir);
 
 	/* trim list to fit */
-	while (g_list_length(dir_history) > MAX_DIR_HISTORY)
+	while (g_list_length(prefs.dir_history) > MAX_DIR_HISTORY)
 	{
-	    GList *last = g_list_last(dir_history);
+	    GList *last = g_list_last(prefs.dir_history);
 	    g_free((char *)last->data);
-	    dir_history = g_list_remove_link(dir_history, last);
+	    prefs.dir_history = g_list_remove_link(prefs.dir_history, last);
 	}
 
+    	/* save dir history, and everything else */
+    	preferences_save();
+	
     	/* update Previous Directory menu */
 	if (dir_previous_menu != 0)
     	    construct_dir_previous_menu();
