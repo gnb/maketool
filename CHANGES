@@ -1,4 +1,4 @@
-* 0.6.99  (22 Sep 2001)
+* 0.7  (28 Sep 2001)
 x  [FEA] There is now a GUI for choosing options to ./configure scripts when
    building a Makefile in directories which use autoconf.
 x  [FEA] Added support for automake.
