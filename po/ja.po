@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: maketool 0.6.2\n"
-"POT-Creation-Date: 2003-05-24 15:54+1000\n"
+"POT-Creation-Date: 2003-09-01 23:20+1000\n"
 "PO-Revision-Date: 2000-12-01 19:53+09:00\n"
 "Last-Translator: SATO Satoru <ss@gnome.gr.jp>\n"
 "Language-Team: Japanese <translation@gnome.gr.jp>\n"
@@ -53,11 +53,11 @@ msgstr "Maketool: オプションを設定"
 msgid "Preview"
 msgstr "プレビュー"
 
-#: autoconf.c:1068 print.c:371 ui.c:570 ui.c:635
+#: autoconf.c:1068 print.c:372 ui.c:618 ui.c:683
 msgid "OK"
 msgstr "了解"
 
-#: autoconf.c:1075 print.c:375 ui.c:641
+#: autoconf.c:1075 print.c:376 ui.c:689
 msgid "Cancel"
 msgstr "取り消し"
 
@@ -472,7 +472,7 @@ msgid "XConsortium Imake"
 msgstr ""
 
 #. name
-#: irix-makesys.c:73
+#: irix-makesys.c:75
 msgid "IRIX makefile system"
 msgstr ""
 
@@ -731,85 +731,77 @@ msgstr "ヘルプ(_H)"
 msgid "_About Maketool..."
 msgstr "Maketool の概要(_A)..."
 
-#: main.c:1646
+#: main.c:1645
 msgid "_Help on..."
 msgstr "ヘルプ(_H)..."
 
-#: main.c:1648
-msgid "_Tutorial..."
-msgstr "チュートリアル(_T)..."
-
-#: main.c:1649
+#: main.c:1647
 msgid "Table of _Contents..."
 msgstr ""
 
-#: main.c:1650
-msgid "Index..."
-msgstr "インデックス..."
-
-#: main.c:1651
+#: main.c:1648
 #, fuzzy
 msgid "Web Page..."
 msgstr "ホームページ(_H)..."
 
-#: main.c:1671
+#: main.c:1667
 msgid "Again"
 msgstr "再実行"
 
-#: main.c:1674
+#: main.c:1670
 msgid "Stop"
 msgstr "停止"
 
-#: main.c:1674
+#: main.c:1670
 msgid "Stop current build"
 msgstr "今のビルドを停止"
 
-#: main.c:1679 main.c:1684
+#: main.c:1675 main.c:1680
 #, c-format
 msgid "Build `%s'"
 msgstr "`%s' をビルド"
 
-#: main.c:1691
+#: main.c:1687
 msgid "Clear"
 msgstr "クリア"
 
-#: main.c:1691 preferences.c:830
+#: main.c:1687 preferences.c:865
 msgid "Clear log"
 msgstr "ログをクリア"
 
-#: main.c:1693
+#: main.c:1689
 msgid "Next"
 msgstr "次"
 
-#: main.c:1693
+#: main.c:1689
 msgid "Edit next error or warning"
 msgstr "次のエラーあるいは警告について編集"
 
-#: main.c:1696
+#: main.c:1692
 msgid "File Next"
 msgstr "次のファイル"
 
-#: main.c:1696
+#: main.c:1692
 msgid "Edit first error or warning in next file"
 msgstr "次のファイルのエラーか警告について編集"
 
-#: main.c:1702
+#: main.c:1698
 msgid "Print"
 msgstr "印刷"
 
-#: main.c:1702
+#: main.c:1698
 msgid "Print log"
 msgstr "ログを印刷"
 
-#: main.c:1817
+#: main.c:1813
 msgid "Maketool"
 msgstr "Maketool"
 
-#: main.c:1958
+#: main.c:1959
 msgid "Welcome to Maketool"
 msgstr "Maketool にようこそ"
 
-#: main.c:1999
+#: main.c:2000
 #, fuzzy
 msgid "Maketool: Upgraded Preferences"
 msgstr "Maketool: 設定"
@@ -827,181 +819,180 @@ msgstr ""
 msgid "IRIX smake"
 msgstr ""
 
-#: preferences.c:664
+#: preferences.c:699
 msgid "Choose Makefile"
 msgstr "Makefile の選択"
 
 #.
 #. * `Parallel' frame
 #.
-#: preferences.c:698
+#: preferences.c:733
 msgid "Make runs commands"
 msgstr "コマンドを実行"
 
-#: preferences.c:708
+#: preferences.c:743
 msgid "in series."
 msgstr "連続で"
 
-#: preferences.c:718
+#: preferences.c:753
 msgid "in parallel. Maximum number of processes is "
 msgstr "並行して。最大プロセス数は "
 
-#: preferences.c:742
+#: preferences.c:777
 msgid "in parallel. Maximum machine load is "
 msgstr "並行して。最大マシン負荷は "
 
 #.
 #. * Edit first detected error.
 #.
-#: preferences.c:766
+#: preferences.c:801
 msgid "Automatically edit first error"
 msgstr "最初のエラーについて自動的に編集"
 
 #.
 #. * Auto edit warnings
 #.
-#: preferences.c:777
+#: preferences.c:812
 msgid "Edit Next ignores warnings"
 msgstr "次の無視した警告を編集"
 
 #.
 #. * -k flag
 #.
-#: preferences.c:788
+#: preferences.c:823
 msgid "Continue despite failures"
 msgstr "警告を無視して続ける"
 
 #.
 #. * enable make_makefiles script
 #.
-#: preferences.c:799
+#: preferences.c:834
 msgid "Build Makefile from Imakefile or Makefile.in"
 msgstr "Imakefile か Makefile.in から Makefile を生成"
 
 #.
 #. * scroll to end of window on make child's output
 #.
-#: preferences.c:810
+#: preferences.c:845
 msgid "Scroll to end on output"
 msgstr "出力の最後にスクロール"
 
 #.
 #. * Action on starting build.
 #.
-#: preferences.c:821
+#: preferences.c:856
 msgid "On starting each build: "
 msgstr "各ビルドの最初: "
 
-#: preferences.c:829 preferences.c:853
+#: preferences.c:864 preferences.c:888
 msgid "Do nothing"
 msgstr "何もしない"
 
-#: preferences.c:831
+#: preferences.c:866
 msgid "Collapse all log items"
 msgstr "すべてのログアイテムを折畳む"
 
 #.
 #. * Action on finishing build.
 #.
-#: preferences.c:845
+#: preferences.c:880
 msgid "On finishing each build: "
 msgstr "各ビルドの最後: "
 
-#: preferences.c:854
+#: preferences.c:889
 msgid "Beep"
 msgstr "ビープ音"
 
-#: preferences.c:855
+#: preferences.c:890
 msgid "Run command"
 msgstr "コマンドを実行"
 
-#: preferences.c:856
+#: preferences.c:891
 msgid "Show dialog"
 msgstr "ダイアログを表示"
 
 #.
 #. * Choose Makefile.
 #.
-#: preferences.c:880
+#: preferences.c:915
 msgid "Makefile:"
 msgstr "Makefile:"
 
-#: preferences.c:888
+#: preferences.c:923
 msgid "(default)"
 msgstr "(デフォルト)"
 
-#: preferences.c:904 print.c:360
+#: preferences.c:939 print.c:361
 msgid "Browse..."
 msgstr "閲覧..."
 
-#: preferences.c:1073
+#: preferences.c:1108
 msgid "Make"
 msgstr "Make"
 
-#: preferences.c:1074
+#: preferences.c:1109
 msgid "Environ"
 msgstr "環境"
 
-#: preferences.c:1085
+#: preferences.c:1120
 msgid "Name"
 msgstr "名前"
 
-#: preferences.c:1086
+#: preferences.c:1121
 msgid "Value"
 msgstr "値"
 
-#: preferences.c:1087
+#: preferences.c:1122
 msgid "Type"
 msgstr "タイプ"
 
 #.
 #. * Name
 #.
-#: preferences.c:1114 preferences.c:1753
+#: preferences.c:1149 preferences.c:1811
 msgid "Name:"
 msgstr "名前:"
 
 #.
 #. * Value
 #.
-#: preferences.c:1132
+#: preferences.c:1167
 msgid "Value:"
 msgstr "値:"
 
 #.
 #. * Type
 #.
-#: preferences.c:1150
+#: preferences.c:1185
 msgid "Type:"
 msgstr "タイプ:"
 
-#: preferences.c:1178
+#: preferences.c:1213
 msgid "Set"
 msgstr "設定"
 
-#: preferences.c:1186
+#: preferences.c:1221
 msgid "Unset"
 msgstr "設定を解除"
 
 #. -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#: preferences.c:1199
+#: preferences.c:1247
 msgid ""
 "Key\n"
-"%f       source filename            %{x:+y}  y if %x is not empty\n"
-"%k       keep going flag (-k)       %D       maketool data directory\n"
-"%l       source line number         %M       make program\n"
-"%m       -f makefile                %S       makesystem name\n"
-"%n       dryrun flag (-n)           %V       list version flags\n"
-"%p       parallel flags (-j or -l)\n"
-"%q       list targets flags\n"
+"%f       source filename        %u       help url\n"
+"%k       keep going flag (-k)   %v       variable overrides\n"
+"%l       source line number     %{x:+y}  y if %x is not empty\n"
+"%m       -f makefile            %D       maketool data directory\n"
+"%n       dryrun flag (-n)       %M       make program\n"
+"%p       parallel flags (-j,-l) %S       makesystem name\n"
+"%q       list targets flags     %V       list version flags\n"
 "%t       target\n"
-"%v       variable overrides\n"
 msgstr ""
 
 #.
 #. * Make program
 #.
-#: preferences.c:1235
+#: preferences.c:1280
 #, fuzzy
 msgid "Make Program:"
 msgstr "プログラム"
@@ -1009,7 +1000,7 @@ msgstr "プログラム"
 #.
 #. * Build a target
 #.
-#: preferences.c:1264
+#: preferences.c:1309
 #, fuzzy
 msgid "Make a target:"
 msgstr "make ターゲットをリスト表示:"
@@ -1017,105 +1008,112 @@ msgstr "make ターゲットをリスト表示:"
 #.
 #. * Make target lister
 #.
-#: preferences.c:1282
+#: preferences.c:1327
 msgid "List make targets:"
 msgstr "make ターゲットをリスト表示:"
 
 #.
 #. * Make version lister
 #.
-#: preferences.c:1299
+#: preferences.c:1344
 msgid "List make version:"
 msgstr "make のバージョンをリスト表示:"
 
 #.
 #. * Editor
 #.
-#: preferences.c:1316
+#: preferences.c:1361
 msgid "Edit source files:"
 msgstr "ソースファイルを編集:"
 
 #.
 #. * Makefile updater
 #.
-#: preferences.c:1341
+#: preferences.c:1380
 msgid "Build makefile:"
 msgstr "makefile を生成:"
 
-#: preferences.c:1459
+#.
+#. * Help browser
+#.
+#: preferences.c:1397
+msgid "Help browser:"
+msgstr ""
+
+#: preferences.c:1517
 #, c-format
 msgid "Maketool: %s Choose Color"
 msgstr "Maketool: 選択した色 %s"
 
-#: preferences.c:1503
+#: preferences.c:1561
 msgid "Choose..."
 msgstr "選択..."
 
-#: preferences.c:1590
+#: preferences.c:1648
 msgid "Information Background:"
 msgstr "[情報]の背景色:"
 
-#: preferences.c:1591
+#: preferences.c:1649
 msgid "Information Foreground:"
 msgstr "[情報]の前景色:"
 
-#: preferences.c:1592
+#: preferences.c:1650
 msgid "Warning Background:"
 msgstr "[警告]の背景色:"
 
-#: preferences.c:1593
+#: preferences.c:1651
 msgid "Warning Foreground:"
 msgstr "[警告]の前景色:"
 
-#: preferences.c:1594
+#: preferences.c:1652
 msgid "Error Background:"
 msgstr "エラーの背景色:"
 
-#: preferences.c:1595
+#: preferences.c:1653
 msgid "Error Foreground:"
 msgstr "[エラー]の前景色:"
 
-#: preferences.c:1596
+#: preferences.c:1654
 msgid "Summary Background:"
 msgstr "[概要]の背景色:"
 
-#: preferences.c:1597
+#: preferences.c:1655
 msgid "Summary Foreground:"
 msgstr "[概要]の前景色:"
 
-#: preferences.c:1602
+#: preferences.c:1660
 msgid "Sample"
 msgstr "サンプル"
 
-#: preferences.c:1622
+#: preferences.c:1680
 msgid "information: yadda yadda yadda"
 msgstr "情報：いろいろ"
 
-#: preferences.c:1625
+#: preferences.c:1683
 msgid "warning: danger, Will Robinson!"
 msgstr "警告: ロビンソン、危険!"
 
-#: preferences.c:1628
+#: preferences.c:1686
 msgid "error: I'm sorry Dave I can't do that"
 msgstr "エラー: ごめんよ Dave、それはできない"
 
-#: preferences.c:1631
+#: preferences.c:1689
 msgid "Executive Summary"
 msgstr "実行概要"
 
-#: preferences.c:1664
+#: preferences.c:1722
 msgid "Reset to Old"
 msgstr "古い設定にリセット"
 
-#: preferences.c:1670
+#: preferences.c:1728
 msgid "Reset to Defaults"
 msgstr "デフォルト設定にリセット"
 
-#: preferences.c:1690
+#: preferences.c:1748
 msgid "mm"
 msgstr "mm"
 
-#: preferences.c:1728
+#: preferences.c:1786
 msgid ""
 "Large\n"
 "canvas\n"
@@ -1129,129 +1127,129 @@ msgstr ""
 "実行\n"
 "ここ"
 
-#: preferences.c:1740
+#: preferences.c:1798
 msgid "Paper Size"
 msgstr "ページャーの大きさ"
 
-#: preferences.c:1761
+#: preferences.c:1819
 msgid "A4"
 msgstr "A4"
 
-#: preferences.c:1762
+#: preferences.c:1820
 msgid "B5"
 msgstr "B5"
 
-#: preferences.c:1763
+#: preferences.c:1821
 msgid "US letter"
 msgstr "US レター"
 
-#: preferences.c:1764
+#: preferences.c:1822
 msgid "US legal"
 msgstr "US リーガル"
 
-#: preferences.c:1765
+#: preferences.c:1823
 msgid "Custom"
 msgstr "カスタム"
 
-#: preferences.c:1776
+#: preferences.c:1834
 msgid "Orientation:"
 msgstr "方向:"
 
-#: preferences.c:1784
+#: preferences.c:1842
 msgid "Portrait"
 msgstr "ポートレート"
 
-#: preferences.c:1785
+#: preferences.c:1843
 msgid "Landscape"
 msgstr "ランドスケープ"
 
-#: preferences.c:1796
+#: preferences.c:1854
 msgid "Width:"
 msgstr "幅:"
 
-#: preferences.c:1818
+#: preferences.c:1876
 msgid "Height:"
 msgstr "高さ:"
 
-#: preferences.c:1841
+#: preferences.c:1899
 msgid "Margins"
 msgstr "マージン"
 
-#: preferences.c:1855
+#: preferences.c:1913
 msgid "Left:"
 msgstr "左:"
 
-#: preferences.c:1877
+#: preferences.c:1935
 msgid "Right:"
 msgstr "右:"
 
-#: preferences.c:1899
+#: preferences.c:1957
 msgid "Top:"
 msgstr "上:"
 
-#: preferences.c:1921
+#: preferences.c:1979
 msgid "Bottom:"
 msgstr "下:"
 
-#: preferences.c:1962
+#: preferences.c:2020
 msgid "Editor:"
 msgstr "エディタ:"
 
-#: preferences.c:2049
+#: preferences.c:2108
 msgid "Maketool: Preferences"
 msgstr "Maketool: 設定"
 
-#: preferences.c:2065
+#: preferences.c:2124
 msgid "General"
 msgstr "一般"
 
-#: preferences.c:2071
+#: preferences.c:2130
 msgid "Variables"
 msgstr "変数"
 
-#: preferences.c:2076
+#: preferences.c:2135
 msgid "Programs"
 msgstr "プログラム"
 
-#: preferences.c:2081
+#: preferences.c:2140
 msgid "Colors"
 msgstr "色"
 
-#: preferences.c:2086
+#: preferences.c:2145
 msgid "Page Setup"
 msgstr "ページ設定"
 
-#: preferences.c:2093
+#: preferences.c:2152
 msgid "Styles"
 msgstr "スタイル"
 
 #. TODO: lpr_ API should allow us an error message
-#: print.c:224
+#: print.c:225
 #, c-format
 msgid "Can't create job on printer `%s'"
 msgstr "プリンター `%s' にジョブを送れません"
 
-#: print.c:273
+#: print.c:274
 msgid "Maketool: Choose Output File"
 msgstr "Maketool: 出力ファイルを選択"
 
-#: print.c:310
+#: print.c:311
 msgid "Maketool: Print"
 msgstr "Maketool: 印刷"
 
-#: print.c:322
+#: print.c:323
 msgid "Print to printer"
 msgstr "プリンターに出力"
 
-#: print.c:334
+#: print.c:335
 msgid "no printers on this system"
 msgstr "プリンタがみつかりません"
 
-#: print.c:345
+#: print.c:346
 msgid "Print to file"
 msgstr "ファイルに出力"
 
-#: print.c:373
+#: print.c:374
 msgid "Page Setup..."
 msgstr "ページ設定..."
 
@@ -1266,9 +1264,15 @@ msgstr "automakeを実行(_m)"
 msgid "maketool: reaped unexpected pid %d\n"
 msgstr "maketool: 予期しない PID %d を刈取り\n"
 
-#: ui.c:638
+#: ui.c:686
 msgid "Apply"
 msgstr "適用"
+
+#~ msgid "_Tutorial..."
+#~ msgstr "チュートリアル(_T)..."
+
+#~ msgid "Index..."
+#~ msgstr "インデックス..."
 
 #~ msgid "Maketool: About Make"
 #~ msgstr "Maketool: Make について"
