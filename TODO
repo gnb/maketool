@@ -1,51 +1,17 @@
+--- open ---
 
-x  DONE: `Variables' tab in Preferences window needs to shrink.
-
-x  DONE: When user presses `Edit Next' the new selected error
-   should become visible even if its currently in a collapsed
-   build or it has scrolled out of sight.
-   
 x  Show a different icon on error lines which have been edited.
-
-x  DONE: Have to be able to resize the window down vertically.
 
 x  IN PROGRESS: Implement printing and Print Settings window.
 
-x  DONE: Implement File->Change Directory  command.
-
-x  DONE: Add icon for non-GNOME w/ms.
-
-x  DONE: Implement extraction of targets and generating the Build menu.
-
 x  Implement extra stuff in the Help menu.
-
-x  DONE: well expanded - see below. ?? Implement tighter GNOME integration.
-
-x  DONE: Implement setting environment from Variables.
-
-x  DONE: Change the `Type' field in the Variables tab in the
-   Preferences window to a combo box.
-   
-x  DONE: I18N.
 
 x  Provide filters for other compilers than gcc.
 
 x  Make filters configurable in Preferences GUI. This implies making
    the changes persistent too!
 
-x  DONE: Save & load preferences, window geom etc.
-
-x  DONE: Override preferences with -f -j -k and -l options from commandline.
-
-x  DONE: Handle makes over multiple directories - get the filenames right.
-
 x  Use a hashtable of filenames to reduce memory traffic for filenames.
-
-x  DONE: Make a nicer animation for when make is running.
-
-x  DONE: Add menu item Edit->Copy for filling the clipboard from the selected
-   line(s?) of the log window. Implies adding an Edit menu & moving some
-   of the View menu items into it.
 
 x  GNOME integration: drag'n'drop. Dragging in directory changes to
    that directory. Dragging in file or string makes it if it's a known
@@ -67,32 +33,9 @@ x  GNOME integration: use GNOME URL handling in Help menu.
 
 x  GNOME integration: provide triggers for sounds etc.
 
-x  DONE: Improve glib_extra.c so it doesn't require need to care
-   about poll(2) directly and submit to the glib maintainers.
-
-x  DONE: Add patchlevel.h
-
-x  DONE: Add autoconf support.
-
 x  Implement the FR_PENDING filter result.
 
-x  DONE: Install extract_targets.sh
-
-x  DONE: Accelerators etc for menu items.
-
-x  DONE: (for colours only) Allow user to configure error & warning colours & icons in Preferences.
-
 x  Doco.
-
-x  DONE: Remove line length limitation in handle_input().
-
-x  DONE: Remove line length limitation in filter_apply_one().
-
-x  DONE: Add check for buffer overflow in ui_create_tools().
-
-x  CLOSED: Use getopt?
-
-x  DONE: Remove those irritating variable values from the Preferences window.
 
 x  Fix bug whereby `configure --with-included-gettext' leaves a symlink
    intl/libintl.h -> intl/libgettext.h which is not removed again when
@@ -102,43 +45,21 @@ x  Fix bug whereby `configure --with-included-gettext' leaves a symlink
 x  On startup, when preferences or args specify a non-existant makefile,
    issue a warning alert to the user.
    
-x  DONE: Fix bug whereby run load spinbox saves wrong value to preferences.
-   It was a float rounding problem.
-   
-x  DONE: Add filters to summarise compile lines, and a View menu item
-   to choose between full and summarised version in log window.
-
 x  Remove strict dependancy on POSIX regcomp() for older systems,
    conditionally replace regcomp with function based on <regex.h>
    
 x  Correctly handle user's upgrade from 0.3 to 0.4 by saving new
    prefs items to ~/.maketoolrc.
    
-x  DONE: Waaaaah! Need a dryrun mode!!   
-
 x  Automatically recalculate list of targets, and rebuild the Build
    menu, when makefile changes.
-   
-x  DONE: Fix bug which loses last line of child process' output if the
-   line doesn't end in a '\n' (worse, it prepends that to the output
-   of the next child process).
    
 x  Change the preferences so that the actual make executable used is
    specified in exactly one place instead of three (prog_make,
    prog_make_version, and inside the shell script extract_targets).
    Use %M as the name of the executable in those cases.
    
-x  DONE: Allow setting of make variables using VAR=val syntax on command line.
-
 x  Make the default text editor configurable, figured out in configure.
-
-x  DONE: Loading a large make log does way too much updating of the scrollbar.
-
-x  DONE: use a GNU logo in the `Help->About make' dialog.
-
-x  DONE: When loading log file, should report number of errors & warnings.
-
-x  DONE: Edit Next Error command should make the newly line visible by scrolling.
 
 x  In summary mode, need to highlight the `Compiling' lines visually to
    separate them from the usual make clutter.
@@ -148,59 +69,23 @@ x  Should be able to drag & drop {filename, linenumber, message} or text.
 x  For the editing program, should be able to specify a %sequence which
    contains the quoted error message, for integration with IDEs.
 
-x  DONE: An error message which specifies an absolute pathname /abs/path tries
-   to open file /curr/dir/abs/path instead of /abs/path. Had to also be in
-   a recursive make.
-   
 x  Add ability to delete individual make runs from view window
-
-x  DONE: Add ability to view multi-directory logs as either flat or
-   organised hierarchically by directory.
-
-x  DONE: Work out some way to handle the huge number of targets available
-   in the Linux kernel toplevel makefile without overflowing the screen.
-
-x  DONE: Add option to map directory level to tree indent level
 
 x  Add a feature to watch an existing log file as it grows.
 
-x  DONE: When clicking on errrors from a loaded log file, pathnames should
-   be interpreted relative to the log file's directory.
-
-x  DONE: Provide a small ctree with 3 rows to preview colour changes in
-   Preferences window.
-   
 x  Provide a Preferences setting to control what happens when a make
    run finishes. Nothing; Sound Bell; Flash Window; Run Program.
    
 x  Add timestamp to log start line, either current time for normal builds
    or file modification time for log files.
    
-x  DONE: Also number of errors & warnings.
-
-x  DONE: Should be able to edit main.c by clicking on "    from main.c" in gcc
-   inclusion trace.
-
-x  DONE: Provide facility to search the log text.
-
-x  DONE: Fix bug where sometimes list_targets doesn't finish, or isn't reaped,
-   or something. This was a race condition between spawning the first make
-   process and registering the SIGCHLD signal handler.
-
 x  Fix bug where build start line, updated to reflect number of errors,
    is displayed at wrong horizontal position (as if it had lost an indent).
    This seems to be a GTK display bug.
    
-x  DONE: The feature whereby targets are specified on the commandline should be
-   modified to use the new task_*() routines. Check that this behaves
-   correctly with autoconf support.
-   
 x  Handle files & line numbers in Java exception report.
 
 x  Handle column in Java errors.
-
-x  DONE: Fix bug where unsaved edits in various parts of Pereferences
-   window are not reverted when the window is popped up again.
 
 x  Handle files & line numbers in Java exception report.
 
@@ -208,9 +93,6 @@ x  Handle column in Java errors.
 
 x  ability to recursively delete a node from the log window
 
-x  DONE: tooltip for `again' icon, and possibly menu item, should mention
-   what the actual last target is.
-   
 x  Fix bug where changing any of the log flags causes the current scroll
    position in the log to be lost as the log is repopulated.
    
@@ -234,44 +116,27 @@ x  Printing: add notebook page to edit paper size, orientation, and
    
 x  Printing: add support for landscape mode.
 
-x  DONE: Printing: Print window's Page Setup button should pop up the Page Setup
-   notebook page of the Preferences dialog.
-   
 x  Printing: page numbers
 
 x  Printing: colours/icons for errors & warnings
-
-x  DONE: Printing: clip text.
 
 x  Printing: title line on every page.
 
 x  Printing: modal dialogs.
 
-x  DONE: Printing: dialogs come up at sensible locations, e.g. centred over
-   the toplevel shell. Set transient-for flag too.
-   
 x  Printing: option to print entire log file or just descendants of
    selected node.
    
 x  Printing: option to print using collapsed status of log lines or
    just entire log.
    
-x  DONE: are the fds for pipes to child processes leaked? NO.
-
 x  configure-time check for /usr/doc is insufficient. Need to use /usr/doc
    on Linux only, $(prefix)/share/$(PACKAGE) on NetBSD.
-   
-x  DONE: Makefile.in needs to define CPPFLAGS with @CPPFLAGS@ at the end for
-   NetBSD to find gettext library.
    
 x  Frederick Bruckman says: To be able to pass in datadir or localedir to
    configure would be nice.
 
 x  Implement case-insensitive literals in Find window.
-
-x  DONE: Implement backwards search in Find window.
-
-x  Populate Find window string from current selection on Edit->Find ?
 
 x  Handle configure.in/config.status being in an ancestor directory
 
@@ -287,6 +152,165 @@ x  possibly generate token span from line before the MWOS "   ^" stuff.
 
 x  apply the prefs option used at start of build to opening log files.
 
+x  Option to always scroll to end on make output
+
+x  A.T. Hofkamp says: when extract_targets is not found, the failure
+   mode is that the Build menu contains the following entries:
+   /bin/sh:
+   extract_targets:
+   command
+   not
+   found
+   
+x  A.T. Hofkamp says about the Find window:   I still feel that tasks like
+   this cannot be done faster than by typing something like
+   /91.*blo/
+   (but I am a strongly keyboard-oriented guy).
+
+x  Add an editor choice for "gvim +%l %f"
+
+x  Fix the page name and page orientation combos in the Preferences
+   window to behave correctly and actually be used.
+   
+--- closed ---
+
+x  DONE: `Variables' tab in Preferences window needs to shrink.
+
+x  DONE: When user presses `Edit Next' the new selected error
+   should become visible even if its currently in a collapsed
+   build or it has scrolled out of sight.
+
+x  DONE: Have to be able to resize the window down vertically.
+
+x  DONE: Implement File->Change Directory  command.
+
+x  DONE: Add icon for non-GNOME w/ms.
+
+x  DONE: Implement extraction of targets and generating the Build menu.
+
+x  DONE: well expanded - see below. ?? Implement tighter GNOME integration.
+
+x  DONE: Implement setting environment from Variables.
+
+x  DONE: Change the `Type' field in the Variables tab in the
+   Preferences window to a combo box.
+   
+x  DONE: I18N.
+
+x  DONE: Save & load preferences, window geom etc.
+
+x  DONE: Override preferences with -f -j -k and -l options from commandline.
+
+x  DONE: Handle makes over multiple directories - get the filenames right.
+
+x  DONE: Make a nicer animation for when make is running.
+
+x  DONE: Add menu item Edit->Copy for filling the clipboard from the selected
+   line(s?) of the log window. Implies adding an Edit menu & moving some
+   of the View menu items into it.
+
+x  DONE: Improve glib_extra.c so it doesn't require need to care
+   about poll(2) directly and submit to the glib maintainers.
+
+x  DONE: Add patchlevel.h
+
+x  DONE: Add autoconf support.
+
+x  DONE: Install extract_targets.sh
+
+x  DONE: Accelerators etc for menu items.
+
+x  DONE: (for colours only) Allow user to configure error & warning colours & icons in Preferences.
+
+x  DONE: Remove line length limitation in handle_input().
+
+x  DONE: Remove line length limitation in filter_apply_one().
+
+x  DONE: Add check for buffer overflow in ui_create_tools().
+
+x  CLOSED: Use getopt?
+
+x  DONE: Remove those irritating variable values from the Preferences window.
+
+x  DONE: Fix bug whereby run load spinbox saves wrong value to preferences.
+   It was a float rounding problem.
+   
+x  DONE: Add filters to summarise compile lines, and a View menu item
+   to choose between full and summarised version in log window.
+
+x  DONE: Waaaaah! Need a dryrun mode!!   
+
+x  DONE: Fix bug which loses last line of child process' output if the
+   line doesn't end in a '\n' (worse, it prepends that to the output
+   of the next child process).
+   
+x  DONE: Allow setting of make variables using VAR=val syntax on command line.
+
+x  DONE: Loading a large make log does way too much updating of the scrollbar.
+
+x  DONE: use a GNU logo in the `Help->About make' dialog.
+
+x  DONE: When loading log file, should report number of errors & warnings.
+
+x  DONE: Edit Next Error command should make the newly line visible by scrolling.
+
+x  DONE: An error message which specifies an absolute pathname /abs/path tries
+   to open file /curr/dir/abs/path instead of /abs/path. Had to also be in
+   a recursive make.
+   
+x  DONE: Add ability to view multi-directory logs as either flat or
+   organised hierarchically by directory.
+
+x  DONE: Work out some way to handle the huge number of targets available
+   in the Linux kernel toplevel makefile without overflowing the screen.
+
+x  DONE: Add option to map directory level to tree indent level
+
+x  DONE: When clicking on errrors from a loaded log file, pathnames should
+   be interpreted relative to the log file's directory.
+
+x  DONE: Provide a small ctree with 3 rows to preview colour changes in
+   Preferences window.
+   
+x  DONE: Also number of errors & warnings.
+
+x  DONE: Should be able to edit main.c by clicking on "    from main.c" in gcc
+   inclusion trace.
+
+x  DONE: Provide facility to search the log text.
+
+x  DONE: Fix bug where sometimes list_targets doesn't finish, or isn't reaped,
+   or something. This was a race condition between spawning the first make
+   process and registering the SIGCHLD signal handler.
+
+x  DONE: The feature whereby targets are specified on the commandline should be
+   modified to use the new task_*() routines. Check that this behaves
+   correctly with autoconf support.
+   
+x  DONE: Fix bug where unsaved edits in various parts of Pereferences
+   window are not reverted when the window is popped up again.
+
+x  DONE: tooltip for `again' icon, and possibly menu item, should mention
+   what the actual last target is.
+   
+x  DONE: Printing: Print window's Page Setup button should pop up the Page Setup
+   notebook page of the Preferences dialog.
+   
+x  DONE: Printing: clip text.
+
+x  DONE: Printing: dialogs come up at sensible locations, e.g. centred over
+   the toplevel shell. Set transient-for flag too.
+   
+x  DONE: are the fds for pipes to child processes leaked? NO.
+
+x  DONE: Makefile.in needs to define CPPFLAGS with @CPPFLAGS@ at the end for
+   NetBSD to find gettext library.
+   
+x  DONE: Implement backwards search in Find window.
+
+x  DONE: Populate Find window string from current selection on Edit->Find ?
+   No, better solution is to select the old string instead.
+
 x  DONE: Use gtk_window_set_transient_for() correctly.
 
 x  DONE: Add HAV_SYS_FILIO check for FIONREAD
@@ -297,21 +321,11 @@ x  DONE: Bug: Stop button no longer ungreys when running!
 
 x  DONE: Add filters to support MWOS cross-compiler (see sample mwos.errs)
 
-x  Option to always scroll to end on make output
-
 x  DONE: Handle user clicking E's X button on dialogs.
 
 x  DONE: A.T. Hofkamp says: make_makefile and extract_targets should live
    somewhere like $prefix/libexec/maketool/ not $prefix/bin.
 
-x  A.T. Hofkamp says: when extract_targets is not found, the failure
-   mode is that the Build menu contains the following entries:
-   /bin/sh:
-   extract_targets:
-   command
-   not
-   found
-   
 x  DONE: A.T. Hofkamp says about the Find window:  
 >   The buttons seem to do something else than they say.
 >   - 'Search forwards' seems to mean 'Search top-to-bottom'
@@ -334,14 +348,7 @@ x  DONE: A.T. Hofkamp says about the Find window:
 > 
 
 
-x  A.T. Hofkamp says about the Find window:   I still feel that tasks like
-   this cannot be done faster than by typing something like
-   /91.*blo/
-   (but I am a strongly keyboard-oriented guy).
-
 x  DONE: Add an option to disable make_makefile
-
-x  Add an editor choice for "gvim +%l %f"
 
 x  DONE: A.T. Hofkamp says running gvim works but he gets
    ioctl(FIONREAD): Bad file descriptor
@@ -355,6 +362,3 @@ x  DONE: A.T. Hofkamp says: Please make it possibe to edit the Makefile
 x  DONE: Vaclav Slavik says:  let maketool remember previous directories in
    config file, not only during one session.
 
-x  Fix the page name and page orientation combos in the Preferences
-   window to behave correctly and actually be used.
-   
