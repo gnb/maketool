@@ -25,7 +25,7 @@
 #error Why are you even bothering to compile with POSIX regular expressions?
 #endif
 
-CVSID("$Id: pmake.c,v 1.4 2003-05-24 05:48:21 gnb Exp $");
+CVSID("$Id: pmake.c,v 1.5 2003-09-01 13:23:34 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -113,14 +113,14 @@ smake_version_flags(estring *e)
 static void
 pmake_list_targets_flags(estring *e)
 {
-    estring_append_string(e, "-q -d g1 _no_such_target_");
+    estring_append_string(e, "-q -d g1");
 }
 
 #if HAVE_IRIX_SMAKE
 static void
 irix_smake_list_targets_flags(estring *e)
 {
-    estring_append_string(e, "-q -p 1 _no_such_target_");
+    estring_append_string(e, "-q -p 1");
 }
 #endif
 

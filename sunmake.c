@@ -27,7 +27,7 @@
 #error Why are you even bothering to compile with POSIX regular expressions?
 #endif
 
-CVSID("$Id: sunmake.c,v 1.1 2003-05-04 04:28:21 gnb Exp $");
+CVSID("$Id: sunmake.c,v 1.2 2003-09-01 13:23:34 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -80,7 +80,7 @@ sunmake_version_flags(estring *e)
 static void
 sunmake_list_targets_flags(estring *e)
 {
-    estring_append_string(e, "-n -p _no_such_target_");
+    estring_append_string(e, "-n -p");
 }
 
 typedef struct
