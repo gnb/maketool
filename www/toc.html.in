@@ -36,22 +36,7 @@ define(NAVLINK,
 	</TR>
 	<TR>
 	  <TD>
-	    <A HREF="http://www.caube.org.au/"><IMG WIDTH=85 HEIGHT=32 BORDER=0 SRC="caubutt1.gif" ALT="[nospam]"></A>
-	  </TD>
-	</TR>
-	<TR>
-	  <TD>
 	    <A HREF="http://www.gimp.org/"><IMG WIDTH=90 HEIGHT=36 BORDER=0 SRC="gimp.gif" ALT="[gimp]"></A>
-	  </TD>
-	</TR>
-
-	<TR>
-	  <TD BGCOLOR="#000000">
-	    <SPAN STYLE="color: #ffffff; text-align: center;">
-	      Heartfelt sympathy<BR>
-	      to the victims of<BR>
-	      terror in the USA.
-	    </SPAN>
 	  </TD>
 	</TR>
 	
