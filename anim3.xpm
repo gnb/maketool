@@ -1,0 +1,38 @@
+/* XPM */
+static char *anim3_xpm[] = {
+/* width height num_colors chars_per_pixel */
+"    24    24        7            1",
+/* colors */
+". c None s None",
+"# c #ffffff",
+"a c #dedede",
+"b c #212121",
+"c c #424242",
+"d c #adadad",
+"e c #737373",
+/* pixels */
+".........ddddaa.........",
+".......dddaaaaaaa.......",
+".....ddddddddaaaaaa.....",
+"....ddddddaaaaaaaaaa....",
+"...ddddddddddaaaaaaaa...",
+"..ddddddd......aaaaaaa..",
+"..dddddd........aaaaaa..",
+".dddddd..........#aa#a#.",
+".ddddd............#a#a#.",
+".dddd..............##a#.",
+"ddddd..............#####",
+"edede..............#####",
+"edede...................",
+"edede...................",
+".eeee...................",
+".eeeee...........b......",
+".eeeeee..........b......",
+"..eeeece........bb.b....",
+"..eececce......bb.bb....",
+"...eececccc.ccbbbb......",
+"....eccec.cbbb.b.b.bbb..",
+".....eccccccccbbbbb.....",
+".......cc.cb.bbbb.......",
+".........cccccb........."
+};
