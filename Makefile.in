@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.9 1999-07-14 06:16:04 gnb Exp $
+# $Id: Makefile.in,v 1.10 1999-07-14 07:35:50 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -133,12 +133,14 @@ install::
 	$(INSTALL) -m 755 COPYING $(DOCDIR)/COPYING
 	$(INSTALL) -m 755 COPYRIGHT $(DOCDIR)/COPYRIGHT
 	$(INSTALL) -m 755 TODO $(DOCDIR)/TODO
+	$(INSTALL) -m 755 CHANGES $(DOCDIR)/CHANGES
 	
 
 uninstall::
 	$(RM) $(DOCDIR)/COPYING
 	$(RM) $(DOCDIR)/COPYRIGHT
 	$(RM) $(DOCDIR)/TODO
+	$(RM) $(DOCDIR)/CHANGES
 
 ###
 
@@ -146,7 +148,7 @@ uninstall::
 distdir=	$(PACKAGE)-$(VERSION)
 DISTTAR=	$(PACKAGE)-$(VERSION)-src.tgz
 DISTFILES=	\
-		ABOUT-NLS COPYING COPYRIGHT TODO maketool.spec.in \
+		ABOUT-NLS COPYING COPYRIGHT TODO CHANGES maketool.spec.in \
 		\
 		configure.in aclocal.m4 config.guess config.sub install-sh \
 		configure Makefile.in config.h.in mkinstalldirs \

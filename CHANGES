@@ -1,0 +1,39 @@
+
+* 0.3  (14 Jul 1999)
+x  The Licence button now pops up a window which
+   shows the GPL in a text widget. Text is loaded
+   at runtime from the installed doc dir.
+x  All dialogs are titled "Maketool: foo"
+x  Added --version option.
+x  Implemented the following arguments with gmake's syntax:
+   -C --directory -f --file --makefile -h, --help -j --jobs -k
+   --keep-going  -l --load-average --max-load -S --no-keep-going
+   --stop -v --version
+x  Fixed bugs which broke compile on systems which need
+   the included gettext.
+x  Makefile no longer needs separate $run_prefix.
+x  Preferences and window size are loaded on startup and saved
+   when changed, in the file ~/.maketoolrc.
+x  Fixed various minor bugs.
+x  Removed the test initial values of variables in the Preferences.
+x  No longer relies on OS having poll(2).
+x  Added accelerators.
+x  Toolbar and menubar are now dockable (in a limited way).
+x  Main window can resize down vertically.
+x  aclocal.m4 is much neater now.
+x  Moved icons and test stuff into their own directories.
+x  Split the View menu into View and Edit menus.
+x  Refined extract_targets heuristics a little.
+x  All C converted to GNU-standard identifiers.
+x  Added a `Stop' button to the toolbar.
+x  Improved detection of GNU standard targets. Now detects all
+   the standard targets mentioned in the doc.
+x  Toolbar icons are a lot less subtle in colour, so that their
+   insensitive state can be easily distinguished.
+
+
+* 0.2   (1 Jun 1999)
+x  First public release.
+
+* 0.1  (14 May 1999)
+x  Started work.
