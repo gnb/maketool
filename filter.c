@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.31 2003-09-03 12:03:19 gnb Exp $");
+CVSID("$Id: filter.c,v 1.32 2003-09-24 10:23:00 gnb Exp $");
 
 typedef struct
 {
@@ -142,7 +142,7 @@ filter_load(void)
 	"\\1",				/* file */
 	"",				/* line */
 	"",				/* col */
-	"Directory \\1",		/* summary */
+	"",		    	    	/* summary */
     	"gmake recursion - push");	/* comment */
 
     filter_add(
