@@ -22,7 +22,7 @@
 #include <signal.h>
 #include <sys/poll.h>
 
-CVSID("$Id: glib_extra.c,v 1.11 2000-01-03 14:47:14 gnb Exp $");
+CVSID("$Id: glib_extra.c,v 1.12 2000-07-18 17:55:40 gnb Exp $");
 
 
 typedef struct
@@ -108,7 +108,7 @@ g_unix_source_prepare(
     gpointer user_data)
 {
 #if DEBUG > 5
-    fprintf(stderr, "g_unix_source_prepare(): called\n");
+    fprintf(stderr, "g_unix_source_prepare(): returning %d\n", (int)g_unix_got_signal);
 #endif
     return g_unix_got_signal;
 }
@@ -120,7 +120,7 @@ g_unix_source_check(
     gpointer user_data)
 {
 #if DEBUG > 5
-    fprintf(stderr, "g_unix_source_check(): called\n");
+    fprintf(stderr, "g_unix_source_check(): returning %d\n", (int)g_unix_got_signal);
 #endif
     return g_unix_got_signal;
 }
@@ -174,6 +174,8 @@ g_unix_reap_init(void)
     if (first)
     {
     	first = FALSE;
+	signal(SIGCHLD, g_unix_signal_handler);
+    	g_unix_piddata = g_hash_table_new(g_direct_hash, g_direct_equal);
 	g_source_add(
 		G_UNIX_REAP_PRIORITY,	/* priority */
 		TRUE,			/* can_recurse */
@@ -181,8 +183,6 @@ g_unix_reap_init(void)
 		(gpointer)0,		/* source_data */
 		(gpointer)0,		/* user_data */
 		(GDestroyNotify)0);
-    	g_unix_piddata = g_hash_table_new(g_direct_hash, g_direct_equal);
-	signal(SIGCHLD, g_unix_signal_handler);
     }
 }
 
