@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: help.c,v 1.18 1999-11-05 02:31:35 gnb Exp $");
+CVSID("$Id: help.c,v 1.19 2000-01-24 11:09:49 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -147,6 +147,12 @@ make_version_reap(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	GtkWidget *hbox;
 	GdkPixmap *pm;
 	GdkBitmap *mask;
+
+    	/* Hack to cause any pending input from the pipe to
+	 * be processed before we try to use it.
+	 */
+    	while (g_main_pending())
+    	    g_main_iteration(/*may_block*/FALSE);
 
 	about_make_shell = ui_create_ok_dialog(toplevel, _("Maketool: About Make"));
 
