@@ -18,3 +18,9 @@ examples
 maketool_client
 BUILD
 i386
+msg
+maketool.ps
+bugs
+patches
+samples
+debug
