@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.40 2003-10-08 13:27:31 gnb Exp $");
+CVSID("$Id: ui.c,v 1.41 2003-10-22 12:13:21 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -347,8 +347,9 @@ ui_add_button_2(
 	gtk_menu_append(GTK_MENU(menu), item);
     else
 	gtk_menu_insert(GTK_MENU(menu), item, position);
-    gtk_signal_connect(GTK_OBJECT(item), "activate", 
-    	GTK_SIGNAL_FUNC(callback), calldata);
+    if (callback != 0)
+	gtk_signal_connect(GTK_OBJECT(item), "activate", 
+    	    GTK_SIGNAL_FUNC(callback), calldata);
     if (group >= 0)
     	ui_group_add(group, item);
 	
@@ -585,9 +586,9 @@ ui_tool_drop_menu_create(
     if (linked_item != 0 && GTK_IS_BUTTON(linked_item))
     {
 	gtk_signal_connect(GTK_OBJECT(mitem), "select",
-    		ui_tool_drop_enter, linked_item);
+    		GTK_SIGNAL_FUNC(ui_tool_drop_enter), linked_item);
 	gtk_signal_connect(GTK_OBJECT(mitem), "deselect",
-    		ui_tool_drop_leave, linked_item);
+    		GTK_SIGNAL_FUNC(ui_tool_drop_leave), linked_item);
     }
 
     if (group >= 0)
