@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.1 1999-06-01 11:04:42 gnb Exp $
+# $Id: Makefile.in,v 1.2 1999-06-01 12:48:54 gnb Exp $
 #
 
 # TODO: gtk flags should come from `configure'
@@ -32,12 +32,15 @@ PIXMAPS=	\
 		print.xpm warning.xpm
 ###
 
+# Nothing to do here except package up source for distribution.
+
 all::
 
 clean::
 		
-# TODO
 install::
+
+uninstall::
 		
 ###
 

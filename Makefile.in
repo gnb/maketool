@@ -16,15 +16,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.2 1999-06-01 11:04:40 gnb Exp $
+# $Id: Makefile.in,v 1.3 1999-06-01 12:48:52 gnb Exp $
 #
 
-# TODO: gtk flags should come from `configure'
+prefix=		@prefix@
+exec_prefix=	@exec_prefix@
+BINDIR=		@bindir@
+INSTALL=	@INSTALL@
 
-CC=		gcc -Wall
-CFLAGS=		-g
-CPPFLAGS:=	$(shell gtk-config --cflags) -D_USE_BSD -I. -Iicons -Iintl
-LDLIBS:=	$(shell gtk-config --libs) @INTLLIBS@
+CC=		@CC@
+CFLAGS=		@CFLAGS@
+CPPFLAGS=	@GTK_CFLAGS@ -D_USE_BSD -I. -Iicons -Iintl
+LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 O=		objs
 
 SOURCES=	main.c filter.c help.c preferences.c log.c ui.c \
@@ -37,15 +40,50 @@ SUBDIRS=	icons intl po #test
 
 ###
 
+# maketool program
+
 all:: maketool
 
 maketool: $(OBJECTS)
 	$(LINK.c) -o $@ $(OBJECTS) $(LDLIBS)
 	
+install:: $(BINDIR)/maketool
+
+$(BINDIR)/maketool: maketool
+	test -d $(@D) || $(INSTALL) -m 755 -d $(@D)
+	$(INSTALL) -m 755 $< $@
+	
+uninstall::
+	$(RM) $(BINDIR)/maketool
+	
 clean::
 	$(RM) maketool
 		
 ###
+
+# extract_targets shell script
+
+all:: extract_targets
+
+extract_targets: extract_targets.sh
+	cp $< $@
+	chmod 755 $@
+	
+install:: $(BINDIR)/extract_targets
+
+$(BINDIR)/extract_targets: extract_targets
+	test -d $(@D) || $(INSTALL) -m 755 -d $(@D)
+	$(INSTALL) -m 755 $< $@
+	
+uninstall::
+	$(RM) $(BINDIR)/extract_targets
+	
+clean::
+	$(RM) extract_targets
+		
+###
+
+# C infrastructure
 
 $O/%.o: %.c $O/.stamp
 	$(COMPILE.c) -o $@ $<
@@ -58,7 +96,9 @@ clean::
 	$(RM) -r $O
 ###
 
-install clean::
+# Subdirectories
+
+all install uninstall clean::
 	for subdir in $(SUBDIRS); do \
 	  $(MAKE) -C $$subdir $@ || exit 1; \
 	done
@@ -92,4 +132,7 @@ dist:
 	done
 	tar chozf $(distdir).tgz $(distdir)
 	$(RM) -r $(distdir)
+	
+configure: configure.in
+	autoconf --localdir=/usr/share/aclocal
 	
