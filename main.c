@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.93 2003-08-20 15:36:09 gnb Exp $");
+CVSID("$Id: main.c,v 1.94 2003-09-24 10:26:12 gnb Exp $");
 
 
 /*
@@ -1085,47 +1085,47 @@ construct_dir_previous_menu(void)
 static gboolean
 change_directory(const char *dir)
 {
-    char *olddir;
-    
-    olddir = g_get_current_dir();
 #if DEBUG > 5
-    fprintf(stderr, "Changing dir from %s to: %s\n", olddir, dir);
+    fprintf(stderr, "Changing dir to: %s\n", dir);
 #endif
     
     if (chdir(dir) < 0)
     {
-    	g_free(olddir);
     	return FALSE;
     }
 
     /*
      * Update directory history
      */
-    if (g_list_find_str(prefs.dir_history, olddir) != 0)
+    if (current_dir != 0)
     {
-    	/* already in list */
-	g_free(olddir);
-    }
-    else
-    {
-	/* not already in history list, prepend it */
-	prefs.dir_history = g_list_prepend(prefs.dir_history, olddir);
-
-	/* trim list to fit */
-	while (g_list_length(prefs.dir_history) > MAX_DIR_HISTORY)
+	if (g_list_find_str(prefs.dir_history, current_dir) != 0)
 	{
-	    GList *last = g_list_last(prefs.dir_history);
-	    g_free((char *)last->data);
-	    prefs.dir_history = g_list_remove_link(prefs.dir_history, last);
+	    /* already in list */
+	    g_free(current_dir);
 	}
+	else
+	{
+	    /* not already in history list, prepend it */
+	    prefs.dir_history = g_list_prepend(prefs.dir_history, current_dir);
 
-    	/* save dir history, and everything else */
-    	preferences_save();
-	
-    	/* update Previous Directory menu */
-	if (dir_previous_menu != 0)
-    	    construct_dir_previous_menu();
+	    /* trim list to fit */
+	    while (g_list_length(prefs.dir_history) > MAX_DIR_HISTORY)
+	    {
+		GList *last = g_list_last(prefs.dir_history);
+		g_free((char *)last->data);
+		prefs.dir_history = g_list_remove_link(prefs.dir_history, last);
+	    }
+
+    	    /* save dir history, and everything else */
+    	    preferences_save();
+
+    	    /* update Previous Directory menu */
+	    if (dir_previous_menu != 0)
+    		construct_dir_previous_menu();
+	}
     }
+    current_dir = g_get_current_dir();
 	
     /* Check for presence of autoconf-related files */
     set_makeprog(prefs.makeprog);
@@ -1137,11 +1137,7 @@ change_directory(const char *dir)
 	set_main_title();
 	
     if (messageent != 0)
-    {
-    	char *curr = g_get_current_dir();
-	message("Directory %s", curr);
-	g_free(curr);
-    }
+	message("Directory %s", current_dir);
 
     if (build_menu != 0)
     	list_targets();
@@ -1165,7 +1161,7 @@ static void
 file_change_dir_cb(GtkWidget *w, gpointer data)
 {
     static GtkWidget *filesel = 0;
-    char *currdir, *fakefile;
+    char *fakefile;
     
     if (filesel == 0)
     {
@@ -1182,10 +1178,8 @@ file_change_dir_cb(GtkWidget *w, gpointer data)
      * Filesel window needs the trailing / so it doesn't
      * try to interpret the dirname as a filename.
      */
-    currdir = g_get_current_dir();
-    fakefile = g_strdup_printf("%s/", currdir);
+    fakefile = g_strdup_printf("%s/", current_dir);
     gtk_file_selection_set_filename(GTK_FILE_SELECTION(filesel), fakefile);
-    g_free(currdir);
     g_free(fakefile);
     
     gtk_widget_show(filesel);
@@ -1807,31 +1801,30 @@ clipboard_init(GtkWidget *w)
 static void
 set_main_title(void)
 {
-    char *pwd = g_get_current_dir();
-    char *base;
+    char *pwd = current_dir;
     char *title;
     const char *title_prefix = _("Maketool");
+    static char *home = 0;
+    static int homelen;
+    
+    assert(pwd != 0);
 
-    if (pwd == 0)
-    	base = 0;
-    else
-    {    
-	base = strrchr(pwd, '/');
-	if (base != 0 && base != pwd)   /* handle pwd=="/" */
-	    base++;
+    if (home == 0)
+    {
+    	home = getenv("HOME");
+	if (home == 0)
+	    home = "";
+	home = g_strdup(home);
+	homelen = strlen(home);
     }
-    /*
-     * At this point, `base' is a readable representation
-     * of the basename of the current working directory, or 0.
-     */
-    if (base == 0)
-	title = g_strdup_printf("%s %s", title_prefix, VERSION);
+    assert(home != 0);
+    
+    if (!strncmp(home, pwd, homelen) && pwd[homelen] == '/')
+	title = g_strdup_printf("%s %s: ~/%s", title_prefix, VERSION, pwd+homelen+1);
     else
-	title = g_strdup_printf("%s %s: %s", title_prefix, VERSION, base);
+	title = g_strdup_printf("%s %s: %s", title_prefix, VERSION, pwd);
     gtk_window_set_title(GTK_WINDOW(toplevel), title);
     g_free(title);
-    if (pwd != 0)
-	g_free(pwd);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
