@@ -49,7 +49,7 @@ typedef struct
 {
     enum { RUN_SERIES, RUN_PARALLEL_PROC, RUN_PARALLEL_LOAD } run_how;
     int run_processes;
-    float run_load;
+    int run_load;	/* load*10 */
     
     gboolean edit_first_error;
     gboolean edit_warnings;

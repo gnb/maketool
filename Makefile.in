@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.5 1999-06-06 16:10:42 gnb Exp $
+# $Id: Makefile.in,v 1.6 1999-06-09 14:55:44 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -31,7 +31,7 @@ LICENCE=	$(run_prefix)/doc/$(PACKAGE)-$(VERSION)/COPYING
 
 CC=		@CC@
 CFLAGS=		@CFLAGS@
-CPPFLAGS=	@GTK_CFLAGS@ -D_USE_BSD -I. -Iicons -Iintl -DLICENCE="\"$(LICENCE)\""
+CPPFLAGS=	@GTK_CFLAGS@ -D_USE_BSD -I. -Iicons -Iintl -DLICENCE="\"$(LICENCE)\"" $(TESTCPPFLAGS)
 LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 O=		objs
 
@@ -108,6 +108,15 @@ all install uninstall clean::
 	  $(MAKE) -C $$subdir $@ || exit 1; \
 	done
 		
+###
+
+argstest:
+	-$(RM) maketool $O/main.o
+	$(MAKE) TESTCPPFLAGS=-DARGSTEST=1 maketool
+	awk -f argstest.awk < argstest.dat
+	-$(RM) maketool $O/main.o
+	
+	
 ###
 
 # doco. Such as it is...

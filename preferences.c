@@ -21,7 +21,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: preferences.c,v 1.13 1999-06-06 17:43:00 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.14 1999-06-09 14:55:44 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -228,7 +228,7 @@ preferences_init(void)
 {
     prefs.run_how = RUN_SERIES;
     prefs.run_processes = 2;
-    prefs.run_load = 2.0;
+    prefs.run_load = 20;
         
     prefs.edit_first_error = FALSE;
     prefs.edit_warnings = TRUE;
@@ -284,7 +284,7 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
 
         
     prefs.run_processes = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(run_proc_sb));
-    prefs.run_load = gtk_spin_button_get_value_as_float(GTK_SPIN_BUTTON(run_load_sb));
+    prefs.run_load = (int)(10.0 * gtk_spin_button_get_value_as_float(GTK_SPIN_BUTTON(run_load_sb)));
     
     prefs.edit_first_error = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(edit1_check));
     prefs.edit_warnings = !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(editw_check));
@@ -541,7 +541,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_toggle_button_set_active(
     	GTK_TOGGLE_BUTTON(run_radio[prefs.run_how]), TRUE);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(run_proc_sb), prefs.run_processes);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(run_load_sb), prefs.run_load);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(run_load_sb), (gfloat)prefs.run_load / 10.0);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(edit1_check), prefs.edit_first_error);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(editw_check), !prefs.edit_warnings);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fail_check), prefs.ignore_failures);

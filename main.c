@@ -28,7 +28,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.27 1999-06-09 07:56:26 gnb Exp $");
+CVSID("$Id: main.c,v 1.28 1999-06-09 14:55:44 gnb Exp $");
 
 typedef enum
 {
@@ -146,11 +146,17 @@ expand_prog(
     case RUN_SERIES:
     	break;	/* no flag */
     case RUN_PARALLEL_PROC:
-    	sprintf(runflags, "-j%d", prefs.run_processes);
+    	if (prefs.run_processes > 0)
+    	    sprintf(runflags, "-j%d", prefs.run_processes);
+	else
+    	    strcpy(runflags, "-j");
     	expands['p'] = runflags;
     	break;
     case RUN_PARALLEL_LOAD:
-    	sprintf(runflags, "-l%.2g", prefs.run_load);
+    	if (prefs.run_load > 0)
+    	    sprintf(runflags, "-l%.2g", (gfloat)prefs.run_load / 10.0);
+	else
+    	    strcpy(runflags, "-l");
     	expands['p'] = runflags;
     	break;
     }
@@ -913,12 +919,83 @@ ui_create(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static const char usage_string[] = "\
+Usage: maketool [options] [target] ...\n\
+Options:\n\
+  -C DIRECTORY, --directory=DIRECTORY\n\
+                              Change to DIRECTORY before doing anything.\n\
+  -f FILE, --file=FILE, --makefile=FILE\n\
+                              Read FILE as a makefile.\n\
+  -h, --help                  Print this message and exit.\n\
+  -j [N], --jobs[=N]          Allow N jobs at once; infinite jobs with no arg.\n\
+  -k, --keep-going            Keep going when some targets can't be made.\n\
+  -l [N], --load-average[=N], --max-load[=N]\n\
+                              Don't start multiple jobs unless load is below N.\n\
+  -S, --no-keep-going, --stop\n\
+                              Turns off -k.\n\
+  -v, --version               Print the version number of maketool and exit.
+";
+
+static const char version_string[] = "\
+Maketool " VERSION "\n\
+(c) 1999 Greg Banks <gnb@alphalink.com.au>\n\
+Maketool comes with ABSOLUTELY NO WARRANTY.\n\
+You may redistribute copies of this software\n\
+under the terms of the GNU General Public\n\
+Licence; see the file COPYING.\n\
+";
+
+
 static void
-usage(void)
+usage(int code)
 {
-    fprintf(stderr, _("Usage: %s [options] target [target...]\n"), argv0);
-    /* TODO: options */
+    fputs(usage_string, stderr);
+    exit(code);
 }
+
+static void
+set_makefile(const char *mf)
+{
+    if (prefs.makefile != 0)
+    	g_free(prefs.makefile);
+    prefs.makefile = g_strdup(mf);
+}
+
+static void
+set_directory(const char *dir)
+{
+    if (chdir(dir) < 0)
+    {
+    	perror(dir);
+    	exit(1);
+    }
+}
+
+
+#ifdef ARGSTEST
+char *original_dir = 0;
+static char *
+relative_dir(void)
+{
+    char *curr_dir = g_get_current_dir();
+    int i, j = 0;
+    estring rd;
+    
+    for (i=0 ;
+         curr_dir[i] && original_dir[i] && curr_dir[i] == original_dir[i] ;
+	 i++)
+    	if (curr_dir[i] == '/')
+	    j = i;
+    if (!original_dir[i])
+    	j = i;
+
+    estring_init(&rd);
+    if (j > 0)
+    	estring_append_string(&rd, "...");
+    estring_append_string(&rd, curr_dir+j);
+    return rd.data;
+}
+#endif
 
 static void
 parse_args(int argc, char **argv)
@@ -926,6 +1003,10 @@ parse_args(int argc, char **argv)
     int i;
     estring targs;
     
+#ifdef ARGSTEST
+    original_dir = g_get_current_dir();
+#endif
+
     argv0 = argv[0];
     estring_init(&targs);
     
@@ -933,20 +1014,80 @@ parse_args(int argc, char **argv)
     {
     	if (argv[i][0] == '-')
 	{
-	    if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version"))
+	    if (!strcmp(argv[i], "-C"))
 	    {
-	    	printf(
-"Maketool %s\n\
-(c) 1999 Greg Banks <gnb@alphalink.com.au>\n\
-Maketool comes with ABSOLUTELY NO WARRANTY.\n\
-You may redistribute copies of this software\n\
-under the terms of the GNU General Public\n\
-Licence; see the file COPYING.\n",
-		VERSION);
+	    	if (i == argc-1)
+		    usage(1);
+	    	set_directory(argv[++i]);
+	    }
+	    else if (!strncmp(argv[i], "--directory=", 12))
+	    {
+	    	set_directory(argv[i]+12);
+	    }
+	    else if (!strcmp(argv[i], "-f"))
+	    {
+	    	if (i == argc-1)
+		    usage(1);
+	    	set_makefile(argv[++i]);
+	    }
+	    else if (!strncmp(argv[i], "--file=", 7))
+	    {
+	    	set_makefile(argv[i]+7);
+	    }
+	    else if (!strncmp(argv[i], "--makefile=", 11))
+	    {
+	    	set_makefile(argv[i]+11);
+	    }
+	    else if (!strcmp(argv[i], "-h") ||
+	             !strcmp(argv[i], "--help"))
+	    {
+	    	usage(0);
+	    }
+	    else if (!strcmp(argv[i], "-j"))
+	    {
+	    	prefs.run_how = RUN_PARALLEL_PROC;
+		prefs.run_processes = (i < argc-1 && isdigit(argv[i+1][0]) ? atoi(argv[++i]) : 0);
+	    }
+	    else if (!strncmp(argv[i], "--jobs", 6))
+	    {
+	    	prefs.run_how = RUN_PARALLEL_PROC;
+		prefs.run_processes = (argv[i][6] == '=' ? atoi(argv[i]+7) : 0);
+	    }
+	    else if (!strcmp(argv[i], "-k") ||
+	             !strcmp(argv[i], "--keep-going"))
+	    {
+	    	prefs.ignore_failures = TRUE;
+	    }
+	    else if (!strcmp(argv[i], "-l"))
+	    {
+	    	prefs.run_how = RUN_PARALLEL_LOAD;
+		prefs.run_load = (i < argc-1 && isdigit(argv[i+1][0]) ? (int)(atof(argv[++i])*10.0) : 0);
+	    }
+	    else if (!strncmp(argv[i], "--load-average", 14))
+	    {
+	    	prefs.run_how = RUN_PARALLEL_LOAD;
+		prefs.run_load = (argv[i][14] == '=' ? (int)(atof(argv[i]+15)*10.0) : 0);
+	    }
+	    else if (!strncmp(argv[i], "--max-load", 6))
+	    {
+	    	prefs.run_how = RUN_PARALLEL_LOAD;
+		prefs.run_load = (argv[i][10] == '=' ? (int)(atof(argv[i]+11)*10.0) : 0);
+	    }
+	    else if (!strcmp(argv[i], "-S") ||
+	             !strcmp(argv[i], "--no-keep-going") ||
+	             !strcmp(argv[i], "--stop"))
+	    {
+	    	prefs.ignore_failures = FALSE;
+	    }
+	    else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version"))
+	    {
+	    	fputs(version_string, stdout);
 	    	exit(0);
 	    }
-	    /* TODO: options */
-	    usage();
+	    else
+	    {
+		usage(1);
+	    }
 	}
 	else
 	{
@@ -957,6 +1098,25 @@ Licence; see the file COPYING.\n",
     }
     
     targets = targs.data;
+
+
+#ifdef ARGSTEST
+    {
+	static const char *run_how_strings[] = {
+	    "RUN_SERIES", "RUN_PARALLEL_PROC", "RUN_PARALLEL_LOAD"};
+	static const char *bool_strings[] = {
+	    "FALSE", "TRUE"};
+	    
+	printf("makefile = %s\n", prefs.makefile);
+	printf("directory = %s\n", relative_dir());
+	printf("targets = %s\n", targets);
+	printf("ignore_failures = %s\n", bool_strings[prefs.ignore_failures]);
+	printf("run_how = %s\n", run_how_strings[prefs.run_how]);
+	printf("run_processes = %d\n", prefs.run_processes);
+	printf("run_load = %d\n", prefs.run_load);
+	exit(0);
+    }
+#endif
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

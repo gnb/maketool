@@ -1,0 +1,278 @@
+#
+# Data file for testing maketool arguments.
+# $Id: argstest.dat,v 1.1 1999-06-09 14:55:44 gnb Exp $
+#
+@name no arguments
+@args
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_SERIES
+run_processes = 2
+run_load = 20
+#
+#
+@name targets
+@args fred jane sam
+@exp
+makefile = (null)
+directory = ...
+targets = fred jane sam
+ignore_failures = FALSE
+run_how = RUN_SERIES
+run_processes = 2
+run_load = 20
+#
+#
+@name -C DIR flag
+@args -C test
+@exp
+makefile = (null)
+directory = .../test
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_SERIES
+run_processes = 2
+run_load = 20
+#
+#
+@name --directory=DIR flag
+@args --directory=test
+@exp
+makefile = (null)
+directory = .../test
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_SERIES
+run_processes = 2
+run_load = 20
+#
+#
+@name -f FILE flag
+@args -f other
+@exp
+makefile = other
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_SERIES
+run_processes = 2
+run_load = 20
+#
+#
+@name --file=FILE flag
+@args --file=other
+@exp
+makefile = other
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_SERIES
+run_processes = 2
+run_load = 20
+#
+#
+@name --makefile=FILE flag
+@args --makefile=other
+@exp
+makefile = other
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_SERIES
+run_processes = 2
+run_load = 20
+#
+#
+@name -j flag
+@args -j
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_PARALLEL_PROC
+run_processes = 0
+run_load = 20
+#
+#
+@name --jobs flag
+@args --jobs
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_PARALLEL_PROC
+run_processes = 0
+run_load = 20
+#
+#
+@name -j N flag
+@args -j 42
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_PARALLEL_PROC
+run_processes = 42
+run_load = 20
+#
+#
+@name --jobs=N flag
+@args --jobs=42
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_PARALLEL_PROC
+run_processes = 42
+run_load = 20
+#
+#
+@name -k flag
+@args -k
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = TRUE
+run_how = RUN_SERIES
+run_processes = 2
+run_load = 20
+#
+#
+@name --keep-going flag
+@args --keep-going
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = TRUE
+run_how = RUN_SERIES
+run_processes = 2
+run_load = 20
+#
+#
+@name -l flag
+@args -l
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_PARALLEL_LOAD
+run_processes = 2
+run_load = 0
+#
+#
+@name -l N flag
+@args -l 4.2
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_PARALLEL_LOAD
+run_processes = 2
+run_load = 42
+#
+#
+@name --load-average flag
+@args --load-average
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_PARALLEL_LOAD
+run_processes = 2
+run_load = 0
+#
+#
+@name --load-average=N flag
+@args --load-average=4.2
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_PARALLEL_LOAD
+run_processes = 2
+run_load = 42
+#
+#
+@name --max-load flag
+@args --max-load
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_PARALLEL_LOAD
+run_processes = 2
+run_load = 0
+#
+#
+@name --max-load=N flag
+@args --max-load=4.2
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_PARALLEL_LOAD
+run_processes = 2
+run_load = 42
+#
+#
+@name -S flag
+@args -k -S
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_SERIES
+run_processes = 2
+run_load = 20
+#
+#
+@name --no-keep-going flag
+@args -k --no-keep-going
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_SERIES
+run_processes = 2
+run_load = 20
+#
+#
+@name --stop flag
+@args -k --stop
+@exp
+makefile = (null)
+directory = ...
+targets = (null)
+ignore_failures = FALSE
+run_how = RUN_SERIES
+run_processes = 2
+run_load = 20
+#
+#
+@name all sortsa stuff
+@args -C test -j 4 -k -f other fred jane
+@exp
+makefile = other
+directory = .../test
+targets = fred jane
+ignore_failures = TRUE
+run_how = RUN_PARALLEL_PROC
+run_processes = 4
+run_load = 20
