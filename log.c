@@ -22,7 +22,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: log.c,v 1.21 1999-11-07 08:08:50 gnb Exp $");
+CVSID("$Id: log.c,v 1.22 1999-11-07 08:50:00 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -44,6 +44,7 @@ typedef struct
 static GtkWidget	*logwin;	/* a GtkCTree widget */
 static int		num_errors;
 static int		num_warnings;
+static gboolean     	num_ew_changed = FALSE;
 static GList		*log;		/* list of LogRecs */
 /*static GList		*log_pending_lines = 0;*/ /*TODO*/
 static GList		*log_directory_stack = 0;
@@ -187,6 +188,13 @@ log_current_unique_node(void)
     return 0;
 }
 
+static LogRec *
+log_rootmost_node(void)
+{
+    GList *tail = g_list_last(log_node_stack);
+    return (tail == 0 ? 0 : (LogRec *)tail->data);
+}
+
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static LogRec *
@@ -208,9 +216,11 @@ log_add_rec(const char *line, const FilterResult *res)
     {
     case FR_WARNING:
 	num_warnings++;
+	num_ew_changed = TRUE;
     	break;
     case FR_ERROR:
 	num_errors++;
+	num_ew_changed = TRUE;
     	break;
     default:
     	break;
@@ -324,6 +334,46 @@ log_show_rec(LogRec *lr)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static void
+log_update_build_start(void)
+{
+    LogRec *bs;
+    estring text;
+    int n = 0;
+    
+    if (!num_ew_changed || num_errors == 0 && num_warnings == 0)
+    	return;
+    if ((bs = log_rootmost_node()) == 0)
+    	return; /* yeah like that's going to happen */
+    assert(bs->node != 0);
+    
+    estring_init(&text);
+    estring_append_string(&text, bs->line);
+    estring_append_string(&text, " (");
+    if (num_errors > 0)
+    {
+    	if (n)
+	    estring_append_string(&text, ", ");
+	estring_append_printf(&text, _("%d errors"), num_errors);
+	n++;
+    }
+    if (num_warnings > 0)
+    {
+    	if (n)
+	    estring_append_string(&text, ", ");
+	estring_append_printf(&text, _("%d warnings"), num_warnings);
+    	n++;
+    }
+    estring_append_string(&text, ")");
+
+    gtk_ctree_node_set_text(GTK_CTREE(logwin), bs->node, /*column*/0, text.data);
+
+    estring_free(&text);
+    num_ew_changed = FALSE;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 LogRec *
 log_add_line(const char *line)
 {
@@ -373,6 +423,8 @@ log_add_line(const char *line)
     lr = log_add_rec(line, &res);
     log_show_rec(lr);
     estring_free(&fullpath);
+    /* TODO: do this exactly once when loading from file */
+    log_update_build_start();
     return lr;
 }
 
@@ -401,6 +453,7 @@ log_is_empty(void)
     return GTK_CTREE_IS_EMPTY(logwin);
 }
 
+/* TODO: this now just collapses top-level nodes */
 void
 log_collapse_all(void)
 {
@@ -689,6 +742,7 @@ log_start_build(const char *message)
     
     num_errors = 0;
     num_warnings = 0;
+    num_ew_changed = FALSE;
     filter_init();
     
     filter_result_init(&res);

@@ -173,7 +173,9 @@ x  Provide a Preferences setting to control what happens when a make
    run finishes. Nothing; Sound Bell; Flash Window; Run Program.
    
 x  Add timestamp to log start line, either current time for normal builds
-   or file modification time for log files. Also number of errors & warnings.
+   or file modification time for log files.
+   
+x  DONE: Also number of errors & warnings.
 
 x  DONE: Should be able to edit main.c by clicking on "    from main.c" in gcc
    inclusion trace.
@@ -182,3 +184,9 @@ x  Provide facility to search the log text.
 
 x  Fix bug where sometimes list_targets doesn't finish, or isn't reaped,
    or something.
+
+x  Fix bug where build start line, updated to reflect number of errors,
+   is displayed at wrong horizontal position (as if it had lost an indent).
+   This seems to be a GTK display bug.
+   
+   
