@@ -1,3 +1,19 @@
+Sat Oct 25 21:18:49 2003  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.8.3
+
+	* [BUG] Replaced GtkCTree widget with a tweaked version which features
+	an O(1) append, resulting in a large speedup for large builds.
+	* [BUG] Fixed bug where double-clicking on an error message for a file
+	in the current directory couldn't find the file.
+	* [BUG] Fixed bug which emitted critical messages from g_cclosure_new
+	and g_signal_connect_closure_by_id on startup when no targets were
+	found in the current directory, if built for gtk2.
+
+	* [NVC] The GTK2 define is calculated in configure not the header file.
+	* [NVC] Fixed minor compile warnings.
+	* [NVC] Tweak the definition of "inline" when compiling with gcc
+	-pedantic to remove dozens of spurious complaints about "inline".
+
 Fri Oct 17 01:20:26 2003  Greg Banks <gnb@alphalink.com.au>
 	* Release 0.8.2
 
