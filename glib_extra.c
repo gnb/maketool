@@ -22,7 +22,7 @@
 #include <signal.h>
 #include <sys/poll.h>
 
-CVSID("$Id: glib_extra.c,v 1.7 1999-06-13 15:36:06 gnb Exp $");
+CVSID("$Id: glib_extra.c,v 1.8 1999-11-04 07:20:38 gnb Exp $");
 
 
 typedef struct
@@ -103,7 +103,7 @@ g_unix_source_prepare(
     gint *timeout,
     gpointer user_data)
 {
-#if DEBUG
+#if DEBUG > 5
     fprintf(stderr, "g_unix_source_prepare(): called\n");
 #endif
     return g_unix_got_signal;
@@ -115,7 +115,7 @@ g_unix_source_check(
     GTimeVal *current_time,
     gpointer user_data)
 {
-#if DEBUG
+#if DEBUG > 5
     fprintf(stderr, "g_unix_source_check(): called\n");
 #endif
     return g_unix_got_signal;
@@ -127,7 +127,7 @@ g_unix_source_dispatch(
     GTimeVal *current_time,
     gpointer user_data)
 {
-#if DEBUG
+#if DEBUG > 5
     fprintf(stderr, "g_unix_source_dispatch(): called\n");
 #endif
     g_unix_got_signal = FALSE;
