@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.18 2000-01-03 14:47:14 gnb Exp $
+# $Id: Makefile.in,v 1.19 2000-01-05 14:06:53 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -36,7 +36,7 @@ CC=		@CC@
 CFLAGS=		@CFLAGS@
 CPPFLAGS=	@GTK_CFLAGS@ -D_USE_BSD -I. -Iicons -Iintl \
 		-DLOCALEDIR=\"$(localedir)\" \
-		$(TESTCPPFLAGS)
+		@CPPFLAGS@ $(TESTCPPFLAGS)
 LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 O=		objs
 

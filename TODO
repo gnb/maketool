@@ -261,6 +261,8 @@ x  are the fds for pipes to child processes leaked?
 x  configure-time check for /usr/doc is insufficient. Need to use /usr/doc
    on Linux only, $(prefix)/share/$(PACKAGE) on NetBSD.
    
-x  Makefile.in needs to define CPPFLAGS with @CPPFLAGS@ at the end for
+x  DONE: Makefile.in needs to define CPPFLAGS with @CPPFLAGS@ at the end for
    NetBSD to find gettext library.
    
+x  Frederick Bruckman says: To be able to pass in datadir or localedir to
+   configure would be nice.
