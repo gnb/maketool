@@ -25,6 +25,7 @@ BEGINDOWNLOAD
 DOWNLOAD(i386-linux RPM,maketool-LATEST_VERSION-1.i386.rpm)
 DOWNLOAD(source tarball,maketool-LATEST_VERSION-src.tgz)
 DOWNLOAD(latest source patch,maketool-PREVIOUS_VERSION-LATEST_VERSION.patch.gz)
+DOWNLOAD(get this source patch if<BR>you're using GTK 1.2.6,gtk-1.2.6.patch.gz)
 ENDDOWNLOAD
 
 <P>
