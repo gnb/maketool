@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: help-common.mk.in,v 1.1 2000-08-06 10:46:55 gnb Exp $
+# $Id: help-common.mk.in,v 1.2 2000-08-06 11:06:51 gnb Exp $
 #
 
 TOPDIR=		../../..
@@ -77,7 +77,7 @@ uninstall::
 ###
 
 # Making a distribution
-distdir=	$(TOPDIR)/$(PACKAGE)-$(VERSION)/doc/help
+distdir=	$(TOPDIR)/$(PACKAGE)-$(VERSION)/doc/help/$(LANG)
 DISTFILES=	Makefile.in help.sgml $(INSTALLABLES) $(HTML_MANIFEST)
 
 dist:
