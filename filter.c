@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.37 2003-10-10 09:31:35 gnb Exp $");
+CVSID("$Id: filter.c,v 1.38 2003-10-10 09:32:14 gnb Exp $");
 
 typedef struct
 {
@@ -824,6 +824,7 @@ filter_apply(const char *line, FilterResult *result)
 	    return;
     }
     result->code = FR_UNDEFINED;
+    filter_state = "";
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
