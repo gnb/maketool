@@ -1,8 +1,8 @@
 --- open ---
 
-x  Fix preferences code to handle upgrade from 0.7->0.8 by rewriting
-   the prog_list_targets pref from "extract_targets %m %v" to
-   GMAKE " %m %v %q %t".
+x  The Indent Directories option relies on filtering gmake output
+   for 'Entering directory' messages.  When running in a non-English
+   locale, these may be translated by gmake's gettext.
 
 x  In work_ended(), check whether the makefile has been modified
    since the last time we read the list of targets from make, and if
@@ -53,9 +53,6 @@ x  Change maketool_client to be public and its default mode to take
    them to a discovered maketool for interpretation.  automake.mk etc
    will need to use a new --message opion.
 
-x  Limit the sizes of target names in the Build menu, especially
-   when a pair of them is used as a range for a submenu.
-
 x  When the user cancels a ./configure run from the GUI, this should
    show in the log window instead of "*** [config.status] Error 1".
    
@@ -102,8 +99,6 @@ x  GNOME integration: use GNOME URL handling in Help menu.
 
 x  GNOME integration: provide triggers for sounds etc.
 
-x  Implement the FR_PENDING filter result.
-
 x  Doco.
 
 x  Fix bug whereby `configure --with-included-gettext' leaves a symlink
@@ -117,16 +112,8 @@ x  On startup, when preferences or args specify a non-existant makefile,
 x  Remove strict dependancy on POSIX regcomp() for older systems,
    conditionally replace regcomp with function based on <regex.h>
    
-x  Correctly handle user's upgrade from 0.3 to 0.4 by saving new
-   prefs items to ~/.maketoolrc.
-   
 x  Automatically recalculate list of targets, and rebuild the Build
    menu, when makefile changes.
-   
-x  Change the preferences so that the actual make executable used is
-   specified in exactly one place instead of three (prog_make,
-   prog_make_version, and inside the shell script extract_targets).
-   Use %M as the name of the executable in those cases.
    
 x  Make the default text editor configurable, figured out in configure.
 
@@ -254,6 +241,23 @@ x  When ./configure is run from make_makefile(), config.status is also
    run afterward, redundantly.
 
 --- closed ---
+
+x  Change the preferences so that the actual make executable used is
+   specified in exactly one place instead of three (prog_make,
+   prog_make_version, and inside the shell script extract_targets).
+   Use %M as the name of the executable in those cases.
+   
+x  Correctly handle user's upgrade from 0.3 to 0.4 by saving new
+   prefs items to ~/.maketoolrc.
+
+x  Implement the FR_PENDING filter result.
+
+x  Limit the sizes of target names in the Build menu, especially
+   when a pair of them is used as a range for a submenu.
+
+x  Fix preferences code to handle upgrade from 0.7->0.8 by rewriting
+   the prog_list_targets pref from "extract_targets %m %v" to
+   GMAKE " %m %v %q %t".
 
 x  DONE: The length of the Build menu is limited by splitting long lists
    of targets into sub-menus.  However the width is not controlled.
