@@ -1,8 +1,7 @@
 <!DOCTYPE ARTICLE PUBLIC "-//OASIS//DTD DocBook V3.1//EN">
 
-<article class="whitepaper" status="DRAFT" lang="EN" ID="maketool-help"
-         xreflabel="maketool-help" 
-         revision="$Id: help.sgml,v 1.3 2000-08-06 11:21:35 gnb Exp $"
+<article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
+         revision="$Id: help.sgml,v 1.4 2000-11-26 10:16:10 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool online help</title>
@@ -10,7 +9,7 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2000-08-06 11:21:35 $</pubdate>
+  <pubdate role="cvs">$Date: 2000-11-26 10:16:10 $</pubdate>
   <releaseinfo>This is version VERSION</releaseinfo>
   <copyright>
     <year>2000</year>
@@ -25,16 +24,24 @@
 
 </artheader>
 
-<sect1 id="dummy">
+<sect1 id="index" xreflabel="Maketool Index">
 <title>Dummy</title>
+
 <para>
 This section exists only to force jade to split the first
-real section into its own HTML file
+real section into its own HTML file.
 </para>
+
+<para>
+See the
+<ulink url="info:standards#Makefile_Conventions">GNU Makefile Standards</ulink>
+document.
+</para>
+
 </sect1>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="ok">
+<sect1 id="ok" xreflabel="Ok Button">
 <title>Ok Button</title>
 
 <graphic format=GIF fileref="ok.gif"></graphic>
@@ -50,10 +57,14 @@ See also:
 <xref linkend="cancel">
 </para>
 
+<para>
+<xref linkend="index">
+</para>
+
 </sect1>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="apply">
+<sect1 id="apply" xreflabel="Apply Button">
 <title>Apply Button</title>
 
 <graphic format=GIF fileref="apply.gif"></graphic>
@@ -69,10 +80,14 @@ See also:
 <xref linkend="cancel">
 </para>
 
+<para>
+<xref linkend="index">
+</para>
+
 </sect1>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="cancel">
+<sect1 id="cancel" xreflabel="Cancel Button">
 <title>Cancel Button</title>
 
 <graphic format=GIF fileref="cancel.gif"></graphic>
@@ -88,13 +103,233 @@ See also:
 <xref linkend="apply">
 </para>
 
+<para>
+<xref linkend="index">
+</para>
+
 </sect1>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="tools-again">
+<sect1 id="tools-again" xreflabel="Again tool">
 <title>Again tool</title>
 
 <graphic format=GIF fileref="tools-again.gif"></graphic>
+
+<para>
+Click this toolbar button to repeat the last <command>gmake</command> run,
+i.e. run <command>gmake</command> with the same target you used last time
+you ran <command>gmake</command>.  Look at the tooltip to see which
+target will be built.
+</para>
+
+<para>
+This toolbar button becomes available once you have done at least
+one <command>gmake</command> run.
+</para>
+
+<para>
+See also:
+<xref linkend="tools-all">
+<xref linkend="tools-clean">
+<!-- <xref linkend="menu-build"> -->
+</para>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="tools-stop" xreflabel="Stop tool">
+<title>Stop tool</title>
+
+<graphic format=GIF fileref="tools-stop.gif"></graphic>
+
+<para>
+Click this toolbar button to stop the current <command>gmake</command> run.
+</para>
+
+<para>
+This toolbar button becomes available only during a <command>gmake</command>
+run.
+</para>
+
+<para>
+See also:
+<xref linkend="tools-all">
+<xref linkend="tools-clean">
+<!-- <xref linkend="menu-build"> -->
+</para>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="tools-all" xreflabel="Build All tool">
+<title>Build All tool</title>
+
+<graphic format=GIF fileref="tools-all.gif"></graphic>
+
+<para>
+Click this toolbar button to run <command>gmake</command> with the
+target <varname>all</varname>.  Makefiles which adhere to GNU
+Makefile standards define this target thus:
+</para>
+
+<blockquote>
+  <para>
+    Compile the entire program.  This should be the default target.
+    This target need not rebuild any documentation files.
+  </para>
+</blockquote>
+
+<para>
+This toolbar button becomes available if the <filename>Makefile</filename>
+in the current directory defines an <varname>all</varname> target, and
+remains available while <command>gmake</command> is not running.
+</para>
+
+<para>
+See also:
+<xref linkend="tools-clean">
+</para>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="tools-clean" xreflabel="Build Clean tool">
+<title>Build Clean tool</title>
+
+<graphic format=GIF fileref="tools-clean.gif"></graphic>
+
+<para>
+Click this toolbar button to run <command>gmake</command> with the
+target <varname>clean</varname>.  Makefiles which adhere to GNU
+Makefile standards define this target thus:
+</para>
+
+<blockquote>
+  <para>
+    Delete all files from the current directory that are normally
+    created by building the program.  Don't delete the files that
+    record the configuration.  Also preserve files that could be
+    made by building, but normally aren't because the distribution
+    comes with them.
+  </para>
+</blockquote>
+
+<para>
+This toolbar button becomes available if the <filename>Makefile</filename>
+in the current directory defines a <varname>clean</varname> target, and
+remains available while <command>gmake</command> is not running.
+</para>
+
+<para>
+See also:
+<xref linkend="tools-all">
+</para>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="tools-clear" xreflabel="Clear Log tool">
+<title>Clear Log tool</title>
+
+<graphic format=GIF fileref="tools-clear.gif"></graphic>
+
+<para>
+Click this toolbar button to clear the log window, i.e. delete
+all text in the window.
+</para>
+
+<para>
+This toolbar button becomes available when the log window contains text.
+</para>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="tools-edit-next" xreflabel="Edit Next Error tool">
+<title>Edit Next Error tool</title>
+
+<graphic format=GIF fileref="tools-edit-next.gif"></graphic>
+
+<para>
+  Click this toolbar button to edit the next error or warning after the
+  currently selected line in the log window.  If the <guilabel>Edit Next
+  ignores warnings</guilabel> toggle in the <guilabel>Preferences</guilabel>
+  window is set, this button will skip over warnings and only find errors.
+</para>
+
+<para>
+  This toolbar button becomes available when the log window contains text.
+</para>
+
+<para>
+  See also:
+  <xref linkend="tools-edit-file-next">
+</para>
+
+<para>
+  <xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="tools-edit-file-next" xreflabel="Edit File Next Error tool">
+<title>Edit File Next Error tool</title>
+
+<graphic format=GIF fileref="tools-edit-file-next.gif"></graphic>
+
+<para>
+  Click this toolbar button to edit the next error or warning after the
+  currently selected line in the log window.  Unlike the
+  <xref linkend="tools-edit-next">, this button first skips all errors
+  and warnings in the same file as the selected line; this is useful
+  when
+  
+  If the <guilabel>Edit Next
+  ignores warnings</guilabel> toggle in the <guilabel>Preferences</guilabel>
+  window is set, this button will skip over warnings and only find errors.
+</para>
+
+<para>
+  This toolbar button becomes available when the log window contains text.
+</para>
+
+<para>
+  See also:
+  <xref linkend="tools-edit-next">
+</para>
+
+<para>
+  <xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="tools-print" xreflabel="Print tool">
+<title>Print tool</title>
+
+<graphic format=GIF fileref="tools-print.gif"></graphic>
 
 <para>
 Click this toolbar button to repeat the last make run, i.e. run
@@ -108,19 +343,21 @@ This toolbar button becomes available once you have done at least
 one <command>gmake</command> run.
 </para>
 
-<!--
 <para>
 See also:
 <xref linkend="tools-all">
 <xref linkend="tools-clean">
-<xref linkend="menu-build">
+<!-- <xref linkend="menu-build"> -->
 </para>
--->
+
+<para>
+<xref linkend="index">
+</para>
 
 </sect1>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="prefs-kflag">
+<sect1 id="prefs-kflag" xreflabel="Continue despite failures">
 <title>Continue despite failures</title>
 
 <para>
@@ -131,6 +368,10 @@ targets after a target fails to be built.  The normal behaviour of
 
 <para>
 This toggle sets the <option>-k</option> flag to <command>gmake</command>.
+</para>
+
+<para>
+<xref linkend="index">
 </para>
 
 </sect1>
