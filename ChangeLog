@@ -1,4 +1,6 @@
 Mon Oct  6 10:19:52 2003  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.8.1
+
 	* [FEA] Added a progress indicator for loading and saving log files.
 	* [FEA] During builds, provide a summary in the statusbar of the number
 	of errors and warnings encountered.
@@ -10,6 +12,10 @@ Mon Oct  6 10:19:52 2003  Greg Banks <gnb@alphalink.com.au>
 	directories.
 	* [NVC] Centralise several includes of <sys/stat.h>, and protect
 	with the standard autoconf define.
+	* [NVC] Improved the excludes file.
+	* [NVC] Now that maketool uses more of the gmake "Entering
+	directory" messages, the wrap script needs to simulate them
+	more closely for non-GNU makes.
 
 Tue Sep 30 03:00:40 2003  Greg Banks <gnb@alphalink.com.au>
 	* Release 0.8
