@@ -4,7 +4,7 @@
 ]>
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.12 2001-09-23 13:16:20 gnb Exp $"
+         revision="$Id: help.sgml,v 1.13 2001-09-28 04:51:28 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool</title>
@@ -12,7 +12,7 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2001-09-23 13:16:20 $</pubdate>
+  <pubdate role="cvs">$Date: 2001-09-28 04:51:28 $</pubdate>
   <releaseinfo>This is version &version;</releaseinfo>
   <copyright>
     <year>2000</year>
@@ -2044,8 +2044,7 @@ Quick Tip: usually the only targets you need to know are
     <term><command>tags</command></term>
     <listitem>
       <para>
-      Update the <filename>tags</filename> file used by the
-      <command>vi</command> editor.
+      Same as <command>TAGS</command>.
       </para>
     </listitem>
   </varlistentry>
