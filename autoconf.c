@@ -1111,14 +1111,6 @@ build_configure_cb(GtkWidget *w, gpointer data)
     show_configure_window(/*from_client*/FALSE);
 }
 
-void
-build_autoconf_cb(GtkWidget *w, gpointer data)
-{
-    task_enqueue(logged_task(g_strdup("autoconf")));
-    task_start();
-}
-
-
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 gboolean

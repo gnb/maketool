@@ -1,5 +1,9 @@
 --- open ---
 
+x  Move "File->Edit Makefile" to the Edit menu, and make its label
+   change at runtime to reflect the MakeSystem's "source" makefile
+   (with a defaulting mechanism to find GNUmakefiles).
+
 x  Rajesh Gupta reports:
    > Let me explain my setting also know. I have a makefile and
    > srcs.mak file.  all sources are listed in srcs.mak file. I
@@ -7,12 +11,6 @@ x  Rajesh Gupta reports:
    > full path of makefile. When I did a make all it gave warning
    > srcs.mak not found. That is quite understandable but then
    > when I clicked apply in preference menu [dialog] it crashed.
-
-x  Add a Build->Makefile menu item to allow the user to manually start
-   the Makefile-build process.
-   
-x  Change the Build->Run autoconf etc menu items to be dependent on
-   the directory's makesystem.
 
 x  Change maketool_client to be public and its default mode to take
    make-style args (options targets and variable overrides) and pass
@@ -164,10 +162,6 @@ x  Implement case-insensitive literals in Find window.
 
 x  Handle configure.in/config.status being in an ancestor directory
 
-x  Handle dependancies of multiple files on their .in counterparts via
-   autoconf, in particular Makefiles in subdirs. Possible create a
-   temporary `Makefiles' target.
-   
 x  be able to merge multi-line MWOS error messages into 1 summary line??
 
 x  generate column info from MWOS "     ^" stuff
@@ -207,8 +201,6 @@ x  Checks for configure.in and configure used to grey menu items
 x  The --no-create option to configure is not preserved, and probably
    can't be.
    
-x  Need a function to remove config.cache.
-
 x  After successfully running autoconf, automatically:
    * remove config.cache
    * remove config.status
@@ -216,8 +208,6 @@ x  After successfully running autoconf, automatically:
    * grey menu items.
    
 x  Configure option parser should handle "--quiet, --silent" properly.
-
-x  Merge line-ifying handle_input() into task.c.
 
 x  Deal with configure being missing or corrupted in read_configure_options()
 
@@ -228,11 +218,6 @@ x  During configure option GUI field validation, if user enters whitespace
 x  Keyboard navigation in Configure Options dialog is broken; focus
    never enters the notebook pages.
    
-x  
-   
-
-
-
    
 
 --- closed ---
@@ -489,4 +474,19 @@ x  DONE: Create dummy N_() macros to seed the PO files with common autoconf
    help strings.
    
 x  DONE: Rationalise use of handle_input()
+
+x  DONE: Merge line-ifying handle_input() into task.c.
+
+x  DONE: Add a Build->Makefile menu item to allow the user to manually start
+   the Makefile-build process.
+   
+x  DONE: Change the Build->Run autoconf etc menu items to be dependent on
+   the directory's makesystem.
+
+x  DONE: Handle dependancies of multiple files on their .in counterparts via
+   autoconf, in particular Makefiles in subdirs. Possible create a
+   temporary `Makefiles' target.
+   
+x  DONE: Need a function to remove config.cache.
+
 

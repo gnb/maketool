@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.51 2001-09-22 02:17:52 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.52 2001-09-22 03:33:36 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -327,7 +327,7 @@ preferences_load(void)
     prefs.prog_list_targets = ui_config_get_string("prog_list_targets", "extract_targets %m %v");
     prefs.prog_list_version = ui_config_get_string("prog_list_version", GMAKE " --version");
     prefs.prog_edit_source = ui_config_get_string("prog_edit_source", "nc -noask %{l:+-line %l} %f");
-    prefs.prog_make_makefile = ui_config_get_string("prog_make_makefile2", GMAKE " %n %v -f %D/%S.mk Makefile");
+    prefs.prog_make_makefile = ui_config_get_string("prog_make_makefile2", GMAKE " %n %v -f %D/%S.mk %t");
     prefs.prog_finish = ui_config_get_string("prog_finish", "");
 
     prefs.win_width = ui_config_get_int("win_width", 300);

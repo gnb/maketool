@@ -126,7 +126,14 @@ typedef struct
 {
     char *name;
     gboolean automatic;     /* can do useful automatic update */
+    char *makefile; 	    /* usually "Makefile" */
     char *deps[32]; 	    /* all filenames on which Makefile depends */
+    struct
+    {
+    	char *label;
+	char *command;
+	void (*handler)(GtkWidget *, gpointer);
+    } commands[32]; 	    /* specific commands for Build menu */
 } MakeSystem;
 
 typedef enum
@@ -207,7 +214,6 @@ void print_page_setup_cb(GtkWidget *, gpointer);
 /* autoconf.c */
 long show_configure_window(gboolean from_client);
 void build_configure_cb(GtkWidget *w, gpointer data);
-void build_autoconf_cb(GtkWidget *w, gpointer data);
 gboolean check_for_configure_in(void);
 gboolean check_for_configure(void);
 

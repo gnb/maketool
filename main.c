@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.80 2001-09-22 02:20:58 gnb Exp $");
+CVSID("$Id: main.c,v 1.81 2001-09-22 03:33:36 gnb Exp $");
 
 
 /*
@@ -360,33 +360,85 @@ logged_task(char *command)
 
 static const MakeSystem makesys_plain = 
 {
-    "plain",
-    FALSE,
-    {0}
+    "plain",	    	/* name */
+    FALSE,  	    	/* automatic */
+    0,	    	    	/* makefile */
+    {0},    	    	/* deps */
+    {{0}} 	    	/* commands */
 };
 static const MakeSystem makesys_automake = 
 {
-    "automake",
-    TRUE,
-    {"Makefile.am", "Makefile.in", "config.status", "configure", "configure.in", 0}
+    "automake",	    	/* name */
+    TRUE,  	    	/* automatic */
+    "Makefile",     	/* makefile */
+    {
+    	"Makefile.am",
+	"Makefile.in",
+	"config.status",
+	"configure",
+	"configure.in",
+	0
+    },	    	    	/* deps */
+    {
+    	{N_("Run auto_make..."), "automake -a"},
+    	{N_("Run a_utoconf..."), "autoconf"},
+    	{N_("_Remove config.cache..."), "/bin/rm -f config.cache"},
+    	{N_("Run _configure..."), 0, build_configure_cb},
+    	{N_("Run config._status..."), "./config.status"},
+	{0}
+    }	    	    	/* commands */
 };
 static const MakeSystem makesys_autoconf_dist = 
 {
-    "autoconf-dist",
-    TRUE,
-    {"Makefile.in", "config.status", "configure", 0}
+    "autoconf-dist",	/* name */
+    TRUE,  	    	/* automatic */
+    "Makefile",     	/* makefile */
+    {
+    	"Makefile.in",
+	"config.status",
+	"configure",
+	0
+    },	    	    	/* deps */
+    {
+    	{N_("_Remove config.cache..."), "/bin/rm -f config.cache"},
+    	{N_("Run _configure..."), 0, build_configure_cb},
+    	{N_("Run config._status..."), "./config.status"},
+	{0}
+    }	    	    	/* commands */
 };
 static const MakeSystem makesys_autoconf_maint = 
 {
-    "autoconf-maint",
-    TRUE,
-    {"Makefile.in", "config.status", "configure", "configure.in", 0}
+    "autoconf-maint",	/* name */
+    TRUE,  	    	/* automatic */
+    "Makefile",     	/* makefile */
+    {
+    	"Makefile.in",
+	"config.status",
+	"configure",
+	"configure.in",
+	0
+    },	    	    	/* deps */
+    {
+    	{N_("Run a_utoconf..."), "autoconf"},
+    	{N_("_Remove config.cache..."), "/bin/rm -f config.cache"},
+    	{N_("Run _configure..."), 0, build_configure_cb},
+    	{N_("Run config._status..."), "./config.status"},
+	{0}
+    }	    	    	/* commands */
 };
 static const MakeSystem makesys_imake = 
 {
-    "imake",
-    TRUE,
-    {"Imakefile", 0}
+    "imake",	    	/* name */
+    TRUE,  	    	/* automatic */
+    "Makefile",     	/* makefile */
+    {
+    	"Imakefile",
+	0
+    },	    	    	/* deps */
+    {
+    	{N_("Run _xmkmf..."), "xmkmf"},
+	{0}
+    }	    	    	/* commands */
 };
 
 static const MakeSystem *
@@ -420,11 +472,6 @@ intuit_makesystem(void)
 /*
  * Check to see if we can and should update
  * the Makefile from other files.
- *
- * Note assumption that the makefile is called
- * Makefile and not makefile or GNUmakefile,
- * which happens to be true for all the make
- * systems handled so far.
  */
 
 static gboolean
@@ -441,7 +488,7 @@ makefile_needs_update(void)
      * Get Makefile's mod time.  If it doesn't
      * exist, we can update.
      */
-    if (stat("Makefile", &sb) < 0)
+    if (stat(makesys->makefile, &sb) < 0)
     	return (errno == ENOENT);
     mf_mtime = sb.st_mtime;
 
@@ -469,11 +516,11 @@ make_makefile(void)
     fprintf(stderr, "make_makefile: makesys=%s\n", makesys->name);
 #endif
 
-    if (makefile_needs_update())
-    {
-	char *cmd = expand_prog(prefs.prog_make_makefile, 0, 0, 0);
-	task_enqueue(logged_task(cmd));
-    }
+    task_enqueue(
+    	logged_task(
+	    expand_prog(prefs.prog_make_makefile, 0, 0, makesys->makefile)
+	)
+    );
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -670,7 +717,7 @@ list_targets_task(void)
 static void
 list_targets(void)
 {
-    if (prefs.enable_make_makefile)
+    if (prefs.enable_make_makefile && makefile_needs_update())
 	make_makefile();
     task_enqueue(list_targets_task());
     task_start();
@@ -936,7 +983,7 @@ void
 build_start(const char *target)
 {
     first_error = TRUE;
-    if (prefs.enable_make_makefile)
+    if (prefs.enable_make_makefile && makefile_needs_update())
 	make_makefile();
     task_enqueue(make_task(target));
     task_start();
@@ -1311,6 +1358,39 @@ build_dryrun_cb(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
+build_makefile_cb(GtkWidget *w, gpointer data)
+{
+    assert(makesys != 0);
+    assert(makesys->makefile != 0);
+    
+    first_error = TRUE;
+    make_makefile();
+    task_start();
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+build_makesys_command_cb(GtkWidget *w, gpointer data)
+{
+    int n = GPOINTER_TO_INT(data);
+    
+    assert(makesys != 0);
+    assert(n >= 0 && n < 32);
+    assert(makesys->commands[n].label != 0);
+
+    if (makesys->commands[n].handler != 0)
+    	(*makesys->commands[n].handler)(w, makesys->commands[n].command);
+    else
+    {
+	task_enqueue(logged_task(g_strdup(makesys->commands[n].command)));
+	task_start();
+    }
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
 build_cb(GtkWidget *w, gpointer data)
 {
     build_start((char *)data);    
@@ -1528,13 +1608,28 @@ unimplemented(GtkWidget *w, gpointer data)
 static void
 construct_build_menu_basic_items(void)
 {
+    int i;
+    
     again_menu_item = ui_add_button(build_menu, _("_Again"), "<Ctrl>A", build_again_cb, 0, GR_AGAIN);
     ui_add_button(build_menu, _("_Stop"), 0, build_stop_cb, 0, GR_RUNNING);
     ui_add_toggle(build_menu, _("_Dryrun Only"), "<Ctrl>D", build_dryrun_cb, 0,
     	0, prefs.dryrun);
-    ui_add_separator(build_menu);
-    ui_add_button(build_menu, _("Run a_utoconf..."), 0, build_autoconf_cb, 0, GR_AUTOCONF);
-    ui_add_button(build_menu, _("Run _configure..."), 0, build_configure_cb, 0, GR_CONFIGURE);
+
+    if (makesys->makefile != 0 &&
+    	makesys->commands[0].label != 0)
+    {
+	ui_add_separator(build_menu);
+
+    	/* TODO: proper groups */
+	if (makesys->makefile != 0)
+	    ui_add_button(build_menu, makesys->makefile, 0, build_makefile_cb, 0, GR_NOTRUNNING);
+
+    	for (i = 0 ; makesys->commands[i].label != 0 ; i++)
+	    ui_add_button(build_menu, _(makesys->commands[i].label), 0,
+	    	    	    build_makesys_command_cb, GINT_TO_POINTER(i),
+			    GR_NOTRUNNING);
+    }
+    
     ui_add_separator(build_menu);
 }
 
