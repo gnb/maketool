@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: print.c,v 1.6 2000-07-29 15:18:14 gnb Exp $");
+CVSID("$Id: print.c,v 1.7 2000-08-21 06:19:57 gnb Exp $");
 
 static GtkWidget	*print_shell = 0;
 typedef enum { D_PRINTER, D_FILE, D_NUM_DESTS } DEST;
@@ -116,7 +116,7 @@ void
 lpr_init(void)
 {
     FILE *fp;
-    char *cmd
+    char *cmd;
     char buf[1024];
     
     if (_lpr_initialised)
@@ -124,7 +124,7 @@ lpr_init(void)
     _lpr_initialised = TRUE;
     
     /* TODO: check that lpstat -c (IIRC) and output are correct */
-    cmd = g_strdup_print("%s -c", LPSTAT_COMMAND)
+    cmd = g_strdup_printf("%s -c", LPSTAT_COMMAND);
     fp = popen(cmd, "r");
     g_free(cmd);
     
