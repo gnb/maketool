@@ -17,8 +17,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _TASK_H_
-#define _TASK_H_
+#ifndef _MAKETOOL_TASK_H_
+#define _MAKETOOL_TASK_H_
 
 #include "common.h"
 #include "util.h"
@@ -114,4 +114,4 @@ gboolean task_is_successful(const Task *);
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-#endif /* _TASK_H_ */
+#endif /* _MAKETOOL_TASK_H_ */
