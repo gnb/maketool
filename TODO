@@ -1,5 +1,7 @@
 --- open ---
 
+x  Handle autoheader.
+
 x  The Indent Directories option relies on filtering gmake output
    for 'Entering directory' messages.  When running in a non-English
    locale, these may be translated by gmake's gettext, breaking
