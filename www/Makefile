@@ -17,8 +17,9 @@ all:: $(PAGES)
 
 changelog.html: _changelist.html
 features.html: _thanks.m4
-$(PAGES): _styles.html _common.m4
+$(PAGES): _styles.html _common.m4 _copyright.html
 index.html index_c.html index_d.html: _index.html
+download.html: versions.m4 _download.m4
 
 _changelist.html: ../CHANGES
 	./changes2html < $< > $@

@@ -2,7 +2,7 @@ define(DATE,esyscmd(date +"%d %b %Y"))dnl
 define(YEAR,esyscmd(date +"%Y"))dnl
 define(BEGINHEAD,
 <HTML><HEAD>
-<!-- (c) 1997-1999 Greg Banks. All Rights Reserved. -->
+include(_copyright.html)
 <title>TITLE</title>
 )dnl
 define(ENDHEAD,

@@ -5,8 +5,7 @@ include(_styles.html)
 ENDHEAD
 BEGINBODY
 
-define(LATEST_VERSION,0.5.1)
-define(PREVIOUS_VERSION,0.5)
+include(versions.m4)
 define(COUNTER_START_DATE,`10 Oct 1999')
 
 <!-- TODO: mention in the features page that it's released under GPL -->
@@ -19,15 +18,14 @@ The latest version available is <B>LATEST_VERSION</B>.
 Due to space limitations I am unable to provide downloads of many older
 versions on this website; EMAILME(contact me)
 if you really need an older version.
-<A
 </P>
 
-<P>
-Download the i386-linux RPM: <A HREF="maketool-LATEST_VERSION-1.i386.rpm">maketool-LATEST_VERSION-1.i386.rpm</A><BR>
-Download the source tarball: <A HREF="maketool-LATEST_VERSION-src.tgz">maketool-LATEST_VERSION-src.tgz</A><BR>
-Download the patch from PREVIOUS_VERSION to LATEST_VERSION:
-<A HREF="maketool-PREVIOUS_VERSION-LATEST_VERSION.patch.gz">maketool-PREVIOUS_VERSION-LATEST_VERSION.patch.gz</A><BR>
-</P>
+include(_download.m4)
+BEGINDOWNLOAD
+DOWNLOAD(i386-linux RPM,maketool-LATEST_VERSION-1.i386.rpm)
+DOWNLOAD(source tarball,maketool-LATEST_VERSION-src.tgz)
+DOWNLOAD(latest source patch,maketool-PREVIOUS_VERSION-LATEST_VERSION.patch.gz)
+ENDDOWNLOAD
 
 <P>
 Maketool has also been ported to NetBSD, you can
