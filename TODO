@@ -1,5 +1,13 @@
 --- open ---
 
+x  Sometimes targets fail to be built without recognised error
+   messages.  In this case gmake says "gmake ***[target] Error 1"
+   and exit(1)s but maketool does not notice there's a problem
+   and believes the build finished successfully.  Need to at
+   least print the exit code of the build, possibly show the
+   *** messages as errors if no errors for the same file were
+   otherwise reported.
+
 x  Investigate performance of regexec() in IRIX libc vs glibc.
 
 x  Help->Help On reports "main-window" if clicked on the background of
