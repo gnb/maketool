@@ -23,9 +23,10 @@
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.34 2002-09-24 14:13:28 gnb Exp $");
+CVSID("$Id: help.c,v 1.35 2003-02-09 04:58:21 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
+static GtkWidget	*options_shell = 0;
 static GtkWidget	*about_shell = 0;
 static GtkWidget	*about_make_shell = 0;
 
@@ -70,6 +71,62 @@ licence_cb(GtkWidget *w, gpointer data)
     }
 
     gtk_widget_show(licence_shell);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+build_options_string(estring *e)
+{
+    int i;
+
+    filter_describe_all(e, /*lod*/1, "    ");
+
+    estring_append_string(e, "Makefile systems:\n");
+    for (i = 0 ; makesystems[i] ; i++)
+    	estring_append_printf(e, "    %s\n", _(makesystems[i]->label));
+
+    estring_append_string(e, "Make programs:\n");
+    for (i = 0 ; makeprograms[i] ; i++)
+    	estring_append_printf(e, "    %s\n", _(makeprograms[i]->label));
+}
+
+static void
+options_cb(GtkWidget *w, gpointer data)
+{
+    if (options_shell == 0)
+    {
+	GtkWidget *hbox, *text, *sb;
+	estring options_str;
+
+	options_shell = ui_create_ok_dialog(toplevel, _("Maketool: Compile Options"));
+	ui_set_help_name(options_shell, "options-window");
+	gtk_widget_set_usize(options_shell, 450, 300);
+
+	hbox = gtk_hbox_new(FALSE, SPACING);
+	gtk_container_border_width(GTK_CONTAINER(hbox), SPACING);
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(options_shell)->vbox), hbox);
+	gtk_widget_show(hbox);
+
+	text = gtk_text_new(0, 0);
+	gtk_text_set_editable(GTK_TEXT(text), FALSE);
+	gtk_box_pack_start(GTK_BOX(hbox), text, TRUE, TRUE, 0);   
+	gtk_widget_show(text);
+
+	sb = gtk_vscrollbar_new(GTK_TEXT(text)->vadj);
+	gtk_box_pack_start(GTK_BOX(hbox), sb, FALSE, FALSE, 0);   
+	gtk_widget_show(sb);
+
+    	estring_init(&options_str);
+	build_options_string(&options_str);
+
+	gtk_text_insert(GTK_TEXT(text), 0, 0, 0,
+	    options_str.data, options_str.length);
+
+	estring_free(&options_str);
+    }
+
+    gtk_widget_show(options_shell);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -126,6 +183,7 @@ help_about_cb(GtkWidget *w, gpointer data)
 	gtk_container_add(GTK_CONTAINER(hbox), label);
 	gtk_widget_show(label);
 
+	ui_dialog_create_button(about_shell, _("Options..."), options_cb, (gpointer)0);
 	ui_dialog_create_button(about_shell, _("Licence..."), licence_cb, (gpointer)0);
     }
     
