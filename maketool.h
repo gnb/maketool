@@ -92,7 +92,8 @@ typedef struct
     GList *variables;		/* list of Variable structs */
     char *var_make_flags;	/* Variables as make commandline N=V options */
     char **var_environment;	/* Variables as array of env "N=V" strings */
-    
+
+    char *makeprog;    
     char *prog_make;
     char *prog_list_targets;
     char *prog_list_version;
@@ -150,7 +151,10 @@ struct MakeSystem_s
 typedef struct
 {
     const char *name;
+    const char *executable;
     const char *label;
+    const char **logo_xpm;
+
     /*
      * Standard default filenames for the makefile in the same order
      * searched by the make program, e.g. GNUmakefile, makefile, Makefile.
@@ -245,6 +249,8 @@ void grey_menu_items(void);
 char *expand_prog(const char *prog, const char *file, int line, const char *target);
 void handle_line(Task *task, int len, const char *line);
 void set_targets(unsigned int ntargs, char **targs);
+void set_makeprog(const char *name);
+extern const MakeProgram *makeprog;
 void list_targets_error(const char *errmsg);
 gboolean filter_target(const char *targ);
 extern const MakeSystem *makesys;
@@ -279,6 +285,7 @@ extern const MakeSystem * const makesystems[];
 /* makeprog.c */
 const char *mp_which_makefile(const MakeProgram *mp);
 extern const MakeProgram * const makeprograms[];
+const MakeProgram *mp_find(const char *name);
 /* autoconf.c */
 long show_configure_window(gboolean from_client);
 /* filter.c */
