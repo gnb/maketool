@@ -22,7 +22,7 @@
 #include <signal.h>
 #include <sys/poll.h>
 
-CVSID("$Id: glib_extra.c,v 1.6 1999-05-30 11:24:39 gnb Exp $");
+CVSID("$Id: glib_extra.c,v 1.7 1999-06-13 15:36:06 gnb Exp $");
 
 
 typedef struct
@@ -33,8 +33,7 @@ typedef struct
 } GPidData;
 
 static GHashTable *g_unix_piddata = 0;
-static int g_unix_got_signal = 0;
-
+static gboolean g_unix_got_signal = FALSE;
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -49,8 +48,8 @@ g_unix_default_reaper(pid_t pid, int status, struct rusage *usg, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-static gboolean
-g_unix_dispatch_reapers(gpointer data)
+static void
+g_unix_dispatch_reapers(void)
 {
     GPidData *pd;
     pid_t pid;
@@ -84,37 +83,6 @@ g_unix_dispatch_reapers(gpointer data)
 	    	g_hash_table_remove(g_unix_piddata, GINT_TO_POINTER(pid));
 	}
     }
-    return FALSE;	/* stop calling this function */
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-/* TODO: copy #ifndef HAVE_POLL definition of g_poll() from glib's gmain.c */
-
-static gint
-g_unix_poll_func(
-    GPollFD *ufds,
-    guint nfds,
-    gint timeout)
-{
-    int ret;
-    
-    ret = poll((struct pollfd*)ufds, nfds, timeout);
-    
-#if DEBUG > 10
-    fprintf(stderr, "g_unix_poll_func(): ret=%d errno=%d g_unix_got_signal=%d\n",
-    	ret, errno, g_unix_got_signal);
-#endif
-
-    if (g_unix_got_signal > 0)
-    {
-#if DEBUG
-	fprintf(stderr, "g_unix_poll_func(): g_unix_got_signal=%d\n", g_unix_got_signal);
-#endif
-    	g_idle_add(g_unix_dispatch_reapers, (gpointer)0);
-    	g_unix_got_signal = 0;
-    }
-    return ret;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -122,10 +90,68 @@ g_unix_poll_func(
 static RETSIGTYPE
 g_unix_signal_handler(int sig)
 {
-    g_unix_got_signal++;
+    g_unix_got_signal = TRUE;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+
+static gboolean
+g_unix_source_prepare(
+    gpointer source_data, 
+    GTimeVal *current_time,
+    gint *timeout,
+    gpointer user_data)
+{
+#if DEBUG
+    fprintf(stderr, "g_unix_source_prepare(): called\n");
+#endif
+    return g_unix_got_signal;
+}
+    
+static gboolean
+g_unix_source_check(
+    gpointer source_data,
+    GTimeVal *current_time,
+    gpointer user_data)
+{
+#if DEBUG
+    fprintf(stderr, "g_unix_source_check(): called\n");
+#endif
+    return g_unix_got_signal;
+}
+    
+static gboolean
+g_unix_source_dispatch(
+    gpointer source_data, 
+    GTimeVal *current_time,
+    gpointer user_data)
+{
+#if DEBUG
+    fprintf(stderr, "g_unix_source_dispatch(): called\n");
+#endif
+    g_unix_got_signal = FALSE;
+    g_unix_dispatch_reapers();
+    return TRUE;
+}
+    
+static void
+g_unix_source_destroy(gpointer data)
+{
+#if DEBUG
+    fprintf(stderr, "g_unix_source_destroy(): called\n");
+#endif
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static GSourceFuncs reaper_source_funcs = 
+{
+g_unix_source_prepare,
+g_unix_source_check,
+g_unix_source_dispatch,
+g_unix_source_destroy
+};
 
 /*TODO:return a gint tag for removal*/
 
@@ -141,7 +167,13 @@ g_unix_add_reap_func(
     if (first)
     {
     	first = FALSE;
-	g_main_set_poll_func(g_unix_poll_func);
+	g_source_add(
+		1,			/* priority */
+		TRUE,			/* can_recurse */
+		&reaper_source_funcs,
+		(gpointer)0,		/* source_data */
+		(gpointer)0,		/* user_data */
+		(GDestroyNotify)0);
     	g_unix_piddata = g_hash_table_new(g_direct_hash, g_direct_equal);
 	signal(SIGCHLD, g_unix_signal_handler);
     }
