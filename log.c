@@ -22,7 +22,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: log.c,v 1.13 1999-06-06 17:43:00 gnb Exp $");
+CVSID("$Id: log.c,v 1.14 1999-07-18 01:46:04 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -44,7 +44,6 @@ typedef struct
 static GtkWidget	*logwin;	/* a GtkCTree widget */
 static int		num_errors;
 static int		num_warnings;
-static int		flags = LF_SHOW_INFO|LF_SHOW_WARNINGS|LF_SHOW_ERRORS;
 static GList		*log;		/* list of LogRecs */
 static LogRec		*current_build_rec = 0;
 /*static GList		*log_pending_lines = 0;*/ /*TODO*/
@@ -55,6 +54,18 @@ static gboolean		foreground_set[L_MAX];
 static GdkColor		backgrounds[L_MAX];
 static gboolean		background_set[L_MAX];
 static NodeIcons	icons[L_MAX];
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+filter_result_init(FilterResult *res)
+{
+    res->code = FR_UNDEFINED;
+    res->file = 0;
+    res->line = 0;
+    res->column = 0;
+    res->summary = 0;
+}
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -152,23 +163,24 @@ log_show_rec(LogRec *lr)
     gboolean was_empty = GTK_CTREE_IS_EMPTY(logwin);
     LogSeverity sev = L_INFO;
     GtkCTreeNode *parent_node = (current_build_rec == 0 ? 0 : current_build_rec->node);
+    char *text;
     
     switch (lr->res.code)
     {
     case FR_UNDEFINED:		/* same as INFORMATION */
     case FR_INFORMATION:
     	/* use default font, fgnd, bgnd */
-	if (!(flags & LF_SHOW_INFO))
+	if (!(prefs.log_flags & LF_SHOW_INFO))
 	    return;
     	break;
     case FR_WARNING:
 	sev = L_WARNING;
-	if (!(flags & LF_SHOW_WARNINGS))
+	if (!(prefs.log_flags & LF_SHOW_WARNINGS))
 	    return;
     	break;
     case FR_ERROR:
 	sev = L_ERROR;
-	if (!(flags & LF_SHOW_ERRORS))
+	if (!(prefs.log_flags & LF_SHOW_ERRORS))
 	    return;
     	break;
     case FR_BUILDSTART:
@@ -178,12 +190,15 @@ log_show_rec(LogRec *lr)
     default:
     	break;
     }
+    
+    text = ((prefs.log_flags & LF_SUMMARISE) && lr->res.summary != 0 ?
+    		lr->res.summary : lr->line);
 
     /* TODO: freeze & thaw if it redraws the wrong colour 1st */
     lr->node = gtk_ctree_insert_node(GTK_CTREE(logwin),
     	parent_node,				/* parent */
 	(GtkCTreeNode*)0,			/* sibling */
-	&lr->line,				/* text[] */
+	&text,					/* text[] */
 	0,					/* spacing */
 	icons[sev].closed_pm,
 	icons[sev].closed_mask,			/* pixmap_closed,mask_closed */
@@ -212,9 +227,7 @@ log_add_line(const char *line)
     estring fullpath;
 
     estring_init(&fullpath);
-    res.file = 0;
-    res.line = 0;
-    res.column = 0;
+    filter_result_init(&res);
     filter_apply(line, &res);
 #if DEBUG
     fprintf(stderr, "filter_apply: \"%s\" -> %d \"%s\" %d\n",
@@ -390,14 +403,15 @@ log_set_selected(LogRec *lr)
 int
 log_get_flags(void)
 {
-    return flags;
+    return prefs.log_flags;
 }
 
 void
 log_set_flags(int f)
 {
-    flags = f;
+    prefs.log_flags = f;
     log_repopulate();
+    preferences_save();
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -421,7 +435,7 @@ log_init(GtkWidget *w)
 {
     GdkWindow *win = toplevel->window;
     GdkColormap *colormap = gtk_widget_get_colormap(toplevel);
-
+    
     /* L_INFO */
     fonts[L_INFO] = 0;
     foreground_set[L_INFO] = FALSE;
@@ -470,10 +484,8 @@ log_start_build(const char *message)
     num_warnings = 0;
     filter_init();
     
+    filter_result_init(&res);
     res.code = FR_BUILDSTART;
-    res.file = 0;
-    res.line = 0;
-    res.column = 0;
 
     log_show_rec(log_add_rec(message, &res));
 }

@@ -44,6 +44,7 @@ typedef struct
     char *file;
     int line;
     int column;
+    char *summary;
 } FilterResult;
 
 void filter_load(void);

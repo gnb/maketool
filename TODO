@@ -105,3 +105,10 @@ x  Fix bug whereby run load spinbox saves wrong value to preferences.
    
 x  Add filters to summarise compile lines, and a View menu item
    to choose between full and summarised version in log window.
+
+x  Remove strict dependancy on POSIX regcomp() for older systems,
+   conditionally replace regcomp with function based on <regex.h>
+   
+x  Correctly handle user's upgrade from 0.3 to 0.4 by saving new
+   prefs items to ~/.maketoolrc.
+   

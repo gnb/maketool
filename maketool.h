@@ -44,6 +44,17 @@ typedef struct
  *     char *flags;
  * } BuildStyle;
  */
+ 
+typedef enum
+{
+    LF_SHOW_INFO		=1<<0,
+    LF_SHOW_WARNINGS		=1<<1,
+    LF_SHOW_ERRORS		=1<<2,
+    LF_SUMMARISE		=1<<3,
+    
+    LF_DEFAULT_VALUE=		LF_SHOW_INFO|LF_SHOW_WARNINGS|LF_SHOW_ERRORS
+} LogFlags;
+
 
 typedef struct
 {
@@ -69,6 +80,8 @@ typedef struct
     
     int win_width;		/* size of main window */
     int win_height;
+    
+    int log_flags;		/* bitwise OR of LF_* flags */
 } Preferences;
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

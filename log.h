@@ -40,13 +40,6 @@ typedef enum
     L_MAX
 } LogSeverity;
 
-typedef enum
-{
-    LF_SHOW_INFO		=1<<0,
-    LF_SHOW_WARNINGS		=1<<1,
-    LF_SHOW_ERRORS		=1<<2
-} LogFlags;
-
 void log_init(GtkWidget *);
 
 void log_clear(void);

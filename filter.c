@@ -21,7 +21,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.8 1999-05-30 11:24:39 gnb Exp $");
+CVSID("$Id: filter.c,v 1.9 1999-07-18 01:46:04 gnb Exp $");
 
 typedef struct
 {
@@ -30,6 +30,7 @@ typedef struct
     char *file_str;
     char *line_str;
     char *col_str;
+    char *summary_str;
     FilterCode code;
     char *comment;
 } Filter;
@@ -49,6 +50,7 @@ filter_add(
     const char *file_str,
     const char *line_str,
     const char *col_str,
+    const char *summary_str,
     const char *comment)
 {
     Filter *f = g_new(Filter, 1);
@@ -70,6 +72,7 @@ filter_add(
     f->file_str = g_strdup(file_str);
     f->line_str = g_strdup(line_str);
     f->col_str = g_strdup(col_str);
+    f->summary_str = g_strdup(summary_str);
     f->comment = g_strdup(comment);
     
     /* TODO: this is O(N^2) - try prepending then reversing O(N) */
@@ -83,58 +86,64 @@ void
 filter_load(void)
 {
     filter_add(
-    	"",
-	"^make\\[[0-9]+\\]: Entering directory `([^']+)'",
-	FR_PUSHDIR,
-	"\\1",
-	"",
-	"",
-    	"gmake recursion - push");
+    	"",				/* state */
+	"^make\\[[0-9]+\\]: Entering directory `([^']+)'", /* regexp */
+	FR_PUSHDIR,			/* code */
+	"\\1",				/* file */
+	"",				/* line */
+	"",				/* col */
+	0,				/* summary */
+    	"gmake recursion - push");	/* comment */
 
     filter_add(
-    	"",
-	"^make\\[[0-9]+\\]: Leaving directory",
-	FR_POPDIR,
-	"",
-	"",
-	"",
-    	"gmake recursion - pop");
+    	"",				/* state */
+	"^make\\[[0-9]+\\]: Leaving directory", /* regexp */
+	FR_POPDIR,			/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	0,				/* summary */
+    	"gmake recursion - pop");	/* comment */
 
     filter_add(
-    	"",
-	"^[^:]+:[0-9]+: \\(Each undeclared identifier is reported only once",
-	FR_INFORMATION,
-	"",
-	"",
-	"",
-    	"gcc spurious message #1");
+    	"",				/* state */
+	"^[^:]+:[0-9]+: \\(Each undeclared identifier is reported only once", /* regexp */
+	FR_INFORMATION,			/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	0,				/* summary */
+    	"gcc spurious message #1");	/* comment */
 
     filter_add(
-    	"",
-	"^[^:]+:[0-9]+: for each function it appears in.\\)",
-	FR_INFORMATION,
-	"",
-	"",
-	"",
-    	"gcc spurious message #2");
+    	"",				/* state */
+	"^[^:]+:[0-9]+: for each function it appears in.\\)", /* regexp */
+	FR_INFORMATION,			/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	0,				/* summary */
+    	"gcc spurious message #2");	/* comment */
 	
     filter_add(
-    	"",
-	"^([^:]+):([0-9]+): warning:",
-	FR_WARNING,
-	"\\1",
-	"\\2",
-	"",
-    	"gcc warnings");
+    	"",				/* state */
+	"^([^:]+):([0-9]+): warning:",	/* regexp */
+	FR_WARNING,			/* code */
+	"\\1",				/* file */
+	"\\2",				/* line */
+	"",				/* col */
+	0,				/* summary */
+    	"gcc warnings");		/* comment */
 	
     filter_add(
-    	"",
-	"^([^:]+):([0-9]+): ",
-	FR_ERROR,
-	"\\1",
-	"\\2",
-	"",
-    	"gcc errors");
+    	"",				/* state */
+	"^([^:]+):([0-9]+): ",		/* regexp */
+	FR_ERROR,			/* code */
+	"\\1",				/* file */
+	"\\2",				/* line */
+	"",				/* col */
+	0,				/* summary */
+    	"gcc errors");			/* comment */
 
 #ifdef __hpux
     filter_add(
@@ -144,6 +153,7 @@ filter_load(void)
 	"\\2",				/* file */
 	"\\3",				/* line */
 	"",				/* col */
+	0,				/* summary */
     	"HP-UX old CC/cpp error");	/* comment */
 	
     filter_add(
@@ -153,6 +163,7 @@ filter_load(void)
 	"\\2",				/* file */
 	"\\3",				/* line */
 	"",				/* col */
+	0,				/* summary */
     	"HP-UX old CC/cpp warning");	/* comment */
 #endif
 
@@ -167,7 +178,32 @@ filter_load(void)
 	"\\4",				/* file */
 	"\\2",				/* line */
 	"\\3",				/* col */
+	0,				/* summary */
     	"Oracle Pro/C error");		/* comment */
+	
+    /*
+     * The remaining filters don't detect errors,
+     * they just provide summaries of compile lines.
+     */
+    filter_add(
+    	"",				/* state */
+	"^(cc|c89|gcc|CC|c++|g++).*[ \t]*-c[ \t]*.*[ \t]([^ \t]*\\.)(c|C|cc|c++|cpp)", /* regexp */
+	FR_INFORMATION,			/* code */
+	"\\2\\3",			/* file */
+	"",				/* line */
+	"",				/* col */
+	"Compiling \\2\\3",		/* summary */
+    	"C/C++ compile line");		/* comment */
+    filter_add(
+    	"",				/* state */
+	"^(cc|c89|gcc|CC|c++|g++|ld).*[ \t]*-o[ \t]*([^ \t]*)", /* regexp */
+	FR_INFORMATION,			/* code */
+	"\\2",				/* file */
+	"",				/* line */
+	"",				/* col */
+	"Linking \\2",			/* summary */
+    	"C/C++ link line");		/* comment */
+    /* TODO: support for ar, libtool */	
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -232,6 +268,15 @@ filter_apply_one(
     result->line = atoi(buf);
     filter_replace_matches(f->col_str, buf, line, matches);
     result->column = atoi(buf);
+    if (f->summary_str == 0)
+    {
+    	result->summary = 0;
+    }
+    else
+    {
+	filter_replace_matches(f->summary_str, buf, line, matches);
+	result->summary = g_strdup(buf);
+    }
     filter_replace_matches(f->file_str, buf, line, matches);
     result->file = buf;
     result->code = f->code;
@@ -249,8 +294,8 @@ filter_apply(const char *line, FilterResult *result)
 	Filter *f = (Filter*)fl->data;
 	filter_apply_one(f, line, result);
 #if DEBUG
-	fprintf(stderr, "filter [%s] on \"%s\" -> %d\n",
-		f->comment, line, (int)result->code);
+	fprintf(stderr, "filter [%s] on \"%s\" -> %d (%s)\n",
+		f->comment, line, (int)result->code, result->summary);
 #endif
 	if (result->code != FR_UNDEFINED)
 	    return;

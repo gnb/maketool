@@ -21,7 +21,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: preferences.c,v 1.18 1999-07-14 03:59:44 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.19 1999-07-18 01:46:04 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -268,6 +268,8 @@ preferences_load(void)
 
     prefs.win_width = ui_config_get_int("win_width", 300);
     prefs.win_height = ui_config_get_int("win_height", 500);
+
+    prefs.log_flags = ui_config_get_int("log_flags", LF_DEFAULT_VALUE);
 }
 
 void
@@ -294,6 +296,8 @@ preferences_save(void)
 
     ui_config_set_int("win_width", prefs.win_width);
     ui_config_set_int("win_height", prefs.win_height);
+    
+    ui_config_set_int("log_flags", prefs.log_flags);
 
     ui_config_sync();
 }
