@@ -1,3 +1,33 @@
+Fri Oct 17 01:20:26 2003  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.8.2
+
+	* [FEA] Added to toolbar a drop-down menu showing history of built
+	targets, in chronological order.  Selecting a target builds that target.
+	* [FEA] Warn the user when preferences or -f commandline option specify
+	a Makefile which does not exist.
+
+	* [FEA] Improved log list code, dramatically improving maketool
+	speed for large builds.
+	* [FEA] Reduced the number of regexps each log line needs to be
+	compared against, by up to 40%.  The difference is significant on
+	platforms where regexec() is slow (e.g. IRIX).
+
+	* [FEA] Filter out "--- target ---" lines from smake.
+	* [FEA] Filter MIPSpro REMARK messages as warnings.
+	* [BUG] Fixed bugs where some MIPSpro messages confused the line number
+	and summary replacement expressions.
+	* [BUG] Some MIPSpro assembler warnings were not detected.
+	* [BUG] Some MIPSpro warning messages were incorrectly detected as
+	errors.
+	* [NVC] Fallback case to reset filter state when multi-line filters go
+	wrong.
+
+	* [BUG] Fixed error message in configure when GTK is not found.
+	* [NVC] Filter layer now gathers stats on tries and matches, both
+	per-filter and globally.  The stats are not displayed unless maketool
+	is built for debugging.
+	* [NVC] aclocal.m4 is no longer polluted with acinclude.m4's cvs Id string.
+
 Mon Oct  6 10:19:52 2003  Greg Banks <gnb@alphalink.com.au>
 	* Release 0.8.1
 
