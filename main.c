@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.84 2002-09-24 14:25:14 gnb Exp $");
+CVSID("$Id: main.c,v 1.85 2003-02-09 05:19:37 gnb Exp $");
 
 
 /*
@@ -64,6 +64,8 @@ GdkBitmap	*anim_masks[ANIM_MAX+1];
 GtkWidget	*anim;
 GtkWidget   	*toolbar;
 GtkWidget   	*again_menu_item, *again_tool_item;
+const char * const again_menu_label[2] = { N_("_Again"), N_("_Again (%s)") };
+const char * const again_tool_tooltip[2] = { N_("Build last target again"), N_("Build `%s' again") };
 
 GdkAtom     	clipboard_atom = GDK_NONE;
 char  	    	*clipboard_text = 0;
@@ -76,22 +78,7 @@ gboolean    	has_configure;
 
 const MakeSystem    *makesys;
 
-/*
- * These are the targets specifically mentioned in the
- * current GNU makefile standards (except `mostlyclean'
- * which is from the old standards). These targets are
- * visually separated in the Build menu.
- */
-static const char *standard_targets[] = {
-"all",
-"install", "install-strip", "installcheck", "installdirs", "uninstall",
-"mostlyclean", "clean", "distclean", "reallyclean", "maintainer-clean",
-"TAGS", "tags",
-"info", "dvi",
-"dist",
-"check",
-0
-};
+const MakeProgram   *makeprog;
 
 #define PASTE3(x,y,z) x##y##z
 
@@ -108,7 +95,6 @@ static void dir_previous_cb(GtkWidget *w, gpointer data);
 #define BUILD_MENU_THRESHOLD	20
 
 #define HOMEPAGE    "http://www.alphalink.com.au/~gnb/maketool/"
-
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -163,8 +149,6 @@ grey_menu_items(void)
     ui_group_set_sensitive(GR_ALL, all);
     ui_group_set_sensitive(GR_CLEAN, clean);
     ui_group_set_sensitive(GR_FIND_AGAIN, !empty && find_can_find_again());
-    ui_group_set_sensitive(GR_AUTOCONF, !running && has_configure_in);
-    ui_group_set_sensitive(GR_CONFIGURE, !running && has_configure);
     ui_group_set_sensitive(GR_NEVER, FALSE);
 }
 
@@ -179,11 +163,14 @@ expand_prog(
     char *out;
     const char *expands[256];
     estring fflag;
+    estring jflag;
+    estring kflag;
+    estring nflag;
+    estring pflag;
+    estring vflag;
     char linebuf[32];
-    char runflags[32];
         
-    for (i=0 ; i<256 ; i++)
-    	expands[i] = 0;
+    memset(expands, 0, sizeof(expands));
     
     expands['f'] = file;
 
@@ -194,49 +181,44 @@ expand_prog(
     }
     
     estring_init(&fflag);
-    if (prefs.makefile != 0)
-    {
-    	estring_append_string(&fflag, "-f ");
-	estring_append_string(&fflag, prefs.makefile);
-	expands['m'] = fflag.data;
-    }
+    (*makeprog->makefile_flags)(&fflag);
+    expands['m'] = fflag.data;
     
-    switch (prefs.run_how)
-    {
-    case RUN_SERIES:
-    	break;	/* no flag */
-    case RUN_PARALLEL_PROC:
-    	if (prefs.run_processes > 0)
-    	    sprintf(runflags, "-j%d", prefs.run_processes);
-	else
-    	    strcpy(runflags, "-j");
-    	expands['p'] = runflags;
-    	break;
-    case RUN_PARALLEL_LOAD:
-    	if (prefs.run_load > 0)
-    	    sprintf(runflags, "-l%.2g", (gfloat)prefs.run_load / 10.0);
-	else
-    	    strcpy(runflags, "-l");
-    	expands['p'] = runflags;
-    	break;
-    }
+    estring_init(&jflag);
+    (*makeprog->parallel_flags)(&jflag);
+    expands['p'] = jflag.data;
     
-    if (prefs.ignore_failures)
-    	expands['k'] = "-k";
-
+    estring_init(&pflag);
+    (*makeprog->list_targets_flags)(&pflag);
+    expands['q'] = pflag.data;
+    
+    estring_init(&kflag);
+    (*makeprog->keep_going_flags)(&kflag);
+    expands['k'] = kflag.data;
+    
     expands['v'] = prefs.var_make_flags;
+
+    estring_init(&vflag);
+    (*makeprog->version_flags)(&vflag);
+    expands['V'] = vflag.data;
     
     expands['t'] = target;
     
-    if (prefs.dryrun)
-	expands['n'] = "-n";
-
+    estring_init(&nflag);
+    (*makeprog->dryrun_flags)(&nflag);
+    expands['n'] = nflag.data;
+    
     expands['D'] = PKGDATADIR;
     expands['S'] = makesys->name;
     
     out = expand_string(prog, expands);
     
     estring_free(&fflag);
+    estring_free(&jflag);
+    estring_free(&kflag);
+    estring_free(&nflag);
+    estring_free(&vflag);
+    estring_free(&pflag);
     
     return out;
 }
@@ -256,13 +238,13 @@ set_last_target(const char *target)
      *       even though the position of the underscore in the label
      *       may change.
      */
-    menulabel = g_strdup_printf(_("_Again (%s)"), last_target);
+    menulabel = g_strdup_printf(_(again_menu_label[!!last_target]), last_target);
     label = GTK_LABEL(GTK_BIN(again_menu_item)->child);
     gtk_label_set_text(label, menulabel);
     gtk_label_parse_uline(label, menulabel);
     g_free(menulabel);
 
-    tooltip = g_strdup_printf(_("Build `%s' again"), last_target);
+    tooltip = g_strdup_printf(_(again_tool_tooltip[!!last_target]), last_target);
     gtk_tooltips_set_tip(GTK_TOOLBAR(toolbar)->tooltips, again_tool_item,
     	tooltip, 0);
     g_free(tooltip);
@@ -358,157 +340,6 @@ logged_task(char *command)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-static const MakeSystem makesys_plain = 
-{
-    "plain",	    	/* name */
-    FALSE,  	    	/* automatic */
-    0,	    	    	/* makefile */
-    {0},    	    	/* deps */
-    {{0}} 	    	/* commands */
-};
-static const MakeSystem makesys_automake = 
-{
-    "automake",	    	/* name */
-    TRUE,  	    	/* automatic */
-    "Makefile",     	/* makefile */
-    {
-    	"Makefile.am",
-	"Makefile.in",
-	"config.status",
-	"configure",
-	"configure.in",
-	0
-    },	    	    	/* deps */
-    {
-    	{N_("Run auto_make"), "automake -a"},
-    	{N_("Run a_utoconf"), "autoconf"},
-    	{N_("_Remove config.cache"), "/bin/rm -f config.cache"},
-    	{N_("Run _configure..."), 0, build_configure_cb},
-    	{N_("Run config._status"), "./config.status"},
-	{0}
-    }	    	    	/* commands */
-};
-static const MakeSystem makesys_autoconf_dist = 
-{
-    "autoconf-dist",	/* name */
-    TRUE,  	    	/* automatic */
-    "Makefile",     	/* makefile */
-    {
-    	"Makefile.in",
-	"config.status",
-	"configure",
-	0
-    },	    	    	/* deps */
-    {
-    	{N_("_Remove config.cache"), "/bin/rm -f config.cache"},
-    	{N_("Run _configure..."), 0, build_configure_cb},
-    	{N_("Run config._status"), "./config.status"},
-	{0}
-    }	    	    	/* commands */
-};
-static const MakeSystem makesys_autoconf_maint = 
-{
-    "autoconf-maint",	/* name */
-    TRUE,  	    	/* automatic */
-    "Makefile",     	/* makefile */
-    {
-    	"Makefile.in",
-	"config.status",
-	"configure",
-	"configure.in",
-	0
-    },	    	    	/* deps */
-    {
-    	{N_("Run a_utoconf"), "autoconf"},
-    	{N_("_Remove config.cache"), "/bin/rm -f config.cache"},
-    	{N_("Run _configure..."), 0, build_configure_cb},
-    	{N_("Run config._status"), "./config.status"},
-	{0}
-    }	    	    	/* commands */
-};
-static const MakeSystem makesys_imake = 
-{
-    "imake",	    	/* name */
-    TRUE,  	    	/* automatic */
-    "Makefile",     	/* makefile */
-    {
-    	"Imakefile",
-	0
-    },	    	    	/* deps */
-    {
-    	{N_("Run _xmkmf"), "xmkmf"},
-	{0}
-    }	    	    	/* commands */
-};
-
-static const MakeSystem *
-intuit_makesystem(void)
-{
-    has_configure_in = check_for_configure_in();
-    has_configure = check_for_configure();
-    
-    if (file_exists("Makefile.am"))
-    	return &makesys_automake;
-    if (has_configure_in)
-    	return &makesys_autoconf_maint;
-    if (has_configure)
-    	return &makesys_autoconf_dist;
-    
-    /*
-     * This check is after the autoconf check on the assumption
-     * that Imake projects get converted into autoconf projects
-     * and not vice versa, so if both are present autoconf is
-     * likely to be the correct choice.
-     */
-    if (file_exists("Imakefile"))
-    	return &makesys_imake;
-    
-    /* return (file_exists("Makefile") ? &makesys_plain : &makesys_unknown); */
-    return &makesys_plain;
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-/*
- * Check to see if we can and should update
- * the Makefile from other files.
- */
-
-static gboolean
-makefile_needs_update(void)
-{
-    int i;
-    struct stat sb;
-    time_t mf_mtime;
-
-    if (!makesys->automatic)
-    	return FALSE;	    /* nothing useful to do */
-	
-    /*
-     * Get Makefile's mod time.  If it doesn't
-     * exist, we can update.
-     */
-    if (stat(makesys->makefile, &sb) < 0)
-    	return (errno == ENOENT);
-    mf_mtime = sb.st_mtime;
-
-    /*
-     * Check if any of the dependencies are missing or newer.
-     */
-    for (i = 0 ; makesys->deps[i] != 0 ; i++)
-    {
-    	if (stat(makesys->deps[i], &sb) <= 0)
-	    if (errno == ENOENT)
-	    	return TRUE;
-	if (sb.st_mtime > mf_mtime)
-	    return TRUE;
-    }
-
-    /* ok, everything seems in order, don't update */
-    return FALSE;
-}
-
-
 static void
 make_makefile(void)
 {
@@ -585,31 +416,53 @@ append_build_menu_items(GList *list)
     }
 }
 
-static gboolean
-is_standard_target(const char *targ)
+
+gboolean
+filter_target(const char *targ)
 {
-    const char **tp;
+    int len;
+
+    if (targ[0] == '.')
+	return FALSE;
+    if (strstr(targ, "/.") != 0)
+	return FALSE;
+    if (targ[0] == '/')
+	return FALSE;
+    if (!strncmp(targ, "../", 3))
+	return FALSE;
+    if (targ[0] == '_')
+	return FALSE;
     
-    for (tp = standard_targets ; *tp ; tp++)
-    {
-	if (!strcmp(*tp, targ))
-	    return TRUE;
-    }
-    return FALSE;
+    len = strlen(targ);
+
+    if (!strcmp(targ+len-2, ".o"))
+	return FALSE;
+    if (!strcmp(targ+len-7, "DESCEND"))
+	return FALSE;
+    if (!strcmp(targ+len-8, "SETUPDIR"))
+	return FALSE;
+
+    return TRUE;
 }
 
-typedef struct
+static int
+compare_strings(const void *a, const void *b)
 {
-    Task task;
-    estring targets;
-} ListTargetsTask;
+    return strcmp((const char *)a, (const char *)b);
+}
 
-static void
-list_targets_reap(Task *task)
+/*
+ * Set the complete collection of all available targets.
+ * Takes ownership of the targs[] array and the
+ * strings pointed to by it; these should all be malloc()ed.
+ */
+void
+set_targets(unsigned int ntargs, char **targs)
 {
-    ListTargetsTask *ltt = (ListTargetsTask *)task;
-    char *t, *buf;
+    unsigned int i;
+    char *t;
     GList *std = 0;
+    GHashTable *unique;
 
     /*
      * First, remove list of available targets from previous run
@@ -622,51 +475,51 @@ list_targets_reap(Task *task)
     ui_delete_menu_items(build_menu);
     construct_build_menu_basic_items();
      
-    if (!task_is_successful(task))
+    if (ntargs == 0)
     {
     	GtkWidget *errorw;
 	
-    	/* Oh dear, something went wrong.  We have no targets. */
-	message(_("Error listing targets: %s"), ltt->targets.data);
-	estring_free(&ltt->targets);
-	errorw = ui_add_button_2(build_menu, _("No targets found"), FALSE, 0, 0, 0, 0);
-	gtk_widget_set_sensitive(errorw, FALSE);
+	errorw = ui_add_button_2(build_menu, _("No targets found"), FALSE, 0, 0,
+	    	    	         0, GR_NEVER);
 	grey_menu_items();
+	if (targs != 0)
+	    g_free(targs);
 	return;
     }
-    
+
     /* 
-     * Parse the output of the program into whitespace-separated
-     * strings which are targets. Build two lists, std (all
+     * Iterate over all the targets. Build two lists, std (all
      * the found targets which are also in `standard_targets')
      * and available_targets (all others).
      */
-    buf = ltt->targets.data;
-    if (buf != 0)
+    unique = g_hash_table_new(g_str_hash, g_str_equal);
+    for (i = 0 ; i < ntargs ; i++)
     {
-	while ((t = strtok(buf, " \t\r\n")) != 0)
+	t = targs[i];
+	
+	if (g_hash_table_lookup(unique, t) != 0)
+	    continue;
+	g_hash_table_insert(unique, t, t);
+	
+	if (ms_is_standard_target(makesys, t))
 	{
-	    {
-		t = g_strdup(t);
-		if (is_standard_target(t))
-		{
 #if DEBUG
-    	    	    fprintf(stderr, "reap_list adding standard target \"%s\"\n", t);
+    	    fprintf(stderr, "reap_list adding standard target \"%s\"\n", t);
 #endif
-    	    	    std = g_list_append(std, t);
-		}
-		else
-		{
+    	    std = g_list_prepend(std, t);
+	}
+	else
+	{
 #if DEBUG
-    	    	    fprintf(stderr, "reap_list adding target \"%s\"\n", t);
+    	    fprintf(stderr, "reap_list adding target \"%s\"\n", t);
 #endif
-    	    	    available_targets = g_list_append(available_targets, t);
-		}
-    	    }
-	    buf = 0;
+    	    available_targets = g_list_prepend(available_targets, t);
 	}
     }
-    estring_free(&ltt->targets);
+    if (targs != 0)
+	g_free(targs);
+    std = g_list_sort(std, compare_strings);
+    available_targets = g_list_sort(available_targets, compare_strings);
     
     /*
      * Build two parts of the menu from the two lists. This
@@ -688,41 +541,22 @@ list_targets_reap(Task *task)
     grey_menu_items();
 }
 
-static void
-list_targets_input(Task *task, int len, const char *buf)
+/*
+ * Oh dear, something went wrong.  We have no targets.
+ * TODO: pop up a dialog.
+ */
+void
+list_targets_error(const char *errmsg)
 {
-    ListTargetsTask *ltt = (ListTargetsTask *)task;
+    set_targets(0, 0);
 
-    estring_append_chars(&ltt->targets, buf, len);
-}
-
-static void
-list_targets_destroy(Task *task)
-{
-    ListTargetsTask *ltt = (ListTargetsTask *)task;
-    estring_free(&ltt->targets);
-}
-
-static TaskOps list_targets_ops =
-{
-0,  	    	    	    	/* start */
-list_targets_input,	    	/* input */
-list_targets_reap, 	    	/* reap */
-list_targets_destroy	    	/* destroy */
-};
-
-static Task *
-list_targets_task(void)
-{
-    ListTargetsTask *ltt = g_new(ListTargetsTask, 1);
-
-    estring_init(&ltt->targets);
-    return task_create(
-    	(Task *)ltt,
-	expand_prog(prefs.prog_list_targets, 0, 0, 0),
-	prefs.var_environment,
-	&list_targets_ops,
-	0);
+    /* 
+     * Give the user some clue as to what just happened.
+     */
+    message(_("Error listing targets: %s"), errmsg);
+#if 1
+    fprintf(stderr, "Error listing targets:%s\n", errmsg);
+#endif
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -730,9 +564,22 @@ list_targets_task(void)
 static void
 list_targets(void)
 {
-    if (prefs.enable_make_makefile && makefile_needs_update())
+    char *command;
+    Task *task;
+    
+    if (prefs.enable_make_makefile && ms_makefile_needs_update(makesys))
 	make_makefile();
-    task_enqueue(list_targets_task());
+    set_last_target(0);
+
+    if (mp_which_makefile(makeprog) == 0)
+    {
+    	set_targets(0, 0);
+    	return;
+    }
+
+    command = expand_prog(prefs.prog_list_targets, 0, 0, "_no_such_target_");
+    task = (*makeprog->list_targets_task)(command);
+    task_enqueue(task);
     task_start();
 }
 
@@ -996,7 +843,7 @@ void
 build_start(const char *target)
 {
     first_error = TRUE;
-    if (prefs.enable_make_makefile && makefile_needs_update())
+    if (prefs.enable_make_makefile && ms_makefile_needs_update(makesys))
 	make_makefile();
     task_enqueue(make_task(target));
     task_start();
@@ -1216,7 +1063,8 @@ change_directory(const char *dir)
     }
 	
     /* Check for presence of autoconf-related files */
-    makesys = intuit_makesystem();
+    makeprog = makeprograms[0];
+    makesys = ms_probe();
 	
     /* update UI for new dir */
     
@@ -1296,25 +1144,16 @@ file_edit_makefile_cb(GtkWidget *w, gpointer data)
     {
     	/*
 	 * Now we have to do it the hard way, attempting to
-	 * reproduce the filename search behaviour of gmake.
+	 * reproduce the filename search behaviour of the make program.
 	 */
-	static const char *search_filenames[] = {
-	"GNUmakefile", "makefile", "Makefile", 0
-	};
 	const char **fn;
 	
-	for (fn = search_filenames ; *fn != 0 ; fn++)
-	{
-	    if (file_exists(*fn))
-	    {
-	    	makefile = *fn;
-		break;
-	    }
-	}
+	makefile = mp_which_makefile(makeprog);
 	
 	if (makefile == 0 || !strcmp(makefile, "Makefile"))
 	{
 	    /* attempt to deal with autoconf, automake, and imake */
+	    /* TODO: iterate over makesystems[] */
 	    static const char *meta_makefiles[] = {
 	    "Makefile.am", "Makefile.in", "Imakefile", 0
 	    };
@@ -1386,17 +1225,15 @@ build_makefile_cb(GtkWidget *w, gpointer data)
 static void
 build_makesys_command_cb(GtkWidget *w, gpointer data)
 {
-    int n = GPOINTER_TO_INT(data);
+    const MakeCommand *cmd = (const MakeCommand *)data;
     
-    assert(makesys != 0);
-    assert(n >= 0 && n < 32);
-    assert(makesys->commands[n].label != 0);
+    assert(cmd != 0);
 
-    if (makesys->commands[n].handler != 0)
-    	(*makesys->commands[n].handler)(w, makesys->commands[n].command);
+    if (cmd->handler != 0)
+    	(*cmd->handler)(w, (gpointer)cmd->command);
     else
     {
-	task_enqueue(logged_task(g_strdup(makesys->commands[n].command)));
+	task_enqueue(logged_task(g_strdup(cmd->command)));
 	task_start();
     }
 }
@@ -1622,24 +1459,42 @@ static void
 construct_build_menu_basic_items(void)
 {
     int i;
+    const MakeSystem *ms;
+    gboolean need_sep = FALSE;
+    gboolean need_mf = FALSE;
     
-    again_menu_item = ui_add_button(build_menu, _("_Again"), "<Ctrl>A", build_again_cb, 0, GR_AGAIN);
+    again_menu_item = ui_add_button(build_menu, _(again_menu_label[0]), "<Ctrl>A", build_again_cb, 0, GR_AGAIN);
     ui_add_button(build_menu, _("_Stop"), 0, build_stop_cb, 0, GR_RUNNING);
     ui_add_toggle(build_menu, _("_Dryrun Only"), "<Ctrl>D", build_dryrun_cb, 0,
     	0, prefs.dryrun);
 
-    if (makesys->makefile != 0 &&
-    	makesys->commands[0].label != 0)
+    if (makesys->makefile != 0)
     {
+	/* add a separator only if we'll be adding any menu items */
 	ui_add_separator(build_menu);
+	need_sep = FALSE;
 
     	/* TODO: proper groups */
-	if (makesys->makefile != 0)
-	    ui_add_button(build_menu, makesys->makefile, 0, build_makefile_cb, 0, GR_NOTRUNNING);
+	ui_add_button(build_menu, makesys->makefile, 0, build_makefile_cb, 0, GR_NOTRUNNING);
+    }
 
-    	for (i = 0 ; makesys->commands[i].label != 0 ; i++)
-	    ui_add_button(build_menu, _(makesys->commands[i].label), 0,
-	    	    	    build_makesys_command_cb, GINT_TO_POINTER(i),
+    for (ms = makesys ; ms != 0 ; ms = ms->parent)
+    {
+    	if (ms->commands == 0)
+	    continue;
+
+    	if (need_sep)
+	{
+	    /* add a separator only if we'll be adding any menu items */
+	    ui_add_separator(build_menu);
+	    need_sep = FALSE;
+	}
+
+    	/* TODO: proper groups */
+    	for (i = 0 ; ms->commands[i].label != 0 ; i++)
+	    ui_add_button(build_menu, _(ms->commands[i].label), 0,
+	    	    	    build_makesys_command_cb,
+			    (gpointer)&ms->commands[i],
 			    GR_NOTRUNNING);
     }
     
@@ -1742,7 +1597,7 @@ ui_create_tools(GtkWidget *toolbar)
 {
     char *tooltip;
     
-    again_tool_item = ui_tool_create(toolbar, _("Again"), _("Build last target again"),
+    again_tool_item = ui_tool_create(toolbar, _("Again"), _(again_tool_tooltip[0]),
     	again_xpm, build_again_cb, 0, GR_AGAIN, "again-tool");
 
     ui_tool_create(toolbar, _("Stop"), _("Stop current build"),
@@ -2155,7 +2010,8 @@ parse_args(int argc, char **argv)
 #endif
 
     /* Check for presence of autoconf-related etc files */
-    makesys = intuit_makesystem();
+    makeprog = makeprograms[0];
+    makesys = ms_probe();
 
     argv0 = argv[0];
     cmd_targets = g_new(char*, argc);
@@ -2207,7 +2063,7 @@ parse_args(int argc, char **argv)
 	    else if (!strcmp(argv[i], "-k") ||
 	             !strcmp(argv[i], "--keep-going"))
 	    {
-	    	prefs.ignore_failures = TRUE;
+	    	prefs.keep_going = TRUE;
 	    }
 	    else if (!strcmp(argv[i], "-l"))
 	    {
@@ -2228,7 +2084,7 @@ parse_args(int argc, char **argv)
 	             !strcmp(argv[i], "--no-keep-going") ||
 	             !strcmp(argv[i], "--stop"))
 	    {
-	    	prefs.ignore_failures = FALSE;
+	    	prefs.keep_going = FALSE;
 	    }
 	    else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version"))
 	    {
@@ -2275,7 +2131,7 @@ parse_args(int argc, char **argv)
 	for (i=0 ; i<cmd_num_targets ; i++)
 	    printf(" %s", cmd_targets[i]);
 	printf(" }\n");
-	printf("ignore_failures = %s\n", bool_strings[prefs.ignore_failures]);
+	printf("keep_going = %s\n", bool_strings[prefs.keep_going]);
 	printf("run_how = %s\n", run_how_strings[prefs.run_how]);
 	printf("run_processes = %d\n", prefs.run_processes);
 	printf("run_load = %d\n", prefs.run_load);
