@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.43 1999-11-07 08:08:50 gnb Exp $");
+CVSID("$Id: main.c,v 1.44 1999-11-07 10:24:03 gnb Exp $");
 
 typedef enum
 {
@@ -1268,7 +1268,7 @@ ui_create(void)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static const char usage_string[] = "\
-Usage: maketool [options] [target] ...\n\
+Usage: maketool [options] [target] [var=value] ...\n\
 Options:\n\
   -C DIRECTORY, --directory=DIRECTORY\n\
                               Change to DIRECTORY before doing anything.\n\
