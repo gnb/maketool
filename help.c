@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: help.c,v 1.17 1999-11-02 06:52:59 gnb Exp $");
+CVSID("$Id: help.c,v 1.18 1999-11-05 02:31:35 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -129,7 +129,8 @@ help_about_cb(GtkWidget *w, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-#include "gnu_m.xpm"
+#include "babygnu_l.xpm"
+#define LOGO babygnu_l_xpm
 
 static estring make_version = ESTRING_STATIC_INIT;
 
@@ -154,7 +155,7 @@ make_version_reap(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	gtk_widget_show(hbox);
 	
 	pm = gdk_pixmap_create_from_xpm_d(toplevel->window,
-    		    &mask, 0, gnu_m_xpm);
+    		    &mask, 0, LOGO);
 	icon = gtk_pixmap_new(pm, mask);
 	gtk_container_add(GTK_CONTAINER(hbox), icon);
 	gtk_widget_show(icon);
