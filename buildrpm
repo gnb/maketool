@@ -158,7 +158,8 @@ HEAD)
     message "Updating files from CVS"
     (
     	set -x
-	cvs -d $ROOT export -r$CVSTAG -d $BUILDDIR $REPOS || exit 1
+	cd $(dirname $BUILDDIR)
+	cvs -d $ROOT export -r$CVSTAG -d $(basename $BUILDDIR) $REPOS || exit 1
     ) || fatal "Can't export from CVS"
     [ -z "$RPMDEST" ] && RPMDEST=$(/bin/pwd)
     cd $BUILDDIR || fatal "CVS export succeeded but no directory"
