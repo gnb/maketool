@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.6 1999-06-09 14:55:44 gnb Exp $
+# $Id: Makefile.in,v 1.7 1999-06-14 02:30:01 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -28,10 +28,13 @@ PACKAGE=	@PACKAGE@
 VERSION=	@VERSION@
 DOCDIR=		$(prefix)/doc/$(PACKAGE)-$(VERSION)
 LICENCE=	$(run_prefix)/doc/$(PACKAGE)-$(VERSION)/COPYING
+localedir=	$(run_prefix)/@DATADIRNAME@/locale
 
 CC=		@CC@
 CFLAGS=		@CFLAGS@
-CPPFLAGS=	@GTK_CFLAGS@ -D_USE_BSD -I. -Iicons -Iintl -DLICENCE="\"$(LICENCE)\"" $(TESTCPPFLAGS)
+CPPFLAGS=	@GTK_CFLAGS@ -D_USE_BSD -I. -Iicons -Iintl \
+		-DLICENCE="\"$(LICENCE)\"" -DLOCALEDIR=\"$(localedir)\" \
+		$(TESTCPPFLAGS)
 LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 O=		objs
 
@@ -41,6 +44,8 @@ HEADERS=	maketool.h filter.h common.h log.h ui.h \
 		spawn.h util.h glib_extra.h
 OBJECTS=	$(SOURCES:%.c=$O/%.o)
 
+top_srcdir=	.
+top_builddir=	.
 SUBDIRS=	icons intl po #test
 
 ###
@@ -49,7 +54,7 @@ SUBDIRS=	icons intl po #test
 
 all:: maketool
 
-maketool: $(OBJECTS)
+maketool: $(OBJECTS) _libintl
 	$(LINK.c) -o $@ $(OBJECTS) $(LDLIBS)
 	
 install:: $(BINDIR)/maketool
@@ -107,6 +112,9 @@ all install uninstall clean::
 	for subdir in $(SUBDIRS); do \
 	  $(MAKE) -C $$subdir $@ || exit 1; \
 	done
+
+_libintl:
+	$(MAKE) -C intl all
 		
 ###
 
