@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: extract_targets.sh,v 1.3 1999-05-30 11:24:39 gnb Exp $
+# $Id: extract_targets.sh,v 1.4 1999-06-01 11:32:14 gnb Exp $
 #
 
 make -n -p "$@" | awk '
@@ -34,8 +34,15 @@ BEGIN {
 /^# VPATH Search Paths/ {
     isFile = 0
 }
-/^[^#: \t\/][^#: \t\/]*:/ {
-    if (isFile && isTarget)
-    	print substr($0, 0, index($0, ":")-1)
+/^[^#: \t][^#: \t]*:/ {
+    if (isFile && isTarget) {
+	targ = substr($0, 0, index($0, ":")-1)
+	# Filter out some real but useless targets
+        suitable = 1
+	if (substr(targ, 0, 1) == "." || index(targ, "/.") > 0)
+	    suitable = 0
+	if (suitable)
+    	    print targ
+    }
     isTarget = 1
 }' | sort -u
