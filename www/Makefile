@@ -10,7 +10,7 @@ IMAGES=		maketool_n.gif mainw.gif fm.mini.jpg tocbg.gif \
 		autoconf.gif autoconf_t.gif kernel.gif kernel_t.gif \
 		colors.jpg colors_t.jpg about_make.gif about_make_t.gif \
 		arrow_l2.gif arrow_r2.gif gimp.gif \
-		acgui.gif acgui_t.gif ja.gif ja_t.gif
+		acgui.gif acgui_t.gif ja.gif ja_t.gif valid-html40.gif
 BINARIES:=	$(foreach b,\
 		    $(shell m4 -I$(RELEASEDIR) list-binaries.m4),\
 		    $(firstword \
@@ -30,11 +30,10 @@ DELIVERABLES=	$(PAGES) $(IMAGES) $(SCRIPTS) $(DOTFILES) \
 
 ############################################################
 
-all:: $(PAGES)
+all:: binary-symlinks $(PAGES)
 
 changelog.html: _changelist.html
 $(PAGES): _styles.html _common.m4 _copyright.html toc.html.in
-index.html: _thanks.m4
 download.html: $(RELEASEDIR)/version.m4 downloadables.m4
 
 _changelist.html: $(RELEASEDIR)/ChangeLog
@@ -51,6 +50,17 @@ ALPHAHOME=	/home/g/gnb
 LOGAPO= 	$(ALPHAHOME)/inst/etc/log.apo
 backbone.php: backbone.php.in
 	m4 $(M4FLAGS) -I$(RELEASEDIR) -DLOGAPO=$(LOGAPO) $< > $@
+
+binary-symlinks:
+	@echo "Building binary symlinks"
+	@for file in $(BINARIES) ; do \
+	    echo "    $$file" ;\
+	    test -f $$file || exit 1 ;\
+	    case "$$file" in \
+	    ../*) ln -snf ../$$file downloads/`basename $$file` ;; \
+	    *) ln -snf $$file downloads/`basename $$file` ;; \
+	    esac \
+	done
 
 clean::
 	$(RM) $(patsubst %.html.in,%.html,$(wildcard $(patsubst %.html,%.html.in,$(PAGES))))
@@ -73,6 +83,7 @@ features.html: index.html
 	
 clean::
 	$(RM) $(COMPAT_PAGES)
+	find downloads -type l -exec rm '{}' \;
 	
 ############################################################
 
@@ -81,7 +92,7 @@ htmldir=	$(HOME)/public_html/alphalink/maketool
 uploadhost=	shell.alphalink.com.au
 uploaddir=	$(uploadhost):public_html
 
-install:: installdirs $(addprefix $(htmldir)/,$(DELIVERABLES))
+install:: installdirs $(addprefix $(htmldir)/,$(DELIVERABLES)) install-download-symlinks
 
 installdirs:
 	@OLD=OLD`date +%Y%m%d` ;\
@@ -101,16 +112,18 @@ $(htmldir)/%: %
 $(htmldir)/.%: %
 	$(INSTALL) -m 644 $< $@
 
-$(htmldir)/downloads/%: $(RELEASEDIR)/%
+$(htmldir)/downloads/%: downloads/%
 	$(INSTALL) -m 644 $< $@
-	ln -sf backbone.php $(htmldir)/$*
-
-$(htmldir)/downloads/%: $(RELEASEDIR)/archive/%
-	$(INSTALL) -m 644 $< $@
-	ln -sf backbone.php $(htmldir)/$*
 
 $(htmldir)/downloads/.%: downloads/%
 	$(INSTALL) -m 644 $< $@
+	
+install-download-symlinks:
+	@echo "Installing download symlinks"
+	@for file in $(BINARIES) ; do \
+	    echo "    $$file" ;\
+	    ln -sf backbone.php $(htmldir)/`basename $$file` ;\
+	done
 
 ############################################################
 
