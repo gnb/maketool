@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
-dnl $Id: configure.in,v 1.43 2003-05-11 22:41:05 gnb Exp $
+dnl $Id: configure.in,v 1.44 2003-05-13 01:15:06 gnb Exp $
 dnl
 
 AC_INIT(main.c)
@@ -94,6 +94,7 @@ AC_CHECK_HEADERS(malloc.h sys/ioctl.h sys/time.h unistd.h memory.h signal.h sys/
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
+AC_C_INLINE
 AC_TYPE_PID_T
 
 dnl Checks for library functions.
@@ -103,49 +104,7 @@ AC_FUNC_WAIT3
 AC_CHECK_FUNCS(putenv regcomp strchr unsetenv)
 
 
-dnl ===============================
-dnl Test for BSD vs SysV signal semantics
-AC_MSG_CHECKING(for signal semantics)
-AC_TRY_RUN([
-#include <signal.h>
-
-static int ncaught;
-
-static RETSIGTYPE
-handler(int sig)
-{
-    ncaught++;
-}
-
-int
-main(int argc, char **argv)
-{
-    int i;
-    
-
-#ifdef SIGCHLD
-    signal(SIGCHLD, handler);
-#else
-    signal(SIGCLD, handler);
-#endif
-    for (i=0 ; i<5 ; i++)
-	kill(getpid(), SIGCLD);
-
-    switch (ncaught)
-    {
-    case 1: /* SysV signal semantics */
-    	return 0;
-    case 5: /* BSD signal semantics */
-    	return 1;
-    default: /* something is awry */
-    	return 2;
-    }
-}
-],AC_DEFINE(HAVE_SYSV_SIGNAL,1) AC_MSG_RESULT(sysv),
-AC_DEFINE(HAVE_SYSV_SIGNAL,0) AC_MSG_RESULT(bsd),
-AC_DEFINE(HAVE_SYSV_SIGNAL,0) AC_MSG_RESULT(assuming bsd))
-dnl ===============================
-
+AC_HAVE_SYSV_SIGNAL
 
 dnl ===============================
 
@@ -174,8 +133,14 @@ irix*)
     ;;
 esac
 
+ALL_OS_SOURCE=
+ALL_OS_SOURCE="$ALL_OS_SOURCE sunmake.c"
+ALL_OS_SOURCE="$ALL_OS_SOURCE irix-makesys.c"
+
+
 AC_SUBST(OS_MAKEPROG_SOURCE)
 AC_SUBST(OS_MAKESYS_SOURCE)
+AC_SUBST(ALL_OS_SOURCE)
 AC_MSG_RESULT($OS_MAKEPROG_SOURCE $OS_MAKESYS_SOURCE)
 
 dnl ===============================
@@ -205,6 +170,20 @@ dnl ===============================
 
 dnl GTK
 AM_PATH_GTK(1.2.0)
+
+dnl ===============================
+dnl A bunch of warning options for gcc.  Note that we add 
+dnl warning flags *after* using $CC to test for most features,
+dnl to avoid spurious failures due to a pedantic compiler.
+AC_GCC_ADD_CFLAGS([-Wall -Wchar-subscripts -Wmissing-declarations
+    -Wmissing-prototypes -Wnested-externs -Wpointer-arithmetic
+    -Wcast-align -Wsign-compare -pedantic])
+
+dnl Remove -Werror if present. It makes life difficult when compiling
+dnl real source, but is useful when testing autoconf feature probing.
+AC_GCC_REMOVE_CFLAGS([-Werror])
+dnl ===============================
+
 
 dnl **HACK** temporarily configure out online help cos its immature
 AC_MSG_CHECKING([whether immature online help is requested])

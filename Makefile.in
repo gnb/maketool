@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.48 2003-05-06 15:12:34 gnb Exp $
+# $Id: Makefile.in,v 1.49 2003-05-13 01:12:12 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -41,6 +41,8 @@ CPPFLAGS=	@GTK_CFLAGS@ -I$(top_srcdir) -Iicons -Iintl \
 		-DLOCALEDIR=\"$(localedir)\" -DPKGLIBEXECDIR=\"$(pkglibexecdir)\" \
 		-DHELPDIR=\"$(helpdir)\" -DPKGDATADIR=\"$(pkgdatadir)\" \
 		@CPPFLAGS@ $(TESTCPPFLAGS)
+COMPILE.c=	$(CC) $(CPPFLAGS) $(CFLAGS)
+LINK.c=		$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS)
 LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 
 SOURCES=	main.c filter.c help.c preferences.c log.c print.c ps.c find.c \
@@ -141,7 +143,7 @@ PURIFY= purify $(PURIFY_FLAGS)
 
 pure:
 	$(MAKE) _PURIFY="$(PURIFY)" all
-        
+
 ###
 
 # Subdirectories
@@ -185,6 +187,11 @@ clean::
 	$(RM) licence.c
 	
 ###
+
+.c.o:
+	$(COMPILE.c) -c $<
+
+###
 # Some basic documentation (COPYRIGHT etc) used to be installed
 # into /usr/doc at this point in the Makefile.  That's now
 # handled by RPM -- see the %doc directive in maketool.spec.in
@@ -199,7 +206,7 @@ DISTFILES=	\
 		configure.in config.guess config.sub install-sh aclocal.m4 \
 		configure Makefile.in config.h.in mkinstalldirs makewrap.in \
 		\
-		$(SOURCES) $(HEADERS) \
+		$(SOURCES) $(HEADERS) @ALL_OS_SOURCE@ \
 		$(CLIENT_SOURCES) $(CLIENT_HEADERS)
 
 
