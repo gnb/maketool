@@ -25,7 +25,6 @@ BEGINDOWNLOAD
 DOWNLOAD(i386-linux RPM,maketool-LATEST_VERSION-1.i386.rpm)
 DOWNLOAD(source tarball,maketool-LATEST_VERSION-src.tgz)
 DOWNLOAD(latest source patch,maketool-PREVIOUS_VERSION-LATEST_VERSION.patch.gz)
-DOWNLOAD(get this source patch if<BR>you're using GTK 1.2.6,gtk-1.2.6.patch.gz)
 ENDDOWNLOAD
 
 <P>
@@ -35,9 +34,10 @@ Maketool has also been ported to NetBSD, you can
 </P>
 
 <P>
-I have received reports that maketool has been ported to Solaris, but I am
+I have personally ported a version of maketool to Solaris, but as I
+have no regular access to a Solaris machine, I am
 unable to point to any binaries (sorry). The latest source includes Solaris
-port patches, but I am currently unable to test those myself.
+port patches.
 </P>
 
 <P>
