@@ -3,7 +3,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: log.c,v 1.9 1999-05-25 15:08:41 gnb Exp $");
+CVSID("$Id: log.c,v 1.10 1999-05-28 13:42:48 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -92,12 +92,10 @@ logAddRec(const char *line, const FilterResult *res)
     
     lr = g_new(LogRec, 1);
     lr->res = *res;
-#if 0
     if (lr->res.file == 0 || *lr->res.file == '\0')
     	lr->res.file = 0;
     else
 	lr->res.file = g_strdup(lr->res.file);	/* TODO: hashtable */
-#endif
     lr->line = g_strdup(line);
     lr->expanded = TRUE;
 
@@ -192,7 +190,9 @@ logAddLine(const char *line)
 {
     FilterResult res;
     LogRec *lr;
+    estring fullpath;
 
+    estring_init(&fullpath);
     res.file = 0;
     res.line = 0;
     res.column = 0;
@@ -225,9 +225,6 @@ logAddLine(const char *line)
     default:
     	if (res.file != 0 && logCurrentDir() != 0)
 	{
-	    estring fullpath;
-	    
-	    estring_init(&fullpath);
 	    estring_append_string(&fullpath, logCurrentDir());
 	    estring_append_char(&fullpath, '/');
 	    estring_append_string(&fullpath, res.file);
@@ -238,6 +235,7 @@ logAddLine(const char *line)
     
     lr = logAddRec(line, &res);
     logShowRec(lr);
+    estring_free(&fullpath);
     return lr;
 }
 
