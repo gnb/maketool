@@ -144,9 +144,6 @@ x  Fix bug whereby `configure --with-included-gettext' leaves a symlink
    re-configured and causes other builds to break with `symbol dcgettext__
    not found'.
    
-x  On startup, when preferences or args specify a non-existant makefile,
-   issue a warning alert to the user.
-   
 x  Remove strict dependancy on POSIX regcomp() for older systems,
    conditionally replace regcomp with function based on <regex.h>
    
@@ -282,6 +279,9 @@ x  When ./configure is run from make_makefile(), config.status is also
 
 --- closed ---
 
+x  On startup, when preferences or args specify a non-existant makefile,
+   issue a warning alert to the user.
+   
 x  Help: write lots of it!!
 
 x  Doco.

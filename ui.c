@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.39 2003-10-08 13:08:22 gnb Exp $");
+CVSID("$Id: ui.c,v 1.40 2003-10-08 13:27:31 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -831,6 +831,10 @@ ui_message_dialog_f(GtkWidget *parent, const char *title, const char *fmt, ...)
 void
 ui_message_wait(GtkWidget *w)
 {
+    int oldmodal = GTK_WINDOW(w)->modal;
+
+    gtk_widget_ref(w);
+    gtk_window_set_modal(GTK_WINDOW(w), TRUE);
     gtk_widget_show(w);
     
     do
@@ -838,6 +842,9 @@ ui_message_wait(GtkWidget *w)
     	gtk_main_iteration();
     }
     while (GTK_WIDGET_VISIBLE(w));
+
+    gtk_window_set_modal(GTK_WINDOW(w), oldmodal);
+    gtk_widget_unref(w);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

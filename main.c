@@ -32,7 +32,7 @@
 #include "mqueue.h"
 #include "progress.h"
 
-CVSID("$Id: main.c,v 1.104 2003-10-08 13:08:22 gnb Exp $");
+CVSID("$Id: main.c,v 1.105 2003-10-08 13:27:31 gnb Exp $");
 
 
 /*
@@ -2209,7 +2209,19 @@ ui_create(void)
 "$HOME/.maketoolrc is older than version %s and\n"
 "has upgraded it.",
 VERSION);
-    	gtk_widget_show(msg);
+    	ui_message_wait(msg);
+    }
+
+    if (!file_exists(prefs.makefile))
+    {
+    	GtkWidget *msg;
+	
+	msg = ui_message_dialog_f(toplevel, _("Maketool: Makefile Doesn't Exist"),
+"The specified makefile\n"
+"%s\n"
+"doesn't exist",
+prefs.makefile);
+    	ui_message_wait(msg);
     }
 }
 
