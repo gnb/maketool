@@ -1,6 +1,6 @@
 #include "util.h"
 
-CVSID("$Id: util.c,v 1.6 1999-05-25 08:02:48 gnb Exp $");
+CVSID("$Id: util.c,v 1.7 1999-05-25 12:11:36 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -24,13 +24,7 @@ void
 estring_append_string(estring *e, const char *str)
 {
     if (str != 0 && *str != '\0')
-    {
-    	int dlen = strlen(str);
-	_estring_expand_by(e, dlen);
-	memcpy(&e->data[e->length], str, dlen);
-	e->length += dlen;
-	e->data[e->length] = '\0';
-    }
+	estring_append_chars(e, str, strlen(str));
 }
 
 void
@@ -38,6 +32,15 @@ estring_append_char(estring *e, char c)
 {
     _estring_expand_by(e, 1);
     e->data[e->length++] = c;
+    e->data[e->length] = '\0';
+}
+
+void
+estring_append_chars(estring *e, const char *buf, int len)
+{
+    _estring_expand_by(e, len);
+    memcpy(&e->data[e->length], buf, len);
+    e->length += len;
     e->data[e->length] = '\0';
 }
 

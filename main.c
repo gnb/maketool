@@ -8,7 +8,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: main.c,v 1.14 1999-05-25 08:02:48 gnb Exp $");
+CVSID("$Id: main.c,v 1.15 1999-05-25 12:11:36 gnb Exp $");
 
 typedef enum
 {
@@ -23,8 +23,10 @@ typedef enum
     NUM_SETS
 } Groups;
 
-char		*targets;
-const char	*lastTarget = 0;
+char		*targets;		/* targets on commandline */
+const char	*lastTarget = 0;	/* last target built, for `again' */
+GList		*availableTargets = 0;	/* all possible targets, for menu */
+GtkWidget	*buildMenu;
 GtkWidget	*toolbar, *messagebox;
 GtkWidget	*messageent;
 pid_t		currentPid = -1;
@@ -39,6 +41,7 @@ GtkWidget	*anim;
 
 #define PASTE3(x,y,z) x##y##z
 
+static void build_cb(GtkWidget *w, gpointer data);
 
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -167,6 +170,65 @@ anim_start(void)
 {
     if (anim_timer < 0)
 	anim_timer = gtk_timeout_add(200/* millisec */, anim_advance, 0);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+reapList(pid_t pid, int status, struct rusage *usg, gpointer user_data)
+{
+    estring *targs = (estring *)user_data;
+    char *t, *buf;
+
+    if (!(WIFEXITED(status) || WIFSIGNALED(status)))
+    	return;
+	
+    fprintf(stderr, "reaped list target\n");
+    buf = targs->data;
+    while ((t = strtok(buf, " \t\r\n")) != 0)
+    {
+    	if (!strcmp(t, "-"))
+	{
+	    uiAddSeparator(buildMenu);	
+	}
+	else
+	{
+    	   t = strdup(t);
+    	   availableTargets = g_list_append(availableTargets, t);
+	   uiAddButton(buildMenu, t, build_cb, t, GR_NOTRUNNING);
+    	}
+	buf = 0;
+    }
+    estring_free(targs);
+    grey_menu_items();
+}
+
+static void
+inputList(int len, const char *buf, gpointer data)
+{
+    estring *targs = (estring *)data;
+    
+    estring_append_chars(targs, buf, len);
+}
+
+static void
+listTargets(void)
+{
+    char *prog;
+    pid_t pid;
+    static estring targs;
+    
+    estring_init(&targs);
+    
+    prog = expand_prog(prefs.prog_list_targets, 0, 0, 0);
+    
+    pid = spawn_with_output(prog, reapList, inputList, (gpointer)&targs,
+    	prefs.var_environment);
+    if (pid > 0)
+    {
+    	/* TODO: remove old menu items */
+    }
+    free(prog);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -523,15 +585,16 @@ uiCreateMenus(GtkWidget *menubar)
     uiAddButton(menu, _("Exit"), file_exit_cb, 0, GR_NONE);
     
     menu = uiAddMenu(menubar, _("Build"));
+    buildMenu = menu;
     uiAddTearoff(menu);
     uiAddButton(menu, _("Again"), build_again_cb, 0, GR_AGAIN);
     uiAddButton(menu, _("Stop"), build_stop_cb, 0, GR_RUNNING);
     uiAddSeparator(menu);
+#if 0
     uiAddButton(menu, "all", build_cb, "all", GR_NOTRUNNING);
     uiAddButton(menu, "install", build_cb, "install", GR_NOTRUNNING);
     uiAddButton(menu, "clean", build_cb, "clean", GR_NOTRUNNING);
     uiAddSeparator(menu);
-#if 1
     uiAddButton(menu, "random", build_cb, "random", GR_NOTRUNNING);
     uiAddButton(menu, "delay", build_cb, "delay", GR_NOTRUNNING);
     uiAddButton(menu, "targets", build_cb, "targets", GR_NOTRUNNING);
@@ -728,6 +791,7 @@ uiCreate(void)
     gtk_widget_show(anim);
 
     grey_menu_items();
+    listTargets();
 
     gtk_widget_show(GTK_WIDGET(mainvbox));
     gtk_widget_show(GTK_WIDGET(vbox));
