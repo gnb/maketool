@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.88 2003-05-04 04:16:50 gnb Exp $");
+CVSID("$Id: main.c,v 1.89 2003-05-04 06:33:33 gnb Exp $");
 
 
 /*
@@ -263,9 +263,7 @@ abbreviate_target(const char *t, int maxlen)
     estring e;
 
     estring_init(&e);
-    fprintf(stderr, "abbreviate_target(\"%s\")\n", t);
     abbreviate_aux(&e, t, maxlen);
-    fprintf(stderr, "   = \"%s\"\n", e.data);
     return e.data;
 }
 
@@ -279,14 +277,12 @@ abbreviate_targets(const char *t1, const char *t2, int maxlen)
 
     estring_init(&e);
     
-    fprintf(stderr, "abbreviate_targets(\"%s\", \"%s\")\n", t1, t2);
     if (l1 + sizeof(dash) + l2 > maxlen)
 	l1 = (l1 < 4 ? l1 : (maxlen - sizeof(dash)) * l1 / (l1 + l2));
     l1 = abbreviate_aux(&e, t1, l1);
     estring_append_string(&e, dash);
     abbreviate_aux(&e, t2, (maxlen - sizeof(dash)) - l1);
 
-    fprintf(stderr, "   = \"%s\"\n", e.data);
     return e.data;
 }
 
