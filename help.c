@@ -5,6 +5,7 @@
 #include <string.h>
 #include <malloc.h>
 #include "spawn.h"
+#include "ui.h"
 #if DEBUG
 #include <stdio.h>
 #endif
@@ -12,48 +13,6 @@
 static GtkWidget	*about_shell = 0;
 static GtkWidget	*about_make_shell = 0;
 
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-
-
-static GtkWidget *
-uiDialogCreateButton(
-    GtkWidget *dialog,
-    const char *label,
-    GtkSignalFunc callback,
-    gpointer user_data)
-{
-    GtkWidget *button;
-    
-    button = gtk_button_new_with_label(label);
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->action_area), button);
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",  callback, user_data);
-    gtk_widget_show(button);
-
-    return button;
-}
-
-static void
-uiDialogOkCb(GtkWidget *w, gpointer data)
-{
-    gtk_widget_hide(GTK_WIDGET(data));
-}
-
-static GtkWidget *
-uiCreateOkDialog(
-    GtkWidget *parent,
-    const char *title)
-{
-    GtkWidget *dialog;
-    
-    dialog = gtk_dialog_new();
-    gtk_window_set_title(GTK_WINDOW(dialog), title);
-    
-    uiDialogCreateButton(dialog, "OK", uiDialogOkCb, (gpointer)dialog);
-    
-    return dialog;
-}    
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 

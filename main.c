@@ -10,15 +10,9 @@
 #include <signal.h>
 #include "spawn.h"
 #include "filter.h"
+#include "ui.h"
+#include "log.h"
 
-
-typedef struct
-{
-    /* TODO: 2 verbosity levels */
-    char *line;
-    FilterResult res;
-    GtkCTreeNode *node;
-} LogRec;
 
 typedef enum
 {
@@ -33,11 +27,6 @@ typedef enum
     NUM_SETS
 } Groups;
 
-#ifndef GTK_CTREE_IS_EMPTY
-#define GTK_CTREE_IS_EMPTY(_ctree_) \
-	(gtk_ctree_node_nth(GTK_CTREE(_ctree_), 0) == 0)
-#endif
-
 const char	*argv0;
 char		**targets;
 int		numTargets;
@@ -45,15 +34,10 @@ int		currentTarget;
 const char	*lastTarget = 0;
 GtkWidget	*toplevel;
 GtkWidget	*toolbar, *messagebox;
-GtkWidget	*logwin, *messageent;
-gboolean	showWarnings = TRUE, showErrors = TRUE, showInfo = TRUE;
-GList		*widgets[NUM_SETS];
+GtkWidget	*messageent;
 pid_t		currentPid = -1;
 gboolean	interrupted = FALSE;
 gint		currentInput;
-int		numErrors;
-int		numWarnings;
-GList		*log;	/* list of LogRecs */
 
 #define ANIM_MAX 8
 GdkPixmap	*animPixmaps[ANIM_MAX+1];
@@ -68,14 +52,13 @@ GdkColor	warningBackground, errorBackground;
 
 #define PASTE3(x,y,z) x##y##z
 
-static LogRec *logSelected(void);
 extern void help_about_show(GtkWidget *topl);
 extern void help_about_make_show(GtkWidget *topl);
 
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-static void
+void
 message(const char *fmt, ...)
 {
     va_list args;
@@ -90,39 +73,11 @@ message(const char *fmt, ...)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-static GPtrArray *uiGroups = 0;
-
-static void
-uiGroupSetSensitive(gint group, gboolean b)
-{
-    GList *list;
-    
-    list = g_ptr_array_index(uiGroups, group);
-    
-    for ( ; list != 0 ; list = list->next)
-    	gtk_widget_set_sensitive(GTK_WIDGET(list->data), b);
-}
-
-static void
-uiGroupAdd(gint group, GtkWidget *w)
-{
-    if (uiGroups == 0)
-    	uiGroups = g_ptr_array_new();
-	
-    if (group >= uiGroups->len)
-	g_ptr_array_set_size(uiGroups, group+1);
-	
-    g_ptr_array_index(uiGroups, group) = 
-    	g_list_prepend(g_ptr_array_index(uiGroups, group), w);
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static void
+void
 grey_menu_items(void)
 {
     gboolean running = (currentPid > 0);
-    gboolean empty = GTK_CTREE_IS_EMPTY(logwin);
+    gboolean empty = logIsEmpty();
     gboolean selected = (logSelected() != 0);
     gboolean again = (lastTarget != 0 && !running);
 
@@ -169,232 +124,6 @@ anim_start(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-static LogRec *
-lr_new(const char *line, const FilterResult *res)
-{
-    LogRec *lr;
-    
-    lr = g_new(LogRec, 1);
-    lr->res = *res;
-    if (lr->res.file != 0)
-	lr->res.file = g_strdup(lr->res.file);	/* TODO: hashtable */
-    lr->line = g_strdup(line);
-
-    switch (lr->res.code)
-    {
-    case FR_WARNING:
-	numWarnings++;
-    	break;
-    case FR_ERROR:
-	numErrors++;
-    	break;
-    default:
-    	break;
-    }
-
-    return lr;
-}
-
-static void
-lr_delete(LogRec *lr)
-{
-    if (lr->res.file != 0)
-    	g_free(lr->res.file);
-    g_free(lr->line);
-    g_free(lr);
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static void
-logShowRec(LogRec *lr)
-{
-    gboolean was_empty = GTK_CTREE_IS_EMPTY(logwin);
-    GdkFont *font = 0;
-    GdkColor *fore = 0;
-    GdkColor *back = 0;
-
-    switch (lr->res.code)
-    {
-    case FR_UNDEFINED:		/* same as INFORMATION */
-    case FR_INFORMATION:
-    	/* use default font, fgnd, bgnd */
-	if (!showInfo)
-	    return;
-    	break;
-    case FR_WARNING:
-    	font = warningFont;
-	fore = &warningForeground;
-	back = &warningBackground;
-	if (!showWarnings)
-	    return;
-    	break;
-    case FR_ERROR:
-    	font = errorFont;
-	fore = &errorForeground;
-	back = &errorBackground;
-	if (!showErrors)
-	    return;
-    	break;
-    case FR_CHANGEDIR:
-    	/* TODO: */
-    	break;
-    case FR_PUSHDIR:
-    	/* TODO: */
-    	break;
-    case FR_POPDIR:
-    	/* TODO: */
-    	break;
-    case FR_PENDING:
-    	/* TODO: */
-    	break;
-    }
-
-    /* TODO: freeze & thaw if it redraws the wrong colour 1st */
-    lr->node = gtk_ctree_insert_node(GTK_CTREE(logwin),
-    	(GtkCTreeNode*)0,			/* parent */
-	(GtkCTreeNode*)0,			/* sibling */
-	&lr->line,					/* text[] */
-	0,					/* spacing */
-	(GdkPixmap *)0, (GdkBitmap *)0,		/* pixmap_closed,mask_closed */
-	(GdkPixmap *)0, (GdkBitmap *)0,		/* pixmap_opened,mask_opened */
-	TRUE,					/* is_leaf */
-	TRUE);					/* expanded */
-    gtk_ctree_node_set_row_data(GTK_CTREE(logwin), lr->node, (gpointer)lr);
-    if (fore != 0)
-	gtk_ctree_node_set_foreground(GTK_CTREE(logwin), lr->node, fore);
-    if (back != 0)
-    	gtk_ctree_node_set_background(GTK_CTREE(logwin), lr->node, back);
-    
-    if (was_empty)
-    	grey_menu_items();	/* log window just became non-empty */
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static GList *logPendingLines = 0;
-static GList *logDirectoryStack = 0;
-
-static void
-logAddLine(char *line)
-{
-    FilterResult res;
-    LogRec *lr;
-
-    res.file = 0;
-    res.line = 0;
-    res.column = 0;
-    filter_apply(line, &res);
-#if DEBUG
-    fprintf(stderr, "filter_apply: \"%s\" -> %d \"%s\" %d\n",
-    	line, (int)res.code, res.file, res.line);
-#endif
-    if (res.code == FR_UNDEFINED)
-    	res.code = FR_INFORMATION;
-    lr = lr_new(line, &res);
-    log = g_list_append(log, lr);		/* TODO: fix O(N^2) */
-    logShowRec(lr);
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static void
-logClear(void)
-{
-    /* delete all LogRecs */
-    while (log != 0)
-    {
-    	lr_delete((LogRec *)log->data);
-	log = g_list_remove_link(log, log);
-    }
-
-    /* clear the log window */
-    gtk_clist_clear(GTK_CLIST(logwin));
-
-    /* update sensitivity of menu items */        
-    grey_menu_items();
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static void
-logRepopulate(void)
-{
-    GList *list;
-    
-    gtk_clist_freeze(GTK_CLIST(logwin));
-    gtk_clist_clear(GTK_CLIST(logwin));
-    for (list=log ; list!=0 ; list=list->next)
-	logShowRec((LogRec *)list->data);    	
-    gtk_clist_thaw(GTK_CLIST(logwin));
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static void
-logSave(const char *file)
-{
-    GList *list;
-    FILE *fp;
-    
-    if ((fp = fopen(file, "w")) == 0)
-    {
-    	message("%s: %s", file, strerror(errno));
-	return;
-    }
-    
-    for (list=log ; list!=0 ; list=list->next)
-    {
-    	LogRec *lr = (LogRec *)list->data;
-	
-	fputs(lr->line, fp);
-	fputc('\n', fp);
-    }
-    
-    fclose(fp);
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static void
-logOpen(const char *file)
-{
-    FILE *fp;
-    char buf[2048];
-    
-    if ((fp = fopen(file, "r")) == 0)
-    {
-    	message("%s: %s", file, strerror(errno));
-	return;
-    }
-    
-    while (fgets(buf, sizeof(buf), fp) != 0)
-    {
-    	char *x;
-	if ((x = strchr(buf, '\n')) != 0)
-	    *x = '\0';
-	if ((x = strchr(buf, '\r')) != 0)
-	    *x = '\0';
-    	logAddLine(buf);
-    }
-    
-    fclose(fp);
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static LogRec *
-logSelected(void)
-{
-    if (GTK_CLIST(logwin)->selection == 0)
-    	return 0;
-	
-    return (LogRec *)gtk_ctree_node_get_row_data(GTK_CTREE(logwin), 
-    		GTK_CTREE_NODE(GTK_CLIST(logwin)->selection->data));
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
 static void
 startEdit(LogRec *lr)
 {
@@ -422,13 +151,13 @@ reapMake(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     	char warnStr[256];
 	char intStr[256];
 	
-	if (numErrors > 0)
-	    sprintf(errStr, ", %d errors", numErrors);
+	if (logNumErrors() > 0)
+	    sprintf(errStr, ", %d errors", logNumErrors());
 	else
 	    errStr[0] = '\0';
 	    
-	if (numWarnings > 0)
-	    sprintf(warnStr, ", %d warnings", numWarnings);
+	if (logNumWarnings() > 0)
+	    sprintf(warnStr, ", %d warnings", logNumWarnings());
 	else
 	    warnStr[0] = '\0';
 
@@ -440,6 +169,7 @@ reapMake(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	message("Finished making %s%s%s%s", target, errStr, warnStr, intStr);
 	
 	currentPid = -1;
+	logEndBuild(target);
 	anim_stop();
 	grey_menu_items();
     }
@@ -494,8 +224,7 @@ buildStart(const char *target)
 	lastTarget = target;
 	interrupted = FALSE;
 	filter_init();
-	numErrors = 0;
-	numWarnings = 0;
+	logStartBuild(target);
 	anim_start();
 	grey_menu_items();
     }
@@ -507,46 +236,6 @@ static void
 file_exit_cb(GtkWidget *w, gpointer data)
 {
     gtk_main_quit();
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-#define FILESEL_CALLBACK_DATA "uiCallback"
-
-static void
-uiFileSelOkCb(GtkWidget *w, gpointer data)
-{
-    GtkWidget *filesel = GTK_WIDGET(data);
-    void (*callback)(const char *filename);
-    
-    callback = gtk_object_get_data(GTK_OBJECT(filesel), FILESEL_CALLBACK_DATA);
-    (*callback)(gtk_file_selection_get_filename(GTK_FILE_SELECTION(filesel)));
-    gtk_widget_hide(filesel);
-}
-
-static GtkWidget *
-uiCreateFileSel(
-    const char *title,
-    void (*callback)(const char *filename),
-    const char *filename)
-{
-    GtkWidget *filesel;
-    
-    filesel = gtk_file_selection_new(title);
-    gtk_signal_connect(
-	    GTK_OBJECT(GTK_FILE_SELECTION(filesel)->ok_button),
-            "clicked", uiFileSelOkCb,
-	    (gpointer)filesel);
-    gtk_signal_connect_object(
-	    GTK_OBJECT(GTK_FILE_SELECTION(filesel)->cancel_button),
-            "clicked", (GtkSignalFunc) gtk_widget_hide,
-	    GTK_OBJECT(filesel));
-    gtk_object_set_data(GTK_OBJECT(filesel), FILESEL_CALLBACK_DATA,
-    	(gpointer)callback);
-    if (filename != 0)
-	gtk_file_selection_set_filename(GTK_FILE_SELECTION(filesel), filename);
-
-    return filesel;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -622,10 +311,12 @@ view_widget_cb(GtkWidget *w, gpointer data)
 static void
 view_flags_cb(GtkWidget *w, gpointer data)
 {
-    gboolean *flagp = (gboolean *)data;
+    gboolean flags = GPOINTER_TO_INT(data);
     
-    *flagp = GTK_CHECK_MENU_ITEM(w)->active;
-    logRepopulate();
+    if (GTK_CHECK_MENU_ITEM(w)->active)
+	logSetFlags(logGetFlags() | flags);
+    else
+	logSetFlags(logGetFlags() & ~flags);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -702,115 +393,6 @@ unimplemented(GtkWidget *w, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-static GtkWidget *
-_uiAddMenuAux(
-    GtkWidget *menubar,
-    const char *label,
-    gboolean isRight)
-{
-    GtkWidget *menu, *item;
-
-    item = gtk_menu_item_new_with_label(label);
-    gtk_widget_show(item);
-
-    menu = gtk_menu_new();
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), menu);
-
-    gtk_menu_bar_append(GTK_MENU_BAR(menubar), item);
-    
-    if (isRight)
-    	gtk_menu_item_right_justify(GTK_MENU_ITEM(item));
-
-    return menu;
-}
-
-static GtkWidget *
-uiAddMenu(GtkWidget *menubar, const char *label)
-{
-    return _uiAddMenuAux(menubar, label, FALSE);
-}
-
-static GtkWidget *
-uiAddMenuRight(GtkWidget *menubar, const char *label)
-{
-    return _uiAddMenuAux(menubar, label, TRUE);
-}
-
-static GtkWidget *
-uiAddButton(
-    GtkWidget *menu,
-    const char *label,
-    void (*callback)(GtkWidget*, gpointer),
-    gpointer calldata,
-    gint group)
-{
-    GtkWidget *item;
-
-    item = gtk_menu_item_new_with_label(label);
-    gtk_menu_append(GTK_MENU(menu), item);
-    gtk_signal_connect(GTK_OBJECT(item), "activate", 
-    	GTK_SIGNAL_FUNC(callback), calldata);
-    if (group >= 0)
-    	uiGroupAdd(group, item);
-    gtk_widget_show(item);
-    return item;
-}
-
-static GtkWidget *
-uiAddTearoff(GtkWidget *menu)
-{
-    GtkWidget *item;
-
-    item = gtk_tearoff_menu_item_new();
-    gtk_menu_append(GTK_MENU(menu), item);
-    gtk_widget_show(item);
-    return item;
-}
-
-GtkWidget *
-uiAddToggle(
-    GtkWidget *menu,
-    const char *label,
-    void (*callback)(GtkWidget*, gpointer),
-    gpointer calldata,
-    GtkWidget *radioOther,
-    gboolean set)
-{
-    GtkWidget *item;
-    
-    if (radioOther == 0)
-    {
-	item = gtk_check_menu_item_new_with_label(label);
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), set);
-    }
-    else
-    {
-    	GSList *group;
-	group = gtk_radio_menu_item_group(GTK_RADIO_MENU_ITEM(radioOther));
-	item = gtk_radio_menu_item_new_with_label(group, label);
-    }
-    
-    gtk_menu_append(GTK_MENU(menu), item);
-    gtk_signal_connect(GTK_OBJECT(item), "activate", 
-    	GTK_SIGNAL_FUNC(callback), calldata);
-    gtk_widget_show(item);
-    return item;
-}
-
-
-static GtkWidget *
-uiAddSeparator(GtkWidget *menu)
-{
-    GtkWidget *item;
-
-    item = gtk_menu_item_new();
-    gtk_menu_append(GTK_MENU(menu), item);
-    gtk_widget_show(item);
-    return item;
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
 static void
 uiCreateMenus(GtkWidget *menubar)
 {
@@ -852,11 +434,14 @@ uiCreateMenus(GtkWidget *menubar)
     uiAddButton(menu, "Edit Prev Error", unimplemented, 0, GR_NOTEMPTY);
     uiAddSeparator(menu);
     uiAddToggle(menu, "Toolbar", view_widget_cb, (gpointer)&toolbar, 0, TRUE);
-    uiAddToggle(menu, "Messages", view_widget_cb, (gpointer)&messagebox, 0, TRUE);
+    uiAddToggle(menu, "Statusbar", view_widget_cb, (gpointer)&messagebox, 0, TRUE);
     uiAddSeparator(menu);
-    uiAddToggle(menu, "Errors", view_flags_cb, (gpointer)&showErrors, 0, showErrors);
-    uiAddToggle(menu, "Warnings", view_flags_cb, (gpointer)&showWarnings, 0, showWarnings);
-    uiAddToggle(menu, "Information", view_flags_cb, (gpointer)&showInfo, 0, showInfo);
+    uiAddToggle(menu, "Errors", view_flags_cb, GINT_TO_POINTER(LF_SHOW_ERRORS),
+    	0, logGetFlags() & LF_SHOW_ERRORS);
+    uiAddToggle(menu, "Warnings", view_flags_cb, GINT_TO_POINTER(LF_SHOW_WARNINGS),
+    	0, logGetFlags() & LF_SHOW_WARNINGS);
+    uiAddToggle(menu, "Information", view_flags_cb, GINT_TO_POINTER(LF_SHOW_INFO),
+    	0, logGetFlags() & LF_SHOW_INFO);
     uiAddSeparator(menu);
     uiAddButton(menu, "Preferences", unimplemented, 0, GR_NONE);
     
@@ -870,42 +455,6 @@ uiCreateMenus(GtkWidget *menubar)
     uiAddButton(menu, "Tutorial", unimplemented, 0, GR_NONE);
     uiAddButton(menu, "Reference Index", unimplemented, 0, GR_NONE);
     uiAddButton(menu, "Home Page", unimplemented, 0, GR_NONE);
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static GtkWidget *
-uiToolCreate(
-    GtkWidget *toolbar,
-    const char *name,
-    const char *tooltip,
-    char **pixmap_xpm,
-    GtkSignalFunc callback,
-    gpointer user_data,
-    gint group)
-{
-    GdkPixmap *pm = 0;
-    GdkBitmap *mask = 0;
-    GtkWidget *item;
-
-    pm = gdk_pixmap_create_from_xpm_d(toplevel->window, &mask, 0, pixmap_xpm);
-    item = gtk_toolbar_append_item(
-    	GTK_TOOLBAR(toolbar),
-    	name,
-	tooltip,
-	0,				/* tooltip_private_text */
-    	gtk_pixmap_new(pm, mask),
-	callback,
-	user_data);
-    if (group >= 0)
-    	uiGroupAdd(group, item);
-    return item;
-}
-
-static void
-uiToolAddSpace(GtkWidget *toolbar)
-{
-    gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -974,21 +523,27 @@ static void
 uiInitFontsAndColors(void)
 {
     GdkColormap *colormap = gtk_widget_get_colormap(toplevel);
+    GdkColor fg, bg;
     
-    warningFont = 0;
-    errorFont = 0;
+    logSetStyle(L_INFO, 0, 0, 0);
     
-    gdk_color_parse("yellow", &warningBackground);
-    gdk_colormap_alloc_color(colormap, &warningBackground, FALSE, TRUE);
+    
+    gdk_color_parse("yellow", &bg);
+    gdk_colormap_alloc_color(colormap, &bg, FALSE, TRUE);
 
-    gdk_color_parse("red", &errorBackground);
-    gdk_colormap_alloc_color(colormap, &errorBackground, FALSE, TRUE);
+    gdk_color_parse("black", &fg);
+    gdk_colormap_alloc_color(colormap, &fg, FALSE, TRUE);
 
-    gdk_color_parse("black", &errorForeground);
-    gdk_colormap_alloc_color(colormap, &errorForeground, FALSE, TRUE);
+    logSetStyle(L_WARNING, 0, &fg, &bg);
 
-    gdk_color_parse("black", &warningForeground);
-    gdk_colormap_alloc_color(colormap, &warningForeground, FALSE, TRUE);
+
+    gdk_color_parse("red", &bg);
+    gdk_colormap_alloc_color(colormap, &bg, FALSE, TRUE);
+
+    gdk_color_parse("black", &fg);
+    gdk_colormap_alloc_color(colormap, &fg, FALSE, TRUE);
+
+    logSetStyle(L_ERROR, 0, &fg, &bg);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -998,7 +553,7 @@ static void
 uiCreate(void)
 {
     GtkWidget *mainvbox, *vbox; /* need 2 for correct spacing */
-    GtkWidget *menubar;
+    GtkWidget *menubar, *logwin;
     GtkTooltips *tooltips;
     GtkWidget *sw;
     static char *titles[1] = { "Log" };
@@ -1031,8 +586,8 @@ uiCreate(void)
     toolbar = gtk_toolbar_new(GTK_ORIENTATION_HORIZONTAL, GTK_TOOLBAR_BOTH);
     gtk_toolbar_set_button_relief(GTK_TOOLBAR(toolbar), GTK_RELIEF_NONE);
     gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
-    uiCreateTools(toolbar);
     gtk_widget_show(GTK_WIDGET(toolbar));
+    uiCreateTools(toolbar);
     
     sw = gtk_scrolled_window_new(0, 0);
     gtk_container_border_width(GTK_CONTAINER(sw), 0);
@@ -1056,6 +611,7 @@ uiCreate(void)
     gtk_scrolled_window_set_vadjustment(GTK_SCROLLED_WINDOW(sw),
     	GTK_CLIST(logwin)->vadjustment);
     gtk_widget_show(logwin);
+    logInit(logwin);
     
     messagebox = gtk_hbox_new(FALSE, SPACING);
     gtk_box_pack_start(GTK_BOX(vbox), messagebox, FALSE, FALSE, 0);
