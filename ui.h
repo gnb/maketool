@@ -34,6 +34,7 @@ void ui_group_add(gint group, GtkWidget *w);
 void ui_group_set_sensitive(gint group, gboolean b);
 
 GtkWidget *ui_create_file_sel(
+    GtkWidget *parent,
     const char *title,
     void (*callback)(const char *filename),
     const char *filename);
@@ -92,13 +93,16 @@ GtkWidget *ui_create_apply_dialog(
     const char *title,
     GtkSignalFunc apply_cb,
     gpointer data);
+GtkWidget *ui_create_dialog(
+    GtkWidget *parent,
+    const char *title);
 GtkWidget *ui_dialog_create_button(
     GtkWidget *dialog,
     const char *label,
     GtkSignalFunc callback,
     gpointer user_data);
 void ui_dialog_changed(GtkWidget *dialog);    
-    
+  
 
 /* config stuff */
 typedef struct

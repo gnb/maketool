@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.32 2000-04-16 08:23:22 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.33 2000-04-16 09:46:57 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -505,7 +505,11 @@ browse_makefile_cb(GtkWidget *w, gpointer data)
     char *mf = gtk_entry_get_text(GTK_ENTRY(makefile_entry));
     
     if (filesel == 0)
-    	filesel = ui_create_file_sel(_("Choose Makefile"), set_makefile, mf);
+    	filesel = ui_create_file_sel(
+	    toplevel,
+	    _("Choose Makefile"),
+	    set_makefile,
+	    mf);
     else
     	gtk_file_selection_set_filename(GTK_FILE_SELECTION(filesel), mf);
 

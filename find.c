@@ -24,7 +24,7 @@
 #include <regex.h>	/* POSIX regular expression fns */
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: find.c,v 1.2 2000-01-08 14:33:13 gnb Exp $");
+CVSID("$Id: find.c,v 1.3 2000-04-16 09:46:57 gnb Exp $");
 
 static GtkWidget	*find_shell = 0;
 typedef enum { FD_FORWARDS, FD_BACKWARDS, FD_MAX_DIRECTIONS } FindDirections;
@@ -337,8 +337,7 @@ create_find_shell(void)
     GtkWidget *entry;
     int row = 0;
 
-    find_shell = gtk_dialog_new();
-    gtk_window_set_title(GTK_WINDOW(find_shell), _("Maketool: Find"));
+    find_shell = ui_create_dialog(toplevel, _("Maketool: Find"));
 
     gtk_container_border_width(GTK_CONTAINER(GTK_DIALOG(find_shell)->vbox), SPACING);
 

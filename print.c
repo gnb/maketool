@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: print.c,v 1.3 2000-01-08 04:26:56 gnb Exp $");
+CVSID("$Id: print.c,v 1.4 2000-04-16 09:46:57 gnb Exp $");
 
 static GtkWidget	*print_shell = 0;
 typedef enum { D_PRINTER, D_FILE, D_NUM_DESTS } DEST;
@@ -259,6 +259,7 @@ print_file_browse_cb(GtkWidget *w, gpointer data)
     
     if (filesel == 0)
     	filesel = ui_create_file_sel(
+	    	toplevel,
 	    	_("Maketool: Open Log File"),
 		print_file_func,
 		gtk_entry_get_text(GTK_ENTRY(file_entry)));
@@ -301,8 +302,7 @@ create_print_shell(void)
     /* get list of printers from system */
     lpr_init();
     
-    print_shell = gtk_dialog_new();
-    gtk_window_set_title(GTK_WINDOW(print_shell), _("Maketool: Print"));
+    print_shell = ui_create_dialog(toplevel, _("Maketool: Print"));
 
     gtk_container_border_width(GTK_CONTAINER(GTK_DIALOG(print_shell)->vbox), SPACING);
 

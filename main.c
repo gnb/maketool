@@ -30,7 +30,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.51 2000-04-16 09:21:33 gnb Exp $");
+CVSID("$Id: main.c,v 1.52 2000-04-16 09:46:57 gnb Exp $");
 
 typedef enum
 {
@@ -798,7 +798,11 @@ file_open_cb(GtkWidget *w, gpointer data)
     static GtkWidget *filesel = 0;
     
     if (filesel == 0)
-    	filesel = ui_create_file_sel(_("Maketool: Open Log File"), file_open_file_func, "make.log");
+    	filesel = ui_create_file_sel(
+	    toplevel,
+	    _("Maketool: Open Log File"),
+	    file_open_file_func,
+	    "make.log");
 
     gtk_widget_show(filesel);
 }
@@ -819,7 +823,11 @@ file_save_cb(GtkWidget *w, gpointer data)
     static GtkWidget *filesel = 0;
     
     if (filesel == 0)
-    	filesel = ui_create_file_sel(_("Maketool: Save Log File"), file_save_file_func, "make.log");
+    	filesel = ui_create_file_sel(
+	    toplevel,
+	    _("Maketool: Save Log File"),
+	    file_save_file_func,
+	    "make.log");
 
     gtk_widget_show(filesel);
 }

@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.17 2000-01-24 11:04:58 gnb Exp $");
+CVSID("$Id: ui.c,v 1.18 2000-04-16 09:46:57 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -105,6 +105,7 @@ ui_file_sel_ok_cb(GtkWidget *w, gpointer data)
 
 GtkWidget *
 ui_create_file_sel(
+    GtkWidget *parent,
     const char *title,
     void (*callback)(const char *filename),
     const char *filename)
@@ -112,6 +113,9 @@ ui_create_file_sel(
     GtkWidget *filesel;
     
     filesel = gtk_file_selection_new(title);
+    gtk_window_set_position(GTK_WINDOW(filesel), GTK_WIN_POS_CENTER);
+    gtk_window_set_transient_for(GTK_WINDOW(filesel),
+    	    GTK_WINDOW(parent));
     gtk_signal_connect(
 	    GTK_OBJECT(GTK_FILE_SELECTION(filesel)->ok_button),
             "clicked", ui_file_sel_ok_cb,
@@ -412,6 +416,24 @@ ui_tool_add_space(GtkWidget *toolbar)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+GtkWidget *
+ui_create_dialog(
+    GtkWidget *parent,
+    const char *title)
+{
+    GtkWidget *dialog;
+    
+    dialog = gtk_dialog_new();
+    gtk_window_set_title(GTK_WINDOW(dialog), title);
+    gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+    gtk_window_set_transient_for(GTK_WINDOW(dialog),
+    	    GTK_WINDOW(parent));
+    
+    return dialog;
+}    
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 
 GtkWidget *
 ui_dialog_create_button(
@@ -443,9 +465,7 @@ ui_create_ok_dialog(
 {
     GtkWidget *dialog;
     
-    dialog = gtk_dialog_new();
-    gtk_window_set_title(GTK_WINDOW(dialog), title);
-    gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+    dialog = ui_create_dialog(parent, title);
     
     ui_dialog_create_button(dialog, _("OK"), ui_dialog_ok_cb, (gpointer)dialog);
     
@@ -504,8 +524,7 @@ ui_create_apply_dialog(
     ad->apply_cb = apply_cb;
     ad->user_data = data;
 
-    ad->dialog = gtk_dialog_new();
-    gtk_window_set_title(GTK_WINDOW(ad->dialog), title);
+    ad->dialog = ui_create_dialog(parent, title);
 
     gtk_object_set_data(GTK_OBJECT(ad->dialog), APPLY_DIALOG_DATA,
     	(gpointer)ad);
