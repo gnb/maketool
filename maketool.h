@@ -22,7 +22,7 @@
 
 #include "common.h"
 #include "maketool_task.h"
-#include <gtk/gtk.h>
+#include "ui.h"
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 /*

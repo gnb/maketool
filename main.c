@@ -21,7 +21,6 @@
 #include <stdarg.h>
 #include "maketool.h"
 #include "ui.h"
-#include "gtkdtree.h"
 #include "log.h"
 #include "util.h"
 #include <ctype.h>
@@ -33,7 +32,7 @@
 #include "mqueue.h"
 #include "progress.h"
 
-CVSID("$Id: main.c,v 1.107 2003-10-19 15:08:57 gnb Exp $");
+CVSID("$Id: main.c,v 1.108 2003-10-21 14:36:59 gnb Exp $");
 
 
 /*
@@ -1645,17 +1644,17 @@ edit_copy_cb(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-log_expand_cb(GtkDTree *tree, GtkDTreeNode *tree_node, gpointer data)
+log_expand_cb(GtkCTree *tree, GtkCTreeNode *tree_node, gpointer data)
 {
-    LogRec *lr = (LogRec *)gtk_dtree_node_get_row_data(tree, tree_node);
+    LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, tree_node);
 
     lr->expanded = TRUE;    
 }
 
 static void
-log_collapse_cb(GtkDTree *tree, GtkDTreeNode *tree_node, gpointer data)
+log_collapse_cb(GtkCTree *tree, GtkCTreeNode *tree_node, gpointer data)
 {
-    LogRec *lr = (LogRec *)gtk_dtree_node_get_row_data(tree, tree_node);
+    LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, tree_node);
 
     lr->expanded = FALSE;    
 }
@@ -1663,13 +1662,13 @@ log_collapse_cb(GtkDTree *tree, GtkDTreeNode *tree_node, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 /*
- * Called when a dtree row is selected or unselected
+ * Called when a ctree row is selected or unselected
  */
 static void
-log_click_cb(GtkDTree *tree, GtkDTreeNode *tree_node, gint column, gpointer data)
+log_click_cb(GtkCTree *tree, GtkCTreeNode *tree_node, gint column, gpointer data)
 {
 #if DEBUG
-    LogRec *lr = (LogRec *)gtk_dtree_node_get_row_data(tree, tree_node);
+    LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, tree_node);
     
     fprintf(stderr, "log_click_cb: code=%d file=\"%s\" line=%d\n",
     	lr->res.code, lr->res.file, lr->res.line);
@@ -2116,12 +2115,12 @@ ui_create(void)
 	SPACING, 0);
     gtk_widget_show(GTK_WIDGET(sw));
 
-    logwin = gtk_dtree_new_with_titles(1, 0, titles);
-    gtk_dtree_set_line_style(GTK_DTREE(logwin), GTK_DTREE_LINES_NONE);
-    gtk_dtree_set_expander_style(GTK_DTREE(logwin), GTK_DTREE_EXPANDER_TRIANGLE);
+    logwin = gtk_ctree_new_with_titles(1, 0, titles);
+    gtk_ctree_set_line_style(GTK_CTREE(logwin), GTK_CTREE_LINES_NONE);
+    gtk_ctree_set_expander_style(GTK_CTREE(logwin), GTK_CTREE_EXPANDER_TRIANGLE);
     gtk_clist_column_titles_hide(GTK_CLIST(logwin));
-    gtk_dtree_set_indent(GTK_DTREE(logwin), 16);
-    gtk_dtree_set_show_stub(GTK_DTREE(logwin), FALSE);
+    gtk_ctree_set_indent(GTK_CTREE(logwin), 16);
+    gtk_ctree_set_show_stub(GTK_CTREE(logwin), FALSE);
     gtk_clist_set_column_width(GTK_CLIST(logwin), 0, 400);
     gtk_clist_set_column_auto_resize(GTK_CLIST(logwin), 0, TRUE);
     gtk_signal_connect(GTK_OBJECT(logwin), "tree-select-row", 
