@@ -24,7 +24,7 @@
 #include <regex.h>	/* POSIX regular expression fns */
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: find.c,v 1.12 2001-08-02 08:28:00 gnb Exp $");
+CVSID("$Id: find.c,v 1.13 2001-09-21 04:20:01 gnb Exp $");
 
 #define FINDCASE 0  	/* TODO: implement case-insensitive literals */
 
@@ -66,7 +66,6 @@ static void
 find_state_print(FILE *fp, const FindState *s)
 {
     const char *type_str = 0;
-    const char *dirn_str = 0;
     
     switch (s->type)
     {
@@ -87,7 +86,7 @@ find_state_print(FILE *fp, const FindState *s)
     }
     
     fprintf(fp, "{ type=%s string=\"%s\" }",
-    	type_str, dirn_str, s->string);
+    	type_str, s->string);
 }
 
 #endif
@@ -142,8 +141,6 @@ find_state_get(FindState *state)
 static void
 find_state_set(const FindState *state)
 {
-    int i;
-    
     /* set current type */
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(type_radio[state->type]), TRUE);
     
@@ -355,7 +352,6 @@ create_find_shell(void)
     GtkWidget *radio;
     GtkWidget *check;
     GtkWidget *entry;
-    int row = 0;
 
     find_shell = ui_create_dialog(toplevel, _("Maketool: Find"));
     ui_set_help_name(find_shell, "find-window");

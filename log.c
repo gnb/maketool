@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.37 2001-07-26 15:32:58 gnb Exp $");
+CVSID("$Id: log.c,v 1.38 2001-09-21 04:20:56 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -728,6 +728,8 @@ log_print(FILE *fp)
 	case FR_ERROR:
 	    sev = L_ERROR;
     	    break;
+	default:
+	    break;  /* shut up Mr gcc */
 	}
 
 	ps_line(ps, log_get_text(lr), sev, log_get_indent_level(lr));
