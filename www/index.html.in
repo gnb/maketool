@@ -42,12 +42,15 @@ I personally test maketool on these platforms:
 </P>
 <UL>
   <LI>RedHat Linux 7.3 on i386
+  <LI>RedHat Linux 9 on i386
   <LI>IRIX on MIPS
+  <LI>SGI ProPack Linux on ia64
 </UL>
 <P>
 I have received reports of maketool running on these platforms:
 </P>
 <UL>
+  <LI>Debian Linux
   <LI>Slackware Linux 3.5
   <LI>NetBSD
   <LI>Solaris
