@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.47 2003-10-16 15:19:57 gnb Exp $");
+CVSID("$Id: filter.c,v 1.48 2003-10-26 08:48:40 gnb Exp $");
 
 typedef struct
 {
@@ -332,6 +332,56 @@ filter_set_start(const char *name)
 void
 filter_load(void)
 {
+    /*
+     * The filters in the "Generic UNIX C compiler" and "GNU cross-compilers"
+     * sets don't detect errors, they just provide summaries of compile lines.
+     * They are interspersed for historical reasons, it's not yet clear whether
+     * they need to be.
+     *
+     * Sadly, <> don't do quite what I expected in regexps, so they've been
+     * replaced with the horror ([ \t]|[ \t].*[ \t]) which matches a string of
+     * 1 or more chars starting and ending with whitespace.
+     *
+     * The order in which filters appear here controls the order in which they
+     * are evaluated when parsing logs.  Two factors control the order:
+     * 1.  More commonly matched filters should be earlier, to reduce the
+     *     number of regexec()s needed to parse logs.
+     * 2.  Potentially a line can match two or more filters, so the "right"
+     *     one needs to be earlier.
+     */
+    filter_set_start(_("Generic UNIX C compiler"));
+    filter_add(
+    	"",				/* state */
+	"^[ \t]*(|/[^ \t:#]+/)(cc|c89|gcc|CC|c\\+\\+|g\\+\\+)([ \t]|[ \t].*[ \t])-c([ \t]|[ \t].*[ \t])([^ \t]*\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
+	FR_INFORMATION,			/* code */
+	"\\5\\6",			/* file */
+	"",				/* line */
+	"",				/* col */
+	"Compiling \\5\\6",		/* summary */
+    	"C/C++ compile line");		/* comment */
+
+    filter_set_start(_("GNU cross-compilers"));
+    filter_add(
+    	"",				/* state */
+	"^[ \t]*(|/[^ \t:#]+/)[-/a-z0-9]+-(cc|gcc|c\\+\\+|g\\+\\+).*[ \t]-c([ \t]|[ \t].*[ \t])([^ \t]+\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
+	FR_INFORMATION,			/* code */
+	"\\4\\5",			/* file */
+	"",				/* line */
+	"",				/* col */
+	"Cross-compiling \\4\\5",   	/* summary */
+    	"GNU C/C++ cross-compile line"); /* comment */
+
+    filter_set_start(_("Linux kernel build"));
+    filter_add(
+    	"",				/* state */
+	"^(/[^ \t:#]+/)+scripts/mkdep", /* regexp */
+	FR_INFORMATION,			/* code */
+	"",			    	/* file */
+	"",				/* line */
+	"",				/* col */
+	"Building dependencies",   	/* summary */
+    	"Linux mkdep line"); 	    	/* comment */
+
     filter_set_start(_("GNU make directory messages"));
 
     filter_add(
@@ -742,38 +792,6 @@ filter_load(void)
 	"\\1 error: \\5",		/* summary */
     	"Oracle Pro/C error");		/* comment */
 	
-    /*
-     * The remaining filters don't detect errors,
-     * they just provide summaries of compile lines.
-     *
-     * Sadly, <> don't do quite what I expected in
-     * regexps, so they've been replaced with the
-     * horror ([ \t]|[ \t].*[ \t]) which matches a
-     * string of 1 or more chars starting and ending
-     * with whitespace.
-     */
-    filter_set_start(_("Generic UNIX C compiler"));
-    filter_add(
-    	"",				/* state */
-	"^[ \t]*(|/[^ \t:#]+/)(cc|c89|gcc|CC|c\\+\\+|g\\+\\+)([ \t]|[ \t].*[ \t])-c([ \t]|[ \t].*[ \t])([^ \t]*\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
-	FR_INFORMATION,			/* code */
-	"\\5\\6",			/* file */
-	"",				/* line */
-	"",				/* col */
-	"Compiling \\5\\6",		/* summary */
-    	"C/C++ compile line");		/* comment */
-
-    filter_set_start(_("GNU cross-compilers"));
-    filter_add(
-    	"",				/* state */
-	"^[ \t]*(|/[^ \t:#]+/)[-/a-z0-9]+-(cc|gcc|c\\+\\+|g\\+\\+).*[ \t]-c([ \t]|[ \t].*[ \t])([^ \t]+\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
-	FR_INFORMATION,			/* code */
-	"\\4\\5",			/* file */
-	"",				/* line */
-	"",				/* col */
-	"Cross-compiling \\4\\5",   	/* summary */
-    	"GNU C/C++ cross-compile line"); /* comment */
-
     filter_set_start(_("Generic UNIX C compiler"));
     filter_add(
     	"",				/* state */
