@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.34 2003-10-02 01:12:19 gnb Exp $");
+CVSID("$Id: filter.c,v 1.35 2003-10-05 09:03:54 gnb Exp $");
 
 typedef struct
 {
@@ -196,6 +196,16 @@ filter_load(void)
 	"\\3",				/* col */
 	"\\4",				/* summary */
     	"new gcc warnings");		/* comment */
+	
+    filter_add(
+    	"",				/* state */
+	"^\\{standard input\\}:([0-9]+): [wW]arning:(.*)$",	/* regexp */
+	FR_WARNING,			/* code */
+	"",				/* file */
+	"\\1",				/* line */
+	"",				/* col */
+	"\\2",				/* summary */
+    	"new gas warnings");		/* comment */
 	
     filter_add(
     	"",				/* state */
