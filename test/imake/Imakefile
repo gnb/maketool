@@ -1,0 +1,28 @@
+XCOMM 
+XCOMM Imakefile for XPPP
+XCOMM 
+XCOMM ############################################################
+XCOMM
+XCOMM IMPORTANT: SOLARIS MOTIF USERS. You might have to append -lgen to
+XCOMM the LIBS1 defined below, if your Imake setup isn't correct.
+XCOMM
+
+#include "Motif.tmpl"
+
+XCOMM ############################################################
+CC = gcc -ansi -pedantic -Wall -Wtraditional
+
+XCOMM  CDEBUGFLAGS =  -O2 -fno-builtin
+XCOMM CDEBUGFLAGS = -O 
+CDEBUGFLAGS = -g
+
+DEFINES =  -DMOTIF #-D_NO_PROTO
+
+INCLUDES = -I$(INCDIR) $(LIBGNB_INCLUDES)
+
+   LIBS = XmClientLibs -lm
+DEPLIBS = XmClientDepLibs
+   OBJS = crud.o
+
+NormalProgramTarget(crud,$(OBJS),$(DEPLIBS),$(LIBS),)
+
