@@ -28,7 +28,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.21 1999-06-01 11:32:48 gnb Exp $");
+CVSID("$Id: main.c,v 1.22 1999-06-01 13:20:56 gnb Exp $");
 
 typedef enum
 {
@@ -39,12 +39,15 @@ typedef enum
     GR_RUNNING,
     GR_EDITABLE,
     GR_AGAIN,
+    GR_ALL,
+    GR_CLEAN,
 
     NUM_SETS
 } Groups;
 
 char		*targets;		/* targets on commandline */
 const char	*lastTarget = 0;	/* last target built, for `again' */
+GList		*predefinedTargets = 0;	/* special well-known targets */
 GList		*availableTargets = 0;	/* all possible targets, for menu */
 GtkWidget	*buildMenu;
 GtkWidget	*toolbar, *messagebox;
@@ -62,6 +65,10 @@ GtkWidget	*anim;
 #define PASTE3(x,y,z) x##y##z
 
 static void build_cb(GtkWidget *w, gpointer data);
+
+#define g_list_find_str(l, s) \
+	g_list_find_custom((l), (s), (GCompareFunc)strcmp)
+
 
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -89,12 +96,16 @@ grey_menu_items(void)
     LogRec *sel = logSelected();
     gboolean editable = (sel != 0 && sel->res.file != 0);
     gboolean again = (lastTarget != 0 && !running);
+    gboolean all = (!running && g_list_find_str(availableTargets, "all") != 0);
+    gboolean clean = (!running && g_list_find_str(availableTargets, "clean") != 0);
 
     uiGroupSetSensitive(GR_NOTRUNNING, !running);
     uiGroupSetSensitive(GR_RUNNING, running);
     uiGroupSetSensitive(GR_NOTEMPTY, !empty);
     uiGroupSetSensitive(GR_EDITABLE, editable);
     uiGroupSetSensitive(GR_AGAIN, again);
+    uiGroupSetSensitive(GR_ALL, all);
+    uiGroupSetSensitive(GR_CLEAN, clean);
 }
 
 char *
@@ -199,6 +210,7 @@ reapList(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 {
     estring *targs = (estring *)user_data;
     char *t, *buf;
+    GList *predefs = 0, *list;
 
     if (!(WIFEXITED(status) || WIFSIGNALED(status)))
     	return;
@@ -206,6 +218,12 @@ reapList(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 #if DEBUG
     fprintf(stderr, "reaped list target\n");
 #endif
+    /* 
+     * Parse the output of the program into whitespace-separated
+     * strings which are targets. Build two lists, predefs (all
+     * the found targets which are also in `predefinedTargets')
+     * and availableTargets (all others).
+     */
     buf = targs->data;
     while ((t = strtok(buf, " \t\r\n")) != 0)
     {
@@ -216,12 +234,36 @@ reapList(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	else
 	{
     	   t = g_strdup(t);
-    	   availableTargets = g_list_append(availableTargets, t);
-	   uiAddButton(buildMenu, t, build_cb, t, GR_NOTRUNNING);
+	   if (g_list_find_str(predefinedTargets, t) != 0)
+    	       predefs = g_list_append(predefs, t);
+	   else
+    	       availableTargets = g_list_append(availableTargets, t);
     	}
 	buf = 0;
     }
     estring_free(targs);
+    
+    /*
+     * Build two parts of the menu from the two lists. This
+     * technique ensures the common and useful targets like
+     * `all' and `install' will appear early in the menu and
+     * will always be visible regardless of its size.
+     */
+    for (list = predefs ; list != 0 ; list = list->next)
+	uiAddButton(buildMenu, (const char*)list->data, build_cb, list->data,
+		GR_NOTRUNNING);
+    if (predefs != 0)
+	uiAddSeparator(buildMenu);
+    for (list = availableTargets ; list != 0 ; list = list->next)
+	uiAddButton(buildMenu, (const char*)list->data, build_cb, list->data,
+		GR_NOTRUNNING);
+
+    /*
+     * Now prepend predefs to availableTargets, which is now a
+     * list of all the found targets, predefined or not.
+     */
+    availableTargets = g_list_concat(predefs, availableTargets);
+
     grey_menu_items();
 }
 
@@ -233,12 +275,22 @@ inputList(int len, const char *buf, gpointer data)
     estring_append_chars(targs, buf, len);
 }
 
+static char *predefTargs[] = {
+"all", "install", "uninstall",
+"mostlyclean", "clean", "distclean", "reallyclean",
+0
+};
+
 static void
 listTargets(void)
 {
     char *prog;
     pid_t pid;
+    char **t;
     static estring targs;
+    
+    for (t = predefTargs ; *t ; t++)
+	predefinedTargets = g_list_prepend(predefinedTargets, *t);
     
     estring_init(&targs);
     
@@ -681,10 +733,10 @@ uiCreateTools()
 
     sprintf(tooltip, _("Build `%s'"), "all");
     uiToolCreate(toolbar, "all", tooltip,
-    	all_xpm, build_cb, "all", GR_NOTRUNNING);
+    	all_xpm, build_cb, "all", GR_ALL);
     sprintf(tooltip, _("Build `%s'"), "clean");
     uiToolCreate(toolbar, "clean", tooltip,
-    	clean_xpm, build_cb, "clean", GR_NOTRUNNING);
+    	clean_xpm, build_cb, "clean", GR_CLEAN);
     
     uiToolAddSpace(toolbar);
     
