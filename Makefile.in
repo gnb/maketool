@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.54 2003-09-01 13:41:50 gnb Exp $
+# $Id: Makefile.in,v 1.55 2003-09-13 09:43:28 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -122,10 +122,11 @@ distclean::
 
 install::
 	for exe in $(NON_GNU_MAKES) ; do \
-	    sed -e "s|@""MAKE""@|$$exe|g" < makewrap.in > makewrap ;\
-	    $(INSTALL) -m 755 makewrap $(pkglibexecdir)/`basename $$exe` ;\
+	    base=`basename $$exe` ;\
+	    m4 -Dexe=$$exe -Dbase=$$base -Dhost_os=@host_os@ makewrap.in > makewrap ;\
+	    $(INSTALL) -m 755 makewrap $(pkglibexecdir)/$$base ;\
+	    $(RM) makewrap ;\
 	done
-	$(RM) makewrap
 
 uninstall::
 	for exe in $(NON_GNU_MAKES) ; do \

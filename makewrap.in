@@ -22,8 +22,11 @@
 # entering and leaving directories, necessary for tracking which directory
 # a file belongs to in a recursive build.
 #
+dnl The usual m4-around-sh trick for quotes is to use [] but
+dnl here we need them for ksh array syntax, so use <>
+changequote(<,>)
 
-ME=`basename $0`
+ME=base
 
 if [ -z "$MAKELEVEL" ]; then
     MAKELEVEL=1
@@ -36,7 +39,41 @@ if [ $MAKELEVEL -gt 1 ]; then
     echo $ME"[$MAKELEVEL]: Entering directory \``/bin/pwd`'"
 fi
 
-@MAKE@ MAKE=$0 "$@"
+define(<smake_hack>,ifelse(
+    base-host_os,<smake-irix>,<yes>,
+    base-host_os,<smake-irix64>,<yes>,
+    <no>))
+ifelse(smake_hack,<yes>,<
+# Bloody smake will only accept arguments in the order:
+# options, variable-overrides, targets so we have to
+# parse and rebuild the options to override $MAKE.
+# Fortunately on IRIX we know /bin/sh is ksh so we can
+# use ksh arrays to preserve whitespace.
+declare -a OPTS
+declare -a VOVER
+declare -a TARGS
+while [ $# -gt 0 ]; do
+    case "$1" in
+    -J*|-n|-k|-q)
+    	OPTS[${#OPTS[@]}]="$1"
+	;;
+    -p|-f)
+    	OPTS[${#OPTS[@]}]="$1"
+    	OPTS[${#OPTS[@]}]="$2"
+    	<shift>
+    	;;
+    -*) echo "$ME: unknown option \"$1\" ignoring" ;;
+    *=*) 
+    	VOVER[${#VOVER[@]}]="$1"
+	;;
+    *)
+    	TARGS[${#TARGS[@]}]="$1"
+	;;
+    esac
+    <shift>
+done
+exe "${OPTS[@]}" "${VOVER[@]}" MAKE=$ME "${TARGS[@]}">,
+<exe MAKE=$ME "$@">)
 status=$?
 
 if [ $MAKELEVEL -gt 1 ]; then
