@@ -69,7 +69,7 @@ x  GNOME integration: provide triggers for sounds etc.
 x  Improve glib_extra.c so it doesn't require need to care
    about poll(2) directly and submit to the glib maintainers.
 
-x  Add patchlevel.h
+x  DONE: Add patchlevel.h
 
 x  Add autoconf support.
 
