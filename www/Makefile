@@ -11,7 +11,15 @@ IMAGES=		maketool_n.gif mainw.gif fm.mini.jpg tocbg.gif \
 		colors.jpg colors_t.jpg about_make.gif about_make_t.gif \
 		arrow_l2.gif arrow_r2.gif gimp.gif \
 		acgui.gif acgui_t.gif ja.gif ja_t.gif
-BINARIES:=	$(addprefix $(RELEASEDIR)/,$(shell m4 -I$(RELEASEDIR) list-binaries.m4))
+BINARIES:=	$(foreach b,\
+		    $(shell m4 -I$(RELEASEDIR) list-binaries.m4),\
+		    $(firstword \
+		    	$(wildcard \
+			    $(RELEASEDIR)/archive/$b \
+			    $(RELEASEDIR)/$b \
+			) \
+		    ) \
+		)
 SCRIPTS=	backbone.php
 DOTFILES=	.htaccess downloads/.htaccess
 
@@ -94,6 +102,10 @@ $(htmldir)/.%: %
 	$(INSTALL) -m 644 $< $@
 
 $(htmldir)/downloads/%: $(RELEASEDIR)/%
+	$(INSTALL) -m 644 $< $@
+	ln -sf backbone.php $(htmldir)/$*
+
+$(htmldir)/downloads/%: $(RELEASEDIR)/archive/%
 	$(INSTALL) -m 644 $< $@
 	ln -sf backbone.php $(htmldir)/$*
 
