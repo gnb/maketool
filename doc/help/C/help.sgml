@@ -4,15 +4,15 @@
 ]>
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.9 2001-08-29 07:19:42 gnb Exp $"
+         revision="$Id: help.sgml,v 1.10 2001-09-23 08:02:35 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
-  <title>Maketool online help</title>
+  <title>Maketool</title>
   <author>
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2001-08-29 07:19:42 $</pubdate>
+  <pubdate role="cvs">$Date: 2001-09-23 08:02:35 $</pubdate>
   <releaseinfo>This is version &version;</releaseinfo>
   <copyright>
     <year>2000</year>
@@ -25,38 +25,28 @@
     this document under the terms of the Open Publication License,
     version 2.0.</para>
   </legalnotice>
+  
+  <abstract>
+    <para>
+    Maketool is a GUI program for running the GNU make utility, or
+    <command>gmake</command>, to build software.
+    </para>
+    <para>
+    GNU make is a powerful utility for organising the process of
+    compiling and linking software, and is widely used in Open Source
+    and commercial software.
+    </para>
+  </abstract>
 
 </artheader>
 
-<sect1 id="index" xreflabel="Maketool Index">
-<title>Dummy</title>
 
-<para>
-This section exists only to force jade to split the first
-real section into its own HTML file.
-</para>
-
-<para>
-See the
-<ulink url="info:standards#Makefile_Conventions">GNU Makefile Standards</ulink>
-document.
-</para>
-
-</sect1>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="main-window" xreflabel="Main window">
+<section id="main-window" xreflabel="Main window">
 <title>Main window</title>
 
 <graphic format=GIF fileref="mainwin.gif"></graphic>
-
-<para>
-Maketool is a GUI program for running the GNU make utility, or
-<command>gmake</command>, to build software.  GNU make is a powerful
-utility for organising the process of compiling and linking
-software, and is widely used in Open Source and commercial
-software.
-</para>
 
 <para>
 This is maketool's main window.  The various parts of the main window are:
@@ -144,14 +134,10 @@ This is maketool's main window.  The various parts of the main window are:
   
 </variablelist>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="ok" xreflabel="Ok Button">
+<section id="ok" xreflabel="Ok Button">
 <title>Ok Button</title>
 
 <graphic format=GIF fileref="ok.gif"></graphic>
@@ -167,14 +153,10 @@ See also:
 <xref linkend="cancel">
 </para>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="apply" xreflabel="Apply Button">
+<section id="apply" xreflabel="Apply Button">
 <title>Apply Button</title>
 
 <graphic format=GIF fileref="apply.gif"></graphic>
@@ -190,14 +172,10 @@ See also:
 <xref linkend="cancel">
 </para>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="cancel" xreflabel="Cancel Button">
+<section id="cancel" xreflabel="Cancel Button">
 <title>Cancel Button</title>
 
 <graphic format=GIF fileref="cancel.gif"></graphic>
@@ -213,14 +191,10 @@ See also:
 <xref linkend="apply">
 </para>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="file-menu" xreflabel="File menu">
+<section id="file-menu" xreflabel="File menu">
 <title>File menu</title>
 
 <graphic format=GIF fileref="file-menu.gif"></graphic>
@@ -373,15 +347,10 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
 
 </variablelist>
 
-
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="edit-menu" xreflabel="Edit menu">
+<section id="edit-menu" xreflabel="Edit menu">
 <title>Edit menu</title>
 
 <graphic format=GIF fileref="edit-menu.gif"></graphic>
@@ -478,15 +447,10 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
 
 </variablelist>
 
-
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="build-menu" xreflabel="Build menu">
+<section id="build-menu" xreflabel="Build menu">
 <title>Build menu</title>
 
 <graphic format=GIF fileref="build-menu.gif"></graphic>
@@ -519,7 +483,7 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
     <term><guibutton>Dryrun Only</guibutton></term>
     <listitem>
       <para>
-      While this option is on, <command>gmake</command> does not
+      While this checkbox is on, <command>gmake</command> does not
       perform any building, and instead only shows the commands it
       would use for building.  This is useful for debugging Makefiles.
       </para>
@@ -528,16 +492,57 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
       </para>
     </listitem>
   </varlistentry>
+  
+  <varlistentry>
+    <term><guibutton>Makefile</guibutton></term>
+    <listitem>
+      <para>
+      Updates the <filename>Makefile</filename> from whatever
+      files are used to create it.  This command only appears
+      if the current directory uses a make system (see
+      <xref linkend="make-systems">) to generate the
+      <filename>Makefile</filename>.
+      </para>
+      <para>
+      Maketool can also perform this update automatically every
+      time a target is built; see the <xref linkend="enable-make-makefile">
+      checkbox.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>make system commands</term>
+    <listitem>
+      <para>
+      The section of the menu between the first and second separators
+      shows commands related to the make system used in the current directory.
+      See <xref linkend="make-systems"> for a description of
+      each command.
+      </para>
+      <para>
+      This section is updated when the current directory
+      is changed using the <xref linkend="change-directory">.
+      </para>
+    </listitem>
+  </varlistentry>
 
   <varlistentry>
     <term>standard targets</term>
     <listitem>
       <para>
-      The section of the menu between the first and second separators
+      The section of the menu between the second and third separators
       shows all the targets defined by the Makefile in the current
-      directory, which are standard targets defined by the GNU
+      directory, which are standard targets described by the GNU
       Makefile Standards.  Those targets, and their standard meanings
       are described in <xref linkend="standard-targets">.
+      </para>
+      <para>
+      Selecting a target causes that target to be built using
+      <command>gmake</command> and the output from <command>gmake</command>
+      to be displayed in the <xref linkend="log-window">.
+      </para>
+      <para>
       This section is updated when the current directory is changed
       using the <xref linkend="change-directory">.
       </para>
@@ -548,11 +553,18 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
     <term>non-standard targets</term>
     <listitem>
       <para>
-      The section of the menu after the second separator
+      The section of the menu after the third separator
       shows all the targets defined by the Makefile in the current
-      directory, excepting those which are standard targets,
-      and excepting certain targets which maketool considers
+      directory, except those which are standard targets,
+      and except certain targets which maketool considers
       "internal" to the Makefile.
+      </para>
+      <para>
+      Selecting a target causes that target to be built using
+      <command>gmake</command> and the output from <command>gmake</command>
+      to be displayed in the <xref linkend="log-window">.
+      </para>
+      <para>
       This section is updated when the current directory is changed
       using the <xref linkend="change-directory">.
       </para>
@@ -561,39 +573,26 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
 
 </variablelist>
 
-
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="view-menu" xreflabel="View menu">
+<section id="view-menu" xreflabel="View menu">
 <title>View menu</title>
 
 <graphic format=GIF fileref="view-menu.gif"></graphic>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="help-menu" xreflabel="Help menu">
+<section id="help-menu" xreflabel="Help menu">
 <title>Help menu</title>
 
 <graphic format=GIF fileref="help-menu.gif"></graphic>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="again-tool" xreflabel="Again tool">
+<section id="again-tool" xreflabel="Again tool">
 <title>Again tool</title>
 
 <graphic format=GIF fileref="tools-again.gif"></graphic>
@@ -618,14 +617,10 @@ See also:
 <!-- <xref linkend="menu-build"> -->
 </para>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="stop-tool" xreflabel="Stop tool">
+<section id="stop-tool" xreflabel="Stop tool">
 <title>Stop tool</title>
 
 <graphic format=GIF fileref="tools-stop.gif"></graphic>
@@ -646,14 +641,10 @@ See also:
 <!-- <xref linkend="menu-build"> -->
 </para>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="all-tool" xreflabel="Build All tool">
+<section id="all-tool" xreflabel="Build All tool">
 <title>Build All tool</title>
 
 <graphic format=GIF fileref="tools-all.gif"></graphic>
@@ -677,14 +668,10 @@ See also:
 <xref linkend="clean-tool">.
 </para>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="clean-tool" xreflabel="Clean tool">
+<section id="clean-tool" xreflabel="Clean tool">
 <title>Clean tool</title>
 
 <graphic format=GIF fileref="tools-clean.gif"></graphic>
@@ -716,14 +703,10 @@ See also:
 <xref linkend="all-tool">
 </para>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="clear-tool" xreflabel="Clear Log tool">
+<section id="clear-tool" xreflabel="Clear Log tool">
 <title>Clear Log tool</title>
 
 <graphic format=GIF fileref="tools-clear.gif"></graphic>
@@ -736,14 +719,10 @@ Click this tool to delete all text in the window.
 This toolbar button becomes available when the log window contains text.
 </para>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="edit-next-tool" xreflabel="Edit Next Error tool">
+<section id="edit-next-tool" xreflabel="Edit Next Error tool">
 <title>Edit Next Error tool</title>
 
 <graphic format=GIF fileref="tools-edit-next.gif"></graphic>
@@ -764,14 +743,10 @@ See also:
 <xref linkend="edit-file-next-tool">
 </para>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="edit-file-next-tool" xreflabel="Edit File Next Error tool">
+<section id="edit-file-next-tool" xreflabel="Edit File Next Error tool">
 <title>Edit File Next Error tool</title>
 
 <graphic format=GIF fileref="tools-edit-file-next.gif"></graphic>
@@ -795,14 +770,10 @@ See also:
 <xref linkend="edit-next-tool">
 </para>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="print-tool" xreflabel="Print tool">
+<section id="print-tool" xreflabel="Print tool">
 <title>Print tool</title>
 
 <graphic format=GIF fileref="tools-print.gif"></graphic>
@@ -816,89 +787,64 @@ which you can use to print the text in the log window.
 This tool becomes available when the log window contains text.
 </para>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="open-log-file-window" xreflabel="Open Log File window">
+<section id="open-log-file-window" xreflabel="Open Log File window">
 <title>Open Log File window</title>
 
 <graphic format=GIF fileref="open-log-file-window.gif"></graphic>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="save-log-file-window" xreflabel="Save Log File window">
+<section id="save-log-file-window" xreflabel="Save Log File window">
 <title>Save Log File window</title>
 
 
 <graphic format=GIF fileref="save-log-file-window.gif"></graphic>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="change-directory-window" xreflabel="Change Directory window">
+<section id="change-directory-window" xreflabel="Change Directory window">
 <title>Change Directory window</title>
 
 
 <graphic format=GIF fileref="change-directory-window.gif"></graphic>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="print-window" xreflabel="Print window">
+<section id="print-window" xreflabel="Print window">
 <title>Print window</title>
 
 
 <graphic format=GIF fileref="print-window.gif"></graphic>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="find-window" xreflabel="Find window">
+<section id="find-window" xreflabel="Find window">
 <title>Find window</title>
 
 
 <graphic format=GIF fileref="find-window.gif"></graphic>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="preferences-window" xreflabel="Preferences window">
+<section id="preferences-window" xreflabel="Preferences window">
 <title>Preferences window</title>
 
-
 <para>
-<xref linkend="index">
+Yadda, yadda, yadda.
 </para>
 
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="general-pane" xreflabel="General pane">
+<section id="general-pane" xreflabel="General pane">
 <title>General pane</title>
 
 <graphic format=GIF fileref="general-pane.gif"></graphic>
@@ -916,106 +862,209 @@ This toggle sets the <option>-k</option> flag to <command>gmake</command>.
 
 <anchor id="edit-next-ignores-warnings" xreflabel="Edit Next ignores warnings">
 
+<anchor id="enable-make-makefile"
+    xreflabel="Build Makefile from Imakefile or Makefile.in">
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="variables-pane" xreflabel="Variables pane">
+<section id="variables-pane" xreflabel="Variables pane">
 <title>Variables pane</title>
 
 
 <graphic format=GIF fileref="variables-pane.gif"></graphic>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="programs-pane" xreflabel="Programs pane">
+<section id="programs-pane" xreflabel="Programs pane">
 <title>Programs pane</title>
 
 
 <graphic format=GIF fileref="programs-pane.gif"></graphic>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="colors-pane" xreflabel="Colors pane">
+<section id="colors-pane" xreflabel="Colors pane">
 <title>Colors pane</title>
 
 
 <graphic format=GIF fileref="colors-pane.gif"></graphic>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="page-setup-pane" xreflabel="Page Setup pane">
+<section id="page-setup-pane" xreflabel="Page Setup pane">
 <title>Page Setup pane</title>
 
 
-<graphic format=GIF fileref="page-setup-pane.gif"></graphic>
+<para>Yadda, yadda, yadda</para>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="about-maketool-window" xreflabel="About Maketool window">
+<section id="configure-window" xreflabel="Configure Options window">
+<title>Configure Options window</title>
+
+<graphic format=GIF fileref="configure-window-basic.gif"></graphic>
+
+<para>
+This window allows you to choose among the various configuration
+options provided by the <xref linkend="autoconf">
+<filename>configure</filename> script in the current directory.
+</para>
+
+<para>
+This window can be opened automatically when the <filename>Makefile</filename>
+is being updated (if the <xref linkend="enable-make-makefile"> checkbox
+is on), or manually by selecting <guibutton>Makefile</guibutton>
+or <guibutton>Run configure...</guibutton> from the <xref linkend="build-menu">.
+See <xref linkend="make-systems"> for more information.
+</para>
+
+<para>
+When the window is opened, the options you chose the last time
+are the default values.
+  <footnote>
+    <para>
+    An exception is the <guibutton>Do not create output files</guibutton>
+    option, which for obvious reasons is not saved in
+    <filename>config.status</filename>.
+    </para>
+  </footnote>
+This information is read from the <filename>config.status</filename>
+file, so it will be used even if you have never used maketool in this
+directory before.
+</para>
+
+<para>
+The window has two modes, <emphasis>Basic</emphasis> (the default)
+and <emphasis>Advanced</emphasis>.  The <guibutton>Advanced...</guibutton>
+button toggles between these two modes.
+</para>
+
+<section>
+<title>Basic mode</title>
+
+<para>
+In Basic mode, the window has the following panes:
+</para>
+
+<variablelist>
+
+  <varlistentry>
+    <term><guibutton>Directory and file names</guibutton></term>
+    <listitem>
+      <para>
+      Contains options related to directories and filenames
+      used by the software package.  In Basic mode the only
+      option is <guibutton>Install architecture-independent
+      files in PREFIX</guibutton>, which specifies the
+      directory under which all the software project's files
+      will be installed (e.g. <filename>/usr/local</filename>).
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Features and packages</guibutton></term>
+    <listitem>
+      <para>
+      Contains options which control user-selectable
+      features of the <filename>configure</filename> script.
+      The exact contents depend on the particular script, and
+      this may pane may not even be present if <filename>configure</filename>
+      is particularly simple.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Preview</guibutton></term>
+    <listitem>
+      <para>
+      Shows the command line of the <filename>configure</filename>
+      script that corresponds to the options you have chosen.
+      Note that the tooltip on each option shows you the name of
+      the commandline option passed to <filename>configure</filename>.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+
+</section> <!-- basic mode -->
+
+<section>
+<title>Advanced mode</title>
+
+<graphic format=GIF fileref="configure-window-advanced.gif"></graphic>
+
+<para>
+In Advanced mode, more options become available in all the panes,
+and two new panes appear:
+</para>
+
+<variablelist>
+
+  <varlistentry>
+    <term><guibutton>Configuration</guibutton></term>
+    <listitem>
+      <para>
+      Contains options related to the behaviour of the
+      <filename>configure</filename> script itself.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Host Type</guibutton></term>
+    <listitem>
+      <para>
+      Contains options related to cross-compilation.
+      This may pane may not be present if <filename>configure</filename>
+      is particularly simple.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+
+
+</section> <!-- advanced mode -->
+
+</section> <!-- configure-window -->
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<section id="about-maketool-window" xreflabel="About Maketool window">
 <title>About Maketool window</title>
 
 
 <graphic format=GIF fileref="about-maketool-window.gif"></graphic>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="licence-window" xreflabel="Licence window">
+<section id="licence-window" xreflabel="Licence window">
 <title>Licence window</title>
 
 
 <graphic format=GIF fileref="licence-window.gif"></graphic>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="about-make-window" xreflabel="About Make window">
+<section id="about-make-window" xreflabel="About Make window">
 <title>About Make window</title>
 
 
 <graphic format=GIF fileref="about-make-window.gif"></graphic>
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="metacharacters" xreflabel="Metacharacters">
+<section id="metacharacters" xreflabel="Metacharacters">
 <title>Metacharacters</title>
 
 <para>
@@ -1416,15 +1465,388 @@ the UNIX shell and read it.  Alternatively, the
 is available online.  You will learn a powerful and useful tool.
 </para>
 
-
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
-<sect1 id="standard-targets" xreflabel="Standard Targets">
+<section id="make-systems" xreflabel="Make Systems">
+<title>Make Systems</title>
+
+
+<para>
+The name <emphasis>make system</emphasis> is used in this documentation
+to refer to one of the various systems used to construct a
+<filename>Makefile</filename> from another source file.  These systems are
+intend to make the creation and maintenance of Makefiles simpler.
+</para>
+
+<para>
+The important thing to understand about make systems is that the source
+of a software project which uses one of these systems is delivered without a
+Makefile.  This means that some extra command(s) need to be
+performed before <command>gmake</command> can be run the first time.
+</para>
+
+<para>
+For people unused to building free software, this represents extra
+complexity right at the time when they are least equipped to handle
+it.  Maketool tries to soften this impact by:
+</para>
+
+<itemizedlist>
+
+  <listitem>
+    <para>
+    automatically detecting which (if any) make system is used by
+    the software project;
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>
+    providing (in the <xref linkend="build-menu">) a command to
+    update the Makefile, and various other commands related to
+    the make system;
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>
+    automatically updating the Makefile every time a target is
+    built (if the <xref linkend="enable-make-makefile"> checkbox is on).
+    </para>
+  </listitem>
+
+</itemizedlist>
+
+<para>
+Maketool knows about all the popular make systems used with
+free software today:
+</para>
+
+<itemizedlist>
+  <listitem><para><xref linkend="automake"></para></listitem>
+  <listitem><para><xref linkend="autoconf"></para></listitem>
+  <listitem><para><xref linkend="imake"></para></listitem>
+</itemizedlist>
+
+</section> <!-- make-systems -->
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<section id="automake" xreflabel="automake">
+<title>automake</title>
+
+<para>
+This is the most powerful and high-end make system available today.  To
+use automake, you only need to provide the briefest sketch of a
+<filename>Makefile</filename>, in a file called
+<filename>Makefile.am</filename>, and automake does the rest.
+</para>
+
+<para>
+Automake requires use of the <xref linkend="autoconf">
+system for discovering and recording configuration information.
+See the <ulink url="info:automake">GNU automake documentation</ulink> for
+more information.
+</para>
+
+<para>
+When maketool detects that the current directory is using automake,
+the following commands appear in the <xref linkend="build-menu">.
+</para>
+
+<variablelist>
+
+  <varlistentry>
+    <term><guibutton>Makefile</guibutton></term>
+    <listitem>
+      <para>
+      Performs all the actions necessary to update the
+      <filename>Makefile</filename> from whatever files it
+      depends on.  This is usually all you ever need to do:
+      it performs all the other commands listed below but in
+      the correct order and only if they are necessary.
+      </para>
+      <para>
+      The output appears in the <xref linkend="log-window">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Run automake</guibutton></term>
+    <listitem>
+      <para>
+      Runs the <command>automake -a</command> command to generate
+      <filename>Makefile.in</filename> from <filename>Makefile.am</filename>.
+      This is useful when you are working on <filename>Makefile.am</filename>.
+      </para>
+      <para>
+      The output appears in the <xref linkend="log-window">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Run autoconf</guibutton></term>
+    <listitem>
+      <para>
+      Runs the <command>autoconf</command> command to generate
+      <filename>configure</filename> from <filename>configure.in</filename>.
+      This is useful when you are working on <filename>configure.in</filename>.
+      </para>
+      <para>
+      The output appears in the <xref linkend="log-window">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Remove config.cache</guibutton></term>
+    <listitem>
+      <para>
+      Removes the <filename>config.cache</filename> file, which is
+      used to cache information discovered by the <filename>configure</filename>
+      script.  This is sometimes necessary when you are working on
+      <filename>configure.in</filename>.
+      </para>
+      <para>
+      The output appears in the <xref linkend="log-window">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Run configure...</guibutton></term>
+    <listitem>
+      <para>
+      Shows the <xref linkend="configure-window">, which allows
+      you to run the <filename>configure</filename> script.  This
+      script accepts your configuration choices, discovers various
+      information about the operating system, and finally generates
+      <filename>Makefile</filename> (and usually some other files,
+      such as <filename>config.h</filename>).
+      </para>
+      <para>
+      The output appears in the <xref linkend="log-window">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Run config.status</guibutton></term>
+    <listitem>
+      <para>
+      Runs the <filename>config.status</filename> script, which
+      is produced by the <filename>configure</filename> script
+      and generates <filename>Makefile</filename> (and usually some other 
+      files, such as <filename>config.h</filename>).  This is useful
+      when you are working on <filename>Makefile.am</filename> or
+      <filename>config.h.in</filename>, because it is faster than
+      running the <filename>configure</filename> script itself.
+      </para>
+      <para>
+      The output appears in the <xref linkend="log-window">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+
+
+</section> <!-- automake -->
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<section id="autoconf" xreflabel="autoconf">
+<title>autoconf</title>
+
+
+<para>
+Autoconf is a system for discovering configuration information
+about the operating system, and encoding that information in
+various files.  It is used to avoid portability issues and to
+provide a standard interface for selecting configurable options.
+</para>
+
+<para>
+Typically, autoconf will be used to generate the <filename>Makefile</filename>
+from a file called <filename>Makefile.in</filename>, and
+<filename>config.h</filename> from a file called
+<filename>config.h.in</filename>.
+</para>
+
+<para>
+However, autoconf is considerably more flexible than this and can
+be used in other ways.  See the
+<ulink url="info:autoconf">GNU autoconf documentation</ulink> for more
+information.
+</para>
+
+<para>
+When maketool detects that the current directory is using automake,
+the following commands appear in the <xref linkend="build-menu">.
+</para>
+
+<variablelist>
+
+  <varlistentry>
+    <term><guibutton>Makefile</guibutton></term>
+    <listitem>
+      <para>
+      Performs all the actions necessary to update the
+      <filename>Makefile</filename> from whatever files it
+      depends on.  This is usually all you ever need to do:
+      it performs all the other commands listed below but in
+      the correct order and only if they are necessary.
+      </para>
+      <para>
+      The output appears in the <xref linkend="log-window">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Run autoconf</guibutton></term>
+    <listitem>
+      <para>
+      Runs the <command>autoconf</command> command to generate
+      <filename>configure</filename> from <filename>configure.in</filename>.
+      This is useful when you are working on <filename>configure.in</filename>.
+      </para>
+      <para>
+      The output appears in the <xref linkend="log-window">.
+      </para>
+      <para>
+      This command only appears if the current directory contains
+      a <filename>configure.in</filename> file (sometimes software is
+      distributed without this file, although that is not a good
+      practice).
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Remove config.cache</guibutton></term>
+    <listitem>
+      <para>
+      Removes the <filename>config.cache</filename> file, which is
+      used to cache information discovered by the <filename>configure</filename>
+      script.  This is sometimes necessary when you are working on
+      <filename>configure.in</filename>.
+      </para>
+      <para>
+      The output appears in the <xref linkend="log-window">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Run configure...</guibutton></term>
+    <listitem>
+      <para>
+      Shows the <xref linkend="configure-window">, which allows
+      you to run the <filename>configure</filename> script.  This
+      script accepts your configuration choices, discovers various
+      information about the operating system, and finally generates
+      <filename>Makefile</filename> (and usually some other files,
+      such as <filename>config.h</filename>).
+      </para>
+      <para>
+      The output appears in the <xref linkend="log-window">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Run config.status</guibutton></term>
+    <listitem>
+      <para>
+      Runs the <filename>config.status</filename> script, which
+      is produced by the <filename>configure</filename> script
+      and generates <filename>Makefile</filename> (and usually some other 
+      files, such as <filename>config.h</filename>).  This is useful
+      when you are working on <filename>Makefile.am</filename> or
+      <filename>config.h.in</filename>, because it is faster than
+      running the <filename>configure</filename> script itself.
+      </para>
+      <para>
+      The output appears in the <xref linkend="log-window">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+
+
+</section> <!-- autoconf -->
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<section id="imake" xreflabel="imake">
+<title>imake</title>
+
+<para>
+Imake is an old-fashioned make system used for building the
+X Window System and some third-party XWindows and Motif
+programs.
+</para>
+
+<para>
+Most uses of imake are being replaced by autoconf, which does
+the same job but more flexibly.   For example, the
+<filename>configure</filename> script in autoconf has a
+<option>--help</option> option which shows the user what
+options are available; there is no equivalent in imake.
+If your project uses imake, please consider learning
+<xref linkend="autoconf">.
+</para>
+
+<para>
+See the <ulink url="man:imake">imake documentation</ulink> for
+more information.
+</para>
+
+<para>
+When maketool detects that the current directory is using automake,
+the following commands appear in the <xref linkend="build-menu">.
+</para>
+
+<variablelist>
+
+  <varlistentry>
+    <term><guibutton>Makefile</guibutton></term>
+    <listitem>
+      <para>
+      Performs all the actions necessary to update the
+      <filename>Makefile</filename> from whatever files it
+      depends on.  This is usually all you ever need to do:
+      it performs all the other commands listed below but in
+      the correct order and only if they are necessary.
+      </para>
+      <para>
+      The output appears in the <xref linkend="log-window">.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Run xmkmf</guibutton></term>
+    <listitem>
+      <para>
+      Runs the <command>xmkmf</command> command to generate
+      <filename>Makefile</filename> from <filename>Imakefile</filename>.
+      </para>
+      <para>
+      The output appears in the <xref linkend="log-window">.
+      </para>
+    </listitem>
+  </varlistentry>
+  
+</variablelist>
+
+
+</section> <!-- imake -->
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<section id="standard-targets" xreflabel="Standard Targets">
 <title>Standard Targets</title>
 
 <variablelist>
@@ -1568,11 +1990,7 @@ is available online.  You will learn a powerful and useful tool.
 </variablelist>
 
 
-<para>
-<xref linkend="index">
-</para>
-
-</sect1>
+</section>
 
 <!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
 
