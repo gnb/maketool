@@ -62,6 +62,10 @@ void log_save(const char *file);
 void log_open(const char *file);
 /* generates PostScript on given FILE* */
 void log_print(FILE *fp);
+/*
+ * Filters line, converts it to zero or more LogRecs
+ * and returns the last LogRec or NULL.
+ */
 LogRec *log_add_line(const char *line);
 void log_ensure_visible(const LogRec *);
 
