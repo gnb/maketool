@@ -21,7 +21,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: preferences.c,v 1.11 1999-05-30 11:24:39 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.12 1999-06-01 12:43:34 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -248,7 +248,7 @@ preferences_init(void)
     prefs_set_var_make_flags();
     
     prefs.prog_make = g_strdup("make %m %k %p %v %t");
-    prefs.prog_list_targets = g_strdup("./extract_targets.sh %m %v");
+    prefs.prog_list_targets = g_strdup("extract_targets %m %v");
     prefs.prog_list_version = g_strdup("make --version");
     prefs.prog_edit_source = g_strdup("nc -noask %{l:+-line %l} %f");
 }
