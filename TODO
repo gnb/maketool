@@ -300,3 +300,52 @@ x  DONE: Add filters to support MWOS cross-compiler (see sample mwos.errs)
 x  Option to always scroll to end on make output
 
 x  Handle user clicking E's X button on dialogs.
+
+x  A.T. Hofkamp says: make_makefile and extract_targets should live
+   somewhere like $prefix/libexec/maketool/ not $prefix/bin.
+
+x  A.T. Hofkamp says: when extract_targets is not found, the failure
+   mode is that the Build menu contains the following entries:
+   /bin/sh:
+   extract_targets:
+   command
+   not
+   found
+   
+x  A.T. Hofkamp says about the Find window:  
+>   The buttons seem to do something else than they say.
+>   - 'Search forwards' seems to mean 'Search top-to-bottom'
+>   - 'Find' seems to mean 'Find first match in log'
+>   - 'Find again' seems to mean 'Find next match in log relative to current
+>     position'
+>   To explain why this is not what I expected, let me show my intuitive meaning
+>   of the buttons (i.e. before I tried them).
+>   - 'Search forwards' meant to me 'search downwards, relative from current position'
+>   - 'Find' meant to me 'go' (thus, 'search downwards, relative from current position')
+>   - 'Find again' meant to me 'try again, from current position'.   
+
+x  A.T. Hofkamp says about the Find window:  
+>   I hit the enter key, and got
+> 
+>   Gtk-WARNING **: invalid cast from (NULL) pointer to `GtkToggleButton'
+> 
+>   Gtk-CRITICAL **: file gtktogglebutton.c: line 296
+>   (gtk_toggle_button_get_active): assertion `toggle_button != NULL' failed.
+> 
+
+
+x  A.T. Hofkamp says about the Find window:   I still feel that tasks like
+   this cannot be done faster than by typing something like
+   /91.*blo/
+   (but I am a strongly keyboard-oriented guy).
+
+x  Add an option to disable make_makefile
+
+x  Add an editor choice for "gvim +%l %f"
+
+x  A.T. Hofkamp says running gvim works but he gets
+   ioctl(FIONREAD): Bad file descriptor
+
+x  A.T. Hofkamp says: add a button to edit the first error in the next file.
+
+x  A.T. Hofkamp says: Please make it possibe to edit the Makefile
