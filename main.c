@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.73 2001-07-25 12:02:44 gnb Exp $");
+CVSID("$Id: main.c,v 1.74 2001-07-26 16:51:48 gnb Exp $");
 
 
 /*
@@ -436,6 +436,19 @@ list_targets_reap(Task *task)
     ui_delete_menu_items(build_menu);
     construct_build_menu_basic_items();
      
+    if (!task_is_successful(task))
+    {
+    	GtkWidget *errorw;
+	
+    	/* Oh dear, something went wrong.  We have no targets. */
+	message(_("Error listing targets: %s"), ltt->targets.data);
+	estring_free(&ltt->targets);
+	errorw = ui_add_button_2(build_menu, _("No targets found"), FALSE, 0, 0, 0, 0);
+	gtk_widget_set_sensitive(errorw, FALSE);
+	grey_menu_items();
+	return;
+    }
+    
     /* 
      * Parse the output of the program into whitespace-separated
      * strings which are targets. Build two lists, std (all

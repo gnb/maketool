@@ -36,6 +36,7 @@ struct _Task
     int input_tag;
     gboolean enqueued;
     TaskOps *ops;
+    int status; /* wait3 status */
 };
 
 struct _TaskOps
@@ -91,6 +92,12 @@ gboolean task_is_running(void);
  * Kill the currently running task.
  */
 void task_kill_current(void);
+
+/*
+ * Returns TRUE iff the task succeeded (exit(0) called).
+ * Only useful inside a TaskOps reap handler.
+ */
+gboolean task_is_successful(const Task *);
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 

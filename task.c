@@ -31,7 +31,7 @@
 #include <sys/filio.h>
 #endif
 
-CVSID("$Id: task.c,v 1.7 2001-07-25 08:35:22 gnb Exp $");
+CVSID("$Id: task.c,v 1.8 2001-07-26 16:51:48 gnb Exp $");
 
 static GList *task_all = 0;
 static void (*task_work_start_cb)(void) = 0;
@@ -117,6 +117,7 @@ task_reap_func(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     task->pid = -1; 	/* so task_is_running() == FALSE in reap fn */
     task_all = g_list_remove(task_all, task);
     
+    task->status = status;
     if (task->ops->reap != 0)
 	(*task->ops->reap)(task);
     task_destroy(task);
@@ -131,6 +132,12 @@ task_reap_func(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	else
     	    task_start();	/* spawn the next task in the queue */
     }
+}
+
+gboolean
+task_is_successful(const Task *task)
+{
+    return (WIFEXITED(task->status) && WEXITSTATUS(task->status) == 0);
 }
 
 

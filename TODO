@@ -160,14 +160,6 @@ x  possibly generate token span from line before the MWOS "   ^" stuff.
 
 x  apply the prefs option used at start of build to opening log files.
 
-x  A.T. Hofkamp says: when extract_targets is not found, the failure
-   mode is that the Build menu contains the following entries:
-   /bin/sh:
-   extract_targets:
-   command
-   not
-   found
-   
 x  A.T. Hofkamp says about the Find window:   I still feel that tasks like
    this cannot be done faster than by typing something like
    /91.*blo/
@@ -414,4 +406,12 @@ x  DONE: Detect (at configure time) whether BSD or SysV signal semantics are
 x  DONE: The directory /usr/src/redhat/SOURCES is RH-specific.  Mandrake
    uses the more vendor-neutral /usr/src/RPM/SOURCES which needs
    to be accomodated.
+   
+x  DONE: A.T. Hofkamp says: when extract_targets is not found, the failure
+   mode is that the Build menu contains the following entries:
+   /bin/sh:
+   extract_targets:
+   command
+   not
+   found
    
