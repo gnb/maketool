@@ -1,0 +1,11 @@
+<!ENTITY gmake "<command>gmake</command>">
+<!ENTITY makefile "<filename>makefile</filename>">
+<!ENTITY Makefile "<filename>Makefile</filename>">
+<!ENTITY GNUmakefile "<filename>GNUmakefile</filename>">
+<!ENTITY Makefilein "<filename>Makefile.in</filename>">
+<!ENTITY Makefileam "<filename>Makefile.am</filename>">
+<!ENTITY Imakefile "<filename>Imakefile</filename>">
+<!ENTITY configure "<filename>configure</filename>">
+<!ENTITY OK "<guibutton>OK</guibutton>">
+<!ENTITY Apply "<guibutton>Apply</guibutton>">
+<!ENTITY Cancel "<guibutton>Cancel</guibutton>">
