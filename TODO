@@ -1,5 +1,13 @@
 --- open ---
 
+x  Rajesh Gupta reports:
+   > Let me explain my setting also know. I have a makefile and
+   > srcs.mak file.  all sources are listed in srcs.mak file. I
+   > ran the maketool from its installation directory and gave the
+   > full path of makefile. When I did a make all it gave warning
+   > srcs.mak not found. That is quite understandable but then
+   > when I clicked apply in preference menu [dialog] it crashed.
+
 x  Add a Build->Makefile menu item to allow the user to manually start
    the Makefile-build process.
    
