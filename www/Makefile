@@ -12,6 +12,7 @@ DELIVERABLES=	$(PAGES) $(IMAGES)
 all:: $(PAGES)
 
 changelog.html: _changelist.html
+features.html: _thanks.m4
 $(PAGES): _styles.html _common.m4
 
 _changelist.html: ../CHANGES

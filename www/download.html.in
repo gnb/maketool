@@ -14,7 +14,7 @@ The latest version available is <B>LATESTVERSION</B>.
 </P>
 
 <P>
-Due to space limitations I am unable to provide downloads of older
+Due to space limitations I am unable to provide downloads of many older
 versions on this website; <A HREF="mailto:gnb@alphalink.com.au">contact me</A>
 if you really need an older version.
 <A
@@ -23,6 +23,18 @@ if you really need an older version.
 <P>
 Download the i386-linux RPM: <A HREF="maketool-LATESTVERSION-1.i386.rpm">maketool-LATESTVERSION-1.i386.rpm</A><BR>
 Download the source tarball: <A HREF="maketool-LATESTVERSION-src.tgz">maketool-LATESTVERSION-src.tgz</A><BR>
+</P>
+
+<P>
+Maketool has also been ported to NetBSD, you can
+<A HREF="ftp://ftp.netbsd.org/pub/NetBSD/packages/pkgsrc/devel/maketool/README.html">get the packages here</A>.
+<B>Disclaimer:</B> I don't control that site, please don't complain to me if anything goes wrong.
+</P>
+
+<P>
+I have received reports that maketool has been ported to Solaris, but I am
+unable to point to any binaries (sorry). The latest source includes Solaris
+port patches, but I am currently unable to test those myself.
 </P>
 
 <P>

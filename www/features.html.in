@@ -32,4 +32,15 @@ Maketool's features include:
   <LI>Configure foreground & background colours of error & warnings lines.
 </UL>
 
+<!-- TODO: move this to a new page -->
+<P>
+Thanks to the following people who have contributed to maketool.
+</P>
+include(_thanks.m4)
+BEGINTHANKS
+THANKS(Frederick Bruckman,`NetBSD port, bugfixes')
+THANKS(Alistair Crooks,Solaris port)
+THANKS(Francesco Lamonica,bug report)
+ENDTHANKS
+
 ENDBODY
