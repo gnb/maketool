@@ -17,10 +17,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: extract_targets.sh,v 1.4 1999-06-01 11:32:14 gnb Exp $
+# $Id: extract_targets.sh,v 1.5 1999-06-01 13:19:05 gnb Exp $
 #
 
-make -n -p "$@" | awk '
+make -n -p "$@" _no_such_target_ 2>/dev/null | awk '
 BEGIN {
     isTarget = 1
     isFile = 0
@@ -39,7 +39,13 @@ BEGIN {
 	targ = substr($0, 0, index($0, ":")-1)
 	# Filter out some real but useless targets
         suitable = 1
-	if (substr(targ, 0, 1) == "." || index(targ, "/.") > 0)
+	if (substr(targ, 0, 1) == ".")
+	    suitable = 0
+	if (index(targ, "/.") > 0)
+	    suitable = 0
+	if (substr(targ, 0, 1) == "/")
+	    suitable = 0
+	if (substr(targ, 0, 3) == "../")
 	    suitable = 0
 	if (suitable)
     	    print targ
