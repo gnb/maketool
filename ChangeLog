@@ -1,3 +1,13 @@
+Sun Nov 16 16:17:30 2003  Greg Banks <gnb@alphalink.com.au>
+	* Release 0.8.4
+
+	* [FEA] Added a Pause command to the toolbar and Build menu
+	which uses BSD job control to pause and resume the build.
+	* [BUG] Removed empty branches from filter regexps; this is a
+	nonportable feature of GNU libc which broke on FreeBSD libc.
+	* [BUG] Tweaked order of execution of filters to speed up builds
+	and opening log files.
+
 Sat Oct 25 21:18:49 2003  Greg Banks <gnb@alphalink.com.au>
 	* Release 0.8.3
 
