@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.33 1999-07-14 04:23:50 gnb Exp $");
+CVSID("$Id: main.c,v 1.34 1999-07-14 06:00:31 gnb Exp $");
 
 typedef enum
 {
@@ -788,6 +788,7 @@ ui_create_menus(GtkWidget *menubar)
 
 #include "all.xpm"
 #include "again.xpm"
+#include "stop.xpm"
 #include "clean.xpm"
 #include "clear.xpm"
 #include "next.xpm"
@@ -800,6 +801,9 @@ ui_create_tools(GtkWidget *toolbar)
     
     ui_tool_create(toolbar, _("Again"), _("Build last target again"),
     	again_xpm, build_again_cb, 0, GR_AGAIN);
+
+    ui_tool_create(toolbar, _("Stop"), _("Stop current build"),
+    	stop_xpm, build_stop_cb, 0, GR_RUNNING);
     
     ui_tool_add_space(toolbar);
 
