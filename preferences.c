@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.59 2003-05-24 05:48:21 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.60 2003-07-25 14:19:55 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -527,7 +527,7 @@ preferences_set_dryrun(gboolean d)
 static void
 prefs_apply_cb(GtkWidget *w, gpointer data)
 {
-    char *mf;
+    const char *mf;
     char *text[VC_MAX];
     int row, nrows, i;
     gboolean colors_changed;
@@ -656,7 +656,7 @@ static void
 browse_makefile_cb(GtkWidget *w, gpointer data)
 {
     static GtkWidget *filesel = 0;
-    char *mf = gtk_entry_get_text(GTK_ENTRY(makefile_entry));
+    const char *mf = gtk_entry_get_text(GTK_ENTRY(makefile_entry));
     
     if (filesel == 0)
     	filesel = ui_create_file_sel(
@@ -988,8 +988,8 @@ var_set_cb(GtkWidget *w, gpointer data)
     char *rtext[VC_MAX];
     int nrows = GTK_CLIST(var_clist)->rows;
     
-    text[VC_NAME] = gtk_entry_get_text(GTK_ENTRY(var_name_entry));
-    text[VC_VALUE] = gtk_entry_get_text(GTK_ENTRY(var_value_entry));
+    text[VC_NAME] = (char *)gtk_entry_get_text(GTK_ENTRY(var_name_entry));
+    text[VC_VALUE] = (char *)gtk_entry_get_text(GTK_ENTRY(var_value_entry));
     text[VC_TYPE] = var_type_to_str(ui_combo_get_current(var_type_combo));
         
     for (row = 0 ; row < nrows ; row++)
@@ -1021,7 +1021,7 @@ static void
 var_unset_cb(GtkWidget *w, gpointer data)
 {
     int row;
-    char *name;
+    const char *name;
     char *rname;
     gboolean changed = FALSE;
     int nrows = GTK_CLIST(var_clist)->rows;
