@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.30 2000-01-08 14:33:13 gnb Exp $");
+CVSID("$Id: log.c,v 1.31 2000-01-24 10:39:49 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -592,9 +592,10 @@ log_open(const char *file)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static int 
-log_get_indent_level(GtkCTreeNode *node)
+log_get_indent_level(const LogRec *lr)
 {
     int indent = 0;
+    GtkCTreeNode *node = lr->node;
     
     for (;;)
     {
@@ -675,7 +676,7 @@ log_print(FILE *fp)
     	    break;
 	}
 
-	ps_line(ps, log_get_text(lr), sev, log_get_indent_level(lr->node));
+	ps_line(ps, log_get_text(lr), sev, log_get_indent_level(lr));
     }
     
     ps_end(ps);
