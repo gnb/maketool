@@ -20,8 +20,9 @@ Double-clicking on an error message starts an editor.
 autoconf
 
 %build
+[ "@ENABLE_ONLINE_HELP@" = yes ] && EOH="--enable-online-help"
 OS=`echo ${RPM_OS} | tr '[A-Z]' '[a-z]'`
-CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr ${RPM_ARCH}-redhat-${OS}
+CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr $EOH ${RPM_ARCH}-redhat-${OS}
 make
 
 %install
@@ -36,23 +37,13 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/maketool
 /usr/libexec/maketool/extract_targets
 /usr/libexec/maketool/make_makefile
-/usr/doc/@PACKAGE@-@VERSION@/COPYING
-/usr/doc/@PACKAGE@-@VERSION@/COPYRIGHT
-/usr/doc/@PACKAGE@-@VERSION@/TODO
-/usr/doc/@PACKAGE@-@VERSION@/CHANGES
-/usr/share/@PACKAGE@/help/C/apply.gif
-/usr/share/@PACKAGE@/help/C/apply.html
-/usr/share/@PACKAGE@/help/C/cancel.gif
-/usr/share/@PACKAGE@/help/C/cancel.html
-/usr/share/@PACKAGE@/help/C/dialog.gif
-/usr/share/@PACKAGE@/help/C/maketool.html
-/usr/share/@PACKAGE@/help/C/ok.gif
-/usr/share/@PACKAGE@/help/C/ok.html
-/usr/share/@PACKAGE@/help/C/prefs-kflag.html
-/usr/share/@PACKAGE@/help/C/tools-again.gif
-/usr/share/@PACKAGE@/help/C/tools-again.html
+%doc COPYING COPYRIGHT TODO CHANGES
+%docdir /usr/share/@PACKAGE@/help
+/usr/share/@PACKAGE@/help
 
 %changelog
+* Sun Nov 26 2000 Greg Banks <gnb@alphalink.com.au>
+- Rationalised documentation with %doc & %docdir.
 * Sun Aug 6 2000 Greg Banks <gnb@alphalink.com.au>
 - Added online help.
 * Sun Nov 7 1999 Greg Banks <gnb@alphalink.com.au>

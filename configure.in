@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
-dnl $Id: configure.in,v 1.26 2000-11-26 06:39:54 gnb Exp $
+dnl $Id: configure.in,v 1.27 2000-11-26 10:09:56 gnb Exp $
 dnl
 
 AC_INIT(main.c)
@@ -59,23 +59,6 @@ AC_MSG_RESULT($ENABLE_MWOS)
 if test "$ENABLE_MWOS" = "yes"; then
     AC_DEFINE(ENABLE_MWOS)
 fi
-
-dnl Test for existance of /usr/doc/ directory (e.g. on RedHat Linux)
-dnl Note we don't test for $prefix/doc because that may not exist
-dnl yet if we are building an RPM.
-DOCDIR=/usr/doc
-AC_MSG_CHECKING(for presence of $DOCDIR)
-changequote(,)dnl
-if test -d $DOCDIR ; then
-  USRDOC=
-  AC_MSG_RESULT(yes)
-else
-  USRDOC="#USRDOC#"
-  AC_MSG_RESULT(no)
-fi
-changequote([,])dnl
-AC_SUBST(USRDOC)
-
 
 dnl Test for printer configuration.
 dnl File /etc/printcap (in BSD-derived systems)

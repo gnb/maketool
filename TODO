@@ -134,9 +134,6 @@ x  Printing: option to print entire log file or just descendants of
 x  Printing: option to print using collapsed status of log lines or
    just entire log.
    
-x  configure-time check for /usr/doc is insufficient. Need to use /usr/doc
-   on Linux only, $(prefix)/share/$(PACKAGE) on NetBSD.
-   
 x  Frederick Bruckman says: To be able to pass in datadir or localedir to
    configure would be nice.
 
@@ -398,3 +395,8 @@ x  DONE: Help: organise smart way to have consistent style etc between
 
 x  DONE: Provide a Preferences setting to control what happens when a make
    run finishes. Nothing; Sound Bell; Flash Window; Run Program.
+
+x  DONE: configure-time check for /usr/doc is insufficient. Need to use /usr/doc
+   on Linux only, $(prefix)/share/$(PACKAGE) on NetBSD.
+   Now those files are handled by RPM using a %doc directive.
+   

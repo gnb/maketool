@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.30 2000-11-26 06:39:54 gnb Exp $
+# $Id: Makefile.in,v 1.31 2000-11-26 10:09:56 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -25,7 +25,6 @@ BINDIR=		@bindir@
 INSTALL=	@INSTALL@
 PACKAGE=	@PACKAGE@
 VERSION=	@VERSION@
-@USRDOC@DOCDIR=		$(prefix)/doc/$(PACKAGE)-$(VERSION)
 localedir=	$(prefix)/@DATADIRNAME@/locale
 libexecdir=	@libexecdir@/$(PACKAGE)
 helpdir=	$(prefix)/@DATADIRNAME@/$(PACKAGE)/help
@@ -133,6 +132,13 @@ pure:
 
 # Subdirectories
 
+ifeq (@ENABLE_ONLINE_HELP@,no)
+# Build an empty directory to keep RPM happy
+install::
+	$(INSTALL) -d $(helpdir)
+endif
+
+
 all install uninstall clean::
 	+for subdir in $(SUBDIRS); do \
 	  $(MAKE) -C $$subdir $@ || exit 1; \
@@ -163,28 +169,11 @@ clean::
 	$(RM) licence.c
 	
 ###
-
-# doco. Such as it is...
-# Note that installing TODO etc into /usr/doc is a Linux
-# tradition, suitable for the world of rapidly mutating
-# Open Source software. It's not really appropriate for
-# commercial Unices.
-
-@USRDOC@install::
-@USRDOC@	test -d $(DOCDIR) || $(INSTALL) -m 755 -d $(DOCDIR)
-@USRDOC@	$(INSTALL) -m 755 COPYING $(DOCDIR)/COPYING
-@USRDOC@	$(INSTALL) -m 755 COPYRIGHT $(DOCDIR)/COPYRIGHT
-@USRDOC@	$(INSTALL) -m 755 TODO $(DOCDIR)/TODO
-@USRDOC@	$(INSTALL) -m 755 CHANGES $(DOCDIR)/CHANGES
-	
-@USRDOC@uninstall::
-@USRDOC@	$(RM) $(DOCDIR)/COPYING
-@USRDOC@	$(RM) $(DOCDIR)/COPYRIGHT
-@USRDOC@	$(RM) $(DOCDIR)/TODO
-@USRDOC@	$(RM) $(DOCDIR)/CHANGES
+# Some basic documentation (COPYRIGHT etc) used to be installed
+# into /usr/doc at this point in the Makefile.  That's now
+# handled by RPM -- see the %doc directive in maketool.spec.in
 
 ###
-
 # Making a distribution
 distdir=	$(PACKAGE)-$(VERSION)
 DISTTAR=	$(PACKAGE)-$(VERSION)-src.tar.gz
