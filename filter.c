@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.38 2003-10-10 09:32:14 gnb Exp $");
+CVSID("$Id: filter.c,v 1.39 2003-10-10 09:33:04 gnb Exp $");
 
 typedef struct
 {
@@ -260,13 +260,24 @@ filter_load(void)
 
     filter_add(
     	"",				/* state */
-	"^\\(\"([^\"]+)\", line ([0-9]+)\\) error: (.*)$",	/* regexp */
+	"^\\(\"([^\"]+)\", line ([0-9]+)\\) [Ee]rror: (.*)$",	/* regexp */
 	FR_ERROR,			/* code */
 	"\\1",				/* file */
 	"\\2",				/* line */
 	"",				/* col */
 	"\\3",				/* summary */
     	"bison errors");		/* comment */
+
+    /* this regexp is triggered by some MIPSpro messages as well as flex */
+    filter_add(
+    	"",				/* state */
+	"^\"([^\"]*)\", line ([0-9]+): [Ww]arning: (.*)$",	/* regexp */
+	FR_WARNING,			/* code */
+	"\\1",				/* file */
+	"\\2",				/* line */
+	"",				/* col */
+	"\\3",				/* summary */
+    	"flex warnings");	    	/* comment */
 
     filter_add(
     	"",				/* state */
