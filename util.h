@@ -38,6 +38,9 @@ void estring_append_chars(estring *e, const char *buf, int len);
 void estring_truncate(estring *e);
 void estring_free(estring *e);
 
+#define ESTRING_STATIC_INIT \
+	{ 0, 0, 0 }
+
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 /* Result needs to be free()d */

@@ -20,8 +20,9 @@
 #include "maketool.h"
 #include "spawn.h"
 #include "ui.h"
+#include "util.h"
 
-CVSID("$Id: help.c,v 1.10 1999-05-30 11:24:39 gnb Exp $");
+CVSID("$Id: help.c,v 1.11 1999-06-01 11:17:31 gnb Exp $");
 
 static GtkWidget	*about_shell = 0;
 static GtkWidget	*about_make_shell = 0;
@@ -97,11 +98,11 @@ help_about_cb(GtkWidget *w, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static estring make_version = ESTRING_STATIC_INIT;
+
 static void
 make_version_reap(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 {
-    estring *vers = (estring *)data;
-
     if (!(WIFEXITED(status) || WIFSIGNALED(status)))
     	return;
 	
@@ -113,7 +114,7 @@ make_version_reap(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	about_make_shell = uiCreateOkDialog(toplevel, _("About Make"));
 
 	/* TODO: logo */
-	label = gtk_label_new(vers->data);
+	label = gtk_label_new(make_version.data);
 	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_make_shell)->vbox), label);
 	gtk_widget_show(label);
     }
@@ -124,12 +125,11 @@ make_version_reap(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 static void
 make_version_input(int len, const char *buf, gpointer data)
 {
-    estring *vers = (estring *)data;
-    
-    estring_append_chars(vers, buf, len);
+    estring_append_chars(&make_version, buf, len);
     
 #if DEBUG
-    fprintf(stderr, "make_version_input(): make_version=\"%s\"\n", vers->data);
+    fprintf(stderr, "make_version_input(): make_version=\"%s\"\n",
+    	make_version.data);
 #endif
 }
 
@@ -137,16 +137,14 @@ make_version_input(int len, const char *buf, gpointer data)
 void
 help_about_make_cb(GtkWidget *w, gpointer data)
 {
-    static estring vers;
-    
     /* TODO: grey out menu item while make --version running */
 
-    if (make_version == 0)
+    if (make_version.data == 0)
     {
 	char *prog;
 	prog = expand_prog(prefs.prog_list_version, 0, 0, 0);
 	spawn_with_output(prog, make_version_reap,
-		make_version_input, (gpointer)toplevel, &vers);
+		make_version_input, (gpointer)toplevel, 0);
 	g_free(prog);
     }
     else if (about_make_shell != 0)
