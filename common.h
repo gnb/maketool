@@ -21,7 +21,7 @@
 #define _common_h_
 
 /*
- * $Id: common.h,v 1.11 2001-10-02 11:13:16 gnb Exp $
+ * $Id: common.h,v 1.12 2002-09-24 14:20:02 gnb Exp $
  */
 
 #include <config.h>
@@ -90,7 +90,7 @@ extern int pclose (FILE *stream);
 #define _(s)	gettext(s)
 #endif
 #ifndef N_
-#define N_(s)	(s)
+#define N_(s)	s
 #endif
 
 
