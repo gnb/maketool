@@ -10,3 +10,5 @@ config.h
 Makefile
 maketool-*.tgz
 extract_targets
+maketool.spec
+maketool-*.rpm
