@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.43 2003-10-13 12:43:21 gnb Exp $");
+CVSID("$Id: filter.c,v 1.44 2003-10-13 12:54:01 gnb Exp $");
 
 typedef struct
 {
@@ -169,6 +169,15 @@ filter_calc_leads(const char *regexp, unsigned char suitable[256])
 		    dmsg1("null branch \"%s\"", r);
 		    nullbranch = TRUE;
 		}
+		else if (*r == '.')
+		{
+		    suitall(TRUE, "dot");
+    	    	}
+		else if (!ingroup && *r == '$')
+		{
+		    dmsg1("anchored at end \"%s\"", r);
+		    break;
+    	    	}
 		else
 		{
     		    suits((int)*r, TRUE, "literal");
