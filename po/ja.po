@@ -327,28 +327,28 @@ msgid "Build `%s' again"
 msgstr "再度 `%s' をビルド"
 
 #: main.c:383
-msgid "Run auto_make..."
-msgstr "automakeを実行(_m)..."
+msgid "Run auto_make"
+msgstr "automakeを実行(_m)"
 
 #: main.c:384 main.c:422
-msgid "Run a_utoconf..."
-msgstr "autoconfを実行(_u)..."
+msgid "Run a_utoconf"
+msgstr "autoconfを実行(_u)"
 
 #: main.c:385 main.c:403 main.c:423
-msgid "_Remove config.cache..."
-msgstr "config.cacheを削除(_R)..."
+msgid "_Remove config.cache"
+msgstr "config.cacheを削除(_R)"
 
 #: main.c:386 main.c:404 main.c:424
 msgid "Run _configure..."
 msgstr "configureを実行(_c)..."
 
 #: main.c:387 main.c:405 main.c:425
-msgid "Run config._status..."
-msgstr "config.statusを実行(_s)..."
+msgid "Run config._status"
+msgstr "config.statusを実行(_s)"
 
 #: main.c:439
-msgid "Run _xmkmf..."
-msgstr "xmkmfを実行(_x)..."
+msgid "Run _xmkmf"
+msgstr "xmkmfを実行(_x)"
 
 #. Oh dear, something went wrong.  We have no targets.
 #: main.c:617
