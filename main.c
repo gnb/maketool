@@ -24,7 +24,7 @@
 #include "log.h"
 #include "util.h"
 #include <ctype.h>
-#include "task.h"
+#include "maketool_task.h"
 #if HAVE_SIGNAL_H
 #include <signal.h>
 #endif
@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.83 2002-09-24 13:45:07 gnb Exp $");
+CVSID("$Id: main.c,v 1.84 2002-09-24 14:25:14 gnb Exp $");
 
 
 /*
@@ -791,9 +791,9 @@ handle_line(Task *task, int len, const char *line)
 #endif
 
     lr = log_add_line(line);
-    if (prefs.scroll_on_output)
+    if (lr != 0 && prefs.scroll_on_output)
     	log_ensure_visible(lr);
-    if (prefs.edit_first_error && first_error)
+    if (lr != 0 && prefs.edit_first_error && first_error)
     {
 	if ((lr->res.code == FR_WARNING && prefs.edit_warnings) ||
 	     lr->res.code == FR_ERROR)
@@ -1922,7 +1922,6 @@ ui_create(void)
     GtkWidget *table;
     GtkWidget *menubar, *logwin;
     GtkWidget *handlebox;
-    GtkTooltips *tooltips;
     GtkWidget *sw;
     GdkPixmap *iconpm;
     GdkBitmap *iconmask = 0;
@@ -1949,7 +1948,7 @@ ui_create(void)
     gdk_window_set_icon_name(toplevel->window, "Maketool");
 
         
-    tooltips = gtk_tooltips_new();
+    gtk_tooltips_new();
 
     table = gtk_table_new(4, 1, FALSE);
     gtk_container_add(GTK_CONTAINER(toplevel), table);
@@ -2302,6 +2301,26 @@ enqueue_cmd_targets(void)
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+#if !HAVE_UNSETENV
+/* tsk, IRIX, how primitive */
+extern char **environ;
+static void
+unsetenv(const char *sym)
+{
+    int i;
+    int len = strlen(sym);
+    
+    for (i = 0 ; environ[i] != 0 ; i++)
+    {
+    	if (!strncmp(environ[i], sym, len) && environ[i][len] == '=')
+	    break;
+    }
+
+    for ( ; environ[i] != 0 ; i++)
+    	environ[i] = environ[i+1];
+}
+#endif
 
 static void
 setup_environment(void)
