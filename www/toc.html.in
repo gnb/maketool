@@ -1,9 +1,13 @@
-<HTML><HEAD>
-include(_copyright.html)
-include(_styles.html)
-</HEAD><BODY BGCOLOR="#ffffff">
 
-<TABLE COLS=1 ROWS=2 BORDER=0 BACKGROUND="tocbg.gif" CELLSPACING=0 CELLPADDING=4>
+define(NAVLINK,
+<TR>
+  <TD>
+    <B>`ifelse($1,HTMLFILE,$2,<A HREF="$1">$2</A>)'</B></BR>
+  </TD>
+</TR>
+)
+
+<TABLE BORDER=0 BACKGROUND="tocbg.gif" CELLSPACING=0 CELLPADDING=4>
   <TR>
     <TD>
       <FONT COLOR="#ffffff" SIZE="+2"><B>maketool</B></FONT>
@@ -11,46 +15,33 @@ include(_styles.html)
   </TR>
   <TR>
     <TD>
-      <TABLE COLS=1 ROWS=4 BORDER=0 BACKGROUND="" BGCOLOR="#ffffff" CELLSPACING=0 CELLPADDING=5>
-	<TR>
-	  <TD>
-	    <B><A HREF="features.html" TARGET="main">Features</A></B></BR>
-	  </TD>
-	</TR>
-	<TR>
-	  <TD>
-	    <B><A HREF="download.html" TARGET="main">Download</A></B></BR>
-	  </TD>
-	</TR>
-	<TR>
-	  <TD>
-	    <B><A HREF="screenshots.html" TARGET="main">Screenshots</A></B></BR>
-	  </TD>
-	</TR>
-	<TR>
-	  <TD>
-	    <B><A HREF="changelog.html" TARGET="main">Change Log</A></B></BR>
-	  </TD>
-	</TR>
+      <TABLE WIDTH=100% BORDER=0 BACKGROUND="" BGCOLOR="#ffffff" CELLSPACING=0 CELLPADDING=5>
+	NAVLINK(index.html,Features)
+	NAVLINK(download.html,Download)
+	NAVLINK(screenshots.html,Screenshots)
+	NAVLINK(changelog.html,Change Log)
       </TABLE>
-      <TABLE COLS=1 ROWS=1 BORDER=0 CELLSPACING=0 CELLPADDING=2>
+      <TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=2>
 	<TR>
 	  <TD>
 	  </TD>
 	</TR>
       </TABLE>
-      <TABLE COLS=1 ROWS=1 BORDER=0 BACKGROUND="" BGCOLOR="#ffffff" CELLSPACING=0 CELLPADDING=5>
+      <TABLE WIDTH=100% BORDER=0 BACKGROUND="" BGCOLOR="#ffffff" CELLSPACING=0 CELLPADDING=5>
 	<TR>
 	  <TD>
-	    Watch for new releases on:<BR>
+	    Watch for new<BR>releases on:<BR>
 	    <A HREF="http://www.freshmeat.net/"><IMG WIDTH=90 HEIGHT=36 SRC="fm.mini.jpg" ALT="freshmeat" BORDER=0></A>
 	  </TD>
 	</TR>
-      </TABLE>
-      <TABLE COLS=1 ROWS=1 BORDER=0 BACKGROUND="" BGCOLOR="#ffffff" CELLSPACING=0 CELLPADDING=5>
 	<TR>
 	  <TD>
 	    <A HREF="http://www.caube.org.au/"><IMG WIDTH=85 HEIGHT=32 BORDER=0 SRC="caubutt1.gif" ALT="[nospam]"></A>
+	  </TD>
+	</TR>
+	<TR>
+	  <TD>
+	    <A HREF="http://www.gimp.org/"><IMG WIDTH=90 HEIGHT=36 BORDER=0 SRC="gimp.gif" ALT="[gimp]"></A>
 	  </TD>
 	</TR>
       </TABLE>
@@ -58,4 +49,3 @@ include(_styles.html)
   </TR>
 </TABLE>
 
-</BODY></HTML>

@@ -10,9 +10,23 @@ define(ENDHEAD,
 )dnl
 define(BEGINBODY,
 <BODY BGCOLOR="#ffffff">
-<CENTER><H1>TITLE</H1></CENTER>
+<TABLE BORDER=0 CELLSPACING=4>
+  <TR>
+    <TD COLSPAN=2 ALIGN=CENTER>
+      <IMG WIDTH=430 HEIGHT=80 SRC="maketool_n.gif" ALT="maketool">
+    </TD>
+  </TR>
+  <TR>
+    <TD VALIGN=TOP>
+include(toc.html.in)
+    </TD>
+    <TD>
+    <CENTER><H1>TITLE</H1></CENTER>
 )dnl
 define(ENDBODY,
+    </TD>
+  </TR>
+</TABLE>
 <!-- <HR NOSHADE SIZE=4> -->
 <BR><BR>
 <CENTER>
