@@ -21,7 +21,7 @@
 #define _config_h_ 1
 
 /*
- * $Id: config.h.in,v 1.14 2001-07-26 16:27:20 gnb Exp $
+ * $Id: config.h.in,v 1.15 2002-09-24 14:20:37 gnb Exp $
  */
 
 /*
@@ -113,6 +113,7 @@
 #define HAVE_GETTEXT 0
 #define HAVE_LC_MESSAGES 0
 #define HAVE_STPCPY 0
+#define HAVE_UNSETENV 0
 /*
  * autoconf defines for gettext which are not
  * documented but are necessary anyway.
