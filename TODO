@@ -22,8 +22,6 @@ x  Change maketool_client to be public and its default mode to take
 x  Limit the sizes of target names in the Build menu, especially
    when a pair of them is used as a range for a submenu.
 
-x  Rationalise use of handle_input()
-
 x  When the user cancels a ./configure run from the GUI, this should
    show in the log window instead of "*** [config.status] Error 1".
    
@@ -490,3 +488,5 @@ x  DONE: Use config.status if it exists and is not newer than configure
 x  DONE: Create dummy N_() macros to seed the PO files with common autoconf
    help strings.
    
+x  DONE: Rationalise use of handle_input()
+
