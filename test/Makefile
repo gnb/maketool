@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile,v 1.7 2001-07-25 08:35:29 gnb Exp $
+# $Id: Makefile,v 1.8 2001-09-28 05:04:00 gnb Exp $
 #
 
 
@@ -40,7 +40,7 @@ error3:
 	gcc -ansi -Wall -c jane.c
 
 error4:
-	+$(MAKE) -C abs_sub JANE2_H=$(PWD)/jane2.h $@
+	+$(MAKE) -C abs_sub $@
 	
 targets:
 	yes ' ' | head -20 | awk '{print NR}'
