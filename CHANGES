@@ -1,3 +1,48 @@
+* 0.6  (13 Jul 2000)
+x  Initial implementation of printing the make log.  Prints to PostScript.
+   Preferences entries exist (e.g. paper size, margins) but there is no GUI
+   for them yet. Reads list of printers from /etc/printcap or `lpstat -c`
+   (decided at configure time).
+x  Initial implementation of a Find window. Still several rough edges. Can
+   enter a literal or a regexp, and find or find-again. Stack of historical
+   search cases, navigable with PgUp/PgDn.  No case-insensitive literals yet.
+x  Implemented a File->Change Directory command, and a menu of previous
+   directories.  Shows basename of current directory in main window title bar.
+x  Dialogs are properly marked as transient so that the window manager
+   handles them correctly.
+x  Dialogs are positioned over the main window instead of letting
+   the window manager choose a random and inconvenient position.
+x  Rewrote the process spawning code.  This made the code a lot more
+   orthogonal and also fixed a bug whereby the Stop button was broken.
+x  Tooltip for Again toolbar button, and the Again menu item, now mention
+   what the last target is. This avoids nasty surprises.
+x  Implemented Edit->Copy command which copies the selected line to the
+   clipboard.
+x  Added filter support for the MWOS xcc cross-compiler.
+x  Added filter support for bison.
+x  Added filter support for flex.
+x  Dependencies are built using makedepend rather than hardcoded.
+x  Can now build debugging version using DEBUG=n on make commandline.
+x  Solaris debugging & Purifying patches for Makefile.
+x  NetBSD port makefile fixes.
+x  configure checks for <sys/filio.h> for Solaris.
+x  Worked around incompatibility with GDK/GTK 1.2.6.  I still don't know why
+   this change actually matters, and I still think it's a GDK or GLIB bug,
+   but for the time being this change fixes maketool. This obsoletes the
+   gtk-1.2.6 patch.
+x  Fixed bug introduced in the gtk-1.2.6 patch which lost the output
+   of `gmake --version' when building the Help->About make dialog.
+x  Fixed bug where an error message specifying an absolute pathname,
+   when found in a recursive make, would result in maketool attempting
+   to edit sub_dir/abs_path instead of abs_path.
+x  Fixed bug which caused coredump when pressing Clear Log during
+   build -- by greying out the Clear Log item.
+x  Fixed alignment of labels in Preferences window.
+x  Fixed a few minor warnings -Wall found.
+x  Fixed bug which caused menu item greying to be done prematurely
+   when child make processes were started.
+
+
 * 0.5.1  (14 Nov 1999)
 x  Fixed race condition which caused the first process spawned to sometimes
    not be reaped properly if it finished quickly. This sometimes lead to
