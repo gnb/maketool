@@ -21,7 +21,7 @@
 #define _config_h_ 1
 
 /*
- * $Id: config.h.in,v 1.6 1999-11-04 04:45:25 gnb Exp $
+ * $Id: config.h.in,v 1.7 1999-11-04 07:20:11 gnb Exp $
  */
 
 /*
@@ -37,7 +37,9 @@
 /*
  * Define as non-zero to turn on debugging prints.
  */
+#ifndef DEBUG 
 #define DEBUG 0
+#endif
 
 /*
  * Executable name for GNU make. Can be a full pathname
