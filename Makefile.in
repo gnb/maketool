@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.12 1999-10-16 16:36:55 gnb Exp $
+# $Id: Makefile.in,v 1.13 1999-10-17 08:53:26 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -25,14 +25,13 @@ BINDIR=		@bindir@
 INSTALL=	@INSTALL@
 PACKAGE=	@PACKAGE@
 VERSION=	@VERSION@
-DOCDIR=		$(prefix)/doc/$(PACKAGE)-$(VERSION)
-LICENCE=	$(prefix)/doc/$(PACKAGE)-$(VERSION)/COPYING
+@USRDOC@DOCDIR=		$(prefix)/doc/$(PACKAGE)-$(VERSION)
 localedir=	$(prefix)/@DATADIRNAME@/locale
 
 CC=		@CC@
 CFLAGS=		@CFLAGS@
 CPPFLAGS=	@GTK_CFLAGS@ -D_USE_BSD -I. -Iicons -Iintl \
-		-DLICENCE="\"$(LICENCE)\"" -DLOCALEDIR=\"$(localedir)\" \
+		-DLOCALEDIR=\"$(localedir)\" \
 		$(TESTCPPFLAGS)
 LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 O=		objs
@@ -117,21 +116,36 @@ argstest:
 	
 ###
 
-# doco. Such as it is...
+# licence.c contains the COPYING file in C syntax. This
+# avoids having to install the COPYING file on platforms
+# other than Linux.
+$O/help.o: licence.c
+licence.c: COPYING
+	sed -e 's///g' -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/^\(.*\)$$/"\1\\n"/' <$< >$@
 
-install::
-	test -d $(DOCDIR) || $(INSTALL) -m 755 -d $(DOCDIR)
-	$(INSTALL) -m 755 COPYING $(DOCDIR)/COPYING
-	$(INSTALL) -m 755 COPYRIGHT $(DOCDIR)/COPYRIGHT
-	$(INSTALL) -m 755 TODO $(DOCDIR)/TODO
-	$(INSTALL) -m 755 CHANGES $(DOCDIR)/CHANGES
+clean::
+	$(RM) licence.c
 	
+###
 
-uninstall::
-	$(RM) $(DOCDIR)/COPYING
-	$(RM) $(DOCDIR)/COPYRIGHT
-	$(RM) $(DOCDIR)/TODO
-	$(RM) $(DOCDIR)/CHANGES
+# doco. Such as it is...
+# Note that installing TODO etc into /usr/doc is a Linux
+# tradition, suitable for the world of rapidly mutating
+# Open Source software. It's not really appropriate for
+# commercial Unices.
+
+@USRDOC@install::
+@USRDOC@	test -d $(DOCDIR) || $(INSTALL) -m 755 -d $(DOCDIR)
+@USRDOC@	$(INSTALL) -m 755 COPYING $(DOCDIR)/COPYING
+@USRDOC@	$(INSTALL) -m 755 COPYRIGHT $(DOCDIR)/COPYRIGHT
+@USRDOC@	$(INSTALL) -m 755 TODO $(DOCDIR)/TODO
+@USRDOC@	$(INSTALL) -m 755 CHANGES $(DOCDIR)/CHANGES
+	
+@USRDOC@uninstall::
+@USRDOC@	$(RM) $(DOCDIR)/COPYING
+@USRDOC@	$(RM) $(DOCDIR)/COPYRIGHT
+@USRDOC@	$(RM) $(DOCDIR)/TODO
+@USRDOC@	$(RM) $(DOCDIR)/CHANGES
 
 ###
 

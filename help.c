@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: help.c,v 1.14 1999-08-07 14:36:26 gnb Exp $");
+CVSID("$Id: help.c,v 1.15 1999-10-17 08:53:26 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -31,15 +31,20 @@ static GtkWidget	*about_make_shell = 0;
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+/*
+ * Hmm, the string literal from Hell. I hope this doesn't give
+ * your compiler conniptions. Contact me if it does -- Greg
+ */
+static const char licence_str[] = 
+#include "licence.c"
+;
+
 static void
 licence_cb(GtkWidget *w, gpointer data)
 {
     if (licence_shell == 0)
     {
 	GtkWidget *hbox, *text, *sb;
-	FILE *fp;
-	int n;
-	char buf[1024];
 
 	licence_shell = ui_create_ok_dialog(toplevel, _("Maketool: Licence"));
 	gtk_widget_set_usize(licence_shell, 450, 300);
@@ -58,14 +63,8 @@ licence_cb(GtkWidget *w, gpointer data)
 	gtk_box_pack_start(GTK_BOX(hbox), sb, FALSE, FALSE, 0);   
 	gtk_widget_show(sb);
 
-	if ((fp = fopen(LICENCE, "r")) == 0)
-	{
-    	    perror(LICENCE);
-    	    return;
-	}
-	while ((n = fread(buf, 1, sizeof(buf), fp)) > 0)
-	    gtk_text_insert(GTK_TEXT(text), 0, 0, 0, buf, n);
-	fclose(fp);
+	gtk_text_insert(GTK_TEXT(text), 0, 0, 0,
+	    licence_str, sizeof(licence_str)-1);
     }
 
     gtk_widget_show(licence_shell);
