@@ -20,3 +20,4 @@ Procedure to update the Change Log web page on new release.
 8.  Connect to alphalink
 9.  Install the web pages on alphalink
     make -C www install
+    make -C www upload
