@@ -1,7 +1,10 @@
-<!DOCTYPE ARTICLE PUBLIC "-//OASIS//DTD DocBook V3.1//EN">
+<!DOCTYPE ARTICLE PUBLIC "-//OASIS//DTD DocBook V3.1//EN" [
+<!ENTITY % buildents SYSTEM "entities.sgml">
+%buildents;
+]>
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.5 2001-08-02 08:20:39 gnb Exp $"
+         revision="$Id: help.sgml,v 1.6 2001-08-28 13:50:38 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool online help</title>
@@ -9,7 +12,7 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2001-08-02 08:20:39 $</pubdate>
+  <pubdate role="cvs">$Date: 2001-08-28 13:50:38 $</pubdate>
   <releaseinfo>This is version VERSION</releaseinfo>
   <copyright>
     <year>2000</year>
@@ -252,10 +255,11 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
       <para>
       Shows the <xref linkend="save-log-file-window"> which allows you
       to choose a filename to which the text in the <xref linkend="log-window">
-      will be saved.  The file will contain raw text, exactly as
-      <command>gmake</command> emitted it.  The file can later be loaded
-      into maketool again using the <guibutton>Open Log...</guibutton> 
-      menu item.
+      will be saved.  The file will contain the raw text from all
+      <command>gmake</command> runs, exactly as <command>gmake</command>
+      emitted it.  The file can later be loaded into maketool again using
+      the <guibutton>Open Log...</guibutton> menu item, or viewed in a
+      text editor.
       </para>
     </listitem>
   </varlistentry>
@@ -298,6 +302,48 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
       generate the Makefile from another source file, that other
       source file will be edited instead.
       </para>
+      <para>
+      The exact filenames checked by this menu item are (in order):
+      </para>
+      <itemizedlist>
+	<listitem>
+	  <para>
+	  <filename>GNUmakefile</filename>
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	  <filename>makefile</filename>
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	  <filename>Makefile</filename>
+	  </para>
+	</listitem>
+      </itemizedlist>
+      <para>
+      If no Makefile is present, or it's filename is
+      <filename>Makefile</filename>, the following filenames
+      are also checked (in order):
+      </para>
+      <itemizedlist>
+	<listitem>
+	  <para>
+	  <filename>Makefile.am</filename> (for <command>automake</command>)
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	  <filename>Makefile.in</filename> (for <command>autoconf</command>)
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	  <filename>Imakefile</filename> (for <command>Imake</command>)
+	  </para>
+	</listitem>
+      </itemizedlist>
     </listitem>
   </varlistentry>
 
@@ -318,7 +364,7 @@ gmake some-target > <emphasis>make.log</emphasis> 2>&1
       Quits maketool.
       </para>
       <para>
-      Note, if you haven't saved the contents of the
+      Note that if you haven't saved the contents of the
       <xref linkend="log-window">, maketool will <emphasis>NOT</emphasis>
       ask you if you want to save.
       </para>
@@ -961,6 +1007,405 @@ This toggle sets the <option>-k</option> flag to <command>gmake</command>.
 
 
 <graphic format=GIF fileref="about-make-window.gif"></graphic>
+
+<para>
+<xref linkend="index">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="metacharacters" xreflabel="Metacharacters">
+<title>Metacharacters</title>
+
+<para>
+Metacharacters are "magical" characters which are interpreted
+in special ways when encountered by a program in it's input.
+Many different &osname; programs implement metacharacters, and
+the concept is one the most useful and powerful features of a
+&osname; system.
+</para>
+
+<para>
+However, like any powerful tool, unless you know what you're doing
+you can have some very unpleasant experiences with metacharacters.
+So unless you know exactly what you're doing, it's wise to avoid using
+metacharacters in filenames and other data used in
+<command>maketool</command>.
+Usually, metacharacters are the odd punctuation characters
+around the edge of your keyboard, such as $ * or &amp;.  If you
+stick to using letters, numbers, and the / (slash) - (dash)
+. (dot) and _ (underscore) characters, you should be fine.
+</para>
+
+<para>
+If you're still reading this, you either know what you're doing,
+or you want to know.  To discourage you further, here are some of the
+reasons why metacharacters can cause unwanted consenquences and
+make debugging painful.
+</para>
+
+<itemizedlist>
+
+  <listitem>
+    <para>
+    Many different &osname; programs (e.g. the shell, <command>gmake</command>,
+    <command>sed</command>, <command>m4</command>, <command>awk</command>
+    and the C compiler) interpret metacharacters.
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>
+    Sometimes it's not easy to tell which programs are going to be
+    involved in processing data, especially if you use someone else's
+    complex shell script.
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>
+    All programs have a quoting convention which enables you to quote
+    metacharacters, usually by proceeding the metacharacter with a
+    \ (backslash) character.  However, the shell has
+    <emphasis>three</emphasis> quoting conventions, which can interact.
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>
+    Scripts for one program can call other programs (e.g. a shell
+    script calls <command>sed</command>), or build other scripts
+    and then call them.  To work properly in the presence of
+    metacharacters, the calling script needs to be aware of the other
+    program's quoting convention; many scripts don't do this.
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>
+    The sets of metacharacters implemented by the various programs
+    overlap, but only partially.  For example, <function>${HOME}</function>
+    has the same meaning in the shell and <command>gmake</command>
+    but <function>$(HOME)</function> does not.
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>
+    A similar situation exists with whitespace (space, tab and
+    newline) characters, which are interpreted specially in the
+    shell and <command>gmake</command>.
+    </para>
+  </listitem>
+
+</itemizedlist>
+
+
+<para>
+If you're still reading this, there is some hope.  Sometimes you can
+achieve what you want with intelligent use of backslash quoting; the
+trick is knowing how many backquotes you need.  Sometimes a combination
+of backslash and double-quote or single-quote quoting works.  Unfortunately
+the consenquences of too much or too little quoting can be as bad as
+the problems you were trying to avoid in the first place.
+Really, <emphasis>the best course is to simply avoid using
+metacharacters and whitespace</emphasis> when naming files or directories.
+</para>
+
+<para>
+If you're still not convinced, here's a quick summary of metacharacter-related
+failure modes when using the <command>autoconf</command> system.
+</para>
+
+<para>
+First, a quick summary of how <command>autoconf</command> works.
+The developer uses the <command>autoconf</command> program, which
+runs <command>m4</command> to process the file <filename>configure.in</filename>
+into a shell script named <filename>configure</filename>, which
+is then distributed with the application source.  The builder runs
+the <filename>configure</filename> script, which amongst many other
+things uses <command>awk</command> and <command>sed</command> to process
+input data.  As it's final step,
+<filename>configure</filename> creates two new shell scripts named
+<filename>config.cache</filename> and <filename>config.status</filename>
+and runs <filename>config.status</filename>.  The next time
+<filename>configure</filename> is run, it runs <filename>config.cache</filename>
+as it's first step.  The <filename>config.status</filename> script uses
+<command>sed</command> to create various other files from
+input templates, usually <filename>Makefile</filename> from
+<filename>Makefile.in</filename> and <filename>config.h</filename>
+from <filename>config.h.in</filename>.  Then the builder uses
+<command>gmake</command>, which uses the information in
+<filename>Makefile</filename> to construct and run shell commands to
+compile and link the source code.  Compilation usually uses information
+in <filename>config.h</filename>.
+</para>
+
+<para>
+At <emphasis>each and every one</emphasis> of these steps, stray
+metacharacters or whitespace can cause damage ranging from the build
+process failing with an error, to more dangerous and subtle problems
+like new files being installed into incorrect directories or over
+precious system files.
+</para>
+
+<para>
+Here's a summary of how each character can cause failures
+in the <command>autoconf</command> chain (for clarity, starting 
+at the step where you run the <filename>configure</filename>
+script).
+</para>
+
+<table frame=none>
+  <title>Metacharacter-related failure modes of autoconf</title>
+  <tgroup cols=2 colsep=0 rowsep=0>
+    <thead>
+
+      <row>
+        <entry>Metacharacter(s)</entry>
+        <entry>Failure modes</entry>
+      </row>
+
+    </thead>
+    <tbody>
+
+      <!-- Yes I am aware of the Pernicious Mixed Content problem -->
+      
+      <row>
+        <entry>(space)</entry>
+        <entry>
+	<xref linkend="metachar-note-2">, <xref linkend="metachar-note-3">, <xref linkend="metachar-note-4">
+	</entry>
+      </row>
+
+      <row>
+        <entry>(tab)</entry>
+        <entry>
+	<xref linkend="metachar-note-2">, <xref linkend="metachar-note-3">, <xref linkend="metachar-note-4">
+    	</entry>
+      </row>
+
+      <row>
+        <entry>( ) (parentheses)</entry>
+        <entry>
+	<xref linkend="metachar-note-3">
+	</entry>
+      </row>
+
+      <row>
+        <entry>* (asterisk)</entry>
+        <entry>
+	<xref linkend="metachar-note-3">
+	</entry>
+      </row>
+
+      <row>
+        <entry>? (question mark)</entry>
+        <entry>
+	<xref linkend="metachar-note-3">
+	</entry>
+      </row>
+
+      <row>
+        <entry>[ ] (square brackets)</entry>
+        <entry>
+	<xref linkend="metachar-note-3">
+	</entry>
+      </row>
+
+      <row>
+        <entry>$ (dollar sign)</entry>
+        <entry>
+	<xref linkend="metachar-note-4">, <xref linkend="metachar-note-5">
+	</entry>
+      </row>
+
+      <row>
+        <entry>; (semicolon)</entry>
+        <entry>
+	<xref linkend="metachar-note-5">
+	</entry>
+      </row>
+
+      <row>
+        <entry>" (double quote)</entry>
+        <entry>
+	<xref linkend="metachar-note-6">, <xref linkend="metachar-note-3">
+	</entry>
+      </row>
+
+      <row>
+        <entry>' (single quote)</entry>
+        <entry>
+	<xref linkend="metachar-note-7">, <xref linkend="metachar-note-8">, <xref linkend="metachar-note-3">, <xref linkend="metachar-note-7">
+	</entry>
+      </row>
+
+      <row>
+        <entry>\ (backslash)</entry>
+        <entry>
+	<xref linkend="metachar-note-6">, <xref linkend="metachar-note-3">
+	</entry>
+      </row>
+
+      <row>
+        <entry># (hash mark)</entry>
+        <entry>
+	<xref linkend="metachar-note-4">
+	</entry>
+      </row>
+
+      <row>
+        <entry>! (exclamation mark)</entry>
+        <entry>
+	<xref linkend="metachar-note-9">
+	</entry>
+      </row>
+
+      <row>
+        <entry>&amp; (ampersand)</entry>
+        <entry>
+	<xref linkend="metachar-note-3">
+	</entry>
+      </row>
+
+      <row>
+        <entry>| (vertical bar)</entry>
+        <entry>
+	<xref linkend="metachar-note-3">
+	</entry>
+      </row>
+
+      <row>
+        <entry>` (backquote)</entry>
+        <entry>
+	<xref linkend="metachar-note-7">, <xref linkend="metachar-note-3">
+	</entry>
+      </row>
+
+      <row>
+        <entry>&lt; &gt; (less, greater)</entry>
+        <entry>
+	<xref linkend="metachar-note-3">
+	</entry>
+      </row>
+
+      <row>
+        <entry>% (percent sign)</entry>
+        <entry>
+	<xref linkend="metachar-note-4">, <xref linkend="metachar-note-5">
+	</entry>
+      </row>
+
+    </tbody>
+  </tgroup>
+</table>
+
+
+<variablelist>
+  <title>Index to failure modes</title>
+
+  <varlistentry>
+    <term><anchor id="metachar-note-2" xreflabel="config.site">config.site</term>
+    <listitem>
+      <para>
+      The <filename>configure</filename> script finishes correctly but
+      undesired whitespace expansion causes confusing error messages
+      when <filename>configure</filename> tries to load the site
+      configuration file <filename>config.site</filename> using a
+      path relative to the directory specified with <option>--prefix</option>.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><anchor id="metachar-note-3" xreflabel="shell">shell</term>
+    <listitem>
+      <para>
+      The <filename>configure</filename> script works but <command>gmake</command>
+      will probably fail due to unexpected expansion by the shell of
+      metacharacters or whitespace in commands given to the shell
+      by <command>gmake</command>.  This may be solved by adding quoting.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><anchor id="metachar-note-4" xreflabel="gmake runtime">gmake runtime</term>
+    <listitem>
+      <para>
+      The <filename>configure</filename> script works but <command>gmake</command>
+      will probably fail due to unexpected expansion by <command>gmake</command>
+      of metacharacters or whitespace in commands given to the shell
+      by <command>gmake</command>.  This may be solved by adding quoting.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><anchor id="metachar-note-5" xreflabel="gmake parsetime">gmake parsetime</term>
+    <listitem>
+      <para>
+      The <filename>configure</filename> script works but <command>gmake</command>
+      will probably fail due to parse errors in <filename>Makefile</filename>
+      caused by expansion by <command>gmake</command> of variables
+      whose values contain metacharacters or whitespace.  This may be solved by adding quoting.
+      The error is typically:
+      </para>
+      <programlisting>
+Makefile:10: *** missing separator.  Stop.
+      </programlisting>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><anchor id="metachar-note-6" xreflabel="C strings">C strings</term>
+    <listitem>
+      <para>
+      The <filename>configure</filename> script works but the C compiler will
+      generate syntax errors if metacharacters are used in a string literal
+      in <filename>config.h</filename> or other C code.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><anchor id="metachar-note-7" xreflabel="balance">balance</term>
+    <listitem>
+      <para>
+      The <filename>configure</filename> script will fail with shell syntax
+      error if the quotes are unbalanced, i.e. do not occur in pairs.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><anchor id="metachar-note-8" xreflabel="lost">lost</term>
+    <listitem>
+      <para>
+      The <filename>configure</filename> script works but the metacharacter
+      is lost from values in created files such as <filename>Makefile</filename>.
+      This may be solved by adding quoting.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><anchor id="metachar-note-9" xreflabel="interactive">interactive</term>
+    <listitem>
+      <para>
+      The <command>autoconf</command> system works fine but the metacharacter needs
+      to be quoted when used in an interactive shell session, for example if you
+      use <command>ls</command> to look in a directory whose name contains the
+      metacharacter.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+
+
 
 <para>
 <xref linkend="index">
