@@ -23,7 +23,7 @@
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.24 2000-08-01 15:37:29 gnb Exp $");
+CVSID("$Id: help.c,v 1.25 2000-11-26 05:52:10 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -106,6 +106,7 @@ help_about_cb(GtkWidget *w, gpointer data)
 	
 	hbox = gtk_hbox_new(FALSE, 5);
 	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_shell)->vbox), hbox);
+	gtk_container_border_width(GTK_CONTAINER(hbox), SPACING);
 	gtk_widget_show(hbox);
 	
 	pm = gdk_pixmap_create_from_xpm_d(toplevel->window,
@@ -160,6 +161,7 @@ create_about_make_shell(void)
 
     hbox = gtk_hbox_new(FALSE, 5);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_make_shell)->vbox), hbox);
+    gtk_container_border_width(GTK_CONTAINER(hbox), SPACING);
     gtk_widget_show(hbox);
 
     pm = gdk_pixmap_create_from_xpm_d(toplevel->window,
