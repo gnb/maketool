@@ -1,16 +1,13 @@
-#include <sys/types.h>
-#include <gtk/gtk.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#define DEFINE_GLOBALS
 #include <sys/time.h>
 #include <stdarg.h>
-#include <string.h>
 #include <errno.h>
 #include <signal.h>
+#include "maketool.h"
 #include "spawn.h"
 #include "ui.h"
 #include "log.h"
+#include "util.h"
 
 
 typedef enum
@@ -26,29 +23,22 @@ typedef enum
     NUM_SETS
 } Groups;
 
-const char	*argv0;
-char		**targets;
-int		numTargets;
-int		currentTarget;
+char		*targets;
 const char	*lastTarget = 0;
-GtkWidget	*toplevel;
 GtkWidget	*toolbar, *messagebox;
 GtkWidget	*messageent;
 pid_t		currentPid = -1;
 gboolean	interrupted = FALSE;
+gboolean	firstError = FALSE;
 
 #define ANIM_MAX 8
 GdkPixmap	*animPixmaps[ANIM_MAX+1];
 GdkBitmap	*animMasks[ANIM_MAX+1];
 GtkWidget	*anim;
 
-#define SPACING 4
 
 #define PASTE3(x,y,z) x##y##z
 
-extern void help_about_show(GtkWidget *topl);
-extern void help_about_make_show(GtkWidget *topl);
-extern void preferences_show(GtkWidget *topl);
 
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -82,6 +72,93 @@ grey_menu_items(void)
     uiGroupSetSensitive(GR_NOTEMPTY, !empty);
     uiGroupSetSensitive(GR_EDITABLE, editable);
     uiGroupSetSensitive(GR_AGAIN, again);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static char *
+variable_make_flags(void)
+{
+    estring out;
+    GList *list;
+    static const char shell_metas[] = " \t\n\r\"'\\*;><?";
+    
+    estring_init(&out);
+    for (list = prefs.variables ; list != 0 ; list = list->next)
+    {
+    	Variable *var = (Variable *)list->data;
+	const char *p;
+	
+	if (var->type != VAR_MAKE)
+	    continue;
+	
+    	if (out.length > 0)
+	    estring_append_char(&out, ' ');
+	estring_append_string(&out, var->name);
+	estring_append_char(&out, '=');
+	for (p = var->value ; *p ; p++)
+	{
+	    if (strchr(shell_metas, *p))
+		estring_append_char(&out, '\\');
+	    estring_append_char(&out, *p);
+	}
+    }
+    return out.data;
+}
+
+char *
+expand_prog(
+    const char *prog,
+    const char *file,
+    int line,
+    const char *target)
+{
+    int i;
+    char *out;
+    const char *expands[256];
+    char *vars;
+    char linebuf[32];
+    char runflags[32];
+        
+    for (i=0 ; i<256 ; i++)
+    	expands[i] = 0;
+    
+    expands['f'] = file;
+
+    if (line > 0)
+    {
+	sprintf(linebuf, "%d", line);
+	expands['l'] = linebuf;
+    }
+    
+    expands['m'] = "-f Makefile";
+    
+    switch (prefs.run_how)
+    {
+    case RUN_SERIES:
+    	break;	/* no flag */
+    case RUN_PARALLEL_PROC:
+    	sprintf(runflags, "-j%d", prefs.run_processes);
+    	expands['p'] = runflags;
+    	break;
+    case RUN_PARALLEL_LOAD:
+    	sprintf(runflags, "-l%.2g", prefs.run_load);
+    	expands['p'] = runflags;
+    	break;
+    }
+    
+    if (prefs.ignore_failures)
+    	expands['k'] = "-k";
+
+    expands['v'] = (vars = variable_make_flags());
+    
+    expands['t'] = target;
+    
+    out = expand_string(prog, expands);
+    
+    free(vars);
+    
+    return out;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -123,15 +200,17 @@ anim_start(void)
 static void
 startEdit(LogRec *lr)
 {
-    char buf[2048];
+    char *prog;
     
     if (lr->res.file == 0 || lr->res.file[0] == '\0')
     	return;
 	
-    sprintf(buf, "nc -noask -line %d %s", lr->res.line, lr->res.file);
+    prog = expand_prog(prefs.prog_edit_source, lr->res.file, lr->res.line, 0);
     
-    if (spawn_simple(buf, 0, 0) > 0)
+    if (spawn_simple(prog, 0, 0) > 0)
 	message("Editing %s (line %d)", lr->res.file, lr->res.line);
+	
+    free(prog);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -179,6 +258,7 @@ handleInput(int len, const char *buf, gpointer data)
 {
     static char linebuf[1024];
     static int nleftover = 0;
+    LogRec *lr;
     
 #if DEBUG   
     fprintf(stderr, "handleData(): \"");
@@ -199,7 +279,19 @@ handleInput(int len, const char *buf, gpointer data)
     	/* got an end-of-line - isolate the line & feed it to handleLine() */
 	*p = '\0';
 	strncpy(&linebuf[nleftover], buf, sizeof(linebuf)-nleftover);
-	logAddLine(linebuf);
+
+	lr = logAddLine(linebuf);
+	if (prefs.edit_first_error && firstError)
+	{
+	    if ((lr->res.code == FR_WARNING && prefs.edit_warnings) ||
+	         lr->res.code == FR_ERROR)
+	    {
+	        firstError = FALSE;
+	    	logSetSelected(lr);
+		startEdit(lr);
+	    }
+	}
+	
 	nleftover = 0;
 	len -= (p - buf);
 	buf = ++p;
@@ -209,21 +301,22 @@ handleInput(int len, const char *buf, gpointer data)
 void
 buildStart(const char *target)
 {
-    char buf[2048];
+    char *prog;
     
-    sprintf(buf, "make %s", target);
+    prog = expand_prog(prefs.prog_make, 0, 0, target);
     
-    currentPid = spawn_with_output(buf, reapMake, handleInput, (gpointer)target);
+    currentPid = spawn_with_output(prog, reapMake, handleInput, (gpointer)target);
     if (currentPid > 0)
     {
-	sprintf(buf, "Making %s", target);
-	message("%s", buf);
+	message("Making %s", target);
 	lastTarget = target;
 	interrupted = FALSE;
-	logStartBuild(buf);
+	firstError = TRUE;
+	logStartBuild(prog);
 	anim_start();
 	grey_menu_items();
     }
+    free(prog);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -352,29 +445,6 @@ view_edit_next_cb(GtkWidget *w, gpointer data)
     {
     	message("No more errors in log");
     } 
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static void
-view_preferences_cb(GtkWidget *w, gpointer data)
-{
-    preferences_show(toplevel);
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static void
-help_about_cb(GtkWidget *w, gpointer data)
-{
-    help_about_show(toplevel);
-}
-
-
-static void
-help_about_make_cb(GtkWidget *w, gpointer data)
-{
-    help_about_make_show(toplevel);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -674,12 +744,10 @@ static void
 parseArgs(int argc, char **argv)
 {
     int i;
+    estring targs;
     
     argv0 = argv[0];
-    
-    numTargets = 0;
-    currentTarget = 0;
-    targets = (char**)malloc(sizeof(char*) * argc);
+    estring_init(&targs);
     
     for (i=1 ; i<argc ; i++)
     {
@@ -690,9 +758,13 @@ parseArgs(int argc, char **argv)
 	}
 	else
 	{
-	    targets[numTargets++] = argv[i];
+	    if (targs.length > 0)
+	    	estring_append_char(&targs, ' ');
+	    estring_append_string(&targs, argv[i]);
 	}
     }
+    
+    targets = targs.data;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -701,8 +773,11 @@ int
 main(int argc, char **argv)
 {
     gtk_init(&argc, &argv);
+    preferences_init();
     parseArgs(argc, argv);
     uiCreate();
+    if (targets != 0)
+    	buildStart(targets);
     gtk_main();
     return 0;
 }

@@ -1,14 +1,8 @@
 #define DEBUG 1
 
-#include <sys/types.h>
-#include <gtk/gtk.h>
-#include <string.h>
-#include <malloc.h>
+#include "maketool.h"
 #include "spawn.h"
 #include "ui.h"
-#if DEBUG
-#include <stdio.h>
-#endif
 
 static GtkWidget	*about_shell = 0;
 static GtkWidget	*about_make_shell = 0;
@@ -42,7 +36,7 @@ for details.\
 ";
 
 void
-help_about_show(GtkWidget *toplevel)
+help_about_cb(GtkWidget *w, gpointer data)
 {
     if (about_shell == 0)
     {
@@ -126,14 +120,21 @@ make_version_input(int len, const char *buf, gpointer data)
 
 
 void
-help_about_make_show(GtkWidget *toplevel)
+help_about_make_cb(GtkWidget *w, gpointer data)
 {
     /* TODO: grey out menu item while make --version running */
+
     if (make_version == 0)
-	spawn_with_output("make --version", make_version_reap,
+    {
+	char *prog;
+	prog = expand_prog(prefs.prog_list_version, 0, 0, 0);
+	spawn_with_output(prog, make_version_reap,
 		make_version_input, (gpointer)toplevel);
+	free(prog);
+    }
     else if (about_make_shell != 0)
     	gtk_widget_show(about_make_shell);
+    
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

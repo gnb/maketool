@@ -1,8 +1,4 @@
-#include <sys/types.h>
-#include <gtk/gtk.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
+#include "maketool.h"
 #include "filter.h"
 #include "log.h"
 
@@ -150,10 +146,11 @@ logShowRec(LogRec *lr)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-void
+LogRec *
 logAddLine(const char *line)
 {
     FilterResult res;
+    LogRec *lr;
 
     res.file = 0;
     res.line = 0;
@@ -165,7 +162,10 @@ logAddLine(const char *line)
 #endif
     if (res.code == FR_UNDEFINED)
     	res.code = FR_INFORMATION;
-    logShowRec(logAddRec(line, &res));
+    
+    lr = logAddRec(line, &res);
+    logShowRec(lr);
+    return lr;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -315,7 +315,6 @@ logNumWarnings(void)
 void
 logInit(GtkWidget *w)
 {
-    GtkWidget *toplevel = gtk_widget_get_ancestor(w, gtk_window_get_type());
     GdkWindow *win = toplevel->window;
     GdkColormap *colormap = gtk_widget_get_colormap(toplevel);
 

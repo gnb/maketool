@@ -46,6 +46,6 @@ int logNumWarnings(void);
 
 void logSave(const char *file);
 void logOpen(const char *file);
-void logAddLine(const char *line);
+LogRec *logAddLine(const char *line);
 
 #endif /* _LOG_H_ */

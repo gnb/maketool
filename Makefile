@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.6 1999-05-19 17:51:51 gnb Exp $
+# $Id: Makefile,v 1.7 1999-05-20 08:43:08 gnb Exp $
 #
 # Makefile for maketool.
 #
@@ -11,7 +11,7 @@ LDLIBS:=	$(shell gtk-config --libs)
 O=		o.i586-unknown-linux
 
 SOURCES=	main.c filter.c help.c preferences.c log.c ui.c \
-		spawn.c glib_extra.c
+		spawn.c util.c glib_extra.c
 OBJECTS=	$(SOURCES:%.c=$O/%.o)
 
 ###
@@ -43,6 +43,9 @@ random:
 	
 targets:
 	yes ' ' | head -20 | awk '{print NR}'
+	: VARIABLE_ONE = $(VARIABLE_ONE)
+	: VARIABLE_TWO = $(VARIABLE_TWO)
+	: VARIABLE_FOUR = $(VARIABLE_FOUR)
 	
 delay:
 	sleep 10

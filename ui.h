@@ -4,6 +4,9 @@
 #include <gtk/gtk.h>
 
 
+int uiComboGetCurrent(GtkWidget *);
+void uiComboSetCurrent(GtkWidget *, int);
+
 void uiGroupAdd(gint group, GtkWidget *w);
 void uiGroupSetSensitive(gint group, gboolean b);
 

@@ -2,6 +2,24 @@
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+int
+uiComboGetCurrent(GtkWidget *combo)
+{
+    GtkList *listw = GTK_LIST(GTK_COMBO(combo)->list);
+    
+    if (listw->selection == 0)
+    	return 0;
+    return gtk_list_child_position(listw, (GtkWidget*)listw->selection->data);
+}
+
+void
+uiComboSetCurrent(GtkWidget *combo, int n)
+{
+    gtk_list_select_item(GTK_LIST(GTK_COMBO(combo)->list), n);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 static GPtrArray *uiGroups = 0;
 
 void
@@ -281,7 +299,7 @@ uiApplyDialogApplyCb(GtkWidget *w, gpointer data)
 }
 
 static void
-uiApplyDialogCloseCb(GtkWidget *w, gpointer data)
+uiApplyDialogCancelCb(GtkWidget *w, gpointer data)
 {
     ApplyDialog *ad = (ApplyDialog *)data;
 
@@ -292,7 +310,7 @@ static void
 uiApplyDialogOkCb(GtkWidget *w, gpointer data)
 {
     uiApplyDialogApplyCb(w, data);
-    uiApplyDialogCloseCb(w, data);
+    uiApplyDialogCancelCb(w, data);
 }
 
 GtkWidget *
@@ -318,7 +336,7 @@ uiCreateApplyDialog(
     gtk_widget_set_sensitive(ad->ok_btn, FALSE);
     ad->apply_btn = uiDialogCreateButton(ad->dialog, "Apply", uiApplyDialogApplyCb, (gpointer)ad);
     gtk_widget_set_sensitive(ad->apply_btn, FALSE);
-    uiDialogCreateButton(ad->dialog, "Close", uiApplyDialogCloseCb, (gpointer)ad);
+    uiDialogCreateButton(ad->dialog, "Cancel", uiApplyDialogCancelCb, (gpointer)ad);
     
     return ad->dialog;
 }    
