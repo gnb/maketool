@@ -21,7 +21,7 @@
 #define _common_h_
 
 /*
- * $Id: common.h,v 1.5 1999-09-05 11:39:31 gnb Exp $
+ * $Id: common.h,v 1.6 1999-11-04 07:19:40 gnb Exp $
  */
 
 #include <config.h>
@@ -30,6 +30,7 @@
 #include <glib.h>
 #include <errno.h>
 #include <stdio.h>
+#include <assert.h>
 #include <libintl.h>
 
 
