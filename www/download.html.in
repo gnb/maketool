@@ -15,6 +15,13 @@ The latest version available is <B>LATEST_VERSION</B>.
 </P>
 
 <P>
+<FONT SIZE=+2 COLOR=#ff0000>URGENT NEWS</FONT> The 0.6 release
+has proved to have major problems working with gtk-1.2.7 and
+the gtk-1.2.6-7 in RedHat 6.2.  I'm working on the problem and
+will have a patch and new release ready as soon as I can.
+</P>
+
+<P>
 Due to space limitations I am unable to provide downloads of many older
 versions on this website; EMAILME(contact me)
 if you really need an older version.
