@@ -8,6 +8,7 @@ config.h
 Makefile
 maketool-*.tgz
 maketool-*.tar.gz
+maketool-*.tar.bz2
 extract_targets
 maketool.spec
 maketool-*.rpm
@@ -24,3 +25,5 @@ bugs
 patches
 samples
 debug
+build.*.log
+rpm.d
