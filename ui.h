@@ -21,12 +21,15 @@
 #define _UI_H_
 
 #include "common.h"
+
+#define __GTK_CTREE_H__ 1
 #include <gtk/gtk.h>
 
-#if GTK_CHECK_VERSION(2,0,0)
-#define GTK2 1
+#undef __GTK_CTREE_H__
+#if GTK2
+#include "gtkctree22.h"
 #else
-#define GTK2 0
+#include "gtkctree12.h"
 #endif
 
 #if GTK2

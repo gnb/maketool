@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
-dnl $Id: configure.in,v 1.63 2003-10-16 15:33:43 gnb Exp $
+dnl $Id: configure.in,v 1.64 2003-10-21 14:36:22 gnb Exp $
 dnl
 
 AC_INIT(main.c)
@@ -193,13 +193,25 @@ if test $gtk2 = yes ; then
     # Need GTK_ENABLE_BROKEN to get GtkText at least until this
     # code is ported to GtkTextView.
     GTK_CFLAGS="$GTK_CFLAGS -DGTK_ENABLE_BROKEN"
+    GTK2=1
+    GTK_EXTRA_SOURCE=gtkctree22.c
 else
     # fall back to gtk 1.2
     AC_MSG_WARN([GNOME version 2 libraries not found, falling back to 1.2])
     AM_PATH_GTK(1.2.0,,AC_MSG_ERROR(maketool requires the GTK+ library))
+    GTK2=0
+    GTK_EXTRA_SOURCE=gtkctree12.c
 fi
+ALL_GTK_SOURCE=
+ALL_GTK_SOURCE="$ALL_GTK_SOURCE gtkctree12.c gtkctree12.h"
+ALL_GTK_SOURCE="$ALL_GTK_SOURCE gtkctree22.c gtkctree22.h"
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
+AC_SUBST(GTK_EXTRA_SOURCE)
+AC_SUBST(ALL_GTK_SOURCE)
+AC_DEFINE_UNQUOTED(GTK2,$GTK2,[
+ * defined to 1 if version 2 of the GTK toolkit is used
+])
 
 
 dnl ===============================
