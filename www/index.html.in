@@ -7,8 +7,10 @@ BEGINBODY
 
 
 <P>
-Maketool is a simple GTK+ based GUI front end for GNU make.
-It is released under GPL with <B>no warranty</B>.
+Maketool is a simple GTK+ based GUI front end for GNU make and
+other make programs.  It is released under the
+<a href="http://www.gnu.org/licenses/gpl.html">GNU General Public License</a>
+with <B>no warranty</B>.
 </P>
 
 <P>
@@ -31,15 +33,16 @@ Maketool's features include:
   <LI>Make in series or in parallel, (using make's -j and -l flags).
   <LI>Dryrun mode (using make's -n flag).
   <LI>Implements many of make's command-line options.
-  <LI>Configure foreground & background colours of error & warnings lines.
+  <LI>Configure foreground &amp; background colours of error &amp; warnings lines.
+  <LI>Now also supports Solaris make, IRIX smake, and BSD pmake.
 </UL>
 
 <P>
 I personally test maketool on these platforms:
 </P>
 <UL>
-  <LI>RedHat Linux 7.1 on i386
-  <LI>Mandrake Linux 7.1 on i386
+  <LI>RedHat Linux 7.3 on i386
+  <LI>IRIX on MIPS
 </UL>
 <P>
 I have received reports of maketool running on these platforms:
