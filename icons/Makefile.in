@@ -16,10 +16,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.8 2001-07-25 08:35:27 gnb Exp $
+# $Id: Makefile.in,v 1.9 2001-09-21 05:52:55 gnb Exp $
 #
 
-# TODO: gtk flags should come from `configure'
+PACKAGE=	@PACKAGE@
+VERSION=	@VERSION@
+
+top_builddir=	..
+
 
 PIXMAPS=	\
 		again.xpm all.xpm \
@@ -47,9 +51,7 @@ uninstall::
 ###
 
 # Making a distribution
-PACKAGE=	@PACKAGE@
-VERSION=	@VERSION@
-distdir=	../$(PACKAGE)-$(VERSION)/icons
+distdir=	$(top_builddir)/$(PACKAGE)-$(VERSION)/icons
 DISTFILES=	Makefile.in $(PIXMAPS)
 
 dist:
