@@ -1,0 +1,145 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH MAKETOOL 1 "February 15, 2002"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+maketool \- simple GTK+ based GUI front end for GNU make
+.\" -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+.SH SYNOPSIS
+.B maketool
+.RI [ OPTION ]...
+.RI [ var=value ]...
+.RI [ target ]...
+.\" -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+.SH DESCRIPTION
+This manual page documents briefly the
+.B maketool
+program.  Maketool's features include:
+.IP \(bu
+Figures out what targets are available and presents them in a menu.
+.IP \(bu
+Runs make and detects compiler errors and warnings in the output.
+.IP \(bu
+Double-clicking on errors starts an editor with that file and line.
+.IP \(bu
+Works with any makefile system that uses GNU make.
+.IP \(bu
+Automatically updates Makefile if project uses
+.BR automake ,
+.BR autoconf
+or
+.BR imake .
+.IP \(bu
+GUI for selecting configure options for automake and autoconf.
+.IP \(bu
+Special handling for standard GNU targets such as
+.IR all ,
+.IR install ,
+.I clean
+etc.
+.IP \(bu
+Save and reload logs of make runs.
+.IP \(bu
+Summarise make logs to reduce visual clutter.
+.IP \(bu
+With recursive make, expand or collapse each directory separately.
+.IP \(bu
+Override values of make and environment variables.
+.IP \(bu
+Make in series or in parallel, (using make's
+.B \-j
+and
+.B \-l
+flags).
+.IP \(bu
+Dryrun mode (using make's
+.B \-n
+flag).
+.IP \(bu
+Implements many of make's command-line options.
+.IP \(bu
+Configure foreground & background colours of error & warnings lines.
+.\" -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+.SH OPTIONS
+This program follow the usual GNU command line syntax, with long
+options starting with two dashes (`-').
+A summary of options is included below.
+.TP
+\fB\-C\fR \fIDIRECTORY\fR, \fB\-\-directory=\fIDIRECTORY\fR
+Change to \fIDIRECTORY\fP before doing anything.
+.TP
+\fB\-f\fR \fIFILE\fR, \fB\-\-file=\fIFILE\fR, \fB\-\-makefile=\fIFILE\fR
+Read \fIFILE\fR as a makefile.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Show help and exit.
+.TP
+\fB\-j\fR [\fIN\fR], \fB\-\-jobs\fR[\fB=\fIN\fR]
+Allow \fIN\fR jobs at once; infinite jobs with no arg.
+.TP
+\fB\-k\fR, \fB\-\-keep-going\fR
+Keep going when some targets can't be made.
+.TP
+\fB\-l\fR [\fIN\fR], \fB\-\-load-average\fR[\fB=\fIN\fR], \fB\-\-max-load\fR[\fB=\fIN\fR]
+Don't start multiple jobs unless load is below \fIN\fR.
+.TP
+\fB\-S\fR, \fB\-\-no-keep-going\fR, \fB\-\-stop\fR
+Turns off -k
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Print the version number of
+.B maketool
+and exit.
+.\" -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+.SH FILES
+.TP
+.B $HOME/.maketoolrc
+Stores information which is configured in the Preferences window.
+.TP
+.B make.log
+Default filename for loading and saving logs.
+.\" -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+.SH ENVIRONMENT
+.PP
+All normal GTK environment apply.
+.B Maketool
+also passes all environment variables to
+.B gmake
+when it is run, except those explicitly set in the
+Variables pane of the Preferences window.
+.\" -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+.SH AUTHOR
+.PP
+This software was written by Greg Banks <gnb@alphalink.com.au>.
+.PP
+This manual page was written by Bambang Purnomosidi D. P. (bpdp)
+<bambang@3wsi.com>, for the Debian GNU/Linux system (but may be used
+by others).
+.\" -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+.SH REPORTING BUGS
+.PP
+Report bugs to <gnb@alphalink.com.au>.
+.\" -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+.SH COPYRIGHT
+.PP
+(c) 1999-2002 Greg Banks <gnb@alphalink.com.au>. Maketool comes with
+ABSOLUTELY NO WARRANTY. You may redistribute copies of this software
+under the terms of the GNU General Public License.
+.\" -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+.SH SEE ALSO
+.PP
+.BR make (1),
+online maketool documentation.

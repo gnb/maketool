@@ -16,13 +16,30 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.3 2001-09-21 05:52:50 gnb Exp $
+# $Id: Makefile.in,v 1.4 2002-02-15 03:49:30 gnb Exp $
 #
 
 top_builddir=	..
+prefix=		@prefix@
 PACKAGE=	@PACKAGE@
 VERSION=	@VERSION@
 SUBDIRS=	help
+mandir=		@mandir@
+INSTALL=	@INSTALL@
+
+###
+# manpage
+
+MANPAGE=	maketool.1
+
+install:: $(mandir)/man1/$(MANPAGE)
+
+$(mandir)/man1/$(MANPAGE): $(MANPAGE)
+	test -d $(@D) || $(INSTALL) -m 755 -d $(@D)
+	$(INSTALL) -m 644 $< $@
+
+uninstall::
+	$(RM) $(mandir)/$(MANPAGE)
 
 ###
 
