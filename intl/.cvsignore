@@ -1,2 +1,5 @@
 Makefile
 libintl.h
+charset.alias
+ref-add.sed
+ref-del.sed
