@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.44 2003-09-24 10:23:46 gnb Exp $");
+CVSID("$Id: log.c,v 1.45 2003-09-24 10:51:15 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -82,15 +82,16 @@ log_normalise_dir(const char *dir)
     if (dir[0] == '/')
     	return g_strdup(dir);
     
-    return g_strconcat(current_dir, "/", dir, 0);
+    return g_strconcat(current_directory(), "/", dir, 0);
 }
 
 static char *
 log_denormalise_dir(const char *dir)
 {
-    int cdlen = strlen(current_dir);
+    const char *pwd = current_directory();
+    int cdlen = strlen(pwd);
     
-    if (strncmp(dir, current_dir, cdlen) || dir[cdlen] != '/')
+    if (strncmp(dir, pwd, cdlen) || dir[cdlen] != '/')
     	return g_strdup(dir);
 
     dir += cdlen;

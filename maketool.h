@@ -236,7 +236,6 @@ typedef enum
 EXTERN const char *argv0;
 EXTERN Preferences prefs;
 EXTERN GtkWidget *toplevel;
-EXTERN char *current_dir;
 
 #define SPACING 4
 
@@ -256,6 +255,7 @@ void set_makeprog(const char *name);
 extern const MakeProgram *makeprog;
 void list_targets_error(const char *errmsg);
 gboolean filter_target(const char *targ);
+const char *current_directory(void);
 extern const MakeSystem *makesys;
 extern const MakeProgram *makeprog;
 /* print.c */ 
