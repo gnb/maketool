@@ -24,7 +24,7 @@
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.43 2003-09-28 11:44:09 gnb Exp $");
+CVSID("$Id: help.c,v 1.44 2003-09-29 01:07:20 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*options_shell = 0;
@@ -50,7 +50,7 @@ licence_cb(GtkWidget *w, gpointer data)
 	GtkWidget *hbox, *text, *sb;
 
 	licence_shell = ui_create_ok_dialog(toplevel, _("Maketool: Licence"));
-	ui_set_help_name(licence_shell, "licence-window");
+	ui_set_help_tag(licence_shell, "licence-window");
 	gtk_widget_set_usize(licence_shell, 590, 300);
 
 	hbox = gtk_hbox_new(FALSE, SPACING);
@@ -101,7 +101,7 @@ options_cb(GtkWidget *w, gpointer data)
 	estring options_str;
 
 	options_shell = ui_create_ok_dialog(toplevel, _("Maketool: Compile Options"));
-	ui_set_help_name(options_shell, "compile-options-window");
+	ui_set_help_tag(options_shell, "compile-options-window");
 	gtk_widget_set_usize(options_shell, 450, 300);
 
 	hbox = gtk_hbox_new(FALSE, SPACING);
@@ -163,7 +163,7 @@ help_about_cb(GtkWidget *w, gpointer data)
 	char *abt;
 
 	about_shell = ui_create_ok_dialog(toplevel, _("Maketool: About"));
-	ui_set_help_name(about_shell, "about-maketool-window");
+	ui_set_help_tag(about_shell, "about-maketool-window");
 	
 	hbox = gtk_hbox_new(FALSE, 5);
 	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(about_shell)->vbox), hbox);
@@ -216,7 +216,7 @@ create_about_make_shell(void)
 
     title = g_strdup_printf(_("Maketool: About %s"), makeprog->label);
     about_make_shell = ui_create_ok_dialog(toplevel, title);
-    ui_set_help_name(about_make_shell, "about-make-window");
+    ui_set_help_tag(about_make_shell, "about-make-window");
     g_free(title);
 
     hbox = gtk_hbox_new(FALSE, 5);
@@ -304,6 +304,174 @@ help_about_make_cb(GtkWidget *w, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static gboolean help_initialised = FALSE;
+#define HELP_NUM_LOCALES    4
+static char *help_locales[HELP_NUM_LOCALES];
+static GHashTable *help_indexes[HELP_NUM_LOCALES];
+
+
+static void
+help_init_locales(void)
+{
+    /* initialise searchlist of locales */
+    const char *loc;
+    int i;
+    char langbuf[3];
+
+    loc = getenv("LC_MESSAGES");
+    if (loc == 0)
+    	loc = getenv("LANG");
+
+    i = 0;
+    if (loc != 0)
+    {
+	help_locales[i++] = g_strdup(loc);
+	if (strlen(loc) > 2 && loc[2] == '_')
+	{
+	    langbuf[0] = loc[0];
+	    langbuf[1] = loc[1];
+	    langbuf[2] = '\0';
+	    help_locales[i++] = g_strdup(langbuf);
+	}
+    }
+    if (loc == 0 || strcmp(loc, "C"))
+	help_locales[i++] = g_strdup("C");
+    help_locales[i] = 0;
+    assert(i < HELP_NUM_LOCALES);
+
+#if DEBUG > 2
+    fprintf(stderr, "help_init_locales: search locales:");
+    for (i=0 ; help_locales[i] != 0 ; i++)
+	fprintf(stderr, " \"%s\"", help_locales[i]);
+    fprintf(stderr, "\n");
+#endif	
+}
+
+static GHashTable *
+help_read_index(const char *filename)
+{
+    FILE *fp;
+    char *tag, *urlpart;
+    GHashTable *hash = 0;
+    char buf[1024];
+    static const char sep[] = " \t\n\r";
+
+    if ((fp = fopen(filename, "r")) == 0)
+    {
+    	if (errno != ENOENT)
+	    perror(filename);
+	return 0;
+    }
+    
+
+    while (fgets(buf, sizeof(buf), fp) != 0)
+    {
+    	if (buf[0] == '#')
+	    continue;	/* skip comment lines */
+    	if ((tag = strtok(buf, sep)) == 0)
+	    continue;
+    	if ((urlpart = strtok(0, sep)) == 0)
+	    continue;
+    	if (strtok(0, sep) != 0)
+	    continue;
+
+#if DEBUG > 2
+	fprintf(stderr, "help_read_index: tag=\"%s\" urlpart=\"%s\"\n",
+	    	    	tag, urlpart);
+#endif
+
+	if (hash == 0)
+	    hash = g_hash_table_new(g_str_hash, g_str_equal);
+	g_hash_table_insert(hash, g_strdup(tag), g_strdup(urlpart));
+    }
+    
+    fclose(fp);
+    return hash;
+}
+
+static void
+help_init_indexes(void)
+{
+    int i;
+    char *file;
+
+    for (i = 0 ; help_locales[i] != 0 ; i++)
+    {
+    	file = g_strconcat(HELPDIR "/", help_locales[i], "/index.dat", 0);
+    	help_indexes[i] = help_read_index(file);
+    	g_free(file);
+    }
+}
+
+static void
+help_init(void)
+{
+    if (help_initialised)
+    	return;
+    help_initialised = TRUE;
+    help_init_locales();
+    help_init_indexes();
+}
+
+/* Look up the given tag and return a file:/ URL or NULL */
+static char *
+help_lookup(const char *tag)
+{
+#define URLPREFIX   	"file://"
+#define URLPREFIXLEN	(sizeof(URLPREFIX)-1)
+    char *url = 0;
+    int i;
+    
+    help_init();
+    
+    for (i = 0 ; help_locales[i] != 0 ; i++)
+    {
+    	/* first try to lookup the index for this locale */
+    	if (help_indexes[i] != 0)
+	{
+	    char *urlpart;
+	    char *filesep;
+	    
+	    if ((urlpart = g_hash_table_lookup(help_indexes[i], tag)) != 0)
+	    {
+    		url = g_strconcat(URLPREFIX HELPDIR "/", help_locales[i], "/", urlpart, 0);
+
+	    	filesep = strrchr(url, '/');
+		filesep = strchr(filesep, '#');
+		if (filesep != 0)
+		    *filesep = '\0';
+		if (file_exists(url+URLPREFIXLEN))
+		{
+		    if (filesep != 0)
+			*filesep = '#';
+		    break;
+		}
+		g_free(url);
+		url = 0;
+	    }
+	}
+
+    	/* not found in index, maybe there's a file of that name */
+    	url = g_strconcat(URLPREFIX HELPDIR "/", help_locales[i], "/", tag, ".html", 0);
+#if DEBUG > 2
+	fprintf(stderr, "help_lookup: trying \"%s\"\n", url);
+#endif
+	if (file_exists(url+URLPREFIXLEN))
+	    break;
+	g_free(url);
+	url = 0;
+    }
+    
+#if DEBUG > 2
+    fprintf(stderr, "help_lookup: \"%s\" -> \"%s\"\n", tag, url);
+#endif
+    return url;
+#undef URLPREFIX
+#undef URLPREFIXLEN
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 static TaskOps help_browser_ops =
 {
 0,  	    	    	    	/* start */
@@ -344,85 +512,22 @@ help_goto_url(const char *url)
     task_spawn(help_browser_task(url));
 }
 
-static char *
-help_find_help_file(const char *name)
-{
-    char *file = 0;
-    int i;
-    static const char *locales[4];
-    static char locale_lang_buf[3];
-    
-    if (locales[0] == 0)
-    {
-    	/* initialise searchlist of locales */
-    	const char *loc;
-	
-    	loc = getenv("LC_MESSAGES");
-	if (loc == 0)
-    	    loc = getenv("LANG");
-
-    	i = 0;
-	if (loc != 0)
-	{
-	    locales[i++] = loc;
-	    if (strlen(loc) > 2)
-	    {
-		locale_lang_buf[0] = loc[0];
-		locale_lang_buf[1] = loc[1];
-		locale_lang_buf[2] = '\0';
-		locales[i++] = locale_lang_buf;
-	    }
-	}
-	if (loc == 0 || strcmp(loc, "C"))
-	    locales[i++] = "C";
-	locales[i] = 0;
-	assert(i < (int)ARRAYLEN(locales));
-	
-#if DEBUG > 2
-    	fprintf(stderr, "help_find_help_file: search locales:");
-    	for (i=0 ; locales[i] != 0 ; i++)
-	    fprintf(stderr, " \"%s\"", locales[i]);
-    	fprintf(stderr, "\n");
-#endif	
-    }
-    
-    for (i=0 ; locales[i] != 0 ; i++)
-    {
-    	file = g_strconcat(HELPDIR "/", locales[i], "/", name, ".html", 0);
-#if DEBUG > 2
-	fprintf(stderr, "help_find_help_file: trying \"%s\"\n", file);
-#endif
-	if (file_exists(file))
-	    break;
-	g_free(file);
-	file = 0;
-    }
-    
-#if DEBUG > 2
-    fprintf(stderr, "help_find_help_file: found \"%s\"\n", file);
-#endif
-    return file;
-}
-
-
 static void
-help_goto_helpname(const char *name)
+help_goto_tag(const char *tag)
 {
-    char *file, *url;
+    char *url;
     
-    if ((file = help_find_help_file(name)) == 0)
-    	return;
-	
-    url = g_strconcat("file://", file, 0);
-    help_goto_url(url);
-    g_free(file);
-    g_free(url);
+    if ((url = help_lookup(tag)) != 0)
+    {
+	help_goto_url(url);
+	g_free(url);
+    }
 }
 
 void
-help_goto_helpname_cb(GtkWidget *w, gpointer data)
+help_goto_tag_cb(GtkWidget *w, gpointer data)
 {
-    help_goto_helpname((const char *)data);
+    help_goto_tag((const char *)data);
 }
 
 void
@@ -440,7 +545,7 @@ void
 help_on_cb(GtkWidget *w, void *user_data)
 {
     GdkEvent *event;
-    const char *name;
+    const char *tag;
     static GdkCursor *help_cursor = 0;
     
     if (help_cursor == 0)
@@ -499,8 +604,8 @@ help_on_cb(GtkWidget *w, void *user_data)
 	    fprintf(stderr, "help_on_cb: Trying to find help...\n");
 #endif
 	    if ((w = gtk_get_event_widget(event)) != 0 &&
-	    	(name = ui_get_help_name(w)) != 0)
-		help_goto_helpname(name);
+	    	(tag = ui_get_help_tag(w)) != 0)
+		help_goto_tag(tag);
 	    break;
 	}
 	else if (event->type == GDK_ENTER_NOTIFY ||

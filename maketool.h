@@ -267,7 +267,7 @@ void file_print_cb(GtkWidget *, gpointer);
 /* help.c */ 
 void help_about_cb(GtkWidget *, gpointer);
 void help_about_make_cb(GtkWidget *, gpointer);
-void help_goto_helpname_cb(GtkWidget *w, gpointer data);
+void help_goto_tag_cb(GtkWidget *w, gpointer data);
 void help_goto_url_cb(GtkWidget *w, gpointer data);
 void help_on_cb(GtkWidget *w, void *user_data);
 /* find.c */

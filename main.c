@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.97 2003-09-28 10:35:34 gnb Exp $");
+CVSID("$Id: main.c,v 1.98 2003-09-29 01:07:20 gnb Exp $");
 
 
 /*
@@ -987,7 +987,7 @@ file_open_cb(GtkWidget *w, gpointer data)
 	    _("Maketool: Open Log File"),
 	    file_open_file_func,
 	    "make.log");
-	ui_set_help_name(filesel, "open-log-file-window");
+	ui_set_help_tag(filesel, "open-log-file-window");
     }
 
     gtk_widget_show(filesel);
@@ -1015,7 +1015,7 @@ file_save_cb(GtkWidget *w, gpointer data)
 	    _("Maketool: Save Log File"),
 	    file_save_file_func,
 	    "make.log");
-	ui_set_help_name(filesel, "save-log-file-window");
+	ui_set_help_tag(filesel, "save-log-file-window");
     }
 
     gtk_widget_show(filesel);
@@ -1174,7 +1174,7 @@ file_change_dir_cb(GtkWidget *w, gpointer data)
 	    _("Maketool: Change Directory"),
 	    file_change_dir_func,
 	    ".");
-	ui_set_help_name(filesel, "change-directory-window");
+	ui_set_help_tag(filesel, "change-directory-window");
     }
 
     /*
@@ -1642,7 +1642,7 @@ ui_create_menus(GtkWidget *menubar)
     ui_add_separator(menu);
     ui_add_button(menu, _("_Help on..."), "F1", help_on_cb, 0, GR_NONE);
     ui_add_separator(menu);
-    ui_add_button(menu, _("Table of _Contents..."), 0, help_goto_helpname_cb, "maketool", GR_NONE);
+    ui_add_button(menu, _("Table of _Contents..."), 0, help_goto_tag_cb, "maketool", GR_NONE);
     ui_add_button(menu, _("Web Page..."), 0, help_goto_url_cb, HOMEPAGE, GR_NONE);
 }
 
@@ -1841,7 +1841,7 @@ ui_create(void)
     gtk_signal_connect(GTK_OBJECT(toplevel), "property_notify_event", 
     	GTK_SIGNAL_FUNC(toplevel_property_notify_cb), NULL);
     gtk_container_border_width(GTK_CONTAINER(toplevel), 0);
-    ui_set_help_name(toplevel, "main-window");
+    ui_set_help_tag(toplevel, "main-window");
     gtk_widget_show(GTK_WIDGET(toplevel));
 
     /* gtk_widget_realize(toplevel); */

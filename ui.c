@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.36 2003-09-28 10:35:34 gnb Exp $");
+CVSID("$Id: ui.c,v 1.37 2003-09-29 01:07:20 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -512,7 +512,7 @@ ui_tool_create(
     ui_callback_t callback,
     gpointer user_data,
     gint group,
-    const char *helpname)
+    const char *helptag)
 {
     GdkPixmap *pm = 0;
     GdkBitmap *mask = 0;
@@ -531,8 +531,8 @@ ui_tool_create(
 	user_data);
     if (group >= 0)
     	ui_group_add(group, item);
-    if (helpname != 0)
-    	ui_set_help_name(item, helpname);
+    if (helptag != 0)
+    	ui_set_help_tag(item, helptag);
 
     return item;
 }
@@ -616,7 +616,7 @@ ui_create_ok_dialog(
     dialog = ui_create_dialog(parent, title);
     
     btn = ui_dialog_create_button(dialog, _("OK"), ui_dialog_ok_cb, (gpointer)dialog);
-    ui_set_help_name(btn, "ok");
+    ui_set_help_tag(btn, "ok");
     gtk_window_set_default(GTK_WINDOW(dialog), btn);
     return dialog;
 }    
@@ -682,12 +682,12 @@ ui_create_apply_dialog(
     
     ad->ok_btn = ui_dialog_create_button(ad->dialog, _("OK"), ui_apply_dialog_ok_cb, (gpointer)ad);
     gtk_widget_set_sensitive(ad->ok_btn, FALSE);
-    ui_set_help_name(ad->ok_btn, "ok");
+    ui_set_help_tag(ad->ok_btn, "ok");
     ad->apply_btn = ui_dialog_create_button(ad->dialog, _("Apply"), ui_apply_dialog_apply_cb, (gpointer)ad);
     gtk_widget_set_sensitive(ad->apply_btn, FALSE);
-    ui_set_help_name(ad->apply_btn, "apply");
+    ui_set_help_tag(ad->apply_btn, "apply");
     btn = ui_dialog_create_button(ad->dialog, _("Cancel"), ui_apply_dialog_cancel_cb, (gpointer)ad);
-    ui_set_help_name(btn, "cancel");
+    ui_set_help_tag(btn, "cancel");
     gtk_window_set_default(GTK_WINDOW(ad->dialog), btn);
     
     return ad->dialog;
@@ -784,19 +784,19 @@ ui_message_wait(GtkWidget *w)
 static const char _ui_help_key[] = "ui-help-key";
 
 void
-ui_set_help_name(GtkWidget *w, const char *str)
+ui_set_help_tag(GtkWidget *w, const char *tag)
 {
-    gtk_object_set_data(GTK_OBJECT(w), _ui_help_key, (void*)str);
+    gtk_object_set_data(GTK_OBJECT(w), _ui_help_key, (void*)tag);
 }
 
 const char *
-ui_get_help_name(GtkWidget *w)
+ui_get_help_tag(GtkWidget *w)
 {
     while (w != 0)
     {
-	const char *name = (const char *)gtk_object_get_data(GTK_OBJECT(w), _ui_help_key);
-	if (name != 0)
-	    return name;
+	const char *tag = (const char *)gtk_object_get_data(GTK_OBJECT(w), _ui_help_key);
+	if (tag != 0)
+	    return tag;
 	w = w->parent;
     }
     return 0;

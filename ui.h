@@ -62,7 +62,7 @@ GtkWidget *ui_tool_create(
     ui_callback_t callback,
     gpointer user_data,
     gint group,
-    const char *helpname);
+    const char *helptag);
 void ui_tool_add_space(GtkWidget *toolbar);
 
 /* Menubar stuff */    
@@ -133,8 +133,8 @@ __attribute__(( format(printf, 3, 4) ))
 void ui_message_wait(GtkWidget *);
 
 
-void ui_set_help_name(GtkWidget *w, const char *str);
-const char *ui_get_help_name(GtkWidget *w);
+void ui_set_help_tag(GtkWidget *w, const char *tag);
+const char *ui_get_help_tag(GtkWidget *w);
   
 /* config stuff */
 typedef struct

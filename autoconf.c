@@ -23,7 +23,7 @@
 #include "maketool_task.h"
 #include "log.h"
 
-CVSID("$Id: autoconf.c,v 1.15 2003-09-27 13:37:18 gnb Exp $");
+CVSID("$Id: autoconf.c,v 1.16 2003-09-29 01:07:20 gnb Exp $");
 
 #define strassign(x, s) \
     do { \
@@ -1001,7 +1001,7 @@ create_autoconf_shell(void)
     
     autoconf_shell = ui_create_dialog(toplevel,  _("Maketool: Configure Options"));
     gtk_window_set_modal(GTK_WINDOW(autoconf_shell), TRUE);
-    ui_set_help_name(autoconf_shell, "configure-window");
+    ui_set_help_tag(autoconf_shell, "configure-window");
     
 /*    gtk_container_border_width(GTK_CONTAINER(autoconf_shell), SPACING); */
     
