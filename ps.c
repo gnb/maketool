@@ -22,7 +22,7 @@
 #include "util.h"
 #include <time.h>
 
-CVSID("$Id: ps.c,v 1.5 2001-07-25 08:35:22 gnb Exp $");
+CVSID("$Id: ps.c,v 1.6 2001-07-26 16:26:36 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -163,9 +163,7 @@ ps_date_string(void)
     time(&clock);
     datebuf = ctime(&clock);
     datebuf[24] = '\0';
-    return g_strdup_printf("%s (%s)",
-    	datebuf,
-	safe_str(tzname[0]));
+    return g_strdup(datebuf);
 }
 
 static const char prologue[] = "\
