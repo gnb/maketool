@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.53 2003-10-12 22:52:33 gnb Exp $");
+CVSID("$Id: log.c,v 1.54 2003-10-16 15:03:55 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -50,6 +50,7 @@ static int		num_warnings;
 static gboolean     	num_ew_changed = FALSE;
 static void 	    	(*log_count_callback)(int, int);
 static GList		*log;		/* list of LogRecs */
+static GList	    	*log_tail;  	/* tail of `log' list */
 
 static GHashTable   	*dir_hash;  	/* hashtable of all normalised directories */
 static GPtrArray	*dir_stack; 	/* stack of GList of entries in dir_hash */
@@ -474,7 +475,13 @@ log_add_rec(char *line, const FilterResult *res, LogContext *con)
     	break;
     }
 
-    log = g_list_append(log, lr);		/* TODO: fix O(N^2) */
+    if (log == 0)
+	log = log_tail = g_list_append(0, lr);
+    else
+    {
+	g_list_append(log_tail, lr);
+	log_tail = log_tail->next;
+    }
 
     return lr;
 }
@@ -730,6 +737,7 @@ log_clear(void)
     	log_del_rec((LogRec *)log->data);
 	log = g_list_remove_link(log, log);
     }
+    log_tail = 0;
 
     /* clear the log window */
     gtk_clist_clear(GTK_CLIST(logwin));
