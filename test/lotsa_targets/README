@@ -1,0 +1,22 @@
+
+Directory to test Makefiles with large numbers of targets,
+which maketool splits into multiple submenus in the Build menu.
+
+To run the test with a different number of targets, do:
+
+% make clean ; make -n NUM_TARGETS=nnn
+
+then start maketool in this directory. This should be done
+for the following values of NUM_TARGETS (expressed in terms
+of the BUILD_MENU_THRESHOLD define in main.c):
+
+0
+1
+BUILD_MENU_THRESHOLD-1
+BUILD_MENU_THRESHOLD
+BUILD_MENU_THRESHOLD+1
+8
+(6*BUILD_MENU_THRESHOLD)-1
+(6*BUILD_MENU_THRESHOLD)
+(6*BUILD_MENU_THRESHOLD)+1
+(6*BUILD_MENU_THRESHOLD)+8
