@@ -152,8 +152,6 @@ x  possibly generate token span from line before the MWOS "   ^" stuff.
 
 x  apply the prefs option used at start of build to opening log files.
 
-x  Option to always scroll to end on make output
-
 x  A.T. Hofkamp says: when extract_targets is not found, the failure
    mode is that the Build menu contains the following entries:
    /bin/sh:
@@ -362,3 +360,4 @@ x  DONE: A.T. Hofkamp says: Please make it possibe to edit the Makefile
 x  DONE: Vaclav Slavik says:  let maketool remember previous directories in
    config file, not only during one session.
 
+x  DONE: Option to always scroll to end on make output

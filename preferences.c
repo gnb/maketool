@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.39 2000-07-29 16:20:08 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.40 2000-07-31 02:17:11 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -32,6 +32,7 @@ static GtkWidget	*edit1_check;
 static GtkWidget	*editw_check;
 static GtkWidget	*fail_check;
 static GtkWidget	*emm_check;
+static GtkWidget	*soo_check;
 static GtkWidget	*run_radio[3];
 static GtkWidget	*prog_make_entry;
 static GtkWidget	*prog_targets_entry;
@@ -292,6 +293,7 @@ preferences_load(void)
     prefs.edit_warnings = ui_config_get_boolean("edit_warnings", TRUE);
     prefs.ignore_failures = ui_config_get_boolean("ignore_failures", FALSE);
     prefs.enable_make_makefile = ui_config_get_boolean("enable_make_makefile", TRUE);
+    prefs.scroll_on_output = ui_config_get_boolean("scroll_on_output", FALSE);
     
     prefs.start_action = ui_config_get_enum("start_action", START_COLLAPSE,
     				start_action_enum_def);
@@ -362,7 +364,8 @@ preferences_save(void)
     ui_config_set_boolean("edit_warnings", prefs.edit_warnings);
     ui_config_set_boolean("ignore_failures", prefs.ignore_failures);
     ui_config_set_boolean("enable_make_makefile", prefs.enable_make_makefile);
-    
+    ui_config_set_boolean("scroll_on_output", prefs.scroll_on_output);
+
     ui_config_set_enum("start_action", prefs.start_action,
     				start_action_enum_def);
     ui_config_set_string("makefile", prefs.makefile);
@@ -462,6 +465,7 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     prefs.edit_warnings = !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(editw_check));
     prefs.ignore_failures = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fail_check));
     prefs.enable_make_makefile = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(emm_check));
+    prefs.scroll_on_output = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(soo_check));
 
     g_free(prefs.prog_make);
     prefs.prog_make = g_strdup(gtk_entry_get_text(GTK_ENTRY(prog_make_entry)));
@@ -677,6 +681,16 @@ prefs_create_general_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), emm_check, 0, 3, row, row+1);
     gtk_widget_show(emm_check);
+    row++;
+
+    /*
+     * scroll to end of window on make child's output
+     */
+    soo_check = gtk_check_button_new_with_label(_("Scroll to end on output"));
+    gtk_signal_connect(GTK_OBJECT(soo_check), "toggled", 
+    	GTK_SIGNAL_FUNC(changed_cb), 0);
+    gtk_table_attach_defaults(GTK_TABLE(table), soo_check, 0, 3, row, row+1);
+    gtk_widget_show(soo_check);
     row++;
 
     /*
@@ -1749,6 +1763,7 @@ prefs_show(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(editw_check), !prefs.edit_warnings);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fail_check), prefs.ignore_failures);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(emm_check), prefs.enable_make_makefile);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(soo_check), prefs.scroll_on_output);
     gtk_entry_set_text(GTK_ENTRY(makefile_entry), (prefs.makefile == 0 ? "" : prefs.makefile));
     ui_combo_set_current(start_action_combo, prefs.start_action);
 

@@ -63,6 +63,7 @@ void log_open(const char *file);
 /* generates PostScript on given FILE* */
 void log_print(FILE *fp);
 LogRec *log_add_line(const char *line);
+void log_ensure_visible(const LogRec *);
 
 /* get the text displayed for the given logrec */
 const char *log_get_text(const LogRec *lr);

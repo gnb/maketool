@@ -78,6 +78,7 @@ typedef struct
     gboolean edit_warnings;
     gboolean ignore_failures;
     gboolean enable_make_makefile;
+    gboolean scroll_on_output;
     
     enum { START_NOTHING, START_CLEAR, START_COLLAPSE } start_action;
     char *makefile;

@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.63 2000-07-29 15:18:14 gnb Exp $");
+CVSID("$Id: main.c,v 1.64 2000-07-31 02:17:11 gnb Exp $");
 
 
 /*
@@ -576,6 +576,8 @@ handle_line(const char *line)
 #endif
 
     lr = log_add_line(line);
+    if (prefs.scroll_on_output)
+    	log_ensure_visible(lr);
     if (prefs.edit_first_error && first_error)
     {
 	if ((lr->res.code == FR_WARNING && prefs.edit_warnings) ||
