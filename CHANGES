@@ -1,3 +1,8 @@
+* 0.5.1  (14 Nov 1999)
+x  Fixed race condition which caused the first process spawned to sometimes
+   not be reaped properly if it finished quickly. This sometimes lead to
+   an empty Build menu.
+
 * 0.5  (07 Nov 1999)
 x  Added feature which builds a new Makefile if it is out of date. Handles
    autoconf and imake.
