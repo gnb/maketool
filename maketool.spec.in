@@ -36,7 +36,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 /usr/bin/maketool
 /usr/libexec/maketool/maketool_client
-/usr/libexec/maketool/extract_targets
 /usr/share/maketool/*.mk
 %doc COPYING COPYRIGHT TODO CHANGES
 %docdir /usr/share/maketool/help
