@@ -5,6 +5,7 @@ configure
 config.cache
 config.status
 config.h
+config.h.in
 Makefile
 maketool-*.tgz
 maketool-*.tar.gz
