@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.44 2003-10-13 12:54:01 gnb Exp $");
+CVSID("$Id: filter.c,v 1.45 2003-10-13 12:55:55 gnb Exp $");
 
 typedef struct
 {
@@ -101,7 +101,9 @@ filter_calc_leads(const char *regexp, unsigned char suitable[256])
 #define dmsg1(fmt, a1)
 #endif
 
-    dmsg1("[%s]...", regexp);
+    dmsg1("%s", "");
+    dmsg1("starting regexp \"%s\"", regexp);
+    dmsg1("%s", "");
 
     if (*r != '^')
     {
