@@ -6,8 +6,8 @@ define(ENDTHANKS,
 </TABLE>
 )dnl
 define(THANKS,
-  <TR>
+`  <TR>
     <TD><I>$1</I></TD>
     <TD>$2</TD>
-  </TR>
+  </TR>'
 )dnl
