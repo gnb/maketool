@@ -44,3 +44,20 @@ dnl Usage: THUMBNAIL(some/dir/fred,gif,[alternate text])
 define(THUMBNAIL,
 <A HREF="$1.$2"><IMG SRC="$1_t.$2" ALT="$3" BORDER=0></A>
 )dnl
+dnl Usage: BEGINDOWNLOAD ( DOWNLOAD(description,filename) )* ENDDOWNLOAD
+define(BEGINDOWNLOAD,
+<table>
+)dnl
+define(ENDDOWNLOAD,
+</table>
+)dnl
+define(DOWNLOAD,
+`  <tr>
+    <td valign=top><b>$1</b></td>
+    <td>
+      <a href="$2">$2</a><br>
+      esyscmd(ls -l RELEASEDIR/$2 | awk {print`\$'5}) bytes<br>
+      MD5 esyscmd(md5sum RELEASEDIR/$2 | awk {print`\$'1})
+    </td>
+  </tr>'
+)dnl

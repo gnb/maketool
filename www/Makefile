@@ -27,7 +27,7 @@ all:: $(PAGES)
 changelog.html: _changelist.html
 $(PAGES): _styles.html _common.m4 _copyright.html toc.html.in
 index.html: _thanks.m4
-download.html: $(RELEASEDIR)/version.m4 _download.m4 downloadables.m4
+download.html: $(RELEASEDIR)/version.m4 downloadables.m4
 
 _changelist.html: $(RELEASEDIR)/CHANGES
 	./changes2html < $< > $@
