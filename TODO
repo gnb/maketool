@@ -127,3 +127,4 @@ x  Change the preferences so that the actual make executable used is
    prog_make_version, and inside the shell script extract_targets).
    Use %M as the name of the executable in those cases.
    
+x  Allow setting of make variables using VAR=val syntax on command line.
