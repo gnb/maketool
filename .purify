@@ -1,0 +1,4 @@
+suppress umr gtk_widget_set_sensitive
+suppress umr memcmp; LocalConnection; XShmQueryVersion
+suppress mlk malloc; calloc; g_malloc0; gtk_type_new; gtk_tooltips_new
+suppress mlk malloc; _GetIMValues; XGetIMValues; gdk_im_real_open
