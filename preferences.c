@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.60 2003-07-25 14:19:55 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.61 2003-08-20 15:39:40 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -40,6 +40,7 @@ static GtkWidget	*prog_targets_entry;
 static GtkWidget	*prog_version_entry;
 static GtkWidget	*prog_edit_entry;
 static GtkWidget	*prog_make_makefile_entry;
+static GtkWidget	*prog_help_browser_entry;
 static GtkWidget	*prog_finish_entry;
 static GtkWidget	*start_action_combo;
 static GtkWidget	*finish_action_combo;
@@ -86,6 +87,32 @@ static void update_color_sample(void);
 #define DEFAULT_COL_FG_ERROR	0
 #define DEFAULT_COL_FG_SUMMARY	0
 
+static const char * const 
+editors[] =
+{
+"nc -noask %{l:+-line %l} %f",
+"gnome-edit %{l:++%l} %f",
+"gnome-terminal -e \"${VISUAL:-vi} %{l:++%l} %f\"",
+"xterm -e ${VISUAL:-vi} %{l:++%l} %f",
+"emacsclient %{l:++%l} %f",
+0
+};
+
+static const char * const 
+browsers[] =
+{
+"nautilus '%u'",
+"gnome-help-browser '%u'",
+"gnome-moz-remote --newwin '%u'",
+"netscape -remote 'openURL(%u)'",
+#if 0
+/* TODO: figure out the commandline syntax for these */
+"konqueror '%u'",
+"opera %u",
+#endif
+"xterm -e lynx '%u'",
+0
+};
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -369,7 +396,8 @@ preferences_load(void)
     if (prefs.prog_list_version == 0)
     	prefs.prog_list_version = g_strdup("%M %V");
 
-    prefs.prog_edit_source = ui_config_get_string("prog_edit_source", "nc -noask %{l:+-line %l} %f");
+    prefs.prog_edit_source = ui_config_get_string("prog_edit_source",
+    	    	    	    	    	    	  editors[0]);
 
     prefs.prog_make_makefile = ui_config_get_string("prog_make_makefile2", 0);
     /* Detect and handle upgrade 0.7 -> 0.8 */
@@ -382,6 +410,9 @@ preferences_load(void)
     }
     if (prefs.prog_make_makefile == 0)
     	prefs.prog_make_makefile = g_strdup("%M %n %v -f %D/%S.mk %t");
+
+    prefs.prog_help_browser = ui_config_get_string("prog_help_browser",
+    	    	    	    	    	    	   browsers[0]);
 
     prefs.prog_finish = ui_config_get_string("prog_finish", "");
 
@@ -465,6 +496,7 @@ preferences_save(void)
     ui_config_set_string("prog_list_version", prefs.prog_list_version);
     ui_config_set_string("prog_edit_source", prefs.prog_edit_source);
     ui_config_set_string("prog_make_makefile2", prefs.prog_make_makefile);
+    ui_config_set_string("prog_help_browser", prefs.prog_help_browser);
     ui_config_set_string("prog_finish", prefs.prog_finish);
 
     ui_config_set_int("win_width", prefs.win_width);
@@ -582,6 +614,9 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     
     g_free(prefs.prog_make_makefile);
     prefs.prog_make_makefile = g_strdup(gtk_entry_get_text(GTK_ENTRY(prog_make_makefile_entry)));
+    
+    g_free(prefs.prog_help_browser);
+    prefs.prog_help_browser = g_strdup(gtk_entry_get_text(GTK_ENTRY(prog_help_browser_entry)));
     
     g_free(prefs.prog_finish);
     prefs.prog_finish = g_strdup(gtk_entry_get_text(GTK_ENTRY(prog_finish_entry)));
@@ -1196,20 +1231,30 @@ prefs_create_variables_page(GtkWidget *toplevel)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static void
+ui_combo_set_strings(GtkCombo *combo, const char * const *p)
+{
+    GList *list = 0;
+    
+    for ( ; *p ; p++)
+	list = g_list_prepend(list, (gpointer)*p);
+
+    gtk_combo_set_popdown_strings(combo, g_list_reverse(list));
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 static const char programs_key[] = N_("\
 Key\n\
-%f       source filename            %{x:+y}  y if %x is not empty\n\
-%k       keep going flag (-k)       %D       maketool data directory\n\
-%l       source line number         %M       make program\n\
-%m       -f makefile                %S       makesystem name\n\
-%n       dryrun flag (-n)           %V       list version flags\n\
-%p       parallel flags (-j or -l)\n\
-%q       list targets flags\n\
+%f       source filename        %u       help url\n\
+%k       keep going flag (-k)   %v       variable overrides\n\
+%l       source line number     %{x:+y}  y if %x is not empty\n\
+%m       -f makefile            %D       maketool data directory\n\
+%n       dryrun flag (-n)       %M       make program\n\
+%p       parallel flags (-j,-l) %S       makesystem name\n\
+%q       list targets flags     %V       list version flags\n\
 %t       target\n\
-%v       variable overrides\n\
 ");
-
-
 
 static GtkWidget *
 prefs_create_programs_page(GtkWidget *toplevel)
@@ -1320,13 +1365,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     gtk_widget_show(label);
     
     combo = gtk_combo_new();
-    list = 0;
-    list = g_list_append(list, "gnome-edit %{l:++%l} %f");
-    list = g_list_append(list, "gnome-terminal -e \"${VISUAL:-vi} %{l:++%l} %f\"");
-    list = g_list_append(list, "xterm -e ${VISUAL:-vi} %{l:++%l} %f");
-    list = g_list_append(list, "nc -noask %{l:+-line %l} %f");
-    list = g_list_append(list, "emacsclient %{l:++%l} %f");
-    gtk_combo_set_popdown_strings(GTK_COMBO(combo), list);
+    ui_combo_set_strings(GTK_COMBO(combo), editors);
     entry = GTK_COMBO(combo)->entry;
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
@@ -1350,6 +1389,25 @@ prefs_create_programs_page(GtkWidget *toplevel)
     gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
     gtk_widget_show(entry);
     prog_make_makefile_entry = entry;
+    row++;
+
+    /*
+     * Help browser
+     */
+    label = gtk_label_new(_("Help browser:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
+    gtk_widget_show(label);
+    
+    combo = gtk_combo_new();
+    ui_combo_set_strings(GTK_COMBO(combo), browsers);
+    entry = GTK_COMBO(combo)->entry;
+    gtk_signal_connect(GTK_OBJECT(entry), "changed", 
+    	GTK_SIGNAL_FUNC(changed_cb), 0);
+    gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 2, row, row+1);
+    gtk_widget_show(combo);
+    prog_help_browser_entry = entry;
     row++;
 
     /*
@@ -2024,6 +2082,7 @@ prefs_show(void)
     gtk_entry_set_text(GTK_ENTRY(prog_version_entry), prefs.prog_list_version);
     gtk_entry_set_text(GTK_ENTRY(prog_edit_entry), prefs.prog_edit_source);
     gtk_entry_set_text(GTK_ENTRY(prog_make_makefile_entry), prefs.prog_make_makefile);
+    gtk_entry_set_text(GTK_ENTRY(prog_help_browser_entry), prefs.prog_help_browser);
     gtk_entry_set_text(GTK_ENTRY(prog_finish_entry), prefs.prog_finish);
     gtk_widget_set_sensitive(prog_finish_entry, (prefs.finish_action == FINISH_COMMAND));
 
