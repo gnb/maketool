@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.38 2001-09-21 04:33:04 gnb Exp $
+# $Id: Makefile.in,v 1.39 2001-09-21 05:00:13 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -42,7 +42,7 @@ LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 SOURCES=	main.c filter.c help.c preferences.c log.c print.c ps.c \
 		find.c autoconf.c ui.c task.c util.c glib_extra.c mqueue.c
 HEADERS=	maketool.h filter.h common.h log.h ui.h \
-		util.h glib_extra.h ps.h task.h
+		util.h glib_extra.h ps.h task.h mqueue.h
 OBJECTS=	$(SOURCES:.c=.o)
 
 top_srcdir=	.
@@ -181,6 +181,7 @@ DISTFILES=	\
 		configure Makefile.in config.h.in mkinstalldirs \
 		\
 		$(SOURCES) $(HEADERS) \
+		$(CLIENT_SOURCES) $(CLIENT_HEADERS) \
 		extract_targets.in
 
 
@@ -200,11 +201,14 @@ dist:
 	$(RM) -r $(distdir)
 
 
-RPMBASE=    $(firstword $(wildcard /usr/src/redhat /usr/src/RPM))
+RPMFLAGS=	--define "_sourcedir $$PWD" \
+		--define "_builddir $$PWD/BUILD" \
+		--define "_rpmdir $$PWD" \
+		--define "_srcrpmdir $$PWD"
 rpm: dist
-	test -d $(RPMBASE)/SOURCES || $(INSTALL) -m 755 -d $(RPMBASE)/SOURCES
-	$(INSTALL) -m 644 $(DISTTAR) $(RPMBASE)/SOURCES/$(DISTTAR)
-	rpm -ba --clean maketool.spec
+	-$(RM) -r BUILD
+	mkdir BUILD
+	rpm $(RPMFLAGS) -ba --clean maketool.spec
 		
 ##
 # deps

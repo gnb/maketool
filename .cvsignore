@@ -8,7 +8,7 @@ config.cache
 config.status
 config.h
 Makefile
-maketool-*.tgz
+maketool-*.tar.gz
 extract_targets
 maketool.spec
 maketool-*.rpm
@@ -17,3 +17,5 @@ make_makefile
 screendumps
 examples
 maketool_client
+BUILD
+i386
