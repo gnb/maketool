@@ -17,7 +17,7 @@ Double-clicking on an error message starts an editor.
 %prep
 %setup -q
 
-autoconf --localdir=/usr/share/aclocal
+autoconf
 
 %build
 OS=`echo ${RPM_OS} | tr '[A-Z]' '[a-z]'`
@@ -35,12 +35,15 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 /usr/bin/maketool
 /usr/bin/extract_targets
+/usr/bin/make_makefile
 /usr/doc/@PACKAGE@-@VERSION@/COPYING
 /usr/doc/@PACKAGE@-@VERSION@/COPYRIGHT
 /usr/doc/@PACKAGE@-@VERSION@/TODO
 /usr/doc/@PACKAGE@-@VERSION@/CHANGES
 
 %changelog
+* Sun Nov 7 1999 Greg Banks <gnb@alphalink.com.au>
+- Next development version; see CHANGES file.
 * Wed Jul 14 1999 Greg Banks <gnb@alphalink.com.au>
 - Next development version; see CHANGES file.
 * Tue Jun 1 1999 Greg Banks <gnb@alphalink.com.au>
