@@ -5,13 +5,12 @@ include(_styles.html)
 ENDHEAD
 BEGINBODY
 
-include(versions.m4)
-define(COUNTER_START_DATE,`10 Oct 1999')
+include(version.m4)
 
 <!-- TODO: mention in the features page that it's released under GPL -->
 <!-- TODO: news... ? -->
 <P>
-The latest version available is <B>LATEST_VERSION</B>.
+The latest version available is <B>VERSION</B>.
 </P>
 
 <P>
@@ -20,10 +19,9 @@ versions on this website; EMAILME(contact me)
 if you really need an older version.
 </P>
 
-include(_download.m4)
 BEGINDOWNLOAD
-DOWNLOAD(i386-linux RPM,maketool-LATEST_VERSION-1.i386.rpm)
-DOWNLOAD(source tarball,maketool-LATEST_VERSION-src.tar.gz)
+define(DOWNLOADABLE,`DOWNLOAD($1,$2)')
+include(downloadables.m4)
 ENDDOWNLOAD
 
 <P>
@@ -43,16 +41,6 @@ I have personally ported a version of maketool to Solaris, but as I
 have no regular access to a Solaris machine, I am
 unable to point to any binaries (sorry). The latest source includes Solaris
 port patches.
-</P>
-
-<P>
-<BR>
-<BR>
-<BR>
-<BR>
-You are the
-<img src="http://www.alphalink.com.au/~gnb/Count.cgi?ft=0&dd=D&md=7&comma=T&df=maketool.dat" alt="Counter" border=0 align=absmiddle>
-<SUP>th</SUP> person to visit this page since COUNTER_START_DATE.
 </P>
 
 ENDBODY
