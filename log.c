@@ -21,8 +21,9 @@
 #include "filter.h"
 #include "log.h"
 #include "util.h"
+#include "ps.h"
 
-CVSID("$Id: log.c,v 1.24 1999-11-28 05:19:08 gnb Exp $");
+CVSID("$Id: log.c,v 1.25 1999-12-19 15:13:44 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -349,7 +350,7 @@ log_update_build_start(void)
     estring text;
     int n = 0;
     
-    if (!num_ew_changed || num_errors == 0 && num_warnings == 0)
+    if (!num_ew_changed || (num_errors == 0 && num_warnings == 0))
     	return;
     if ((bs = log_rootmost_node()) == 0)
     	return; /* yeah like that's going to happen */
@@ -500,6 +501,7 @@ log_save(const char *file)
     
     if ((fp = fopen(file, "w")) == 0)
     {
+    	/* TODO: i18n of system error messages? */
     	message("%s: %s", file, g_strerror(errno));
 	return;
     }
@@ -528,6 +530,7 @@ log_open(const char *file)
     
     if ((fp = fopen(file, "r")) == 0)
     {
+    	/* TODO: i18n of system error messages? */
     	message("%s: %s", file, g_strerror(errno));
 	return;
     }
@@ -578,6 +581,59 @@ log_open(const char *file)
     estring_free(&leftover);
     fclose(fp);
     gtk_clist_thaw(GTK_CLIST(logwin));
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static int 
+log_get_indent_level(GtkCTreeNode *node)
+{
+    int indent = 0;
+    
+    for (;;)
+    {
+    	GtkCTreeNode *parent = GTK_CTREE_ROW(node)->parent;
+	
+	if (parent == 0)
+	    return indent;
+	indent++;
+	
+	node = parent;
+    }
+    return 0;	/* NOTREACHED */
+}
+
+static void
+log_print_node(GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
+{
+    FILE *fp = (FILE *)data;
+    LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(GTK_CTREE(logwin), node);
+    
+    ps_line(fp, log_get_text(lr), log_get_indent_level(node));
+}
+
+
+void
+log_print(FILE *fp)
+{
+    GList *list;
+    
+    ps_begin_file(fp);
+    /* TODO: other std comments */
+    ps_title(fp, "Maketool log");	/* TODO: more details */
+    ps_prologue(fp);
+    
+    
+    for (list=log ; list!=0 ; list=list->next)
+    {
+    	LogRec *lr = (LogRec *)list->data;
+	
+	if (lr->res.code == FR_BUILDSTART)
+	    gtk_ctree_pre_recursive(GTK_CTREE(logwin), lr->node,
+    	    	    		log_print_node, (gpointer)fp);
+    }
+    
+    ps_end_file(fp);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.46 1999-11-26 13:05:43 gnb Exp $");
+CVSID("$Id: main.c,v 1.47 1999-12-19 15:13:44 gnb Exp $");
 
 typedef enum
 {
@@ -392,7 +392,7 @@ start_make_makefile(void *arg)
 static void
 append_build_menu_items(GList *list)
 {
-    GtkWidget *menu;
+    GtkWidget *menu = 0;
     char *targ;
     int n;
     gboolean multiple_mode = (g_list_length(list) > BUILD_MENU_THRESHOLD);
@@ -952,7 +952,6 @@ static void
 edit_copy_cb(GtkWidget *w, gpointer data)
 {
     LogRec *lr = log_selected();
-    const char *text;
 
     assert(lr != 0);
 
@@ -1049,10 +1048,8 @@ ui_create_menus(GtkWidget *menubar)
 #if 0
     ui_add_button(menu, _("_Change directory..."), 0, unimplemented, 0, GR_NOTRUNNING);
     ui_add_separator(menu);
-    ui_add_button(menu, _("_Print"), "<Ctrl>P", unimplemented, 0, GR_NOTEMPTY);
-    ui_add_button(menu, _("Print S_ettings..."), 0, unimplemented, 0, GR_NONE);
-    ui_add_separator(menu);
 #endif
+    ui_add_button(menu, _("_Print..."), "<Ctrl>P", file_print_cb, 0, GR_NOTEMPTY);
     ui_add_button(menu, _("E_xit"), "<Ctrl>X", file_exit_cb, 0, GR_NONE);
     
     menu = ui_add_menu(menubar, _("_Edit"));
@@ -1159,7 +1156,7 @@ ui_create_tools(GtkWidget *toolbar)
     ui_tool_add_space(toolbar);
     
     ui_tool_create(toolbar, _("Print"), _("Print log"),
-    	print_xpm, unimplemented, 0, GR_NOTEMPTY);
+    	print_xpm, file_print_cb, 0, GR_NOTEMPTY);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

@@ -21,7 +21,7 @@
 #define _common_h_
 
 /*
- * $Id: common.h,v 1.6 1999-11-04 07:19:40 gnb Exp $
+ * $Id: common.h,v 1.7 1999-12-19 15:13:44 gnb Exp $
  */
 
 #include <config.h>
@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <libintl.h>
+#include <ctype.h>
 
 
 #if STDC_HEADERS

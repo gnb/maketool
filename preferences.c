@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.28 1999-11-07 08:08:50 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.29 1999-12-19 15:13:45 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -308,7 +308,13 @@ preferences_load(void)
     prefs.colors[COL_FG_WARNING] = ui_config_get_string("fgcolor_warning", DEFAULT_COL_FG_WARNING);
     prefs.colors[COL_FG_ERROR] = ui_config_get_string("fgcolor_error", DEFAULT_COL_FG_ERROR);
 
-
+    prefs.paper_name = ui_config_get_string("paper_name", "A4");
+    prefs.paper_width = ui_config_get_int("paper_width", 595);
+    prefs.paper_height = ui_config_get_int("paper_height", 842);
+    prefs.margin_left = ui_config_get_int("margin_left", 36);
+    prefs.margin_right = ui_config_get_int("margin_right", 36);
+    prefs.margin_top = ui_config_get_int("margin_top", 72);
+    prefs.margin_bottom = ui_config_get_int("margin_bottom", 72);
 }
 
 void
@@ -347,6 +353,14 @@ preferences_save(void)
     ui_config_set_string("fgcolor_info", prefs.colors[COL_FG_INFO]);
     ui_config_set_string("fgcolor_warning", prefs.colors[COL_FG_WARNING]);
     ui_config_set_string("fgcolor_error", prefs.colors[COL_FG_ERROR]);
+
+    ui_config_set_string("paper_name", prefs.paper_name);
+    ui_config_set_int("paper_width", prefs.paper_width);
+    ui_config_set_int("paper_height", prefs.paper_height);
+    ui_config_set_int("margin_left", prefs.margin_left);
+    ui_config_set_int("margin_right", prefs.margin_right);
+    ui_config_set_int("margin_top", prefs.margin_top);
+    ui_config_set_int("margin_bottom", prefs.margin_bottom);
 
     ui_config_sync();
 }
@@ -496,7 +510,7 @@ browse_makefile_cb(GtkWidget *w, gpointer data)
 static GtkWidget *
 prefs_create_general_page(GtkWidget *toplevel)
 {
-    GtkWidget *table, *table2, *hbox;
+    GtkWidget *table, *table2;
     GtkWidget *frame;
     GtkObject *adj;
     GtkWidget *label;
@@ -1147,7 +1161,6 @@ color_selection_change_cb(GtkWidget *w, gpointer data)
 static void
 color_choose_cb(GtkWidget *w, gpointer data)
 {
-    GtkWidget *dialog, *colorsel;
     char *title;
     
     /*
@@ -1320,7 +1333,6 @@ prefs_create_colors_page(GtkWidget *toplevel)
     for (i=0 ; i<L_MAX ; i++)
     {
     	char *text = 0;
-	GtkCTreeNode *node;
 	GdkPixmap *open_pm = 0, *closed_pm = 0;
 	GdkBitmap *open_mask = 0, *closed_mask = 0;
     	switch (i)

@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
-dnl $Id: configure.in,v 1.16 1999-11-14 01:25:31 gnb Exp $
+dnl $Id: configure.in,v 1.17 1999-12-19 15:13:44 gnb Exp $
 dnl
 
 AC_INIT(main.c)
@@ -65,6 +65,29 @@ else
 fi
 changequote([,])dnl
 AC_SUBST(USRDOC)
+
+
+dnl Test for printer configuration.
+dnl File /etc/printcap (in BSD-derived systems)
+PRINTCAP=/etc/printcap
+AC_MSG_CHECKING(for presence of $PRINTCAP)
+if test -f $PRINTCAP ; then
+  AC_DEFINE(HAVE_ETC_PRINTCAP,1)
+  AC_MSG_RESULT(yes)
+else
+  AC_DEFINE(HAVE_ETC_PRINTCAP,0)
+  AC_MSG_RESULT(no)
+fi
+
+dnl Program lpstat (SysV-derived systems)
+AC_PATH_PROG(LPSTAT_COMMAND, lpstat)
+AC_DEFINE_UNQUOTED(LPSTAT_COMMAND, "$LPSTAT_COMMAND")
+if test -z "$LPSTAT_COMMAND" ; then
+  AC_DEFINE(HAVE_LPSTAT,0)
+else
+  AC_DEFINE(HAVE_LPSTAT,1)
+fi
+
 
 dnl Stuff for gettext
 ALL_LINGUAS="la"

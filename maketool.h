@@ -100,6 +100,15 @@ typedef struct
     
     /* X11 color names, or (char*)0 for no setting */
     char *colors[COL_MAX];
+    
+    /* printing parameters */
+    char *paper_name;
+    int paper_width;	    /* in PS units (1/72 inch) */
+    int paper_height;
+    int margin_left;
+    int margin_right;
+    int margin_top;
+    int margin_bottom;
 } Preferences;
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -130,6 +139,8 @@ EXTERN GtkWidget *toplevel;
 void message(const char *fmt, ...);
 void grey_menu_items(void);
 char *expand_prog(const char *prog, const char *file, int line, const char *target);
+/* print.c */ 
+void file_print_cb(GtkWidget *, gpointer);
 /* help.c */ 
 void help_about_cb(GtkWidget *, gpointer);
 void help_about_make_cb(GtkWidget *, gpointer);

@@ -27,8 +27,8 @@
 int ui_combo_get_current(GtkWidget *);
 void ui_combo_set_current(GtkWidget *, int);
 
-void ui_cListGetStrings(GtkWidget*, int row, int ncols, char *text[]);
-void ui_cListSetStrings(GtkWidget*, int row, int ncols, char *text[]);
+void ui_clist_get_strings(GtkWidget*, int row, int ncols, char *text[]);
+void ui_clist_set_strings(GtkWidget*, int row, int ncols, char *text[]);
 
 void ui_group_add(gint group, GtkWidget *w);
 void ui_group_set_sensitive(gint group, gboolean b);

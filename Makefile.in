@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.16 1999-11-07 11:09:56 gnb Exp $
+# $Id: Makefile.in,v 1.17 1999-12-19 15:13:44 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -29,6 +29,10 @@ VERSION=	@VERSION@
 localedir=	$(prefix)/@DATADIRNAME@/locale
 
 CC=		@CC@
+# WARNING: using gcc -ansi on Linux breaks maketool, which
+# relies on BSD signal semantics (which you get with
+# gcc -D_USE_BSD but not with gcc -ansi -D_USE_BSD)
+#CC=		gcc -Wall
 CFLAGS=		@CFLAGS@
 CPPFLAGS=	@GTK_CFLAGS@ -D_USE_BSD -I. -Iicons -Iintl \
 		-DLOCALEDIR=\"$(localedir)\" \
@@ -36,8 +40,8 @@ CPPFLAGS=	@GTK_CFLAGS@ -D_USE_BSD -I. -Iicons -Iintl \
 LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 O=		objs
 
-SOURCES=	main.c filter.c help.c preferences.c log.c ui.c \
-		spawn.c util.c glib_extra.c
+SOURCES=	main.c filter.c help.c preferences.c log.c print.c ps.c \
+		ui.c spawn.c util.c glib_extra.c
 HEADERS=	maketool.h filter.h common.h log.h ui.h \
 		spawn.h util.h glib_extra.h
 OBJECTS=	$(SOURCES:%.c=$O/%.o)

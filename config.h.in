@@ -21,7 +21,7 @@
 #define _config_h_ 1
 
 /*
- * $Id: config.h.in,v 1.7 1999-11-04 07:20:11 gnb Exp $
+ * $Id: config.h.in,v 1.8 1999-12-19 15:13:44 gnb Exp $
  */
 
 /*
@@ -51,6 +51,22 @@
  * hear how you fared - Greg.
  */
 #define GMAKE "gmake"
+
+/*
+ * Whether to look in the file /etc/printcap for
+ * a list of printers (BSD-derived systems). Defined
+ * as 1 or 0.
+ */
+#define HAVE_ETC_PRINTCAP 0
+/*
+ * Whether to run the command "lpstat -c" for
+ * a list of printers (SysV-derived systems).
+ */
+#define HAVE_LPSTAT 0
+/*
+ * Full pathname to the lpstat program if it exists.
+ */
+#define LPSTAT_COMMAND ""
 
 /* Various standard autoconf defines */
 #define HAVE_MALLOC_H 0

@@ -61,6 +61,8 @@ int log_num_warnings(void);
 
 void log_save(const char *file);
 void log_open(const char *file);
+/* generates PostScript on given FILE* */
+void log_print(FILE *fp);
 LogRec *log_add_line(const char *line);
 
 /* get the text displayed for the given logrec */
