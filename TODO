@@ -289,7 +289,7 @@ x  apply the prefs option used at start of build to opening log files.
 
 x  DONE: Use gtk_window_set_transient_for() correctly.
 
-x  Add HAV_SYS_FILIO check for FIONREAD
+x  DONE: Add HAV_SYS_FILIO check for FIONREAD
 
 x  Bug: clicking Clear Log while build in progress coredumps
 

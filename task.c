@@ -26,12 +26,12 @@
 #include <sys/ioctl.h>
 #endif
 
-#if defined(__sun__) && defined(__svr4__)
+#if HAVE_SYS_FILIO_H
 /* for FIONREAD on Solaris */
 #include <sys/filio.h>
 #endif
 
-CVSID("$Id: task.c,v 1.1 2000-04-16 09:21:33 gnb Exp $");
+CVSID("$Id: task.c,v 1.2 2000-04-16 10:11:34 gnb Exp $");
 
 static GList *task_all = 0;
 static void (*task_work_start_cb)(void) = 0;

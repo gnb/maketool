@@ -20,7 +20,6 @@
 #define DEFINE_GLOBALS
 #include <stdarg.h>
 #include "maketool.h"
-#include "spawn.h"
 #include "ui.h"
 #include "log.h"
 #include "util.h"
@@ -30,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.52 2000-04-16 09:46:57 gnb Exp $");
+CVSID("$Id: main.c,v 1.53 2000-04-16 10:11:33 gnb Exp $");
 
 typedef enum
 {

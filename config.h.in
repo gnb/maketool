@@ -21,7 +21,7 @@
 #define _config_h_ 1
 
 /*
- * $Id: config.h.in,v 1.10 2000-01-12 11:30:12 gnb Exp $
+ * $Id: config.h.in,v 1.11 2000-04-16 10:11:33 gnb Exp $
  */
 
 /*
@@ -84,6 +84,7 @@
 #define HAVE_SYS_WAIT_H 0
 #define HAVE_SYS_TIME_H 0
 #define HAVE_SYS_IOCTL_H 0
+#define HAVE_SYS_FILIO_H 0
 #define HAVE_SIGNAL_H 0
 #define HAVE_REGCOMP 0
 #define HAVE_PUTENV 0
