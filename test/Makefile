@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile,v 1.4 1999-11-07 08:08:53 gnb Exp $
+# $Id: Makefile,v 1.5 2000-08-06 10:47:14 gnb Exp $
 #
 
 
@@ -25,7 +25,7 @@ CFLAGS=		-g
 
 all:: errors targets nested delay recurse longline unendedline
 
-errors: error1 error2 error3
+errors: error1 error2 error3 error4
 
 clean::
 	@echo Nothing to see here
@@ -38,7 +38,10 @@ error2:
 	
 error3:
 	gcc -ansi -Wall -c jane.c
-	
+
+error4:
+	+$(MAKE) -C abs_sub JANE2_H=$(PWD)/jane2.h $@
+		
 targets:
 	yes ' ' | head -20 | awk '{print NR}'
 	: VARIABLE_ONE = $(VARIABLE_ONE)
@@ -73,4 +76,7 @@ longline:
 .PHONY: unendedline
 unendedline:
 	./unendedline
+
+.PHONY: this_directory_is_test
+this_directory_is_test:
 

@@ -23,6 +23,7 @@ INCLUDES = -I$(INCDIR) $(LIBGNB_INCLUDES)
    LIBS = XmClientLibs -lm
 DEPLIBS = XmClientDepLibs
    OBJS = crud.o
+   
 
 NormalProgramTarget(crud,$(OBJS),$(DEPLIBS),$(LIBS),)
 

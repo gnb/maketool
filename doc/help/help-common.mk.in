@@ -1,0 +1,87 @@
+#
+# Maketool - GTK-based front end for gmake
+# Copyright (c) 1999-2000 Greg Banks
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# 
+# $Id: help-common.mk.in,v 1.1 2000-08-06 10:46:55 gnb Exp $
+#
+
+TOPDIR=		../../..
+prefix=		@prefix@
+PACKAGE=	@PACKAGE@
+VERSION=	@VERSION@
+LANG=		$(notdir $(shell pwd))
+helpdir=	$(prefix)/@DATADIRNAME@/$(PACKAGE)/help/$(LANG)
+INSTALL=	@INSTALL@
+SGMLDIR=	/usr/local/share/sgml
+JADE=		jade
+NSGMLS=		nsgmls
+HTML_MANIFEST=	HTML.manifest
+HTML_FILES=	$(shell cat $(HTML_MANIFEST))
+IMAGES=		$(wildcard *.gif)
+INSTALLABLES=	$(HTML_FILES) $(IMAGES)
+
+###
+
+# all
+all:: maketool.html
+
+maketool.html: help.sgml
+	$(JADE) -t sgml -i html -d ../help.dsl $(SGMLDIR)/style/dsssl/docbook/docbook.dcl help.sgml
+
+# install
+define _install_one
+$(INSTALL) -m 644 $f $(helpdir)
+
+endef
+
+install::
+	test -d $(helpdir) || $(INSTALL) -d -m 755 $(helpdir)
+	$(foreach f,$(INSTALLABLES),$(_install_one))
+
+# check
+define _checkhtml_one
+-$(NSGMLS) -sv $(SGMLDIR)/jade/pubtext/HTML4.dcl $f
+
+endef
+	
+checkhtml:
+	$(foreach f,$(HTML_FILES),$(_checkhtml_one))
+	
+#clean
+clean::
+	-$(RM) $(HTML_FILES) $(HTML_MANIFEST)
+
+#uninstall
+define _remove_one
+-$(RM) $(helpdir)/$f
+
+endef
+
+uninstall::
+	$(foreach f,$(INSTALLABLES),$(_remove_one))
+		
+###
+
+# Making a distribution
+distdir=	$(TOPDIR)/$(PACKAGE)-$(VERSION)/doc/help
+DISTFILES=	Makefile.in help.sgml $(INSTALLABLES) $(HTML_MANIFEST)
+
+dist:
+	for file in $(DISTFILES); do \
+	  ln $$file $(distdir) 2>/dev/null || cp -p $$file $(distdir) 2>/dev/null; \
+	done
+	

@@ -1,0 +1,138 @@
+<!DOCTYPE ARTICLE PUBLIC "-//OASIS//DTD DocBook V3.1//EN">
+
+<article class="whitepaper" status="DRAFT" lang="EN" ID="maketool-help"
+         xreflabel="maketool-help" 
+         revision="$Id: help.sgml,v 1.1 2000-08-06 10:46:59 gnb Exp $"
+         vendor="Greg Banks">
+<artheader>
+  <title>Maketool online help</title>
+  <author>
+    <firstname>Greg</firstname>
+    <surname>Banks</surname>
+  </author>
+  <pubdate role="cvs">$Date: 2000-08-06 10:46:59 $</pubdate>
+  <releaseinfo>This is version VERSION</releaseinfo>
+  <copyright>
+    <year>2000</year>
+    <holder role="mailto:gnb@alphalink.com.au">Greg Banks</holder> 
+  </copyright>
+  <legalnotice>
+    <title>Copyright</title>
+    <para>Permission is granted to copy, distribute and/or modify
+    this document under the terms of the Open Publication License,
+    version 2.0.</para>
+  </legalnotice>
+
+</artheader>
+
+<sect1 id="dummy">
+<title>Dummy</title>
+<para>
+This section exists only to force jade to split the first
+real section into its own HTML file
+</para>
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="ok">
+<title>Ok Button</title>
+
+<graphic format=GIF fileref="ok.gif"></graphic>
+
+<para>
+Click this button to apply all the changes you have made to this
+dialog window and close the window.
+</para>
+
+<para>
+See also:
+<xref linkend="apply">
+<xref linkend="cancel">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="apply">
+<title>Apply Button</title>
+
+<graphic format=GIF fileref="apply.gif"></graphic>
+
+<para>
+Click this button to apply all the changes you have made to this
+dialog window, without closing the dialog window.
+</para>
+
+<para>
+See also:
+<xref linkend="ok">
+<xref linkend="cancel">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="cancel">
+<title>Cancel Button</title>
+
+<graphic format=GIF fileref="cancel.gif"></graphic>
+
+<para>
+Click this button to discard all the changes you have made to this
+dialog window and close the dialog.
+</para>
+
+<para>
+See also:
+<xref linkend="ok">
+<xref linkend="apply">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="tools-again">
+<title>Again tool</title>
+
+<graphic format=GIF fileref="tools-again.gif"></graphic>
+
+<para>
+Click this toolbar button to repeat the last make run, i.e. run
+<command>gmake</command> with the same target you used last time
+you ran <command>gmake</command>.  Look at the tooltip to see which
+target will be built.
+</para>
+
+<para>
+This toolbar button becomes available once you have done at least
+one <command>gmake</command> run.
+</para>
+
+<para>
+See also:
+<xref linkend="tools-all">
+<xref linkend="tools-clean">
+<xref linkend="menu-build">
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+<sect1 id="prefs-kflag">
+<title>Continue despite failures</title>
+
+<para>
+Select this toggle to have <command>gmake</command> continue building
+targets after a target fails to be built.  The normal behaviour of
+<command>gmake</command> is to stop when the first target fails.
+</para>
+
+<para>
+This toggle sets the <option>-k</option> flag to <command>gmake</command>.
+</para>
+
+</sect1>
+
+<!-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- -->
+
+</article>

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1999-11-07 21:29+1100\n"
+"POT-Creation-Date: 2000-07-11 15:51+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Greg Banks <gnb@alphalink.com.au>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,509 +33,616 @@ msgstr "Maketool: Re"
 msgid "Licence..."
 msgstr "Licencum..."
 
-#: help.c:151
+#: help.c:159
 msgid "Maketool: About Make"
 msgstr "Maketool: Re Make"
 
-#: log.c:357
+#: log.c:367
 #, fuzzy, c-format
 msgid "%d errors"
 msgstr ", %d errata"
 
-#: log.c:364
+#: log.c:374
 #, fuzzy, c-format
 msgid "%d warnings"
 msgstr ", %d warnia"
 
-#: log.c:528
+#: log.c:545
 #, c-format
 msgid "Log file %s"
 msgstr "Filum Loggia %s"
 
-#: main.c:528
+#. Note: this assumes that the accelerator remains constant, i.e. Ctrl+A,
+#. *       even though the position of the underscore in the label
+#. *       may change.
+#.
+#: main.c:268
+#, fuzzy, c-format
+msgid "_Again (%s)"
+msgstr "_Repetum"
+
+#: main.c:274
+#, fuzzy, c-format
+msgid "Build `%s' again"
+msgstr "Facit `%s'"
+
+#: main.c:585
 #, c-format
 msgid "Editing %s (line %d)"
 msgstr "Edentata %s (linea %d)"
 
-#: main.c:584
-#, c-format
-msgid ", %d errors"
-msgstr ", %d errata"
-
-#: main.c:587
-#, c-format
-msgid ", %d warnings"
-msgstr ", %d warnia"
-
-#: main.c:590
-msgid " (interrupted)"
-msgstr " (interruptus)"
-
-#: main.c:592
-#, c-format
-msgid "Finished making %s%s%s%s"
-msgstr "Facit completio %s%s%s%s"
-
-#: main.c:677
+#: main.c:683
 #, c-format
 msgid "Making %s"
 msgstr "Facit %s"
 
-#: main.c:761
+#: main.c:717
+#, c-format
+msgid ", %d errors"
+msgstr ", %d errata"
+
+#: main.c:720
+#, c-format
+msgid ", %d warnings"
+msgstr ", %d warnia"
+
+#: main.c:723
+msgid " (interrupted)"
+msgstr " (interruptus)"
+
+#: main.c:725
+#, c-format
+msgid "Finished making %s%s%s%s"
+msgstr "Facit completio %s%s%s%s"
+
+#: main.c:824
 msgid "Maketool: Open Log File"
 msgstr "Maketool: Open Loggia Filum"
 
-#: main.c:782
+#: main.c:849
 msgid "Maketool: Save Log File"
 msgstr "Maketool: Save Loggia Filum"
 
-#: main.c:895
+#: main.c:894
+msgid "No previous directories"
+msgstr ""
+
+#: main.c:973
+#, fuzzy
+msgid "Maketool: Change Directory"
+msgstr "Directatum _Changæ"
+
+#: main.c:1099
 msgid "No more errors in log"
 msgstr "Erratum in loggia nil est"
 
-#: main.c:970
-msgid "_File"
-msgstr "_Filum"
-
-#: main.c:972
-msgid "_Open Log..."
-msgstr "_Open Loggia..."
-
-#: main.c:973
-msgid "_Save Log..."
-msgstr "_Save Loggia..."
-
-#: main.c:976
-msgid "_Change directory..."
-msgstr "Directatum _Changæ"
-
-#: main.c:978
-msgid "_Print"
-msgstr "_Printare"
-
-#: main.c:979
-msgid "Print S_ettings..."
-msgstr "S_ettingus Printæ"
-
-#: main.c:982
-msgid "E_xit"
-msgstr "E_xitus"
-
-#: main.c:984
-msgid "_Edit"
-msgstr "_Editare"
-
-#: main.c:986
-msgid "Edit _Error"
-msgstr ""
-
-#: main.c:987
-msgid "Edit _Next Error"
-msgstr ""
-
-#: main.c:988
-msgid "Edit _Prev Error"
-msgstr ""
-
-#: main.c:990
-msgid "Pre_ferences..."
-msgstr ""
-
-#: main.c:992
-msgid "_Build"
-msgstr "F_acit"
-
-#: main.c:995
+#: main.c:1189
 msgid "_Again"
 msgstr "_Repetum"
 
-#: main.c:996
+#: main.c:1190
 msgid "_Stop"
 msgstr "_Endare"
 
-#: main.c:997
+#: main.c:1191
 msgid "_Dryrun Only"
 msgstr ""
 
-#: main.c:1010
+#: main.c:1208
+msgid "_File"
+msgstr "_Filum"
+
+#: main.c:1210
+msgid "_Open Log..."
+msgstr "_Open Loggia..."
+
+#: main.c:1211
+msgid "_Save Log..."
+msgstr "_Save Loggia..."
+
+#: main.c:1213
+#, fuzzy
+msgid "_Change Directory..."
+msgstr "Directatum _Changæ"
+
+#: main.c:1214
+#, fuzzy
+msgid "_Previous Directories"
+msgstr "_Indentus Directorum"
+
+#: main.c:1218
+#, fuzzy
+msgid "_Print..."
+msgstr "_Printare"
+
+#: main.c:1220
+msgid "E_xit"
+msgstr "E_xitus"
+
+#: main.c:1222
+msgid "_Edit"
+msgstr "_Editare"
+
+#: main.c:1224
+msgid "Edit _Error"
+msgstr ""
+
+#: main.c:1225
+msgid "Edit _Next Error"
+msgstr ""
+
+#: main.c:1226
+msgid "Edit _Prev Error"
+msgstr ""
+
+#: main.c:1228
+#, fuzzy
+msgid "_Copy"
+msgstr "_Endare"
+
+#: main.c:1230
+#, fuzzy
+msgid "_Find"
+msgstr "_Filum"
+
+#: main.c:1231
+#, fuzzy
+msgid "Find _Again"
+msgstr "_Repetum"
+
+#: main.c:1233
+msgid "Pre_ferences..."
+msgstr ""
+
+#: main.c:1235
+msgid "_Build"
+msgstr "F_acit"
+
+#: main.c:1239
 msgid "_View"
 msgstr "_Vidi"
 
-#: main.c:1012
+#: main.c:1241
 msgid "_Clear Log"
 msgstr ""
 
-#: main.c:1013
+#: main.c:1242
 msgid "C_ollapse All"
 msgstr ""
 
-#: main.c:1015
+#: main.c:1244
 msgid "_Toolbar"
 msgstr ""
 
-#: main.c:1016
+#: main.c:1245
 msgid "_Statusbar"
 msgstr ""
 
-#: main.c:1018
+#: main.c:1247
 msgid "_Errors"
 msgstr ""
 
-#: main.c:1020
+#: main.c:1249
 msgid "_Warnings"
 msgstr ""
 
-#: main.c:1022
+#: main.c:1251
 msgid "_Information"
 msgstr ""
 
-#: main.c:1024
+#: main.c:1253
 msgid "_Summary"
 msgstr ""
 
-#: main.c:1026
+#: main.c:1255
 msgid "_Indent Directories"
 msgstr "_Indentus Directorum"
 
-#: main.c:1029
+#: main.c:1258
 msgid "_Help"
 msgstr ""
 
-#: main.c:1031
+#: main.c:1260
 msgid "_About Maketool..."
 msgstr "_Re Maketool..."
 
-#: main.c:1032
+#: main.c:1261
 msgid "About _make..."
 msgstr "Re _make..."
 
-#: main.c:1035
+#: main.c:1264
 msgid "_Help on..."
 msgstr ""
 
-#: main.c:1037
+#: main.c:1266
 msgid "_Tutorial"
 msgstr ""
 
-#: main.c:1038
+#: main.c:1267
 msgid "_Reference Index"
 msgstr ""
 
-#: main.c:1039
+#: main.c:1268
 msgid "_Home Page"
 msgstr ""
 
-#: main.c:1058
+#: main.c:1287
 #, fuzzy
 msgid "Again"
 msgstr "_Repetum"
 
-#: main.c:1058
+#: main.c:1287
 msgid "Build last target again"
 msgstr ""
 
-#: main.c:1061
+#: main.c:1290
 #, fuzzy
 msgid "Stop"
 msgstr "_Endare"
 
-#: main.c:1061
+#: main.c:1290
 msgid "Stop current build"
 msgstr ""
 
-#: main.c:1066 main.c:1071
+#: main.c:1295 main.c:1300
 #, c-format
 msgid "Build `%s'"
 msgstr "Facit `%s'"
 
-#: main.c:1078
+#: main.c:1307
 msgid "Clear"
 msgstr ""
 
-#: main.c:1078 preferences.c:620
+#: main.c:1307 preferences.c:647
 msgid "Clear log"
 msgstr ""
 
-#: main.c:1080
+#: main.c:1309
 msgid "Next"
 msgstr ""
 
-#: main.c:1080
+#: main.c:1309
 msgid "Edit next error or warning"
 msgstr ""
 
-#: main.c:1085
+#: main.c:1314
 #, fuzzy
 msgid "Print"
 msgstr "_Printare"
 
-#: main.c:1085
+#: main.c:1314
 msgid "Print log"
 msgstr ""
 
-#: main.c:1153
-#, fuzzy, c-format
-msgid "Maketool %s"
+#: main.c:1429
+#, fuzzy
+msgid "Maketool"
 msgstr "Re Maketool"
 
-#: main.c:1251
+#: main.c:1568
 msgid "Welcome to Maketool"
 msgstr "Bonaventura a Maketool"
 
-#: preferences.c:486
+#: preferences.c:510
 msgid "Choose Makefile"
 msgstr ""
 
 #.
 #. * `Parallel' frame
 #.
-#: preferences.c:516
+#: preferences.c:542
 msgid "Make runs commands"
 msgstr ""
 
-#: preferences.c:526
+#: preferences.c:552
 msgid "in series."
 msgstr ""
 
-#: preferences.c:535
+#: preferences.c:561
 msgid "in parallel. Maximum number of processes is "
 msgstr ""
 
-#: preferences.c:558
+#: preferences.c:584
 msgid "in parallel. Maximum machine load is "
 msgstr ""
 
 #.
 #. * Edit first detected error.
 #.
-#: preferences.c:581
+#: preferences.c:607
 msgid "Automatically edit first error"
 msgstr ""
 
 #.
 #. * Auto edit warnings
 #.
-#: preferences.c:591
+#: preferences.c:617
 msgid "Edit Next ignores warnings"
 msgstr ""
 
 #.
 #. * -k flag
 #.
-#: preferences.c:601
+#: preferences.c:627
 msgid "Continue despite failures"
 msgstr ""
 
 #.
 #. * Action on starting build.
 #.
-#: preferences.c:611
+#: preferences.c:637
 msgid "On starting each build: "
 msgstr ""
 
-#: preferences.c:619
+#: preferences.c:646
 msgid "Do nothing"
 msgstr ""
 
-#: preferences.c:621
+#: preferences.c:648
 msgid "Collapse all log items"
 msgstr ""
 
 #.
 #. * Choose Makefile.
 #.
-#: preferences.c:636
+#: preferences.c:663
 msgid "Makefile:"
 msgstr ""
 
-#: preferences.c:643
+#: preferences.c:671
 msgid "(default)"
 msgstr ""
 
-#: preferences.c:658
+#: preferences.c:686
 msgid "Browse..."
 msgstr ""
 
-#: preferences.c:810
+#: preferences.c:838
 msgid "Make"
 msgstr ""
 
-#: preferences.c:811
+#: preferences.c:839
 msgid "Environ"
 msgstr ""
 
-#: preferences.c:821
+#: preferences.c:849
 msgid "Name"
 msgstr ""
 
-#: preferences.c:822
+#: preferences.c:850
 msgid "Value"
 msgstr ""
 
-#: preferences.c:823
+#: preferences.c:851
 msgid "Type"
 msgstr ""
 
 #.
 #. * Name
 #.
-#: preferences.c:850
+#: preferences.c:878 preferences.c:1493
 msgid "Name:"
 msgstr ""
 
 #.
 #. * Value
 #.
-#: preferences.c:867
+#: preferences.c:896
 msgid "Value:"
 msgstr ""
 
 #.
 #. * Type
 #.
-#: preferences.c:884
+#: preferences.c:914
 msgid "Type:"
 msgstr ""
 
-#: preferences.c:911
+#: preferences.c:942
 msgid "Set"
 msgstr ""
 
-#: preferences.c:919
+#: preferences.c:950
 msgid "Unset"
 msgstr ""
 
 #.
 #. * Make program
 #.
-#: preferences.c:974
+#: preferences.c:1005
 msgid "Make:"
 msgstr ""
 
 #.
 #. * Make target lister
 #.
-#: preferences.c:991
+#: preferences.c:1023
 msgid "List make targets:"
 msgstr ""
 
 #.
 #. * Make version lister
 #.
-#: preferences.c:1007
+#: preferences.c:1040
 msgid "List make version:"
 msgstr ""
 
 #.
 #. * Editor
 #.
-#: preferences.c:1023
+#: preferences.c:1057
 msgid "Edit source files:"
 msgstr ""
 
 #.
 #. * Makefile updater
 #.
-#: preferences.c:1047
+#: preferences.c:1082
 msgid "Build makefile:"
 msgstr ""
 
-#: preferences.c:1176
+#: preferences.c:1212
 #, fuzzy, c-format
 msgid "Maketool: %s Choose Color"
 msgstr "Re Maketool"
 
-#: preferences.c:1219
+#: preferences.c:1256
 msgid "Choose..."
 msgstr ""
 
-#: preferences.c:1298
+#: preferences.c:1335
 msgid "Information Background:"
 msgstr ""
 
-#: preferences.c:1299
+#: preferences.c:1336
 msgid "Information Foreground:"
 msgstr ""
 
-#: preferences.c:1300
+#: preferences.c:1337
 msgid "Warning Background:"
 msgstr ""
 
-#: preferences.c:1301
+#: preferences.c:1338
 msgid "Warning Foreground:"
 msgstr ""
 
-#: preferences.c:1302
+#: preferences.c:1339
 msgid "Error Background:"
 msgstr ""
 
-#: preferences.c:1303
+#: preferences.c:1340
 msgid "Error Foreground:"
 msgstr ""
 
-#: preferences.c:1308
+#: preferences.c:1345
 msgid "Sample"
 msgstr ""
 
-#: preferences.c:1329
+#: preferences.c:1365
 msgid "information: yadda yadda yadda"
 msgstr ""
 
-#: preferences.c:1332
+#: preferences.c:1368
 msgid "warning: danger, Will Robinson!"
 msgstr ""
 
-#: preferences.c:1335
+#: preferences.c:1371
 msgid "error: I'm sorry Dave I can't do that"
 msgstr ""
 
-#: preferences.c:1369
+#: preferences.c:1405
 msgid "Reset to Old"
 msgstr ""
 
-#: preferences.c:1375
+#: preferences.c:1411
 msgid "Reset to Defaults"
 msgstr ""
 
-#: preferences.c:1407
+#: preferences.c:1469
+msgid ""
+"Large\n"
+"canvas\n"
+"sample\n"
+"goes\n"
+"here"
+msgstr ""
+
+#: preferences.c:1480
+msgid "Paper Size"
+msgstr ""
+
+#: preferences.c:1505
+msgid "Custom"
+msgstr ""
+
+#: preferences.c:1516
+msgid "Orientation:"
+msgstr ""
+
+#: preferences.c:1524
+#, fuzzy
+msgid "Portrait"
+msgstr "_Printare"
+
+#: preferences.c:1525
+msgid "Landscape"
+msgstr ""
+
+#: preferences.c:1536
+msgid "Width:"
+msgstr ""
+
+#: preferences.c:1558
+msgid "Height:"
+msgstr ""
+
+#: preferences.c:1581
+#, fuzzy
+msgid "Margins"
+msgstr "Facit %s"
+
+#: preferences.c:1595
+msgid "Left:"
+msgstr ""
+
+#: preferences.c:1617
+msgid "Right:"
+msgstr ""
+
+#: preferences.c:1639
+msgid "Top:"
+msgstr ""
+
+#: preferences.c:1661
+msgid "Bottom:"
+msgstr ""
+
+#: preferences.c:1710
 msgid "Editor:"
 msgstr ""
 
-#: preferences.c:1432
+#: preferences.c:1735
 msgid "Maketool: Preferences"
 msgstr ""
 
-#: preferences.c:1446
+#: preferences.c:1749
 msgid "General"
 msgstr ""
 
-#: preferences.c:1452
+#: preferences.c:1755
 msgid "Variables"
 msgstr ""
 
-#: preferences.c:1457
+#: preferences.c:1760
 msgid "Programs"
 msgstr ""
 
-#: preferences.c:1462
+#: preferences.c:1765
 msgid "Colors"
 msgstr ""
 
-#: preferences.c:1468
+#: preferences.c:1770
+msgid "Page Setup"
+msgstr ""
+
+#: preferences.c:1777
 msgid "Styles"
 msgstr ""
 
-#: ui.c:449 ui.c:512
+#: ui.c:503 ui.c:565
 msgid "OK"
 msgstr ""
 
-#: ui.c:514
+#: ui.c:567
 msgid "Apply"
 msgstr "Applicus"
 
-#: ui.c:516
+#: ui.c:569
 msgid "Cancel"
 msgstr "Cancelare"
+
+#~ msgid "Print S_ettings..."
+#~ msgstr "S_ettingus Printæ"
 
 # In GTK file selection window
 #~ msgid "Create Dir"
