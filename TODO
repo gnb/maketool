@@ -256,3 +256,11 @@ x  Printing: option to print entire log file or just descendants of
 x  Printing: option to print using collapsed status of log lines or
    just entire log.
    
+x  are the fds for pipes to child processes leaked?
+
+x  configure-time check for /usr/doc is insufficient. Need to use /usr/doc
+   on Linux only, $(prefix)/share/$(PACKAGE) on NetBSD.
+   
+x  Makefile.in needs to define CPPFLAGS with @CPPFLAGS@ at the end for
+   NetBSD to find gettext library.
+   
