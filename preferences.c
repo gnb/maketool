@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.31 2000-01-05 14:08:34 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.32 2000-04-16 08:23:22 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -631,6 +631,7 @@ prefs_create_general_page(GtkWidget *toplevel)
      * Action on starting build.
      */
     label = gtk_label_new(_("On starting each build: "));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -656,6 +657,7 @@ prefs_create_general_page(GtkWidget *toplevel)
      */
     
     label = gtk_label_new(_("Makefile:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -870,6 +872,7 @@ prefs_create_variables_page(GtkWidget *toplevel)
      * Name
      */
     label = gtk_label_new(_("Name:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -887,6 +890,7 @@ prefs_create_variables_page(GtkWidget *toplevel)
      * Value
      */
     label = gtk_label_new(_("Value:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -904,6 +908,7 @@ prefs_create_variables_page(GtkWidget *toplevel)
      * Type
      */
     label = gtk_label_new(_("Type:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -994,6 +999,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
      * Make program
      */
     label = gtk_label_new(_("Make:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -1011,6 +1017,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
      * Make target lister
      */
     label = gtk_label_new(_("List make targets:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -1027,6 +1034,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
      * Make version lister
      */
     label = gtk_label_new(_("List make version:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -1043,6 +1051,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
      * Editor
      */
     label = gtk_label_new(_("Edit source files:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -1067,6 +1076,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
      * Makefile updater
      */
     label = gtk_label_new(_("Build makefile:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -1083,6 +1093,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
      * Key
      */
     label = gtk_label_new(programs_key);
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 2, row, row+1);
     gtk_widget_show(label);
@@ -1223,6 +1234,7 @@ prefs_create_color_row(
     GtkWidget *button;
     
     label = gtk_label_new(color_labels[color_num]);
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, row, row+1,
 		       (GtkAttachOptions)(GTK_FILL|GTK_EXPAND), (GtkAttachOptions)0,
@@ -1421,6 +1433,7 @@ prefs_create_units_label(void)
     GtkWidget *label;
     
     label = gtk_label_new(UNITS_NAME);
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     return label;
 }
@@ -1450,6 +1463,7 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     hbox = gtk_hbox_new(FALSE, SPACING);
 
     label = gtk_label_new(_("Large\ncanvas\nsample\ngoes\nhere"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_box_pack_end(GTK_BOX(hbox), label, TRUE, TRUE, 0);
     gtk_widget_show(label);
@@ -1473,6 +1487,7 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     row = 0;
     
     label = gtk_label_new(_("Name:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -1495,6 +1510,7 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     row++;
     
     label = gtk_label_new(_("Orientation:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
@@ -1514,12 +1530,16 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     row++;
     
     label = gtk_label_new(_("Width:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
     
     entry = gtk_entry_new();
-    gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row+1,
+    	(GtkAttachOptions)0,
+	(GtkAttachOptions)(GTK_EXPAND|GTK_FILL),
+	0, 0);
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(var_changed_cb), 0);
     gtk_widget_show(entry);
@@ -1532,12 +1552,16 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     row++;
     
     label = gtk_label_new(_("Height:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
     
     entry = gtk_entry_new();
-    gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row+1,
+    	(GtkAttachOptions)0,
+	(GtkAttachOptions)(GTK_EXPAND|GTK_FILL),
+	0, 0);
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(var_changed_cb), 0);
     gtk_widget_show(entry);
@@ -1565,12 +1589,16 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     col = 0;
 
     label = gtk_label_new(_("Left:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, col, col+1, row, row+1);
     gtk_widget_show(label);
     
     entry = gtk_entry_new_with_max_length(MAXLENGTH);
-    gtk_table_attach_defaults(GTK_TABLE(table), entry, col+1, col+2, row, row+1);
+    gtk_table_attach(GTK_TABLE(table), entry, col+1, col+2, row, row+1,
+    	(GtkAttachOptions)0,
+	(GtkAttachOptions)(GTK_EXPAND|GTK_FILL),
+	0, 0);
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(var_changed_cb), 0);
     gtk_widget_show(entry);
@@ -1583,12 +1611,16 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     row++;
 
     label = gtk_label_new(_("Right:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, col, col+1, row, row+1);
     gtk_widget_show(label);
     
     entry = gtk_entry_new_with_max_length(MAXLENGTH);
-    gtk_table_attach_defaults(GTK_TABLE(table), entry, col+1, col+2, row, row+1);
+    gtk_table_attach(GTK_TABLE(table), entry, col+1, col+2, row, row+1,
+    	(GtkAttachOptions)0,
+	(GtkAttachOptions)(GTK_EXPAND|GTK_FILL),
+	0, 0);
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(var_changed_cb), 0);
     gtk_widget_show(entry);
@@ -1601,12 +1633,16 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     row++;
 
     label = gtk_label_new(_("Top:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, col, col+1, row, row+1);
     gtk_widget_show(label);
     
     entry = gtk_entry_new_with_max_length(MAXLENGTH);
-    gtk_table_attach_defaults(GTK_TABLE(table), entry, col+1, col+2, row, row+1);
+    gtk_table_attach(GTK_TABLE(table), entry, col+1, col+2, row, row+1,
+    	(GtkAttachOptions)0,
+	(GtkAttachOptions)(GTK_EXPAND|GTK_FILL),
+	0, 0);
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(var_changed_cb), 0);
     gtk_widget_show(entry);
@@ -1619,12 +1655,16 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     row++;
 
     label = gtk_label_new(_("Bottom:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, col, col+1, row, row+1);
     gtk_widget_show(label);
     
     entry = gtk_entry_new_with_max_length(MAXLENGTH);
-    gtk_table_attach_defaults(GTK_TABLE(table), entry, col+1, col+2, row, row+1);
+    gtk_table_attach(GTK_TABLE(table), entry, col+1, col+2, row, row+1,
+    	(GtkAttachOptions)0,
+	(GtkAttachOptions)(GTK_EXPAND|GTK_FILL),
+	0, 0);
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(var_changed_cb), 0);
     gtk_widget_show(entry);
@@ -1664,6 +1704,7 @@ prefs_create_styles_page(GtkWidget *toplevel)
     
     
     label = gtk_label_new(_("Editor:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
     gtk_widget_show(label);
