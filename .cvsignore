@@ -7,3 +7,5 @@ configure
 config.cache
 config.status
 config.h
+Makefile
+maketool-*.tgz

@@ -1,0 +1,8 @@
+Makefile
+Makefile.in
+cat-id-tbl.c
+stamp-cat-id
+maketool.pot
+*.gmo
+POTFILES
+*.bck

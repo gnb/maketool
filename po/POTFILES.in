@@ -1,0 +1,13 @@
+# List of source files containing strings requiring translation
+# Copyright (c) 1999 Greg Banks
+# $Id: POTFILES.in,v 1.1 1999-06-01 11:04:46 gnb Exp $
+
+filter.c
+glib_extra.c
+help.c
+log.c
+main.c
+preferences.c
+spawn.c
+ui.c
+util.c

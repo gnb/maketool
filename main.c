@@ -28,7 +28,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.19 1999-05-30 11:24:39 gnb Exp $");
+CVSID("$Id: main.c,v 1.20 1999-06-01 11:04:40 gnb Exp $");
 
 typedef enum
 {
@@ -887,9 +887,8 @@ parseArgs(int argc, char **argv)
 int
 main(int argc, char **argv)
 {
-    /*setlocale(LC_ALL, "");*/
-    bindtextdomain("maketool", "."); /* TODO: defines in config.h */
-    textdomain("maketool");
+    bindtextdomain(PACKAGE, LOCALEDIR);
+    textdomain(PACKAGE);
     
     gtk_init(&argc, &argv);    
     preferences_init();

@@ -21,7 +21,7 @@
 #define _common_h_
 
 /*
- * $Id: common.h,v 1.3 1999-05-30 11:24:39 gnb Exp $
+ * $Id: common.h,v 1.4 1999-06-01 11:04:40 gnb Exp $
  */
 
 #include <config.h>
@@ -31,7 +31,6 @@
 #include <errno.h>
 #include <stdio.h>
 #include <libintl.h>
-#include "patchlevel.h"
 
 
 #if STDC_HEADERS

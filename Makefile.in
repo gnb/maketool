@@ -16,20 +16,24 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.1 1999-05-30 11:24:39 gnb Exp $
+# $Id: Makefile.in,v 1.2 1999-06-01 11:04:40 gnb Exp $
 #
 
 # TODO: gtk flags should come from `configure'
 
 CC=		gcc -Wall
 CFLAGS=		-g
-CPPFLAGS:=	$(shell gtk-config --cflags) -D_USE_BSD -I. -Iicons
-LDLIBS:=	$(shell gtk-config --libs)
+CPPFLAGS:=	$(shell gtk-config --cflags) -D_USE_BSD -I. -Iicons -Iintl
+LDLIBS:=	$(shell gtk-config --libs) @INTLLIBS@
 O=		objs
 
 SOURCES=	main.c filter.c help.c preferences.c log.c ui.c \
 		spawn.c util.c glib_extra.c
+HEADERS=	maketool.h filter.h common.h log.h ui.h \
+		spawn.h util.h glib_extra.h
 OBJECTS=	$(SOURCES:%.c=$O/%.o)
+
+SUBDIRS=	icons intl po #test
 
 ###
 
@@ -52,27 +56,40 @@ $O/.stamp:
 
 clean::
 	$(RM) -r $O
+###
+
+install clean::
+	for subdir in $(SUBDIRS); do \
+	  $(MAKE) -C $$subdir $@ || exit 1; \
+	done
 		
 ###
 
-random:
-	$(COMPILE.c) -c -o $O/crud.o crud.c
-	
-targets:
-	yes ' ' | head -20 | awk '{print NR}'
-	: VARIABLE_ONE = $(VARIABLE_ONE)
-	: VARIABLE_TWO = $(VARIABLE_TWO)
-	: VARIABLE_THREE = $(VARIABLE_THREE)
-	: VARIABLE_FOUR = $(VARIABLE_FOUR)
-	: VARIABLE_FIVE = $(VARIABLE_FIVE)
-	: VARIABLE_SIX = $(VARIABLE_SIX)
-	
-delay:
-	sleep 10
+# Making a distribution
+PACKAGE=	@PACKAGE@
+VERSION=	@VERSION@
+distdir=	$(PACKAGE)-$(VERSION)
+DISTFILES=	\
+		ABOUT-NLS COPYING COPYRIGHT TODO \
+		\
+		configure.in aclocal.m4 config.guess config.sub install-sh \
+		configure Makefile.in config.h.in \
+		\
+		$(SOURCES) $(HEADERS)
 
-SUBDIRS= subdir1 subdir2
-recurse:
-	for d in $(SUBDIRS) ; do \
-	    $(MAKE) -C $$d all ;\
+
+dist:
+	$(RM) -r $(distdir)
+	mkdir $(distdir)
+	chmod 777 $(distdir)
+	for file in $(DISTFILES); do \
+	  ln $$file $(distdir) 2>/dev/null || cp -p $$file $(distdir) 2>/dev/null; \
 	done
+	for subdir in $(SUBDIRS); do \
+	  mkdir $(distdir)/$$subdir || exit 1; \
+	  chmod 777 $(distdir)/$$subdir; \
+	  $(MAKE) -C $$subdir $@ || exit 1; \
+	done
+	tar chozf $(distdir).tgz $(distdir)
+	$(RM) -r $(distdir)
 	

@@ -21,8 +21,18 @@
 #define _config_h_ 1
 
 /*
- * $Id: config.h.in,v 1.1 1999-05-30 11:24:39 gnb Exp $
+ * $Id: config.h.in,v 1.2 1999-06-01 11:04:40 gnb Exp $
  */
+
+/*
+ * The i18n package. Used to find .mo files at runtime.
+ */
+#define PACKAGE "package"
+
+/*
+ * Version of maketool.
+ */
+#define VERSION "version"
 
 /*
  * Define as non-zero to turn on debugging prints.
@@ -30,14 +40,9 @@
 #define DEBUG 0
 
 /*
- * The i18n package. Used to find .mo files at runtime.
- */
-#define PACKAGE "maketool"
-
-/*
  * The directory into which the .mo files are installed.
  */
-#define LOCALEDIR	"/usr/share/locale"
+#define LOCALEDIR	"/fred/jane/sam"
 
 /* Various standard autoconf defines */
 #define HAVE_MALLOC_H 0
@@ -52,5 +57,11 @@
 #define HAVE_UNISTD_H 0
 #define STDC_HEADERS 0
 #define RETSIGTYPE void
+/* autoconf defines specifically for gettext */
+#define ENABLE_NLS 0
+#define HAVE_CATGETS 0
+#define HAVE_GETTEXT 0
+#define HAVE_LC_MESSAGES 0
+#define HAVE_STPCPY 0
 
 #endif /* _config_h_ */
