@@ -85,9 +85,16 @@ void task_enqueue(Task *);
 
 
 /*
- * Begin execution of any enqueued tasks
+ * Begin execution of any enqueued tasks.  Any builtin tasks
+ * at the head of the queue are executed, then any command task
+ * is spawned.
  */
 void task_start(void);
+
+/*
+ * Dequeue and unref all enqueued tasks
+ */
+void task_abort_queue(void);
 
 /*
  * Cause the immediate spawning of an un-enqueued task.

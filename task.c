@@ -31,7 +31,7 @@
 #include <sys/filio.h>
 #endif
 
-CVSID("$Id: task.c,v 1.17 2003-10-29 12:39:18 gnb Exp $");
+CVSID("$Id: task.c,v 1.18 2004-11-07 02:21:36 gnb Exp $");
 
 /*
  * TODO: GDK is used only for the gdk_input_*() functions, which
@@ -76,17 +76,38 @@ task_create(Task *task, char *command, char **env, TaskOps *ops, int flags)
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+#if DEBUG
+static const char *
+task_describe(const Task *task)
+{
+    static char buf[256];
+
+    if (task->command == 0)
+    	snprintf(buf, sizeof(buf), "task(builtin 0x%lx)",
+	    	(unsigned long)task->ops->start);
+    else
+    	snprintf(buf, sizeof(buf), "task(\"%s\")", task->command);
+    return buf;
+}
+#endif
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 void
 task_enqueue(Task *task)
 {
     task->enqueued = TRUE;
     task_all = g_list_append(task_all, task);
+#if DEBUG
+    fprintf(stderr, "enqueued %s\n", task_describe(task));
+#endif
 }
 
 static void
 task_destroy(Task *task)
 {
+#if DEBUG
+    fprintf(stderr, "destroying %s\n", task_describe(task));
+#endif
     g_free(task->command);
     if (task->fd != -1)
     {
@@ -164,15 +185,49 @@ task_linemode_input(Task *task, int len, const char *buf)
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+/*
+ * Dequeue the task, returning TRUE if it was enqueued
+ */
+static gboolean
+task_dequeue(Task *task)
+{
+    gboolean was_enqueued = task->enqueued;
+    task_all = g_list_remove(task_all, task);
+    task->enqueued = FALSE;
+#if DEBUG
+    fprintf(stderr, "dequeued %s\n", task_describe(task));
+#endif
+    return was_enqueued;
+}
+
+/*
+ * Dequeue and unref all tasks
+ */
+void
+task_abort_queue(void)
+{
+#if DEBUG
+    fprintf(stderr, "aborting %d queued tasks\n", g_list_length(task_all));
+#endif
+    while (task_all != 0)
+    {
+    	Task *task = (Task *)task_all->data;
+	
+	task_dequeue(task);
+	task_unref(task);
+    }
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
 task_reap_func(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 {
     Task *task = (Task *)user_data;
-    gboolean was_enqueued = task->enqueued;
+    gboolean was_enqueued;
 
 #if DEBUG
-    fprintf(stderr, "Task \"%s\" pid %d ", task->command, (int)pid);
+    fprintf(stderr, "reaping %s pid %d ", task_describe(task), (int)pid);
     if (WIFEXITED(status))
     	fprintf(stderr, "exited with code %d\n", WEXITSTATUS(status));
     else if (WIFSIGNALED(status))
@@ -201,7 +256,7 @@ task_reap_func(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	task_input_func(user_data, task->fd, GDK_INPUT_READ);
 
     task->pid = -1; 	/* so task_is_running() == FALSE in reap fn */
-    task_all = g_list_remove(task_all, task);
+    was_enqueued = task_dequeue(task);
     
     task->status = status;
     /* flush any pending lines or part-lines */
@@ -210,17 +265,8 @@ task_reap_func(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     if (task->ops->reap != 0)
 	(*task->ops->reap)(task);
     task_unref(task);
-    
     if (was_enqueued)
-    {
-    	if (task_all == 0)
-    	{
-	    if (task_work_end_cb != 0)
-	    	(*task_work_end_cb)();
-	}
-	else
-    	    task_start();	/* spawn the next task in the queue */
-    }
+	task_start();	/* spawn the next task in the queue */
 }
 
 gboolean
@@ -394,7 +440,7 @@ task_spawn(Task *task)
 	task->pid = task_spawn_with_input(task);
 
 #if DEBUG
-    fprintf(stderr, "spawned \"%s\", pid %d\n", task->command, (int)task->pid);
+    fprintf(stderr, "spawned %s, pid %d\n", task_describe(task), (int)task->pid);
 #endif
 
     if (task->pid > 0)
@@ -409,8 +455,17 @@ task_spawn(Task *task)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-gboolean
-task_run(Task *task)
+static gboolean
+task_run_builtin(Task *task)
+{
+    assert(task->ops->start != 0);
+    (*task->ops->start)(task);
+    task_dequeue(task);
+    return TRUE;
+}
+
+static gboolean
+task_run_command(Task *task)
 {
     if (!task_spawn(task))
     	return FALSE;
@@ -421,6 +476,20 @@ task_run(Task *task)
     task_unref(task);
 	
     return TRUE;
+}
+
+
+gboolean
+task_run(Task *task)
+{
+    assert(!task->enqueued);
+#if DEBUG
+    fprintf(stderr, "running %s\n", task_describe(task));
+#endif
+    if (task->command == NULL)
+    	return task_run_builtin(task);
+    else
+    	return task_run_command(task);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -439,16 +508,42 @@ task_current(void)
 void
 task_start(void)
 {
-    Task *curr = task_current();
-    
-    if (curr == 0 &&
-    	task_all != 0)
+    static gboolean working = FALSE;
+
+#if DEBUG
+    fprintf(stderr, "starting %d queued tasks\n", g_list_length(task_all));
+#endif
+    while (task_current() == 0 && task_all != 0)
     {
-    	if (task_spawn((Task *)task_all->data))
+    	Task *task = (Task *)task_all->data;
+
+    	if (!working)
 	{
-    	    if (task_work_start_cb != 0)
+	    if (task_work_start_cb != 0)
 		(*task_work_start_cb)();
+	    working = TRUE;
 	}
+
+    	if (task->command == 0)
+	{
+	    task_run_builtin(task);
+	    task_unref(task);
+	}
+	else
+	{
+    	    if (!task_spawn(task))
+	    {
+		task_dequeue(task);
+		task_unref(task);
+	    }
+	}
+    }
+
+    if (working && task_all == 0)
+    {
+	if (task_work_end_cb != 0)
+	    (*task_work_end_cb)();
+	working = FALSE;
     }
 }
 
