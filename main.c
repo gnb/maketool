@@ -28,7 +28,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.28 1999-06-09 14:55:44 gnb Exp $");
+CVSID("$Id: main.c,v 1.29 1999-06-10 08:02:38 gnb Exp $");
 
 typedef enum
 {
@@ -50,7 +50,7 @@ const char	*last_target = 0;	/* last target built, for `again' */
 GList		*predefined_targets = 0;	/* special well-known targets */
 GList		*available_targets = 0;	/* all possible targets, for menu */
 GtkWidget	*build_menu;
-GtkWidget	*toolbar, *messagebox;
+GtkWidget	*toolbar_hb, *messagebox;
 GtkWidget	*messageent;
 pid_t		current_pid = -1;
 gboolean	interrupted = FALSE;
@@ -557,7 +557,7 @@ view_collapse_all_cb(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-view_edit_cb(GtkWidget *w, gpointer data)
+edit_error_cb(GtkWidget *w, gpointer data)
 {
     LogRec *lr = log_selected();
 
@@ -568,7 +568,7 @@ view_edit_cb(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-view_edit_next_cb(GtkWidget *w, gpointer data)
+edit_next_error_cb(GtkWidget *w, gpointer data)
 {
     gboolean next = GPOINTER_TO_INT(data);
     LogRec *lr = log_selected();
@@ -668,6 +668,14 @@ ui_create_menus(GtkWidget *menubar)
 #endif
     ui_add_button(menu, _("Exit"), file_exit_cb, 0, GR_NONE);
     
+    menu = ui_add_menu(menubar, _("Edit"));
+    ui_add_tearoff(menu);
+    ui_add_button(menu, _("Edit Error"), edit_error_cb, 0, GR_EDITABLE);
+    ui_add_button(menu, _("Edit Next Error"), edit_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
+    ui_add_button(menu, _("Edit Prev Error"), edit_next_error_cb, GINT_TO_POINTER(FALSE), GR_NOTEMPTY);
+    ui_add_separator(menu);
+    ui_add_button(menu, _("Preferences..."), edit_preferences_cb, 0, GR_NONE);
+
     menu = ui_add_menu(menubar, _("Build"));
     build_menu = menu;
     ui_add_tearoff(menu);
@@ -688,11 +696,8 @@ ui_create_menus(GtkWidget *menubar)
     ui_add_tearoff(menu);
     ui_add_button(menu, _("Clear Log"), view_clear_cb, 0, GR_NOTEMPTY);
     ui_add_button(menu, _("Collapse All"), view_collapse_all_cb, 0, GR_NOTEMPTY);
-    ui_add_button(menu, _("Edit"), view_edit_cb, 0, GR_EDITABLE);
-    ui_add_button(menu, _("Edit Next Error"), view_edit_next_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
-    ui_add_button(menu, _("Edit Prev Error"), view_edit_next_cb, GINT_TO_POINTER(FALSE), GR_NOTEMPTY);
     ui_add_separator(menu);
-    ui_add_toggle(menu, _("Toolbar"), view_widget_cb, (gpointer)&toolbar, 0, TRUE);
+    ui_add_toggle(menu, _("Toolbar"), view_widget_cb, (gpointer)&toolbar_hb, 0, TRUE);
     ui_add_toggle(menu, _("Statusbar"), view_widget_cb, (gpointer)&messagebox, 0, TRUE);
     ui_add_separator(menu);
     ui_add_toggle(menu, _("Errors"), view_flags_cb, GINT_TO_POINTER(LF_SHOW_ERRORS),
@@ -701,8 +706,6 @@ ui_create_menus(GtkWidget *menubar)
     	0, log_get_flags() & LF_SHOW_WARNINGS);
     ui_add_toggle(menu, _("Information"), view_flags_cb, GINT_TO_POINTER(LF_SHOW_INFO),
     	0, log_get_flags() & LF_SHOW_INFO);
-    ui_add_separator(menu);
-    ui_add_button(menu, _("Preferences"), view_preferences_cb, 0, GR_NONE);
     
     menu = ui_add_menu_right(menubar, _("Help"));
     ui_add_tearoff(menu);
@@ -728,7 +731,7 @@ ui_create_menus(GtkWidget *menubar)
 #include "print.xpm"
 
 static void
-ui_create_tools()
+ui_create_tools(GtkWidget *toolbar)
 {
     char tooltip[1024];
     
@@ -749,7 +752,7 @@ ui_create_tools()
     ui_tool_create(toolbar, _("Clear"), _("Clear log"),
     	clear_xpm, view_clear_cb, 0, GR_NOTEMPTY);
     ui_tool_create(toolbar, _("Next"), _("Edit next error or warning"),
-    	next_xpm, view_edit_next_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
+    	next_xpm, edit_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
     
     ui_tool_add_space(toolbar);
     
@@ -810,7 +813,8 @@ static void
 ui_create(void)
 {
     GtkWidget *table;
-    GtkWidget *menubar, *logwin;
+    GtkWidget *menubar, *toolbar, *logwin;
+    GtkWidget *handlebox;
     GtkTooltips *tooltips;
     GtkWidget *sw;
     GdkPixmap *iconpm;
@@ -841,21 +845,35 @@ ui_create(void)
     table = gtk_table_new(4, 1, FALSE);
     gtk_container_add(GTK_CONTAINER(toplevel), table);
     gtk_container_border_width(GTK_CONTAINER(table), 0);
-    gtk_table_set_row_spacings(GTK_TABLE(table), SPACING);
+    gtk_table_set_row_spacings(GTK_TABLE(table), 0);
     
-    menubar = gtk_menu_bar_new();
-    gtk_table_attach(GTK_TABLE(table), menubar, 0, 1, 0, 1,
+    handlebox = gtk_handle_box_new();
+    gtk_handle_box_set_shadow_type(GTK_HANDLE_BOX(handlebox), GTK_SHADOW_NONE);
+    gtk_table_attach(GTK_TABLE(table), handlebox, 0, 1, 0, 1,
     	GTK_FILL|GTK_EXPAND|GTK_SHRINK, 0,
 	0, 0);
+    gtk_widget_show(handlebox);
+
+    menubar = gtk_menu_bar_new();
+    gtk_container_add(GTK_CONTAINER(handlebox), menubar);
+    gtk_widget_show(menubar);
     ui_create_menus(menubar);
-    gtk_widget_show(GTK_WIDGET(menubar));
         
+    handlebox = gtk_handle_box_new();
+    gtk_handle_box_set_shadow_type(GTK_HANDLE_BOX(handlebox), GTK_SHADOW_NONE);
+    /* gtk_container_border_width(GTK_CONTAINER(handlebox), SPACING); */
+    gtk_table_attach(GTK_TABLE(table), handlebox, 0, 1, 1, 2,
+    	GTK_FILL|GTK_EXPAND|GTK_SHRINK, 0,
+	0, 0);
+    gtk_widget_show(handlebox);
+    toolbar_hb = handlebox;
+
     toolbar = gtk_toolbar_new(GTK_ORIENTATION_HORIZONTAL, GTK_TOOLBAR_BOTH);
     gtk_toolbar_set_button_relief(GTK_TOOLBAR(toolbar), GTK_RELIEF_NONE);
-    gtk_table_attach(GTK_TABLE(table), toolbar, 0, 1, 1, 2,
-    	GTK_FILL|GTK_EXPAND|GTK_SHRINK, 0,
-	SPACING, 0);
-    gtk_widget_show(GTK_WIDGET(toolbar));
+    gtk_toolbar_set_space_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_SPACE_LINE);
+    gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_ICONS);
+    gtk_container_add(GTK_CONTAINER(handlebox), toolbar);
+    gtk_widget_show(toolbar);
     ui_create_tools(toolbar);
     
     sw = gtk_scrolled_window_new(0, 0);

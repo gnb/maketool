@@ -103,7 +103,7 @@ void help_about_make_cb(GtkWidget *, gpointer);
 void preferences_init(void);
 void preferences_load(void);
 void preferences_save(void);
-void view_preferences_cb(GtkWidget *, gpointer);
+void edit_preferences_cb(GtkWidget *, gpointer);
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 

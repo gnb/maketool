@@ -21,7 +21,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: preferences.c,v 1.14 1999-06-09 14:55:44 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.15 1999-06-10 08:02:38 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -1010,7 +1010,7 @@ prefs_create_shell(GtkWidget *toplevel)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 void
-view_preferences_cb(GtkWidget *w, gpointer data)
+edit_preferences_cb(GtkWidget *w, gpointer data)
 {
     if (prefs_shell == 0)
 	prefs_create_shell(toplevel);
