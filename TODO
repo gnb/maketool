@@ -187,6 +187,32 @@ x  The --no-create option to configure is not preserved, and probably
    
 x  Need a function to remove config.cache.
 
+x  After successfully running autoconf, automatically:
+   * remove config.cache
+   * remove config.status
+   * check for configure script
+   * grey menu items.
+   
+x  Configure option parser should handle "--quiet, --silent" properly.
+
+x  Merge line-ifying handle_input() into task.c.
+
+x  Deal with configure being missing or corrupted in read_configure_options()
+
+x  During configure option GUI field validation, if user enters whitespace
+   where it's not allowed, popup an advisory notice with a button to
+   link to the help chapter.
+   
+x  Keyboard navigation in Configure Options dialog is broken; focus
+   never enters the notebook pages.
+   
+x  
+   
+
+
+
+   
+
 --- closed ---
 
 x  DONE: `Variables' tab in Preferences window needs to shrink.

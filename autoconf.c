@@ -105,7 +105,6 @@ static const benum_t initial_opt_flags[] =
 {
 {"cache-file",	    	    OPT_ADVANCED|OPT_NOSPACE|OPT_NOMETA},
 {"no-create",	    	    OPT_ADVANCED},
-/* TODO: fix parsing of "--quiet, --silent" */
 {"quiet,",  	    	    OPT_SILENT},
 {"quiet",   	    	    OPT_ADVANCED},
 {"prefix",     	    	    OPT_NOSPACE|OPT_NOMETA},
@@ -261,14 +260,6 @@ benum_describe_bits(const benum_t *be, int val)
 #endif
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-
-/* TODO: lose this */
-static void
-gtk_button_set_label(GtkButton *btn, const char *str)
-{
-    gtk_label_set_text(GTK_LABEL(GTK_BIN(btn)->child), str);
-}
 
 
 /* TODO: merge into ui.c */
@@ -607,7 +598,6 @@ handle_line(const char *line)
     }
 }
 
-/* TODO: merge line-ifying into task.c */
 
 static void
 handle_input(int len, const char *buf)
@@ -699,7 +689,6 @@ read_configure_options(void)
 {
     Task *task;
     
-    /* TODO: deal with configure being missing or corrupted */
     
     /* Delete all previously read options */
     while (all_options != 0)
@@ -893,7 +882,7 @@ autoconf_advanced_cb(GtkWidget *w, gpointer data)
 /*    DPRINTF("autoconf_advanced_cb\n"); */
     
     advanced = !advanced;
-    gtk_button_set_label(GTK_BUTTON(advanced_btn),
+    gtk_label_set_text(GTK_LABEL(GTK_BIN(advanced_btn)->child),
     	    	    	  _(advanced_btn_names[advanced]));
     apply_advanced();
 }
@@ -983,7 +972,6 @@ on_text_changed(GtkWidget *w, gpointer data)
     
     if (!valid)
     {
-    	/* TODO: popup Field Invalid alert */
 	gtk_entry_set_text(GTK_ENTRY(w), opt->value);
 	gdk_beep();
     	return;
@@ -1013,7 +1001,6 @@ create_option_widgets(void)
     	    continue;
 
 
-	/* TODO: fixed fucked-up keyboard navigation */    
 
 	row = 0;
 	while (options != 0)
@@ -1205,7 +1192,6 @@ build_autoconf_cb(GtkWidget *w, gpointer data)
 {
     task_enqueue(logged_task(g_strdup("autoconf")));
     task_start();
-    /* TODO: call check_for_configure() and grey_menu_items() on reap */
 }
 
 
