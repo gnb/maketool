@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.2 2000-08-06 10:46:55 gnb Exp $
+# $Id: Makefile.in,v 1.3 2000-08-06 11:06:27 gnb Exp $
 #
 
 TOPDIR=		../..
@@ -35,7 +35,7 @@ all clean install uninstall::
 
 # Making a distribution
 distdir=	$(TOPDIR)/$(PACKAGE)-$(VERSION)/doc/help
-DISTFILES=	Makefile.in
+DISTFILES=	Makefile.in help-common.mk.in help.dsl
 
 dist:
 	for file in $(DISTFILES); do \
