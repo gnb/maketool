@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.66 2000-08-06 11:05:46 gnb Exp $");
+CVSID("$Id: main.c,v 1.67 2000-08-27 09:30:18 gnb Exp $");
 
 
 /*
@@ -642,7 +642,7 @@ handle_input(int len, const char *buf)
 	*p = '\0';
 	estring_append_string(&leftover, buf);
 
-    	handle_line(leftover.data);
+    	handle_line(leftover.length > 0 ? leftover.data : "");
 	
 	estring_truncate(&leftover);
 	len -= (p - buf);
