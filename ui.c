@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.24 2001-07-25 08:35:22 gnb Exp $");
+CVSID("$Id: ui.c,v 1.25 2001-07-25 11:49:08 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -458,7 +458,7 @@ ui_create_dialog(
     GtkWidget *parent,
     const char *title)
 {
-    GtkWidget *dialog;
+    GtkWidget *dialog, *bbox;
     
     dialog = gtk_dialog_new();
     gtk_window_set_title(GTK_WINDOW(dialog), title);
@@ -466,7 +466,11 @@ ui_create_dialog(
     gtk_window_set_transient_for(GTK_WINDOW(dialog),
     	    GTK_WINDOW(parent));
     gtk_container_set_border_width(GTK_CONTAINER(GTK_DIALOG(dialog)->action_area), 4);
-    
+
+    bbox = gtk_hbutton_box_new();
+    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->action_area), bbox);
+    gtk_widget_show(bbox);
+
     return dialog;
 }    
 
@@ -480,10 +484,13 @@ ui_dialog_create_button(
     GtkSignalFunc callback,
     gpointer user_data)
 {
-    GtkWidget *button;
+    GtkWidget *button, *bbox;
     
     button = gtk_button_new_with_label(label);
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->action_area), button);
+    GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);    
+    bbox = ((GtkBoxChild *)GTK_BOX(GTK_DIALOG(dialog)->action_area)->children->data)->widget;
+    gtk_box_pack_start(GTK_BOX(bbox), button,
+    	    	      /*expand*/FALSE, /*fill*/TRUE, /*padding*/0);
     gtk_signal_connect(GTK_OBJECT(button), "clicked",  callback, user_data);
     gtk_widget_show(button);
 
@@ -507,7 +514,7 @@ ui_create_ok_dialog(
     
     btn = ui_dialog_create_button(dialog, _("OK"), ui_dialog_ok_cb, (gpointer)dialog);
     ui_set_help_name(btn, "ok");
-    
+    gtk_window_set_default(GTK_WINDOW(dialog), btn);
     return dialog;
 }    
 
@@ -533,6 +540,7 @@ ui_apply_dialog_apply_cb(GtkWidget *w, gpointer data)
     (*ad->apply_cb)(ad->dialog, ad->user_data);
     gtk_widget_set_sensitive(ad->ok_btn, FALSE);
     gtk_widget_set_sensitive(ad->apply_btn, FALSE);
+    gtk_window_set_default(GTK_WINDOW(ad->dialog), ad->apply_btn);
 }
 
 static void
@@ -577,6 +585,7 @@ ui_create_apply_dialog(
     ui_set_help_name(ad->apply_btn, "apply");
     btn = ui_dialog_create_button(ad->dialog, _("Cancel"), ui_apply_dialog_cancel_cb, (gpointer)ad);
     ui_set_help_name(btn, "cancel");
+    gtk_window_set_default(GTK_WINDOW(ad->dialog), btn);
     
     return ad->dialog;
 }    
@@ -588,6 +597,7 @@ ui_dialog_changed(GtkWidget *dialog)
 
     gtk_widget_set_sensitive(ad->ok_btn, TRUE);
     gtk_widget_set_sensitive(ad->apply_btn, TRUE);
+    gtk_window_set_default(GTK_WINDOW(ad->dialog), ad->ok_btn);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
