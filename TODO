@@ -291,9 +291,9 @@ x  DONE: Use gtk_window_set_transient_for() correctly.
 
 x  DONE: Add HAV_SYS_FILIO check for FIONREAD
 
-x  Bug: clicking Clear Log while build in progress coredumps
+x  DONE: Bug: clicking Clear Log while build in progress coredumps
 
-x  Bug: Stop button no longer ungreys when running!
+x  DONE: Bug: Stop button no longer ungreys when running!
 
 x  Add filters to support MWOS cross-compiler (see sample mwos.errs)
 

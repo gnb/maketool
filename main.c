@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.53 2000-04-16 10:11:33 gnb Exp $");
+CVSID("$Id: main.c,v 1.54 2000-04-16 11:00:24 gnb Exp $");
 
 typedef enum
 {
@@ -37,6 +37,7 @@ typedef enum
     
     GR_NOTEMPTY=0,
     GR_NOTRUNNING,
+    GR_CLEAR_LOG,   	/* !running && !empty */
     GR_RUNNING,
     GR_SELECTED,
     GR_EDITABLE,
@@ -159,6 +160,7 @@ grey_menu_items(void)
     gboolean clean = (!running && g_list_find_str(available_targets, "clean") != 0);
 
     ui_group_set_sensitive(GR_NOTRUNNING, !running);
+    ui_group_set_sensitive(GR_CLEAR_LOG, !running && !empty);
     ui_group_set_sensitive(GR_RUNNING, running);
     ui_group_set_sensitive(GR_NOTEMPTY, !empty);
     ui_group_set_sensitive(GR_SELECTED, selected);
@@ -1074,7 +1076,7 @@ ui_create_menus(GtkWidget *menubar)
     
     menu = ui_add_menu(menubar, _("_View"));
     ui_add_tearoff(menu);
-    ui_add_button(menu, _("_Clear Log"), 0, view_clear_cb, 0, GR_NOTEMPTY);
+    ui_add_button(menu, _("_Clear Log"), 0, view_clear_cb, 0, GR_CLEAR_LOG);
     ui_add_button(menu, _("C_ollapse All"), 0, view_collapse_all_cb, 0, GR_NOTEMPTY);
     ui_add_separator(menu);
     ui_add_toggle(menu, _("_Toolbar"), 0, view_widget_cb, (gpointer)&toolbar_hb, 0, TRUE);
@@ -1141,7 +1143,7 @@ ui_create_tools(GtkWidget *toolbar)
     ui_tool_add_space(toolbar);
     
     ui_tool_create(toolbar, _("Clear"), _("Clear log"),
-    	clear_xpm, view_clear_cb, 0, GR_NOTEMPTY);
+    	clear_xpm, view_clear_cb, 0, GR_CLEAR_LOG);
     ui_tool_create(toolbar, _("Next"), _("Edit next error or warning"),
     	next_xpm, edit_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
     

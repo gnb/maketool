@@ -31,7 +31,7 @@
 #include <sys/filio.h>
 #endif
 
-CVSID("$Id: task.c,v 1.2 2000-04-16 10:11:34 gnb Exp $");
+CVSID("$Id: task.c,v 1.3 2000-04-16 11:00:24 gnb Exp $");
 
 static GList *task_all = 0;
 static void (*task_work_start_cb)(void) = 0;
@@ -320,9 +320,11 @@ task_start(void)
     if (curr == 0 &&
     	task_all != 0)
     {
-    	if (task_work_start_cb != 0)
-	    (*task_work_start_cb)();
-    	task_spawn((Task *)task_all->data);
+    	if (task_spawn((Task *)task_all->data))
+	{
+    	    if (task_work_start_cb != 0)
+		(*task_work_start_cb)();
+	}
     }
 }
 
