@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.36 1999-08-07 15:29:41 gnb Exp $");
+CVSID("$Id: main.c,v 1.37 1999-08-10 15:44:39 gnb Exp $");
 
 typedef enum
 {
@@ -55,6 +55,8 @@ GtkWidget	*messageent;
 pid_t		current_pid = -1;
 gboolean	interrupted = FALSE;
 gboolean	first_error = FALSE;
+/* used in splitting lines from child process' output */
+estring     	leftover = ESTRING_STATIC_INIT;
 
 #define ANIM_MAX 15
 GdkPixmap	*anim_pixmaps[ANIM_MAX+1];
@@ -93,13 +95,14 @@ void
 message(const char *fmt, ...)
 {
     va_list args;
-    char buf[1024];
+    char *msg;
     
     va_start(args, fmt);
-    g_vsnprintf(buf, sizeof(buf), fmt, args);
+    msg = g_strdup_vprintf(fmt, args);
     va_end(args);
     
-    gtk_entry_set_text(GTK_ENTRY(messageent), buf);
+    gtk_entry_set_text(GTK_ENTRY(messageent), msg);
+    g_free(msg);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -366,32 +369,70 @@ start_edit(LogRec *lr)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
+handle_line(const char *line)
+{
+    LogRec *lr;
+
+#if DEBUG > 38
+    fprintf(stderr, "handle_line(): \"%s\"\n", line);
+#endif
+
+    lr = log_add_line(line);
+    if (prefs.edit_first_error && first_error)
+    {
+	if ((lr->res.code == FR_WARNING && prefs.edit_warnings) ||
+	     lr->res.code == FR_ERROR)
+	{
+	    first_error = FALSE;
+	    log_set_selected(lr);
+	    start_edit(lr);
+	}
+    }
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+#define safe_str(s) 	((s) == 0 ? "" : (s))
+
+static void
 reap_make(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 {
     char *target = (char *)user_data;
     
     if (WIFEXITED(status) || WIFSIGNALED(status))
     {
-    	char err_str[256];
-    	char warn_str[256];
-	char int_str[256];
+    	char *err_str = 0, *warn_str = 0, *int_str = 0;
 	
+	/*
+	 * Handle case where last line of child process'
+	 * output has no terminating '\n'. Beware - 
+	 * this last line may contain an error or warning,
+	 * which affects log_num_{errors,warnings}().
+	 */
+    	if (leftover.length > 0)
+	    handle_line(leftover.data);
+	estring_free(&leftover);
+
+
 	if (log_num_errors() > 0)
-	    sprintf(err_str, _(", %d errors"), log_num_errors());
-	else
-	    err_str[0] = '\0';
+	    err_str = g_strdup_printf(_(", %d errors"), log_num_errors());
 	    
 	if (log_num_warnings() > 0)
-	    sprintf(warn_str, _(", %d warnings"), log_num_warnings());
-	else
-	    warn_str[0] = '\0';
+	    warn_str = g_strdup_printf(_(", %d warnings"), log_num_warnings());
 
 	if (interrupted)
-	    strcpy(int_str, _(" (interrupted)"));
-	else
-	    int_str[0] = '\0';
+	    int_str = _(" (interrupted)");
 	    
-	message(_("Finished making %s%s%s%s"), target, err_str, warn_str, int_str);
+	message(_("Finished making %s%s%s%s"),
+	    target,
+	    safe_str(err_str),
+	    safe_str(warn_str),
+	    safe_str(int_str));
+	    
+	if (err_str != 0)
+	    g_free(err_str);
+	if (warn_str != 0)
+	    g_free(warn_str);
 	
 	current_pid = -1;
 	log_end_build(target);
@@ -400,17 +441,14 @@ reap_make(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     }
 }
 
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+#undef safe_str
 
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
 handle_input(int len, const char *buf, gpointer data)
 {
-    static char linebuf[1024];
-    static int nleftover = 0;
-    LogRec *lr;
-    
-#if DEBUG   
+#if DEBUG > 40
     fprintf(stderr, "handle_data(): \"");
     fwrite(buf, len, 1, stderr);
     fprintf(stderr, "\"\n");
@@ -421,28 +459,17 @@ handle_input(int len, const char *buf, gpointer data)
 	char *p = strchr(buf, '\n');
 	if (p == 0)
 	{
-    	    /* only a part of a line left - append to linebuf */
-	    strncpy(&linebuf[nleftover], buf, sizeof(linebuf)-nleftover);
-	    nleftover += len;
+    	    /* only a part of a line left - append to leftover */
+	    estring_append_string(&leftover, buf);
 	    return;
 	}
     	/* got an end-of-line - isolate the line & feed it to handle_line() */
 	*p = '\0';
-	strncpy(&linebuf[nleftover], buf, sizeof(linebuf)-nleftover);
+	estring_append_string(&leftover, buf);
 
-	lr = log_add_line(linebuf);
-	if (prefs.edit_first_error && first_error)
-	{
-	    if ((lr->res.code == FR_WARNING && prefs.edit_warnings) ||
-	         lr->res.code == FR_ERROR)
-	    {
-	        first_error = FALSE;
-	    	log_set_selected(lr);
-		start_edit(lr);
-	    }
-	}
+    	handle_line(leftover.data);
 	
-	nleftover = 0;
+	estring_truncate(&leftover);
 	len -= (p - buf);
 	buf = ++p;
     }
@@ -452,6 +479,15 @@ void
 build_start(const char *target)
 {
     char *prog;
+    
+    /*
+     * Free'ing and reinitialising seems a bit extreme,
+     * but it allows the program to give back to malloc()
+     * a large line buffer allocated for a single unusual
+     * very long line.
+     */
+    estring_free(&leftover);
+    estring_init(&leftover);
     
     prog = expand_prog(prefs.prog_make, 0, 0, target);
     
@@ -812,7 +848,7 @@ ui_create_menus(GtkWidget *menubar)
 static void
 ui_create_tools(GtkWidget *toolbar)
 {
-    char tooltip[1024];
+    char *tooltip;
     
     ui_tool_create(toolbar, _("Again"), _("Build last target again"),
     	again_xpm, build_again_cb, 0, GR_AGAIN);
@@ -822,12 +858,15 @@ ui_create_tools(GtkWidget *toolbar)
     
     ui_tool_add_space(toolbar);
 
-    sprintf(tooltip, _("Build `%s'"), "all");
+    tooltip = g_strdup_printf(_("Build `%s'"), "all");
     ui_tool_create(toolbar, "all", tooltip,
     	all_xpm, build_cb, "all", GR_ALL);
-    sprintf(tooltip, _("Build `%s'"), "clean");
+    g_free(tooltip);
+    
+    tooltip = g_strdup_printf(_("Build `%s'"), "clean");
     ui_tool_create(toolbar, "clean", tooltip,
     	clean_xpm, build_cb, "clean", GR_CLEAN);
+    g_free(tooltip);
     
     ui_tool_add_space(toolbar);
     
@@ -905,9 +944,10 @@ ui_create(void)
     
     toplevel = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     {
-        char buf[512];
-    	sprintf(buf, _("Maketool %s"), VERSION);
-	gtk_window_set_title(GTK_WINDOW(toplevel), buf);
+        char *title;
+    	title = g_strdup_printf(_("Maketool %s"), VERSION);
+	gtk_window_set_title(GTK_WINDOW(toplevel), title);
+	g_free(title);
     }
     gtk_window_set_default_size(GTK_WINDOW(toplevel),
     	prefs.win_width, prefs.win_height);

@@ -19,7 +19,7 @@
 
 #include "util.h"
 
-CVSID("$Id: util.c,v 1.9 1999-07-14 03:59:44 gnb Exp $");
+CVSID("$Id: util.c,v 1.10 1999-08-10 15:44:40 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -77,6 +77,7 @@ estring_free(estring *e)
    if (e->data != 0)
    {
    	g_free(e->data);
+	e->data = 0;
 	e->length = 0;
 	e->available = 0;
    }

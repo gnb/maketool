@@ -20,9 +20,8 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.13 1999-07-14 03:59:44 gnb Exp $");
+CVSID("$Id: ui.c,v 1.14 1999-08-10 15:44:40 gnb Exp $");
 
-/*#define DEBUG 1*/
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 int

@@ -22,7 +22,7 @@
 #include "log.h"
 #include "util.h"
 
-CVSID("$Id: log.c,v 1.14 1999-07-18 01:46:04 gnb Exp $");
+CVSID("$Id: log.c,v 1.15 1999-08-10 15:44:39 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -355,7 +355,10 @@ void
 log_open(const char *file)
 {
     FILE *fp;
-    char buf[2048];
+    int len;
+    estring leftover;
+    char *startstr, buf[1025];
+
     
     if ((fp = fopen(file, "r")) == 0)
     {
@@ -363,19 +366,49 @@ log_open(const char *file)
 	return;
     }
     
-    sprintf(buf, _("Log file %s"), file);
-    log_start_build(buf);
-    
-    while (fgets(buf, sizeof(buf), fp) != 0)
+    startstr = g_strdup_printf(_("Log file %s"), file);
+    log_start_build(startstr);
+    g_free(startstr);
+
+
+    /*
+     * TODO: reuse commonality between this code
+     * and handle_input() in main.c.
+     */
+    estring_init(&leftover);
+    while ((len = fread(buf, 1, sizeof(buf)-1, fp)) > 0)
     {
-    	char *x;
-	if ((x = strchr(buf, '\n')) != 0)
-	    *x = '\0';
-	if ((x = strchr(buf, '\r')) != 0)
-	    *x = '\0';
-    	log_add_line(buf);
+    	char *start = buf, *end;
+
+    	buf[len] = '\0';
+	while (len > 0)
+	{
+	    end = strchr(start, '\n');
+	    if (end == 0)
+	    {
+    		/* only a part of a line left - append to leftover */
+		estring_append_string(&leftover, start);
+		len = 0;
+	    }
+	    else
+	    {
+    		/* got an end-of-line - isolate the line & feed it to handle_line() */
+		*end = '\0';
+		estring_append_string(&leftover, start);
+
+    		log_add_line(leftover.data);
+
+		estring_truncate(&leftover);
+		len -= (end - start);
+		start = ++end;
+    	    }
+	}
     }
+    /* handle case where last line is not terminated with '\n' */
+    if (leftover.length > 0)
+    	log_add_line(leftover.data);
     
+    estring_free(&leftover);
     fclose(fp);
 }
 

@@ -18,10 +18,11 @@
  */
 
 #include "filter.h"
+#include "util.h"
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.10 1999-08-07 14:59:07 gnb Exp $");
+CVSID("$Id: filter.c,v 1.11 1999-08-10 15:44:39 gnb Exp $");
 
 typedef struct
 {
@@ -237,10 +238,11 @@ filter_init(void)
 static void
 filter_replace_matches(
     const char *in,
-    char *out,
+    estring *out,
     const char *line,
     regmatch_t *matches)
 {
+    estring_truncate(out);
     for ( ; *in ; in++)
     {
     	if (*in == '\\' && in[1] >= '1' && in[1] <= '9')
@@ -249,20 +251,19 @@ filter_replace_matches(
 	    if (matches[n].rm_so >= 0)
 	    {
 	    	int len = matches[n].rm_eo - matches[n].rm_so;
-		memcpy(out, line + matches[n].rm_so, len);
-		out += len;
+		estring_append_chars(out, line + matches[n].rm_so, len);
 	    }
 	    in++;
-	    /*TODO: check result_len */
 	}
 	else
-	    *out++ = *in;
+	    estring_append_char(out, *in);
     }
-    *out = '\0';
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 #define NUM_MATCHES 9
+
+#define safe_atoi(s)	((s) == 0 ? 0 : atoi(s))
 
 void
 filter_apply_one(
@@ -271,7 +272,7 @@ filter_apply_one(
     FilterResult *result)
 {
     regmatch_t matches[NUM_MATCHES];
-    static char buf[1024];
+    static estring buf = ESTRING_STATIC_INIT;
     
     if (regexec(&f->regexp, line, NUM_MATCHES, matches, 0))
     {
@@ -282,23 +283,25 @@ filter_apply_one(
     /*
      * Set the result using the matched subexpressions.
      */
-    filter_replace_matches(f->line_str, buf, line, matches);
-    result->line = atoi(buf);
-    filter_replace_matches(f->col_str, buf, line, matches);
-    result->column = atoi(buf);
+    filter_replace_matches(f->line_str, &buf, line, matches);
+    result->line = safe_atoi(buf.data);
+    filter_replace_matches(f->col_str, &buf, line, matches);
+    result->column = safe_atoi(buf.data);
     if (f->summary_str == 0)
     {
     	result->summary = 0;
     }
     else
     {
-	filter_replace_matches(f->summary_str, buf, line, matches);
-	result->summary = g_strdup(buf);
+	filter_replace_matches(f->summary_str, &buf, line, matches);
+	result->summary = g_strdup(buf.data);
     }
-    filter_replace_matches(f->file_str, buf, line, matches);
-    result->file = buf;
+    filter_replace_matches(f->file_str, &buf, line, matches);
+    result->file = buf.data;
     result->code = f->code;
 }
+
+#undef safe_atoi
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 

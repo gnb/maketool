@@ -83,11 +83,11 @@ x  Allow user to configure error & warning colours & icons in Preferences.
 
 x  Doco.
 
-x  Remove line length limitation in handleInput().
+x  DONE: Remove line length limitation in handle_input().
 
-x  Remove line length limitation in filter_apply_one().
+x  DONE: Remove line length limitation in filter_apply_one().
 
-x  Add check for buffer overflow in uiCreateTools().
+x  DONE: Add check for buffer overflow in ui_create_tools().
 
 x  Use getopt?
 
@@ -105,6 +105,7 @@ x  Fix bug whereby run load spinbox saves wrong value to preferences.
    
 x  Add filters to summarise compile lines, and a View menu item
    to choose between full and summarised version in log window.
+   DONE.
 
 x  Remove strict dependancy on POSIX regcomp() for older systems,
    conditionally replace regcomp with function based on <regex.h>
@@ -112,5 +113,12 @@ x  Remove strict dependancy on POSIX regcomp() for older systems,
 x  Correctly handle user's upgrade from 0.3 to 0.4 by saving new
    prefs items to ~/.maketoolrc.
    
-x  Waaaaah! Need a dryrun mode!!   
-   DONE.
+x  DONE: Waaaaah! Need a dryrun mode!!   
+
+x  Automatically recalculate list of targets, and rebuild the Build
+   menu, when makefile changes.
+   
+x  DONE: Fix bug which loses last line of child process' output if the
+   line doesn't end in a '\n' (worse, it prepends that to the output
+   of the next child process).
+   

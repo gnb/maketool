@@ -16,20 +16,20 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile,v 1.1 1999-06-01 14:09:34 gnb Exp $
+# $Id: Makefile,v 1.2 1999-08-10 15:45:02 gnb Exp $
 #
 
 
 CC=		gcc -Wall
 CFLAGS=		-g
 
-all:: random targets delay recurse
+all:: random targets delay recurse longline unendedline
 
 clean::
 	@echo Nothing to see here
 
 random:
-	$(COMPILE.c) -c -o $O/crud.o crud.c
+	gcc -ansi -Wall -c -o crud.o crud.c
 	
 targets:
 	yes ' ' | head -20 | awk '{print NR}'
@@ -51,3 +51,11 @@ recurse:
 	
 really/deeply/located/target:
 	touch $@
+
+.PHONY: longline
+longline:
+	./longline
+
+.PHONY: unendedline
+unendedline:
+	./unendedline

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# TODO: I really, really should learn Perl.
+
+awk '
+BEGIN {
+    printf "Its an unending thing\n"
+    for (n=0 ; n<1030 ; n+=5)
+    {
+    	printf "%04d|", n+4
+    }
+    exit
+}' < /dev/null
