@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: cvs2changelog,v 1.1 2003-09-30 02:39:33 gnb Exp $
+# $Id: cvs2changelog,v 1.2 2003-10-05 09:28:10 gnb Exp $
 #
 # Shell script to build a change log for a new release
 # from CVS logs. The change log will still need some
@@ -17,7 +17,7 @@ EMAIL="gnb@alphalink.com.au"
 #FILES="Makefile.in Makefile configure.in"
 DATE_FORMAT="%a %b %_d %H:%M:%S %Y"
 CHECKFILE="configure.in"
-IGNOREDIRS="www doc po"
+IGNOREDIRS="www doc po test"
 LOG=ChangeLog
 OLDLOG=ChangeLog.$$
 RAWMODE=no
@@ -357,7 +357,8 @@ getDirs ()
     IGNOREEXP=`echo "$IGNOREDIRS" | sed -e 's:[ 	][  ]*:|:g'`
     find . -type d -name CVS -print |\
     	sed -e '/^\.\/CVS$/d' -e 's/\/CVS$//' -e 's/^\.\///' |\
-	egrep -v '^('$IGNOREEXP')$'
+	egrep -v '^('$IGNOREEXP')$' |\
+	egrep -v '^('$IGNOREEXP')/'
 }
 
 cookedGatherChanges ()
