@@ -24,7 +24,7 @@
 #include <regex.h>	/* POSIX regular expression fns */
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: find.c,v 1.4 2000-06-13 13:54:11 gnb Exp $");
+CVSID("$Id: find.c,v 1.5 2000-06-13 14:20:48 gnb Exp $");
 
 static GtkWidget	*find_shell = 0;
 typedef enum { FD_FORWARDS, FD_BACKWARDS, FD_MAX_DIRECTIONS } FindDirections;
@@ -38,6 +38,8 @@ typedef enum
 static GtkWidget    	*dirn_radio[FD_MAX_DIRECTIONS];
 static GtkWidget    	*type_radio[FT_MAX_TYPES];
 static GtkWidget    	*string_entry;
+
+#define FINDCASE 0  	/* TODO: implement case-insensitive literals */
 
 typedef struct 
 {
@@ -387,10 +389,12 @@ create_find_shell(void)
     gtk_widget_show(radio);
     type_radio[FT_LITERAL] = radio;
     
+#if FINDCASE
     radio = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radio), _("Case Sensitive Literal"));
     gtk_box_pack_start(GTK_BOX(hbox), radio, FALSE, TRUE, 0);
     gtk_widget_show(radio);
     type_radio[FT_CASE_LITERAL] = radio;
+#endif
     
     radio = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radio), _("Regular Expression"));
     gtk_box_pack_start(GTK_BOX(hbox), radio, FALSE, TRUE, 0);
