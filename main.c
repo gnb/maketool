@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.32 1999-07-14 03:59:44 gnb Exp $");
+CVSID("$Id: main.c,v 1.33 1999-07-14 04:23:50 gnb Exp $");
 
 typedef enum
 {
@@ -48,7 +48,6 @@ typedef enum
 
 char		*targets;		/* targets on commandline */
 const char	*last_target = 0;	/* last target built, for `again' */
-GList		*predefined_targets = 0;	/* special well-known targets */
 GList		*available_targets = 0;	/* all possible targets, for menu */
 GtkWidget	*build_menu;
 GtkWidget	*toolbar_hb, *messagebox;
@@ -62,6 +61,22 @@ GdkPixmap	*anim_pixmaps[ANIM_MAX+1];
 GdkBitmap	*anim_masks[ANIM_MAX+1];
 GtkWidget	*anim;
 
+/*
+ * These are the targets specifically mentioned in the
+ * current GNU makefile standards (except `mostlyclean'
+ * which is from the old standards). These targets are
+ * visually separated in the Build menu.
+ */
+static const char *standard_targets[] = {
+"all",
+"install", "install-strip", "installcheck", "installdirs", "uninstall",
+"mostlyclean", "clean", "distclean", "reallyclean", "maintainer-clean",
+"TAGS",
+"info", "dvi",
+"dist",
+"check",
+0
+};
 
 #define PASTE3(x,y,z) x##y##z
 
@@ -228,12 +243,25 @@ append_build_menu_items(GList *list)
     }
 }
 
+static gboolean
+is_standard_target(const char *targ)
+{
+    const char **tp;
+    
+    for (tp = standard_targets ; *tp ; tp++)
+    {
+	if (!strcmp(*tp, targ))
+	    return TRUE;
+    }
+    return FALSE;
+}
+
 static void
 reap_list(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 {
     estring *targs = (estring *)user_data;
     char *t, *buf;
-    GList *predefs = 0;
+    GList *std = 0;
 
     if (!(WIFEXITED(status) || WIFSIGNALED(status)))
     	return;
@@ -243,8 +271,8 @@ reap_list(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 #endif
     /* 
      * Parse the output of the program into whitespace-separated
-     * strings which are targets. Build two lists, predefs (all
-     * the found targets which are also in `predefined_targets')
+     * strings which are targets. Build two lists, std (all
+     * the found targets which are also in `standard_targets')
      * and available_targets (all others).
      */
     buf = targs->data;
@@ -254,8 +282,8 @@ reap_list(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	{
 	    {
     	       t = g_strdup(t);
-	       if (g_list_find_str(predefined_targets, t) != 0)
-    		   predefs = g_list_append(predefs, t);
+	       if (is_standard_target(t))
+    		   std = g_list_append(std, t);
 	       else
     		   available_targets = g_list_append(available_targets, t);
     	    }
@@ -266,20 +294,20 @@ reap_list(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     
     /*
      * Build two parts of the menu from the two lists. This
-     * technique ensures the common and useful targets like
-     * `all' and `install' will appear early in the menu and
+     * technique ensures the GNU standard targets like `all'
+     * and `install' will appear early in the menu and
      * will always be visible regardless of its size.
      */
-    append_build_menu_items(predefs);
-    if (predefs != 0 && available_targets != 0)
+    append_build_menu_items(std);
+    if (std != 0 && available_targets != 0)
 	ui_add_separator(build_menu);
     append_build_menu_items(available_targets);
 
     /*
-     * Now prepend predefs to available_targets, which is now a
-     * list of all the found targets, predefined or not.
+     * Now prepend `std' to `available_targets', which is now a
+     * list of all the found targets, standard or not.
      */
-    available_targets = g_list_concat(predefs, available_targets);
+    available_targets = g_list_concat(std, available_targets);
 
     grey_menu_items();
 }
@@ -292,22 +320,12 @@ input_list(int len, const char *buf, gpointer data)
     estring_append_chars(targs, buf, len);
 }
 
-static char *predef_targs[] = {
-"all", "install", "uninstall",
-"mostlyclean", "clean", "distclean", "reallyclean",
-0
-};
-
 static void
 list_targets(void)
 {
     char *prog;
     pid_t pid;
-    char **t;
     static estring targs;
-    
-    for (t = predef_targs ; *t ; t++)
-	predefined_targets = g_list_prepend(predefined_targets, *t);
     
     estring_init(&targs);
     
