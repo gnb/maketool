@@ -22,11 +22,12 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.26 2001-09-02 11:58:49 gnb Exp $");
+CVSID("$Id: filter.c,v 1.27 2002-09-24 14:29:07 gnb Exp $");
 
 typedef struct
 {
     char *instate;
+    char *outstate;
     regex_t regexp;
     char *file_str;
     char *line_str;
@@ -38,14 +39,14 @@ typedef struct
 
 
 static GList *filters;
-const char *filterState = 0;
+const char *filter_state = "";
 extern const char *argv0;
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static Filter *
 filter_add(
-    const char *instate,
+    const char *state,
     const char *regexp,
     FilterCode code,
     const char *file_str,
@@ -68,7 +69,14 @@ filter_add(
 	g_free(f);
 	return 0;
     }
-    f->instate = g_strdup(instate);
+    f->instate = g_strdup(state);
+    if ((f->outstate = strchr(f->instate, ':')) != 0)
+    {
+    	*f->outstate++ = '\0';
+	f->outstate = g_strdup(f->outstate);
+    }
+    else
+    	f->outstate = g_strdup("");
     f->code = code;
     f->file_str = g_strdup(file_str);
     f->line_str = g_strdup(line_str);
@@ -93,7 +101,7 @@ filter_load(void)
 	"\\1",				/* file */
 	"",				/* line */
 	"",				/* col */
-	"Directory \\1",		/* summary */
+	"",		    	    	/* summary */
     	"gmake recursion - push");	/* comment */
 
     filter_add(
@@ -103,7 +111,7 @@ filter_load(void)
 	"",				/* file */
 	"",				/* line */
 	"",				/* col */
-	0,				/* summary */
+	"",				/* summary */
     	"gmake recursion - pop");	/* comment */
 
     filter_add(
@@ -237,6 +245,162 @@ filter_load(void)
     	"HP-UX old CC/cpp warning");	/* comment */
 #endif
 
+#ifdef __sgi
+    /* old style MIPSpro errors and warnings */
+    filter_add(
+    	":mipspro1",			/* state */
+	"^cc-[0-9]+ (cc|CC): ERROR File = ([^ \t,]+), Line = ([0-9]+)", /* regexp */
+	FR_PENDING|FR_ERROR,	    	/* code */
+	"\\2",				/* file */
+	"\\3",				/* line */
+	"",				/* col */
+	"",	    	    	    	/* summary */
+    	"MIPSpro cc/CC error");   	/* comment */
+	
+    filter_add(
+    	":mipspro1",			/* state */
+	"^cc-[0-9]+ (cc|CC): WARNING File = ([^ \t,]+), Line = ([0-9]+)", /* regexp */
+	FR_PENDING|FR_WARNING,	    	/* code */
+	"\\2",				/* file */
+	"\\3",				/* line */
+	"",				/* col */
+	"",	    	    	    	/* summary */
+    	"MIPSpro cc/CC warning");   	/* comment */
+
+    filter_add(
+    	"mipspro1:mipspro2",		/* state */
+	"^[ \t]+(.*)$",    	    	/* regexp */
+	FR_PENDING|FR_UNDEFINED,    	/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	"\\1",	    	    	    	/* summary */
+    	"MIPSpro multiline message 1"); /* comment */
+
+    filter_add(
+    	"mipspro2:mipspro3",		/* state */
+	"^$",    	    	    	/* regexp */
+	FR_PENDING|FR_UNDEFINED,    	/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	"",	    	    	    	/* summary */
+    	"MIPSpro multiline message 2"); /* comment */
+
+    filter_add(
+    	"mipspro3:mipspro4",		/* state */
+	"^.*$",    	    	    	/* regexp */
+	FR_PENDING|FR_UNDEFINED,    	/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	"",	    	    	    	/* summary */
+    	"MIPSpro multiline message 3"); /* comment */
+
+    filter_add(
+    	"mipspro4:mipspro5",		/* state */
+	"^[ \t]+\\^$",	    	    	/* regexp */
+	FR_PENDING|FR_UNDEFINED,    	/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	"",	    	    	    	/* summary */
+    	"MIPSpro multiline message 4"); /* comment */
+
+    filter_add(
+    	"mipspro5:",		    	/* state */
+	"^$",    	    	    	/* regexp */
+	FR_DONE,			/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	"",	    	    	    	/* summary */
+    	"MIPSpro multiline message 5"); /* comment */
+
+    /* IRIX linker errors */
+    filter_add(
+    	"",				/* state */
+	"^(ld|ld32|ld64): ERROR[ \t]+[0-9]+[ \t]*: (.*)$", /* regexp */
+	FR_ERROR,			/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	"\\2",				/* summary */
+    	"MIPSpro ld error");	    	/* comment */
+	
+    /* new style MIPSpro errors and warnings */
+    filter_add(
+    	":Nmipspro1",			/* state */
+	"^cfe: Error: ([^ \t,]+), line ([0-9]+): (.*)$", /* regexp */
+	FR_PENDING|FR_ERROR,	    	/* code */
+	"\\1",				/* file */
+	"\\2",				/* line */
+	"",				/* col */
+	"\\3",	    	    	    	/* summary */
+    	"new MIPSpro cc/CC error");   	/* comment */
+	
+    filter_add(
+    	":Nmipspro1",			/* state */
+	"^cfe: Warning [0-9]+: ([^ \t,]+), line ([0-9]+): (.*)$", /* regexp */
+	FR_PENDING|FR_WARNING,	    	/* code */
+	"\\1",				/* file */
+	"\\2",				/* line */
+	"",				/* col */
+	"\\3",	    	    	    	/* summary */
+    	"new MIPSpro cc/CC warning");	/* comment */
+
+    filter_add(
+    	"Nmipspro1:Nmipspro2",		/* state */
+	"^ (.*)$",    	    	    	/* regexp */
+	FR_PENDING|FR_UNDEFINED,    	/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	"",	    	    	    	/* summary */
+    	"new MIPSpro multiline message 1"); /* comment */
+
+    filter_add(
+    	"Nmipspro2:",		    	/* state */
+	"^ [- \t]*\\^$",    	    	/* regexp */
+	FR_DONE,			/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	"",	    	    	    	/* summary */
+    	"MIPSpro multiline message 5"); /* comment */
+
+    /* new style assembler and pre-processor errors */
+    filter_add(
+    	"",			    	/* state */
+	"^cfe: Error: ([^ \t,]+):[ \t]*[0-9]+: (.*)$", /* regexp */
+	FR_ERROR,	    	    	/* code */
+	"\\1",				/* file */
+	"\\2",				/* line */
+	"",				/* col */
+	"\\3",	    	    	    	/* summary */
+    	"new MIPSpro cpp error");	/* comment */
+
+    filter_add(
+    	"",			    	/* state */
+	"^cfe: Warning [0-9]+: ([^ \t,]+):[ \t]*[0-9]+: (.*)$", /* regexp */
+	FR_WARNING,	    	    	/* code */
+	"\\1",				/* file */
+	"\\2",				/* line */
+	"",				/* col */
+	"\\3",	    	    	    	/* summary */
+    	"new MIPSpro cpp warning");	/* comment */
+
+    filter_add(
+    	"",			    	/* state */
+	"^as1: Warning: ([^ \t,]+), line [0-9]+: (.*)$", /* regexp */
+	FR_WARNING,	    	    	/* code */
+	"\\1",				/* file */
+	"\\2",				/* line */
+	"",				/* col */
+	"\\3",	    	    	    	/* summary */
+    	"new MIPSpro as warning");	/* comment */
+#endif
+
 #ifdef __sun
     /*TODO: Solaris compilers*/
 #endif
@@ -263,21 +427,21 @@ filter_load(void)
      */
     filter_add(
     	"",				/* state */
-	"^(cc|c89|gcc|CC|c\\+\\+|g\\+\\+)([ \t]|[ \t].*[ \t])-c([ \t]|[ \t].*[ \t])([^ \t]*\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
+	"^[ \t]*(|[^ \t:#]+/)(cc|c89|gcc|CC|c\\+\\+|g\\+\\+)([ \t]|[ \t].*[ \t])-c([ \t]|[ \t].*[ \t])([^ \t]*\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
+	FR_INFORMATION,			/* code */
+	"\\5\\6",			/* file */
+	"",				/* line */
+	"",				/* col */
+	"Compiling \\5\\6",		/* summary */
+    	"C/C++ compile line");		/* comment */
+    filter_add(
+    	"",				/* state */
+	"^[ \t]*(|[^ \t:#]+/)[-/a-z0-9]+-(cc|gcc|c\\+\\+|g\\+\\+).*[ \t]-c([ \t]|[ \t].*[ \t])([^ \t]+\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
 	FR_INFORMATION,			/* code */
 	"\\4\\5",			/* file */
 	"",				/* line */
 	"",				/* col */
-	"Compiling \\4\\5",		/* summary */
-    	"C/C++ compile line");		/* comment */
-    filter_add(
-    	"",				/* state */
-	"^[-/a-z0-9]+-(cc|gcc|c\\+\\+|g\\+\\+).*[ \t]-c([ \t]|[ \t].*[ \t])([^ \t]+\\.)(c|C|cc|c\\+\\+|cpp)", /* regexp */
-	FR_INFORMATION,			/* code */
-	"\\3\\4",			/* file */
-	"",				/* line */
-	"",				/* col */
-	"Cross-compiling \\3\\4",   	/* summary */
+	"Cross-compiling \\4\\5",   	/* summary */
     	"GNU C/C++ cross-compile line"); /* comment */
     filter_add(
     	"",				/* state */
@@ -290,30 +454,30 @@ filter_load(void)
     	"Java compile line");		/* comment */
     filter_add(
     	"",				/* state */
-	"^(cc|c89|gcc|CC|c\\+\\+|g\\+\\+|ld).*[ \t]+-o[ \t]+([^ \t]+)", /* regexp */
+	"^[ \t]*(|[^ \t:#]+/)(cc|c89|gcc|CC|c\\+\\+|g\\+\\+|ld).*[ \t]+-o[ \t]+([^ \t]+)", /* regexp */
 	FR_INFORMATION,			/* code */
 	"",				/* file */
 	"",				/* line */
 	"",				/* col */
-	"Linking \\2",			/* summary */
+	"Linking \\3",			/* summary */
     	"C/C++ link line");		/* comment */
     filter_add(
     	"",				/* state */
-	"^[-/a-z0-9]+-(cc|gcc|c\\+\\+|g\\+\\+|ld).*[ \t]+-o[ \t]+([^ \t]+)", /* regexp */
+	"^[ \t]*(|[^ \t:#]+/)[-/a-z0-9]+-(cc|gcc|c\\+\\+|g\\+\\+|ld).*[ \t]+-o[ \t]+([^ \t]+)", /* regexp */
 	FR_INFORMATION,			/* code */
 	"",				/* file */
 	"",				/* line */
 	"",				/* col */
-	"Cross-linking \\2",		/* summary */
+	"Cross-linking \\3",		/* summary */
     	"GNU C/C++ cross-link line");	/* comment */
     filter_add(
     	"",				/* state */
-	"^ar[ \t][ \t]*[rc][a-z]*[ \t][ \t]*(lib[^ \t]*.a)", /* regexp */
+	"^[ \t]*(|[^ \t:#]+/)ar[ \t][ \t]*[rc][a-z]*[ \t][ \t]*(lib[^ \t]*.a)", /* regexp */
 	FR_INFORMATION,			/* code */
 	"",				/* file */
 	"",				/* line */
 	"",				/* col */
-	"Building library \\1",		/* summary */
+	"Building library \\2",		/* summary */
     	"Archive library link line");	/* comment */
     /* TODO: support for libtool */	
     filter_add(
@@ -384,7 +548,7 @@ filter_load(void)
 void
 filter_init(void)
 {
-    filterState = 0;
+    filter_state = "";
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -419,7 +583,7 @@ filter_replace_matches(
 
 #define safe_atoi(s)	((s) == 0 ? 0 : atoi(s))
 
-void
+static gboolean
 filter_apply_one(
     Filter *f,
     const char *line,
@@ -427,32 +591,45 @@ filter_apply_one(
 {
     regmatch_t matches[NUM_MATCHES];
     static estring buf = ESTRING_STATIC_INIT;
+    int i;
     
+    if (strcmp(filter_state, f->instate))
+	return FALSE;
+
     if (regexec(&f->regexp, line, NUM_MATCHES, matches, 0))
-    {
-    	result->code = FR_UNDEFINED;	/* no match */
-	return;
-    }
+	return FALSE;
+    filter_state = f->outstate;
 
     /*
-     * Set the result using the matched subexpressions.
+     * Set (parts of) the result using the matched subexpressions.
      */
     filter_replace_matches(f->line_str, &buf, line, matches);
-    result->line = safe_atoi(buf.data);
+    if ((i = safe_atoi(buf.data)) > 0)
+	result->line = i;
+
     filter_replace_matches(f->col_str, &buf, line, matches);
-    result->column = safe_atoi(buf.data);
-    if (f->summary_str == 0)
-    {
-    	result->summary = 0;
-    }
-    else
+    if ((i = safe_atoi(buf.data)) > 0)
+	result->column = i;
+
+    if (f->summary_str != 0 && *f->summary_str != '\0')
     {
 	filter_replace_matches(f->summary_str, &buf, line, matches);
-	result->summary = g_strdup(buf.data);
+	if (buf.data != 0 && *buf.data != '\0')
+	    result->summary = g_strdup(buf.data);
     }
+
     filter_replace_matches(f->file_str, &buf, line, matches);
-    result->file = buf.data;
-    result->code = f->code;
+    if (buf.data != 0 && *buf.data != '\0')
+	result->file = g_strdup(buf.data);
+
+    if (f->code == FR_DONE)
+    	result->code &= ~FR_PENDING;
+    else if ((f->code & ~FR_PENDING) != FR_UNDEFINED)
+	result->code = f->code;
+    if ((f->code & FR_PENDING))
+	result->code |= FR_PENDING;
+	
+    return TRUE;
 }
 
 #undef safe_atoi
@@ -463,16 +640,22 @@ void
 filter_apply(const char *line, FilterResult *result)
 {
     GList *fl;
-    
+    gboolean matched;
+
     for (fl=filters ; fl != 0 ; fl=fl->next)
     {
 	Filter *f = (Filter*)fl->data;
-	filter_apply_one(f, line, result);
+	matched = filter_apply_one(f, line, result);
 #if DEBUG
-	fprintf(stderr, "filter [%s] on \"%s\" -> %d (%s)\n",
-		f->comment, line, (int)result->code, safe_str(result->summary));
+	fprintf(stderr, "filter [%s] on \"%s\" -> %s %d (%s) state=\"%s\"\n",
+		f->comment,
+		line, 
+		(matched ? "MATCH" : ""),
+		(int)result->code,
+		safe_str(result->summary),
+		filter_state);
 #endif
-	if (result->code != FR_UNDEFINED)
+	if (matched)
 	    return;
     }
     result->code = FR_UNDEFINED;
