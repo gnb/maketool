@@ -97,3 +97,9 @@ x  Fix bug whereby `configure --with-included-gettext' leaves a symlink
    intl/libintl.h -> intl/libgettext.h which is not removed again when
    re-configured and causes other builds to break with `symbol dcgettext__
    not found'.
+   
+x  On startup, when preferences or args specify a non-existant makefile,
+   issue a warning alert to the user.
+   
+x  Fix bug whereby run load spinbox saves wrong value to preferences.
+   

@@ -18,9 +18,11 @@
  */
 
 #include "ui.h"
+#include "util.h"
 
-CVSID("$Id: ui.c,v 1.12 1999-06-14 00:49:49 gnb Exp $");
+CVSID("$Id: ui.c,v 1.13 1999-07-14 03:59:44 gnb Exp $");
 
+/*#define DEBUG 1*/
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 int
@@ -513,6 +515,217 @@ ui_dialog_changed(GtkWidget *dialog)
 
     gtk_widget_set_sensitive(ad->ok_btn, TRUE);
     gtk_widget_set_sensitive(ad->apply_btn, TRUE);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static GHashTable *ui_config_data = 0;
+static char *ui_config_filename = 0;
+
+static void
+ui_config_set(const char *name, const char *value)
+{
+    char *v;
+    
+    v = (char *)g_hash_table_lookup(ui_config_data, name);
+    if (v != 0)
+    {
+	g_hash_table_remove(ui_config_data, name);
+	g_free(v);
+    }
+    if (value != 0)
+	g_hash_table_insert(ui_config_data, g_strdup(name), g_strdup(value));
+#if DEBUG
+    fprintf(stderr, "ui_config_set: %s = \"%s\"\n", name, value);
+#endif
+}
+
+
+void
+ui_config_init(const char *pkg)
+{
+    estring name, value, filename;
+    FILE *fp;
+    int c;
+
+    ui_config_data = g_hash_table_new(g_str_hash, g_str_equal);
+
+    estring_init(&name);
+    estring_init(&value);
+
+    estring_init(&filename);
+    estring_append_string(&filename, getenv("HOME"));
+    estring_append_string(&filename, "/.");
+    estring_append_string(&filename, pkg);
+    estring_append_string(&filename, "rc");
+    ui_config_filename = filename.data;
+    
+    if ((fp = fopen(ui_config_filename, "r")) == 0)
+    {
+    	if (errno != ENOENT)
+	    perror(ui_config_filename);
+	return;
+    }
+
+    for (;;) 
+    {
+   	c = fgetc(fp);
+	if (c == EOF)
+	    break;
+
+   	/* skip comments */
+	while (c == '#')
+	{
+	     while ((c = fgetc(fp)) != '\n')
+	     	;
+	     c = fgetc(fp);
+	}
+
+	/* name */
+	estring_truncate(&name);
+	estring_append_char(&name, c);
+	while ((c = fgetc(fp)) != '=' && c != '\n')
+	    estring_append_char(&name, c);
+	if (c == '\n')
+	    ungetc(c, fp);
+	
+	/* value */
+	estring_truncate(&value);
+	/* swallow c == '=' */
+	while ((c = fgetc(fp)) != '\n')
+	    estring_append_char(&value, c);
+
+	/* got name, value */
+	ui_config_set(name.data, value.data);
+    }
+   
+    fclose(fp);
+    estring_free(&name);
+    estring_free(&value);
+}
+
+static UiEnumRec ui_boolean_enum_def[] = {
+{"TRUE",	TRUE},
+{"FALSE",	FALSE},
+{"true",	TRUE},
+{"false",	FALSE},
+{"yes",		TRUE},
+{"no",		FALSE},
+{"on",		TRUE},
+{"off",		FALSE},
+{"1",		TRUE},
+{"0",		FALSE},
+{0, 0}};
+
+char *
+ui_config_get_string(const char *name, const char *defv)
+{
+    const char *v;
+    
+    v = (const char *)g_hash_table_lookup(ui_config_data, name);
+    if (v == 0)
+    	v = defv;
+    return g_strdup(v);
+}
+
+int
+ui_config_get_int(const char *name, int defv)
+{
+    char *v;
+    
+    v = (char *)g_hash_table_lookup(ui_config_data, name);
+    return (v == 0 ? defv : atoi(v));
+}
+
+int
+ui_config_get_enum(const char *name, int defv, UiEnumRec *enumdef)
+{
+    char *v;
+    
+    v = (char *)g_hash_table_lookup(ui_config_data, name);
+    if (v != 0)
+    {
+	for ( ; enumdef->name != 0 ; enumdef++)
+    	    if (!strcmp(enumdef->name, v))
+		return enumdef->value;
+		
+	if (isdigit(v[0]))
+	    return atoi(v);
+    }
+    return defv;
+}
+
+gboolean
+ui_config_get_boolean(const char *name, gboolean defv)
+{
+    return (gboolean)ui_config_get_enum(name, (int)defv, ui_boolean_enum_def);
+}
+
+void
+ui_config_set_string(const char *name, const char *val)
+{
+    ui_config_set(name, val);
+}
+
+void
+ui_config_set_int(const char *name, int val)
+{
+    char buf[256];
+    
+    sprintf(buf, "%d", val);
+    ui_config_set(name, buf);
+}
+
+void
+ui_config_set_enum(const char *name, int val, UiEnumRec *enumdef)
+{
+    char *v = 0, buf[256];
+    
+    for ( ; enumdef->name != 0 ; enumdef++)
+    	if (enumdef->value == val)
+	{
+	    v = enumdef->name;
+	    break;
+	}
+    if (v == 0)
+    {
+    	sprintf(buf, "%d", val);
+	v = buf;
+    }
+    
+    ui_config_set(name, v);
+}
+
+void
+ui_config_set_boolean(const char *name, gboolean val)
+{
+    ui_config_set_enum(name, (val ? TRUE : FALSE), ui_boolean_enum_def);
+}
+
+
+static void
+ui_config_save_one(gpointer keyp, gpointer valuep, gpointer user_data)
+{
+    FILE *fp = (FILE *)user_data;
+    const char *key = (const char *)keyp;
+    const char *value = (const char *)valuep;
+    
+    fprintf(fp, "%s=%s\n", key, value);
+}
+
+void
+ui_config_sync(void)
+{
+    FILE *fp;
+   
+    if ((fp = fopen(ui_config_filename, "w")) == 0)
+    {
+   	 perror(ui_config_filename);
+   	 return;
+    }
+    fputs("# Written by maketool. Do not edit\n", fp);
+    g_hash_table_foreach(ui_config_data, ui_config_save_one, (gpointer)fp);
+    fclose(fp);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

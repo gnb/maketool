@@ -66,6 +66,9 @@ typedef struct
     char *prog_list_targets;
     char *prog_list_version;
     char *prog_edit_source;
+    
+    int win_width;		/* size of main window */
+    int win_height;
 } Preferences;
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -100,9 +103,9 @@ char *expand_prog(const char *prog, const char *file, int line, const char *targ
 void help_about_cb(GtkWidget *, gpointer);
 void help_about_make_cb(GtkWidget *, gpointer);
 /* preferences.c */
-void preferences_init(void);
 void preferences_load(void);
 void preferences_save(void);
+void preferences_resize(int width, int height);
 void edit_preferences_cb(GtkWidget *, gpointer);
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

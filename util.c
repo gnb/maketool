@@ -19,7 +19,7 @@
 
 #include "util.h"
 
-CVSID("$Id: util.c,v 1.8 1999-05-30 11:24:40 gnb Exp $");
+CVSID("$Id: util.c,v 1.9 1999-07-14 03:59:44 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -67,7 +67,8 @@ void
 estring_truncate(estring *e)
 {
     e->length = 0;
-    e->data[0] = '\0';
+    if (e->data != 0)
+	e->data[0] = '\0';
 }
 
 void

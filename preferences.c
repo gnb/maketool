@@ -21,7 +21,7 @@
 #include "maketool.h"
 #include "util.h"
 
-CVSID("$Id: preferences.c,v 1.17 1999-07-04 03:10:53 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.18 1999-07-14 03:59:44 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget	*run_proc_sb;
@@ -223,47 +223,89 @@ prefs_set_var_make_flags(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-void
-preferences_init(void)
-{
-    prefs.run_how = RUN_SERIES;
-    prefs.run_processes = 2;
-    prefs.run_load = 20;
-        
-    prefs.edit_first_error = FALSE;
-    prefs.edit_warnings = TRUE;
-    prefs.ignore_failures = FALSE;
-    
-    prefs.start_action = START_COLLAPSE;
-    prefs.makefile = 0;
-    
-    prefs.variables = 0;
-#if 0    
-    prefs_add_variable("VARIABLE_ONE", "The value for 'ONE'", VAR_MAKE);
-    prefs_add_variable("VARIABLE_TWO", "'The' value for TWO", VAR_MAKE);
-    prefs_add_variable("VARIABLE_THREE", "'The' value for THREE", VAR_ENVIRON);
-    prefs_add_variable("VARIABLE_FOUR", "The value for FOUR", VAR_MAKE);
-    prefs_add_variable("VARIABLE_FIVE", "The value for 'FIVE'", VAR_ENVIRON);
-    prefs_add_variable("VARIABLE_SIX", "The value for SIX", VAR_MAKE);
-#endif
-    prefs_set_var_environment();
-    prefs_set_var_make_flags();
-    
-    prefs.prog_make = g_strdup("make %m %k %p %v %t");
-    prefs.prog_list_targets = g_strdup("extract_targets %m %v");
-    prefs.prog_list_version = g_strdup("make --version");
-    prefs.prog_edit_source = g_strdup("nc -noask %{l:+-line %l} %f");
-}
+static UiEnumRec run_how_enum_def[] = {
+{"RUN_SERIES",		RUN_SERIES},
+{"RUN_PARALLEL_PROC",	RUN_PARALLEL_PROC},
+{"RUN_PARALLEL_LOAD",	RUN_PARALLEL_LOAD},
+{0, 0}};
 
+static UiEnumRec start_action_enum_def[] = {
+{"START_NOTHING",	START_NOTHING},
+{"START_CLEAR",		START_CLEAR},
+{"START_COLLAPSE",	START_COLLAPSE},
+{0, 0}};
+
+static UiEnumRec var_type_enum_def[] = {
+{"VAR_MAKE",		VAR_MAKE},
+{"VAR_ENVIRON",		VAR_ENVIRON},
+{0, 0}};
 
 void
 preferences_load(void)
 {
+    ui_config_init("maketool");
+    prefs.run_how = ui_config_get_enum("run_how", RUN_SERIES, run_how_enum_def);
+    prefs.run_processes = ui_config_get_int("run_processes", 2);
+    prefs.run_load = ui_config_get_int("run_load", 20);
+        
+    prefs.edit_first_error = ui_config_get_boolean("edit_first_error", FALSE);
+    prefs.edit_warnings = ui_config_get_boolean("edit_warnings", TRUE);
+    prefs.ignore_failures = ui_config_get_boolean("ignore_failures", FALSE);
+    
+    prefs.start_action = ui_config_get_enum("start_action", START_COLLAPSE,
+    				start_action_enum_def);
+    prefs.makefile = ui_config_get_string("makefile", 0);
+    
+    prefs.variables = 0;
+    /* TODO: load variables */
+    prefs_set_var_environment();
+    prefs_set_var_make_flags();
+    
+    prefs.prog_make = ui_config_get_string("prog_make", "make %m %k %p %v %t");
+    prefs.prog_list_targets = ui_config_get_string("prog_list_targets", "extract_targets %m %v");
+    prefs.prog_list_version = ui_config_get_string("prog_list_version", "make --version");
+    prefs.prog_edit_source = ui_config_get_string("prog_edit_source", "nc -noask %{l:+-line %l} %f");
+
+    prefs.win_width = ui_config_get_int("win_width", 300);
+    prefs.win_height = ui_config_get_int("win_height", 500);
 }
 
 void
 preferences_save(void)
 {
+    ui_config_set_enum("run_how", prefs.run_how, run_how_enum_def);
+    ui_config_set_int("run_processes", prefs.run_processes);
+    ui_config_set_int("run_load", prefs.run_load);
+        
+    ui_config_set_boolean("edit_first_error", prefs.edit_first_error);
+    ui_config_set_boolean("edit_warnings", prefs.edit_warnings);
+    ui_config_set_boolean("ignore_failures", prefs.ignore_failures);
+    
+    ui_config_set_enum("start_action", prefs.start_action,
+    				start_action_enum_def);
+    ui_config_set_string("makefile", prefs.makefile);
+    
+    /* TODO: save variables */
+    
+    ui_config_set_string("prog_make", prefs.prog_make);
+    ui_config_set_string("prog_list_targets", prefs.prog_list_targets);
+    ui_config_set_string("prog_list_version", prefs.prog_list_version);
+    ui_config_set_string("prog_edit_source", prefs.prog_edit_source);
+
+    ui_config_set_int("win_width", prefs.win_width);
+    ui_config_set_int("win_height", prefs.win_height);
+
+    ui_config_sync();
+}
+
+void
+preferences_resize(int width, int height)
+{
+    prefs.win_width = width;
+    prefs.win_height = height;
+    ui_config_set_int("win_width", prefs.win_width);
+    ui_config_set_int("win_height", prefs.win_height);
+    ui_config_sync();
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

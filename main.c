@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.31 1999-06-13 13:37:55 gnb Exp $");
+CVSID("$Id: main.c,v 1.32 1999-07-14 03:59:44 gnb Exp $");
 
 typedef enum
 {
@@ -248,16 +248,19 @@ reap_list(pid_t pid, int status, struct rusage *usg, gpointer user_data)
      * and available_targets (all others).
      */
     buf = targs->data;
-    while ((t = strtok(buf, " \t\r\n")) != 0)
+    if (buf != 0)
     {
+	while ((t = strtok(buf, " \t\r\n")) != 0)
 	{
-    	   t = g_strdup(t);
-	   if (g_list_find_str(predefined_targets, t) != 0)
-    	       predefs = g_list_append(predefs, t);
-	   else
-    	       available_targets = g_list_append(available_targets, t);
-    	}
-	buf = 0;
+	    {
+    	       t = g_strdup(t);
+	       if (g_list_find_str(predefined_targets, t) != 0)
+    		   predefs = g_list_append(predefs, t);
+	       else
+    		   available_targets = g_list_append(available_targets, t);
+    	    }
+	    buf = 0;
+	}
     }
     estring_free(targs);
     
@@ -457,6 +460,34 @@ build_start(const char *target)
 	grey_menu_items();
     }
     g_free(prog);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+toplevel_resize_cb(GtkWidget *w, GdkEvent *ev, gpointer data)
+{
+    static int curr_width = -1, curr_height = -1;
+    int width, height;
+    
+    width = ev->configure.width;
+    height = ev->configure.height;
+    
+    /*
+     * This weeds out the ConfigureNotify events we get
+     * from the X server when the window is moved.
+     */
+    if (curr_width >= 0 &&
+        (curr_width != width || curr_height != height))
+    {
+#if DEBUG
+	fprintf(stderr, "toplevel_resize_cb: Saving new size\n");
+#endif
+	preferences_resize(w->allocation.width, w->allocation.height);
+    }
+    
+    curr_width = width;
+    curr_height = height;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -841,9 +872,12 @@ ui_create(void)
     	sprintf(buf, _("Maketool %s"), VERSION);
 	gtk_window_set_title(GTK_WINDOW(toplevel), buf);
     }
-    gtk_window_set_default_size(GTK_WINDOW(toplevel), 300, 500);
+    gtk_window_set_default_size(GTK_WINDOW(toplevel),
+    	prefs.win_width, prefs.win_height);
     gtk_signal_connect(GTK_OBJECT(toplevel), "destroy", 
     	GTK_SIGNAL_FUNC(file_exit_cb), NULL);
+    gtk_signal_connect(GTK_OBJECT(toplevel), "configure_event", 
+    	GTK_SIGNAL_FUNC(toplevel_resize_cb), NULL);
     gtk_container_border_width(GTK_CONTAINER(toplevel), 0);
     gtk_widget_show(GTK_WIDGET(toplevel));
 
@@ -1160,7 +1194,7 @@ main(int argc, char **argv)
     textdomain(PACKAGE);
     
     gtk_init(&argc, &argv);    
-    preferences_init();
+    preferences_load();
     parse_args(argc, argv);
     ui_create();
     if (targets != 0)
