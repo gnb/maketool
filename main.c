@@ -28,7 +28,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.26 1999-06-06 17:43:00 gnb Exp $");
+CVSID("$Id: main.c,v 1.27 1999-06-09 07:56:26 gnb Exp $");
 
 typedef enum
 {
@@ -803,7 +803,7 @@ ui_init_anim_pixmaps(void)
 static void
 ui_create(void)
 {
-    GtkWidget *mainvbox, *vbox; /* need 2 for correct spacing */
+    GtkWidget *table;
     GtkWidget *menubar, *logwin;
     GtkTooltips *tooltips;
     GtkWidget *sw;
@@ -817,7 +817,7 @@ ui_create(void)
     	sprintf(buf, _("Maketool %s"), VERSION);
 	gtk_window_set_title(GTK_WINDOW(toplevel), buf);
     }
-    gtk_widget_set_usize(toplevel, 300, 500);
+    gtk_window_set_default_size(GTK_WINDOW(toplevel), 300, 500);
     gtk_signal_connect(GTK_OBJECT(toplevel), "destroy", 
     	GTK_SIGNAL_FUNC(file_exit_cb), NULL);
     gtk_container_border_width(GTK_CONTAINER(toplevel), 0);
@@ -832,22 +832,23 @@ ui_create(void)
         
     tooltips = gtk_tooltips_new();
 
-    mainvbox = gtk_vbox_new(FALSE, 0);
-    gtk_container_add(GTK_CONTAINER(toplevel), mainvbox);
-    gtk_container_border_width(GTK_CONTAINER(mainvbox), 0);
-
+    table = gtk_table_new(4, 1, FALSE);
+    gtk_container_add(GTK_CONTAINER(toplevel), table);
+    gtk_container_border_width(GTK_CONTAINER(table), 0);
+    gtk_table_set_row_spacings(GTK_TABLE(table), SPACING);
+    
     menubar = gtk_menu_bar_new();
-    gtk_box_pack_start(GTK_BOX(mainvbox), menubar, FALSE, FALSE, 0);
+    gtk_table_attach(GTK_TABLE(table), menubar, 0, 1, 0, 1,
+    	GTK_FILL|GTK_EXPAND|GTK_SHRINK, 0,
+	0, 0);
     ui_create_menus(menubar);
     gtk_widget_show(GTK_WIDGET(menubar));
         
-    vbox = gtk_vbox_new(FALSE, SPACING);
-    gtk_box_pack_start(GTK_BOX(mainvbox), vbox, TRUE, TRUE, 0);
-    gtk_container_border_width(GTK_CONTAINER(vbox), SPACING);
-
     toolbar = gtk_toolbar_new(GTK_ORIENTATION_HORIZONTAL, GTK_TOOLBAR_BOTH);
     gtk_toolbar_set_button_relief(GTK_TOOLBAR(toolbar), GTK_RELIEF_NONE);
-    gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
+    gtk_table_attach(GTK_TABLE(table), toolbar, 0, 1, 1, 2,
+    	GTK_FILL|GTK_EXPAND|GTK_SHRINK, 0,
+	SPACING, 0);
     gtk_widget_show(GTK_WIDGET(toolbar));
     ui_create_tools(toolbar);
     
@@ -855,7 +856,9 @@ ui_create(void)
     gtk_container_border_width(GTK_CONTAINER(sw), 0);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
     	GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(GTK_BOX(vbox), sw, TRUE, TRUE, 0);
+    gtk_table_attach(GTK_TABLE(table), sw, 0, 1, 2, 3,
+    	GTK_FILL|GTK_EXPAND|GTK_SHRINK, GTK_FILL|GTK_EXPAND|GTK_SHRINK,
+	SPACING, 0);
     gtk_widget_show(GTK_WIDGET(sw));
 
     logwin = gtk_ctree_new_with_titles(1, 0, titles);
@@ -883,7 +886,9 @@ ui_create(void)
     log_init(logwin);
     
     messagebox = gtk_hbox_new(FALSE, SPACING);
-    gtk_box_pack_start(GTK_BOX(vbox), messagebox, FALSE, FALSE, 0);
+    gtk_table_attach(GTK_TABLE(table), messagebox, 0, 1, 3, 4,
+    	GTK_FILL|GTK_EXPAND|GTK_SHRINK, 0,
+	SPACING, 0);
     gtk_container_border_width(GTK_CONTAINER(messagebox), 0);
     gtk_widget_show(GTK_WIDGET(messagebox));
     
@@ -902,8 +907,8 @@ ui_create(void)
     grey_menu_items();
     list_targets();
 
-    gtk_widget_show(GTK_WIDGET(mainvbox));
-    gtk_widget_show(GTK_WIDGET(vbox));
+    gtk_widget_show(GTK_WIDGET(table));
+    
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

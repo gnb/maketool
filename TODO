@@ -7,7 +7,7 @@ x  When user presses `Edit Next' the new selected error
    
 x  Show a different icon on error lines which have been edited.
 
-x  Have to be able to resize the window down vertically.
+x  DONE: Have to be able to resize the window down vertically.
 
 x  Implement printing and Print Settings window.
 
