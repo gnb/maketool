@@ -21,7 +21,7 @@
 #define _config_h_ 1
 
 /*
- * $Id: config.h.in,v 1.16 2003-02-09 04:53:33 gnb Exp $
+ * $Id: config.h.in,v 1.17 2003-05-04 04:10:41 gnb Exp $
  */
 
 /*
@@ -84,6 +84,11 @@
  */
 #define HAVE_MAKESYS_IRIX 0
 
+/*
+ * Support for the Sun make program.
+ */
+#define HAVE_SUN_MAKE 0
+ 
 /*
  * Whether to include the new and immature online-help feature.
  * This is a temporary **HACK** until the help system stabilises.

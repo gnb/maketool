@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
-dnl $Id: configure.in,v 1.40 2003-02-09 04:55:53 gnb Exp $
+dnl $Id: configure.in,v 1.41 2003-05-04 04:10:40 gnb Exp $
 dnl
 
 AC_INIT(main.c)
@@ -159,6 +159,8 @@ OS_MAKESYS_SOURCE=
 
 case "$host_os" in
 solaris*)
+    OS_MAKEPROG_SOURCE="sunmake.c"
+    AC_DEFINE(HAVE_SUN_MAKE)
     AC_DEFINE(ENABLE_FILTER_SUN)
     ;;
 hpux*)
