@@ -1,5 +1,12 @@
 --- open ---
 
+x  Force the licence window text widget, the preferences/programs
+   pane key label, and (optionally?) the main log window, to be
+   fixed width fonts.
+   
+x  Expand TABs in log correctly; with modern fonts the leading TAB
+   characters that pmake emits are shown as silly empty rectangles.
+
 x  Handle autoheader.
 
 x  The Indent Directories option relies on filtering gmake output
