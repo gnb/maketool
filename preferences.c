@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.55 2003-04-28 11:47:31 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.56 2003-05-04 04:26:05 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -34,6 +34,7 @@ static GtkWidget	*fail_check;
 static GtkWidget	*emm_check;
 static GtkWidget	*soo_check;
 static GtkWidget	*run_radio[3];
+static GtkWidget	*makeprog_combo;
 static GtkWidget	*prog_make_entry;
 static GtkWidget	*prog_targets_entry;
 static GtkWidget	*prog_version_entry;
@@ -324,23 +325,64 @@ preferences_load(void)
     prefs_set_var_environment();
     prefs_set_var_make_flags();
     
-    prefs.prog_make = ui_config_get_string("prog_make", GMAKE " %n %m %k %p %v %t");
+    prefs.makeprog = ui_config_get_string("makeprog", 0);
+    /* Detect and handle upgrade 0.7 -> 0.8 */
+    if (prefs.makeprog == 0)
+    {
+    	prefs.upgraded = TRUE;
+    	prefs.makeprog = g_strdup("gmake");
+    }
+    
+    prefs.prog_make = ui_config_get_string("prog_make", 0);
+    /* Detect and handle upgrade 0.7 -> 0.8 */
+    if (prefs.prog_make != 0 &&
+    	strstr(prefs.prog_make, "gmake") != 0)
+    {
+    	prefs.upgraded = TRUE;
+    	g_free(prefs.prog_make);
+	prefs.prog_make = 0;
+    }
+    if (prefs.prog_make == 0)
+    	prefs.prog_make = g_strdup("%M %n %m %k %p %v %t");
 
     prefs.prog_list_targets = ui_config_get_string("prog_list_targets", 0);
     /* Detect and handle upgrade 0.7 -> 0.8 */
     if (prefs.prog_list_targets != 0 &&
-    	strstr(prefs.prog_list_targets, "extract_targets") != 0)
+    	strstr(prefs.prog_list_targets, "gmake") != 0)
     {
     	prefs.upgraded = TRUE;
     	g_free(prefs.prog_list_targets);
 	prefs.prog_list_targets = 0;
     }
     if (prefs.prog_list_targets == 0)
-    	prefs.prog_list_targets = g_strdup(GMAKE " %m %v %q %t");
+    	prefs.prog_list_targets = g_strdup("%M %m %v %q %t");
 
-    prefs.prog_list_version = ui_config_get_string("prog_list_version", GMAKE " --version");
+    prefs.prog_list_version = ui_config_get_string("prog_list_version", 0);
+    /* Detect and handle upgrade 0.7 -> 0.8 */
+    if (prefs.prog_list_version != 0 &&
+    	strstr(prefs.prog_list_version, "gmake") != 0)
+    {
+    	prefs.upgraded = TRUE;
+    	g_free(prefs.prog_list_version);
+	prefs.prog_list_version = 0;
+    }
+    if (prefs.prog_list_version == 0)
+    	prefs.prog_list_version = g_strdup("%M %V");
+
     prefs.prog_edit_source = ui_config_get_string("prog_edit_source", "nc -noask %{l:+-line %l} %f");
-    prefs.prog_make_makefile = ui_config_get_string("prog_make_makefile2", GMAKE " %n %v -f %D/%S.mk %t");
+
+    prefs.prog_make_makefile = ui_config_get_string("prog_make_makefile2", 0);
+    /* Detect and handle upgrade 0.7 -> 0.8 */
+    if (prefs.prog_make_makefile != 0 &&
+    	strstr(prefs.prog_make_makefile, "gmake") != 0)
+    {
+    	prefs.upgraded = TRUE;
+    	g_free(prefs.prog_make_makefile);
+	prefs.prog_make_makefile = 0;
+    }
+    if (prefs.prog_make_makefile == 0)
+    	prefs.prog_make_makefile = g_strdup("%M %n %v -f %D/%S.mk %t");
+
     prefs.prog_finish = ui_config_get_string("prog_finish", "");
 
     prefs.win_width = ui_config_get_int("win_width", 300);
@@ -385,7 +427,10 @@ preferences_load(void)
     }
     
     if (prefs.upgraded)
+    {
+    	ui_config_backup();
     	preferences_save();
+    }
 }
 
 void
@@ -394,7 +439,7 @@ preferences_save(void)
     int i;
     GList *list;
     
-    ui_config_set_string("maketool_version", VERSION);
+    ui_config_set_string("maketoolrc_version", "0.8");
 
     ui_config_set_enum("run_how", prefs.run_how, run_how_enum_def);
     ui_config_set_int("run_processes", prefs.run_processes);
@@ -414,6 +459,7 @@ preferences_save(void)
     
     /* TODO: save variables */
     
+    ui_config_set_string("makeprog", prefs.makeprog);
     ui_config_set_string("prog_make", prefs.prog_make);
     ui_config_set_string("prog_list_targets", prefs.prog_list_targets);
     ui_config_set_string("prog_list_version", prefs.prog_list_version);
@@ -485,6 +531,7 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     char *text[VC_MAX];
     int row, nrows, i;
     gboolean colors_changed;
+    gboolean makeprog_changed;
     
 #if DEBUG
     fprintf(stderr, "prefs_apply_cb()\n");
@@ -511,6 +558,15 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     prefs.keep_going = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fail_check));
     prefs.enable_make_makefile = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(emm_check));
     prefs.scroll_on_output = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(soo_check));
+
+    makeprog_changed = FALSE;
+    i = ui_combo_get_current(makeprog_combo);
+    if (strcmp(makeprograms[i]->name, prefs.makeprog))
+    {
+    	makeprog_changed = TRUE;
+	g_free(prefs.makeprog);
+	prefs.makeprog = g_strdup(makeprograms[i]->name);
+    }
 
     g_free(prefs.prog_make);
     prefs.prog_make = g_strdup(gtk_entry_get_text(GTK_ENTRY(prog_make_entry)));
@@ -567,6 +623,9 @@ prefs_apply_cb(GtkWidget *w, gpointer data)
     }
     if (colors_changed)
     	log_colors_changed();
+
+    if (makeprog_changed)
+    	set_makeprog(prefs.makeprog);
       
     preferences_save();
 }
@@ -1139,17 +1198,15 @@ prefs_create_variables_page(GtkWidget *toplevel)
 
 static const char programs_key[] = N_("\
 Key\n\
-%f              source filename\n\
-%l              source line number\n\
-%m              -f makefile if specified\n\
-%n              dryrun flag (-n) if specified\n\
-%p              parallel flags (-j or -l)\n\
-%k              continue flag (-k) if specified\n\
-%v              make variable overrides\n\
-%t              make target\n\
-%{x:+y}         y if %x is not empty\n\
-%D              maketool data directory\n\
-%S              makesystem name\n\
+%f       source filename            %{x:+y}  y if %x is not empty\n\
+%k       keep going flag (-k)       %D       maketool data directory\n\
+%l       source line number         %M       make program\n\
+%m       -f makefile                %S       makesystem name\n\
+%n       dryrun flag (-n)           %V       list version flags\n\
+%p       parallel flags (-j or -l)\n\
+%q       list targets flags\n\
+%t       target\n\
+%v       variable overrides\n\
 ");
 
 
@@ -1163,6 +1220,8 @@ prefs_create_programs_page(GtkWidget *toplevel)
     GtkWidget *combo;
     GList *list;
     int row = 0;
+    int i;
+    int curr;
     
     table = gtk_table_new(6, 2, FALSE);
     gtk_container_border_width(GTK_CONTAINER(table), SPACING);
@@ -1173,7 +1232,36 @@ prefs_create_programs_page(GtkWidget *toplevel)
     /*
      * Make program
      */
-    label = gtk_label_new(_("Make:"));
+    label = gtk_label_new(_("Make Program:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
+    gtk_widget_show(label);
+    
+    combo = gtk_combo_new();
+    list = 0;
+    curr = 0;
+    for (i = 0 ; makeprograms[i] ; i++)
+    {
+    	list = g_list_append(list, (char *)makeprograms[i]->label);
+	if (makeprog == makeprograms[i])
+	    curr = i;
+    }
+    gtk_combo_set_popdown_strings(GTK_COMBO(combo), list);
+    entry = GTK_COMBO(combo)->entry;
+    gtk_signal_connect(GTK_OBJECT(entry), "changed", 
+    	GTK_SIGNAL_FUNC(changed_cb), 0);
+    gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 2, row, row+1);
+    ui_combo_set_current(GTK_COMBO(combo), curr);
+    gtk_widget_show(combo);
+    makeprog_combo = combo;
+    
+    row++;
+    
+    /*
+     * Build a target
+     */
+    label = gtk_label_new(_("Make a target:"));
     gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row+1);
