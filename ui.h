@@ -82,6 +82,7 @@ GtkWidget *ui_add_toggle(
     GtkWidget *radio_other,
     gboolean set);
 GtkWidget *ui_add_separator(GtkWidget *menu);
+void ui_delete_menu_items(GtkWidget *menu);
 
 /* dialog stuff */
 

@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.18 2000-04-16 09:46:57 gnb Exp $");
+CVSID("$Id: ui.c,v 1.19 2000-07-11 05:48:25 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -64,6 +64,15 @@ ui_clist_set_strings(GtkWidget *w, int row, int ncols, char *text[])
 
 static GPtrArray *ui_groups = 0;
 
+static void
+ui_group_destroy_cb(GtkWidget *w, gpointer user_data)
+{
+    gint group = (gint)user_data;
+    
+    g_ptr_array_index(ui_groups, group) = 
+    	g_list_remove(g_ptr_array_index(ui_groups, group), w);
+}
+
 void
 ui_group_add(gint group, GtkWidget *w)
 {
@@ -75,6 +84,9 @@ ui_group_add(gint group, GtkWidget *w)
 	
     g_ptr_array_index(ui_groups, group) = 
     	g_list_prepend(g_ptr_array_index(ui_groups, group), w);
+	
+    gtk_signal_connect(GTK_OBJECT(w), "destroy", ui_group_destroy_cb,
+	    (gpointer)group);
 }
 
 void
@@ -374,6 +386,27 @@ ui_add_separator(GtkWidget *menu)
     gtk_menu_append(GTK_MENU(menu), item);
     gtk_widget_show(item);
     return item;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+void
+ui_delete_menu_items(GtkWidget *menu)
+{
+    GList *list, *next;
+    
+    for (list = gtk_container_children(GTK_CONTAINER(menu)) ;
+    	 list != 0 ;
+	 list = next)
+    {
+    	GtkWidget *child = (GtkWidget *)list->data;
+	next = list->next;
+
+    	if (GTK_IS_TEAROFF_MENU_ITEM(child))
+	    continue;
+	    
+	gtk_widget_destroy(child);	
+    }
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

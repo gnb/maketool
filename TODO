@@ -11,7 +11,7 @@ x  DONE: Have to be able to resize the window down vertically.
 
 x  IN PROGRESS: Implement printing and Print Settings window.
 
-x  IN PROGRESS: Implement File->Change Directory  command.
+x  DONE: Implement File->Change Directory  command.
 
 x  DONE: Add icon for non-GNOME w/ms.
 

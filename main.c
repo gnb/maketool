@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.54 2000-04-16 11:00:24 gnb Exp $");
+CVSID("$Id: main.c,v 1.55 2000-07-11 05:48:25 gnb Exp $");
 
 typedef enum
 {
@@ -45,6 +45,7 @@ typedef enum
     GR_ALL,
     GR_CLEAN,
     GR_FIND_AGAIN,
+    GR_NEVER,	    	/* never active */
 
     NUM_SETS
 } Groups;
@@ -84,6 +85,10 @@ GdkAtom     	clipboard_atom = GDK_NONE;
 char  	    	*clipboard_text = 0;
 GtkWidget   	*clipboard_widget;
 
+GtkWidget   	*dir_previous_menu;
+#define MAX_DIR_HISTORY 16
+GList	    	*dir_history;	    	/* of strings */
+
 /*
  * These are the targets specifically mentioned in the
  * current GNU makefile standards (except `mostlyclean'
@@ -106,6 +111,9 @@ static const char *standard_targets[] = {
 static void build_cb(GtkWidget *w, gpointer data);
 static void handle_input(int len, const char *buf);
 static void handle_line(const char *line);
+static void set_main_title(void);
+static void construct_build_menu_basic_items(void);
+static void dir_previous_cb(GtkWidget *w, gpointer data);
 
 #define g_list_find_str(l, s) \
 	g_list_find_custom((l), (s), (GCompareFunc)strcmp)
@@ -169,6 +177,7 @@ grey_menu_items(void)
     ui_group_set_sensitive(GR_ALL, all);
     ui_group_set_sensitive(GR_CLEAN, clean);
     ui_group_set_sensitive(GR_FIND_AGAIN, !empty && find_can_find_again());
+    ui_group_set_sensitive(GR_NEVER, FALSE);
 }
 
 char *
@@ -436,6 +445,17 @@ list_targets_reap(Task *task)
     char *t, *buf;
     GList *std = 0;
 
+    /*
+     * First, remove list of available targets from previous run
+     */
+    while (available_targets != 0)
+    {
+	g_free((char *)available_targets->data);
+	available_targets = g_list_remove_link(available_targets, available_targets);
+    }
+    ui_delete_menu_items(build_menu);
+    construct_build_menu_basic_items();
+     
     /* 
      * Parse the output of the program into whitespace-separated
      * strings which are targets. Build two lists, std (all
@@ -835,6 +855,141 @@ file_save_cb(GtkWidget *w, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+#if 0
+static void
+dump_dir_history(const char *str)
+{
+    GList *list;
+    
+    fprintf(stderr, "%s dir_history = {\n", str);
+    for (list = dir_history ; list != 0 ; list = list->next)
+	fprintf(stderr, "   %s\n", (char*)list->data);
+    fprintf(stderr, "}\n");
+}
+#endif
+
+
+static void
+construct_dir_previous_menu(void)
+{
+    GList *list;
+    int i;
+    char accelbuf[32];
+    
+    /* first delete previously existing items */
+    ui_delete_menu_items(dir_previous_menu);
+
+    /* now construct a new menu */    
+    for (list = dir_history, i = 0 ; list != 0 ; list = list->next, i++)
+    {
+    	char *dir = (char *)list->data;
+	
+	if (i < 9)
+	    g_snprintf(accelbuf, sizeof(accelbuf), "<Ctrl>%c", (i+'1'));
+	ui_add_button_2(dir_previous_menu, dir, FALSE, (i<9 ? accelbuf : 0),
+	    	dir_previous_cb, dir, GR_NOTRUNNING);
+    }
+    
+    if (dir_history == 0)
+	ui_add_button(dir_previous_menu, _("No previous directories"), 0, 0, 0, GR_NEVER);
+}
+
+
+static gboolean
+change_directory(const char *dir)
+{
+    char *olddir;
+    
+    olddir = g_get_current_dir();
+#if DEBUG > 5
+    fprintf(stderr, "Changing dir from %s to: %s\n", olddir, dir);
+#endif
+    
+    if (chdir(dir) < 0)
+    {
+    	g_free(olddir);
+    	return FALSE;
+    }
+
+    /*
+     * Update directory history
+     */
+    if (g_list_find_str(dir_history, olddir) != 0)
+    {
+    	/* already in list */
+	g_free(olddir);
+    }
+    else
+    {
+	/* not already in history list, prepend it */
+	dir_history = g_list_prepend(dir_history, olddir);
+
+	/* trim list to fit */
+	while (g_list_length(dir_history) > MAX_DIR_HISTORY)
+	{
+	    GList *last = g_list_last(dir_history);
+	    g_free((char *)last->data);
+	    dir_history = g_list_remove_link(dir_history, last);
+	}
+
+    	/* update Previous Directory menu */
+	if (dir_previous_menu != 0)
+    	    construct_dir_previous_menu();
+    }
+	
+	
+    /* update UI for new dir */
+    
+    if (toplevel != 0)
+	set_main_title();
+	
+    if (build_menu != 0)
+    	list_targets();
+    
+    return TRUE;
+}
+
+static void
+dir_previous_cb(GtkWidget *w, gpointer data)
+{
+    change_directory((char*)data);
+}
+
+static void
+file_change_dir_func(const char *filename)
+{
+    change_directory(filename);
+}
+
+static void
+file_change_dir_cb(GtkWidget *w, gpointer data)
+{
+    static GtkWidget *filesel = 0;
+    char *currdir, *fakefile;
+    
+    if (filesel == 0)
+    	filesel = ui_create_file_sel(
+	    toplevel,
+	    _("Maketool: Change Directory"),
+	    file_change_dir_func,
+	    ".");
+	    
+    /*
+     * Tel the filesel window the current directory.
+     * Filesel window needs the trailing / so it doesn't
+     * try to interpret the dirname as a filename.
+     */
+    currdir = g_get_current_dir();
+    fakefile = g_strdup_printf("%s/", currdir);
+    gtk_file_selection_set_filename(GTK_FILE_SELECTION(filesel), fakefile);
+    g_free(currdir);
+    g_free(fakefile);
+    
+    gtk_widget_show(filesel);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 static void
 build_again_cb(GtkWidget *w, gpointer data)
 {
@@ -1029,6 +1184,17 @@ unimplemented(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
+construct_build_menu_basic_items(void)
+{
+    again_menu_item = ui_add_button(build_menu, _("_Again"), "<Ctrl>A", build_again_cb, 0, GR_AGAIN);
+    ui_add_button(build_menu, _("_Stop"), 0, build_stop_cb, 0, GR_RUNNING);
+    ui_add_toggle(build_menu, _("_Dryrun Only"), "<Ctrl>D", build_dryrun_cb, 0,
+    	0, prefs.dryrun);
+    ui_add_separator(build_menu);
+}
+
+
+static void
 ui_create_menus(GtkWidget *menubar)
 {
     GtkWidget *menu;
@@ -1044,10 +1210,11 @@ ui_create_menus(GtkWidget *menubar)
     ui_add_button(menu, _("_Open Log..."), "<Ctrl>O", file_open_cb, 0, GR_NONE);
     ui_add_button(menu, _("_Save Log..."), "<Ctrl>S", file_save_cb, 0, GR_NOTEMPTY);
     ui_add_separator(menu);
-#if 0
-    ui_add_button(menu, _("_Change directory..."), 0, unimplemented, 0, GR_NOTRUNNING);
+    ui_add_button(menu, _("_Change Directory..."), 0, file_change_dir_cb, 0, GR_NOTRUNNING);
+    dir_previous_menu = ui_add_submenu(menu, TRUE, _("_Previous Directories"));
+    ui_add_tearoff(dir_previous_menu);
+    construct_dir_previous_menu();
     ui_add_separator(menu);
-#endif
     ui_add_button(menu, _("_Print..."), "<Ctrl>P", file_print_cb, 0, GR_NOTEMPTY);
     ui_add_separator(menu);
     ui_add_button(menu, _("E_xit"), "<Ctrl>X", file_exit_cb, 0, GR_NONE);
@@ -1065,14 +1232,9 @@ ui_create_menus(GtkWidget *menubar)
     ui_add_separator(menu);
     ui_add_button(menu, _("Pre_ferences..."), 0, edit_preferences_cb, 0, GR_NONE);
 
-    menu = ui_add_menu(menubar, _("_Build"));
-    build_menu = menu;
-    ui_add_tearoff(menu);
-    again_menu_item = ui_add_button(menu, _("_Again"), "<Ctrl>A", build_again_cb, 0, GR_AGAIN);
-    ui_add_button(menu, _("_Stop"), 0, build_stop_cb, 0, GR_RUNNING);
-    ui_add_toggle(menu, _("_Dryrun Only"), "<Ctrl>D", build_dryrun_cb, 0,
-    	0, prefs.dryrun);
-    ui_add_separator(menu);
+    build_menu = ui_add_menu(menubar, _("_Build"));
+    ui_add_tearoff(build_menu);
+    construct_build_menu_basic_items();
     
     menu = ui_add_menu(menubar, _("_View"));
     ui_add_tearoff(menu);
@@ -1466,13 +1628,12 @@ set_makefile(const char *mf)
 static void
 set_directory(const char *dir)
 {
-    if (chdir(dir) < 0)
+    if (!change_directory(dir))
     {
     	perror(dir);
     	exit(1);
     }
 }
-
 
 #ifdef ARGSTEST
 char *original_dir = 0;
