@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.27 2000-07-29 13:51:17 gnb Exp $
+# $Id: Makefile.in,v 1.28 2000-08-01 15:37:29 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -28,6 +28,7 @@ VERSION=	@VERSION@
 @USRDOC@DOCDIR=		$(prefix)/doc/$(PACKAGE)-$(VERSION)
 localedir=	$(prefix)/@DATADIRNAME@/locale
 libexecdir=	@libexecdir@/$(PACKAGE)
+helpdir=	$(prefix)/@DATADIRNAME@/$(PACKAGE)/help
 
 CC=		@CC@
 # WARNING: using gcc -ansi on Linux breaks maketool, which
@@ -37,6 +38,7 @@ CC=		@CC@
 CFLAGS=		@CFLAGS@
 CPPFLAGS=	@GTK_CFLAGS@ -D_USE_BSD -I. -Iicons -Iintl \
 		-DLOCALEDIR=\"$(localedir)\" -DLIBEXECDIR=\"$(libexecdir)\" \
+		-DHELPDIR=\"$(helpdir)\" \
 		@CPPFLAGS@ $(TESTCPPFLAGS)
 LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 O=		objs

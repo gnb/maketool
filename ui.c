@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.22 2000-07-29 15:18:14 gnb Exp $");
+CVSID("$Id: ui.c,v 1.23 2000-08-01 15:37:30 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -419,7 +419,8 @@ ui_tool_create(
     char **pixmap_xpm,
     GtkSignalFunc callback,
     gpointer user_data,
-    gint group)
+    gint group,
+    const char *helpname)
 {
     GdkPixmap *pm = 0;
     GdkBitmap *mask = 0;
@@ -438,6 +439,9 @@ ui_tool_create(
 	user_data);
     if (group >= 0)
     	ui_group_add(group, item);
+    if (helpname != 0)
+    	ui_set_help_name(item, helpname);
+
     return item;
 }
 
@@ -497,11 +501,12 @@ ui_create_ok_dialog(
     GtkWidget *parent,
     const char *title)
 {
-    GtkWidget *dialog;
+    GtkWidget *dialog, *btn;
     
     dialog = ui_create_dialog(parent, title);
     
-    ui_dialog_create_button(dialog, _("OK"), ui_dialog_ok_cb, (gpointer)dialog);
+    btn = ui_dialog_create_button(dialog, _("OK"), ui_dialog_ok_cb, (gpointer)dialog);
+    ui_set_help_name(btn, "ok");
     
     return dialog;
 }    
@@ -553,6 +558,7 @@ ui_create_apply_dialog(
     gpointer data)
 {
     ApplyDialog *ad;
+    GtkWidget *btn;
     
     ad = g_new(ApplyDialog, 1);
     ad->apply_cb = apply_cb;
@@ -565,9 +571,12 @@ ui_create_apply_dialog(
     
     ad->ok_btn = ui_dialog_create_button(ad->dialog, _("OK"), ui_apply_dialog_ok_cb, (gpointer)ad);
     gtk_widget_set_sensitive(ad->ok_btn, FALSE);
+    ui_set_help_name(ad->ok_btn, "ok");
     ad->apply_btn = ui_dialog_create_button(ad->dialog, _("Apply"), ui_apply_dialog_apply_cb, (gpointer)ad);
     gtk_widget_set_sensitive(ad->apply_btn, FALSE);
-    ui_dialog_create_button(ad->dialog, _("Cancel"), ui_apply_dialog_cancel_cb, (gpointer)ad);
+    ui_set_help_name(ad->apply_btn, "apply");
+    btn = ui_dialog_create_button(ad->dialog, _("Cancel"), ui_apply_dialog_cancel_cb, (gpointer)ad);
+    ui_set_help_name(btn, "cancel");
     
     return ad->dialog;
 }    
@@ -596,6 +605,29 @@ ui_autonull_pointer(GtkWidget **wpp)
 {
     gtk_signal_connect(GTK_OBJECT(*wpp), "destroy", 
     	GTK_SIGNAL_FUNC(ui_autonull_destroy_cb), (void*)wpp);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static const char _ui_help_key[] = "ui-help-key";
+
+void
+ui_set_help_name(GtkWidget *w, const char *str)
+{
+    gtk_object_set_data(GTK_OBJECT(w), _ui_help_key, (void*)str);
+}
+
+const char *
+ui_get_help_name(GtkWidget *w)
+{
+    while (w != 0)
+    {
+	const char *name = (const char *)gtk_object_get_data(GTK_OBJECT(w), _ui_help_key);
+	if (name != 0)
+	    return name;
+	w = w->parent;
+    }
+    return 0;
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

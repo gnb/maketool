@@ -1,0 +1,63 @@
+#
+# Maketool - GTK-based front end for gmake
+# Copyright (c) 1999-2000 Greg Banks
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# 
+# $Id: Makefile.in,v 1.1 2000-08-01 15:37:33 gnb Exp $
+#
+
+
+prefix=		@prefix@
+PACKAGE=	@PACKAGE@
+VERSION=	@VERSION@
+ALL_LINGUAS=	@ALL_LINGUAS@
+helpdir=	$(prefix)/@DATADIRNAME@/$(PACKAGE)/help
+INSTALL=	@INSTALL@
+
+INSTALLABLES=	$(foreach d,C $(ALL_LINGUAS),$(shell find $d -name '*.gif' -o -name '*.html'))
+INSTALLED=	$(addprefix $(helpdir)/,$(INSTALLABLES))
+
+###
+
+all::
+
+clean::
+		
+install:: $(INSTALLED)
+
+$(helpdir)/%: %
+	test -d $(@D) || $(INSTALL) -d -m 755 $(@D)
+	$(INSTALL) -m 644 $< $@
+
+define _remove_one
+-$(RM) $f
+
+endef
+
+uninstall::
+	$(foreach f,$(INSTALLED),$(_remove_one))
+		
+###
+
+# Making a distribution
+distdir=	../../$(PACKAGE)-$(VERSION)/doc/help
+DISTFILES=	Makefile.in $(INSTALLABLES)
+
+dist:
+	for file in $(DISTFILES); do \
+	  ln $$file $(distdir) 2>/dev/null || cp -p $$file $(distdir) 2>/dev/null; \
+	done
+	

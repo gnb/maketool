@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.64 2000-07-31 02:17:11 gnb Exp $");
+CVSID("$Id: main.c,v 1.65 2000-08-01 15:37:30 gnb Exp $");
 
 
 /*
@@ -100,6 +100,9 @@ static void dir_previous_cb(GtkWidget *w, gpointer data);
  * the build menu should be split up into multiple submenus.
  */
 #define BUILD_MENU_THRESHOLD	20
+
+#define HOMEPAGE    "http://www.alphalink.com.au/~gnb/maketool/"
+
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -1355,14 +1358,12 @@ ui_create_menus(GtkWidget *menubar)
     ui_add_tearoff(menu);
     ui_add_button(menu, _("_About Maketool..."), 0, help_about_cb, 0, GR_NONE);
     ui_add_button(menu, _("About _make..."), 0, help_about_make_cb, 0, GR_NONE);
-#if 0
     ui_add_separator(menu);
-    ui_add_button(menu, _("_Help on..."), 0, unimplemented, 0, GR_NONE);
+    ui_add_button(menu, _("_Help on..."), "F1", help_on_cb, 0, GR_NONE);
     ui_add_separator(menu);
-    ui_add_button(menu, _("_Tutorial"), 0, unimplemented, 0, GR_NONE);
-    ui_add_button(menu, _("_Reference Index"), 0, unimplemented, 0, GR_NONE);
-    ui_add_button(menu, _("_Home Page"), 0, unimplemented, 0, GR_NONE);
-#endif
+    ui_add_button(menu, _("_Tutorial..."), 0, help_goto_helpname_cb, "tutorial", GR_NONE);
+    ui_add_button(menu, _("Index..."), 0, help_goto_helpname_cb, "index", GR_NONE);
+    ui_add_button(menu, _("_Home Page..."), 0, help_goto_url_cb, HOMEPAGE, GR_NONE);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -1382,36 +1383,38 @@ ui_create_tools(GtkWidget *toolbar)
     char *tooltip;
     
     again_tool_item = ui_tool_create(toolbar, _("Again"), _("Build last target again"),
-    	again_xpm, build_again_cb, 0, GR_AGAIN);
+    	again_xpm, build_again_cb, 0, GR_AGAIN, "tools-again");
 
     ui_tool_create(toolbar, _("Stop"), _("Stop current build"),
-    	stop_xpm, build_stop_cb, 0, GR_RUNNING);
+    	stop_xpm, build_stop_cb, 0, GR_RUNNING, "tools-stop");
     
     ui_tool_add_space(toolbar);
 
     tooltip = g_strdup_printf(_("Build `%s'"), "all");
     ui_tool_create(toolbar, "all", tooltip,
-    	all_xpm, build_cb, "all", GR_ALL);
+    	all_xpm, build_cb, "all", GR_ALL, "tools-all");
     g_free(tooltip);
     
     tooltip = g_strdup_printf(_("Build `%s'"), "clean");
     ui_tool_create(toolbar, "clean", tooltip,
-    	clean_xpm, build_cb, "clean", GR_CLEAN);
+    	clean_xpm, build_cb, "clean", GR_CLEAN, "tools-clean");
     g_free(tooltip);
     
     ui_tool_add_space(toolbar);
     
     ui_tool_create(toolbar, _("Clear"), _("Clear log"),
-    	clear_xpm, view_clear_cb, 0, GR_CLEAR_LOG);
+    	clear_xpm, view_clear_cb, 0, GR_CLEAR_LOG, "tools-clear-log");
     ui_tool_create(toolbar, _("Next"), _("Edit next error or warning"),
-    	next_xpm, edit_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
+    	next_xpm, edit_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY,
+	"tools-edit-next");
     ui_tool_create(toolbar, _("File Next"), _("Edit first error or warning in next file"),
-    	file_next_xpm, edit_file_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY);
+    	file_next_xpm, edit_file_next_error_cb, GINT_TO_POINTER(TRUE), GR_NOTEMPTY,
+	"tools-edit-file-next");
     
     ui_tool_add_space(toolbar);
     
     ui_tool_create(toolbar, _("Print"), _("Print log"),
-    	print_xpm, file_print_cb, 0, GR_NOTEMPTY);
+    	print_xpm, file_print_cb, 0, GR_NOTEMPTY, "tools-print");
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -1574,6 +1577,7 @@ ui_create(void)
     gtk_signal_connect(GTK_OBJECT(toplevel), "configure_event", 
     	GTK_SIGNAL_FUNC(toplevel_resize_cb), NULL);
     gtk_container_border_width(GTK_CONTAINER(toplevel), 0);
+    ui_set_help_name(toplevel, "index");
     gtk_widget_show(GTK_WIDGET(toplevel));
 
     /* gtk_widget_realize(toplevel); */

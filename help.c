@@ -21,8 +21,9 @@
 #include "task.h"
 #include "ui.h"
 #include "util.h"
+#include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.23 2000-07-29 16:20:07 gnb Exp $");
+CVSID("$Id: help.c,v 1.24 2000-08-01 15:37:29 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -220,6 +221,210 @@ help_about_make_cb(GtkWidget *w, gpointer data)
     	gtk_widget_show(about_make_shell);
     }
     
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static TaskOps help_browser_ops =
+{
+0,  	    	    	    	/* start */
+0,  	    		    	/* input */
+0,  	    	 	    	/* reap */
+0   	    		    	/* destroy */
+};
+
+/*
+ * Possible browser commands are (where %u is the url):
+ * gnome-help-browser '%u'
+ * gnome-moz-remote --newwin '%u'
+ * netscape -remote 'openURL(%u)'
+ * xterm -e lynx '%u'
+ * ?? konqueror '%u'
+ * ?? opera %u
+ */
+
+static Task *
+help_browser_task(const char *url)
+{
+    char *command;
+    
+    /* TODO: expand from prefs */
+    command = g_strdup_printf("gnome-help-browser %s", url);
+    
+    fprintf(stderr, "help_browser_task: command = \"%s\"\n", command);
+    
+    return task_create(
+    	(Task *)g_new(Task, 1),
+	/*expand_prog(prefs.prog_list_version, 0, 0, 0),*/
+	command,
+	/*environment*/0,
+	&help_browser_ops);
+}
+
+static void
+help_goto_url(const char *url)
+{
+    task_spawn(help_browser_task(url));
+}
+
+static char *
+help_find_help_file(const char *name)
+{
+    char *file = 0;
+    int i;
+    static const char *locales[4];
+    static char locale_lang_buf[3];
+    
+    if (locales[0] == 0)
+    {
+    	/* initialise searchlist of locales */
+    	const char *loc;
+	
+    	loc = getenv("LC_MESSAGES");
+	if (loc == 0)
+    	    loc = getenv("LANG");
+
+    	i = 0;
+	if (loc != 0)
+	{
+	    locales[i++] = loc;
+	    if (strlen(loc) > 2)
+	    {
+		locale_lang_buf[0] = loc[0];
+		locale_lang_buf[1] = loc[1];
+		locale_lang_buf[2] = '\0';
+		locales[i++] = locale_lang_buf;
+	    }
+	}
+	if (loc == 0 || strcmp(loc, "C"))
+	    locales[i++] = "C";
+	locales[i] = 0;
+	assert(i < sizeof(locales)/sizeof(locales[0]));
+	
+#if 1
+    	fprintf(stderr, "help_find_help_file: search locales:");
+    	for (i=0 ; locales[i] != 0 ; i++)
+	    fprintf(stderr, " \"%s\"", locales[i]);
+    	fprintf(stderr, "\n");
+#endif	
+    }
+    
+    for (i=0 ; locales[i] != 0 ; i++)
+    {
+    	file = g_strconcat(HELPDIR "/", locales[i], "/", name, ".html", 0);
+#if 1
+	fprintf(stderr, "help_find_help_file: trying \"%s\"\n", file);
+#endif
+	if (file_exists(file))
+	    break;
+	g_free(file);
+	file = 0;
+    }
+    
+#if 1
+    fprintf(stderr, "help_find_help_file: found \"%s\"\n", file);
+#endif
+    return file;
+}
+
+
+static void
+help_goto_helpname(const char *name)
+{
+    char *file, *url;
+    
+    if ((file = help_find_help_file(name)) == 0)
+    	return;
+	
+    url = g_strconcat("file:", file, 0);
+    help_goto_url(url);
+    g_free(file);
+    g_free(url);
+}
+
+void
+help_goto_helpname_cb(GtkWidget *w, gpointer data)
+{
+    help_goto_helpname((const char *)data);
+}
+
+void
+help_goto_url_cb(GtkWidget *w, gpointer data)
+{
+    help_goto_url((const char *)data);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+#include "help_cursor.xbm"
+#include "help_cursor_mask.xbm"
+
+void
+help_on_cb(GtkWidget *w, void *user_data)
+{
+    GdkEvent *event;
+    const char *name;
+    static GdkCursor *help_cursor = 0;
+    
+    if (help_cursor == 0)
+    {
+    	GdkBitmap *source, *mask;
+	GdkColor fg, bg;
+	
+	source = gdk_bitmap_create_from_data(
+	    toplevel->window,
+	    help_cursor_bits,
+	    help_cursor_width,
+	    help_cursor_height);
+	mask = gdk_bitmap_create_from_data(
+	    toplevel->window,
+	    help_cursor_mask_bits,
+	    help_cursor_width,
+	    help_cursor_height);
+	fg.red = 0; fg.green = 0; fg.blue = 0; /* black */
+	bg.red = 0xffff; bg.green = 0xffff; bg.blue = 0xffff; /* white */
+    	help_cursor = gdk_cursor_new_from_pixmap(
+	    source, mask,
+	    &fg, &bg,
+	    help_cursor_hot_x, help_cursor_hot_y);
+	/* TODO: free source, mask */
+    }
+
+    /*
+     * TODO: create a little toy window, pass it in as the 1st argument
+     * to gdk_pointer_grab(), add an event handler to it, and use the
+     * normal gtk main loop to wait for a button press event on it.
+     */
+    gdk_pointer_grab(toplevel->window,
+    	/*owner_events*/TRUE,
+	GDK_BUTTON_PRESS_MASK/*|GDK_BUTTON_RELEASE_MASK|GDK_POINTER_MOTION_MASK*/,
+	/*confine_to*/0,
+	help_cursor,
+	GDK_CURRENT_TIME);
+
+    fprintf(stderr, "help_on_cb: about to get events\n");
+    for (;;)
+    {
+	if ((event = gdk_event_get()) == 0)
+	{
+	    sleep(1);
+	    continue;
+	}
+	fprintf(stderr, "help_on_cb: event->type = %d\n", event->type);
+	
+	if (event->type == GDK_BUTTON_PRESS)
+	{
+	    fprintf(stderr, "help_on_cb: Trying to find help...\n");
+	    if ((w = gtk_get_event_widget(event)) != 0 &&
+	    	(name = ui_get_help_name(w)) != 0)
+		help_goto_helpname(name);
+	    break;
+	}
+	/* TODO: do we need to free the event?? */
+    }
+    fprintf(stderr, "help_on_cb: finished getting events\n");
+    
+    gdk_pointer_ungrab(GDK_CURRENT_TIME);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

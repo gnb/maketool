@@ -1,5 +1,18 @@
 --- open ---
 
+x  Help: make the browser command configuruable in preferences.
+
+x  Help: organise smart way to have consistent style etc between
+   the many HTML files which comprise the help.
+   
+x  Help: organise smart way to generate index at least semi-automatically.
+
+x  Help: figure out a way to hook up help to menu items
+
+x  Help: reimplement the Help On... loop sensibly
+
+x  Help: write lots of it!!
+
 x  Show a different icon on error lines which have been edited.
 
 x  IN PROGRESS: Implement printing and Print Settings window.

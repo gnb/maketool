@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.40 2000-07-31 02:17:11 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.41 2000-08-01 15:37:30 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -575,6 +575,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     
     table = gtk_table_new(6, 3, FALSE);
     gtk_container_border_width(GTK_CONTAINER(table), SPACING);
+    ui_set_help_name(table, "prefs-general-page");
     gtk_widget_show(table);
 
     
@@ -595,6 +596,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(run_radio[RUN_SERIES]), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table2), run_radio[RUN_SERIES], 0, 2, 0, 1);
+    ui_set_help_name(run_radio[RUN_SERIES], "prefs-run-series");
     gtk_widget_show(run_radio[RUN_SERIES]);
     
 
@@ -604,6 +606,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(run_radio[RUN_PARALLEL_PROC]), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table2), run_radio[RUN_PARALLEL_PROC], 0, 1, 1, 2);
+    ui_set_help_name(run_radio[RUN_PARALLEL_PROC], "prefs-run-proc");
     gtk_widget_show(run_radio[RUN_PARALLEL_PROC]);
 
     adj = gtk_adjustment_new(
@@ -627,6 +630,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(run_radio[RUN_PARALLEL_LOAD]), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table2), run_radio[RUN_PARALLEL_LOAD], 0, 1, 2, 3);
+    ui_set_help_name(run_radio[RUN_PARALLEL_LOAD], "prefs-run-load");
     gtk_widget_show(run_radio[RUN_PARALLEL_LOAD]);
     
     adj = gtk_adjustment_new(
@@ -650,6 +654,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(edit1_check), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), edit1_check, 0, 3, row, row+1);
+    ui_set_help_name(edit1_check, "prefs-auto-edit");
     gtk_widget_show(edit1_check);
     row++;
     
@@ -661,6 +666,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), editw_check, 0, 3, row, row+1);
     gtk_widget_show(editw_check);
+    ui_set_help_name(editw_check, "prefs-edit-warnings");
     row++;
     
     /*
@@ -670,6 +676,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(fail_check), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), fail_check, 0, 3, row, row+1);
+    ui_set_help_name(fail_check, "prefs-kflag");
     gtk_widget_show(fail_check);
     row++;
 
@@ -681,6 +688,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), emm_check, 0, 3, row, row+1);
     gtk_widget_show(emm_check);
+    ui_set_help_name(emm_check, "prefs-enable-mmf");
     row++;
 
     /*
@@ -691,6 +699,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), soo_check, 0, 3, row, row+1);
     gtk_widget_show(soo_check);
+    ui_set_help_name(soo_check, "prefs-scroll-output");
     row++;
 
     /*
@@ -713,6 +722,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 3, row, row+1);
     gtk_widget_show(combo);
+    ui_set_help_name(combo, "prefs-start-action");
     start_action_combo = combo;
     row++;
 
@@ -742,6 +752,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 2, row, row+1);
     gtk_widget_show(combo);
+    ui_set_help_name(combo, "prefs-fflag");
     makefile_entry = GTK_COMBO(combo)->entry;
 
     button = gtk_button_new_with_label(_("Browse..."));
@@ -750,6 +761,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_table_attach(GTK_TABLE(table), button, 2, 3, row, row+1,
 		       (GtkAttachOptions)0, (GtkAttachOptions)0,
 		       SPACING, 0);
+    ui_set_help_name(button, "prefs-fflag");
     gtk_widget_show(button);
 
     row++;
@@ -887,6 +899,7 @@ prefs_create_variables_page(GtkWidget *toplevel)
 
     vbox = gtk_vbox_new(FALSE, SPACING);
     gtk_container_border_width(GTK_CONTAINER(vbox), SPACING);
+    ui_set_help_name(vbox, "prefs-variables-page");
     gtk_widget_show(vbox);
     
     hbox = gtk_hbox_new(FALSE, 0);
@@ -1035,6 +1048,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     table = gtk_table_new(6, 2, FALSE);
     gtk_container_border_width(GTK_CONTAINER(table), SPACING);
     gtk_table_set_row_spacings(GTK_TABLE(table), SPACING);
+    ui_set_help_name(table, "prefs-programs-page");
     gtk_widget_show(table);
     
     /*
@@ -1357,6 +1371,7 @@ prefs_create_colors_page(GtkWidget *toplevel)
     table = gtk_table_new(8, 3, FALSE);
     gtk_container_border_width(GTK_CONTAINER(table), SPACING);
     gtk_table_set_row_spacings(GTK_TABLE(table), SPACING);
+    ui_set_help_name(table, "prefs-colors-page");
     gtk_widget_show(table);
     
     color_labels[COL_BG_INFO] = _("Information Background:");
@@ -1496,6 +1511,7 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_box_pack_end(GTK_BOX(hbox), label, TRUE, TRUE, 0);
+    ui_set_help_name(hbox, "prefs-page=setup-page");
     gtk_widget_show(label);
     
     vbox = gtk_vbox_new(FALSE, SPACING);

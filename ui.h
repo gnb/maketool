@@ -48,7 +48,8 @@ GtkWidget *ui_tool_create(
     char **pixmap_xpm,
     GtkSignalFunc callback,
     gpointer user_data,
-    gint group);
+    gint group,
+    const char *helpname);
 void ui_tool_add_space(GtkWidget *toolbar);
 
 /* Menubar stuff */    
@@ -103,6 +104,9 @@ GtkWidget *ui_dialog_create_button(
     GtkSignalFunc callback,
     gpointer user_data);
 void ui_dialog_changed(GtkWidget *dialog);    
+
+void ui_set_help_name(GtkWidget *w, const char *str);
+const char *ui_get_help_name(GtkWidget *w);
   
 /*
  * Makes a widget-pointer magical in that it will be
