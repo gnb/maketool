@@ -170,12 +170,6 @@ x  Add ability to delete individual make runs from view window
 
 x  Add a feature to watch an existing log file as it grows.
 
-x  Add timestamp to log start line, either current time for normal builds
-   or file modification time for log files.
-   
-x  When a normal build is finished, calculate elapsed time and display
-   it in the log start line.
-   
 x  Fix bug where build start line, updated to reflect number of errors,
    is displayed at wrong horizontal position (as if it had lost an indent).
    This seems to be a GTK display bug.
@@ -288,6 +282,12 @@ x  When ./configure is run from make_makefile(), config.status is also
 
 --- closed ---
 
+x  Add timestamp to log start line, either current time for normal builds
+   or file modification time for log files.
+   
+x  When a normal build is finished, calculate elapsed time and display
+   it in the log start line.
+   
 x  GNOME integration: drag'n'drop. Dragging in directory changes to
    that directory. Dragging in file or string makes it if it's a known
    target.

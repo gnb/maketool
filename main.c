@@ -32,7 +32,7 @@
 #include "mqueue.h"
 #include "progress.h"
 
-CVSID("$Id: main.c,v 1.111 2004-11-07 02:33:37 gnb Exp $");
+CVSID("$Id: main.c,v 1.112 2004-11-07 05:36:08 gnb Exp $");
 
 
 /*
@@ -412,9 +412,16 @@ add_target_history(const char *target)
     GList *iter;
 
     /*
-     * `target' is assumed to be non-NULL and to point
-     * to a saved string in the available_targets list.
+     * `target' is assumed to be non-NULL.  It may or may not
+     * point to a saved string in the available_targets list,
+     * so we don't assume that and look it up there.
      */
+    if ((iter = g_list_find_str(available_targets, target)) == NULL)
+    {
+    	/* not an available target, e.g. from drag-n-drop: ignore it */
+	return;
+    }
+    target = (const char *)iter->data;
 
     /* check to see if already in history */
     for (iter = target_history ; iter != 0 ; iter = iter->next)
@@ -1029,27 +1036,20 @@ static void
 make_reap(Task *task)
 {
     MakeTask *mt = (MakeTask *)task;
-    char *err_str = 0, *warn_str = 0, *int_str = 0;
+    char *ann;
+    char *int_str = 0;
     
-    if (log_num_errors() > 0)
-	err_str = g_strdup_printf(_(", %d errors"), log_num_errors());
-
-    if (log_num_warnings() > 0)
-	warn_str = g_strdup_printf(_(", %d warnings"), log_num_warnings());
-
+    ann = log_annotations();
+    
     if (interrupted)
 	int_str = _(" (interrupted)");
 
-    message(_("Finished making %s%s%s%s"),
+    message(_("Finished making %s%s%s"),
 	mt->target,
-	safe_str(err_str),
-	safe_str(warn_str),
+	ann,
 	safe_str(int_str));
 
-    if (err_str != 0)
-	g_free(err_str);
-    if (warn_str != 0)
-	g_free(warn_str);
+    g_free(ann);
 
     log_end_build(mt->target);
     

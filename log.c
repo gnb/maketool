@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.57 2003-10-21 14:36:35 gnb Exp $");
+CVSID("$Id: log.c,v 1.58 2004-11-07 05:36:08 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -48,6 +48,8 @@ static GtkWidget	*logwin;	/* a GtkCTree widget */
 static int		num_errors;
 static int		num_warnings;
 static gboolean     	num_ew_changed = FALSE;
+static time_mark_t  	start;
+static char 	    	*duration_str;
 static void 	    	(*log_count_callback)(int, int);
 static GList		*log;		/* list of LogRecs */
 static GList	    	*log_tail;  	/* tail of `log' list */
@@ -617,42 +619,70 @@ log_show_rec(LogRec *lr)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-log_update_build_start(void)
+log_build_annotate(estring *e, gboolean final, gboolean dostart)
+{
+    int n = 0;
+    static const char a_start[] = " (";
+    static const char a_sep[] = ", ";
+    static const char a_end[] = ")";
+
+    if (num_errors > 0)
+    {
+	estring_append_string(e, a_start);
+	estring_append_printf(e, _("%d errors"), num_errors);
+	n++;
+    }
+    if (num_warnings > 0)
+    {
+	estring_append_string(e, (n ? a_sep : a_start));
+	estring_append_printf(e, _("%d warnings"), num_warnings);
+    	n++;
+    }
+    
+    if (final)
+    {
+	if (duration_str == NULL)
+	    duration_str = time_elapsed_str(&start);
+
+	estring_append_string(e, (n ? a_sep : a_start));
+	if (dostart)
+	{
+	    char *start_str = time_start_str(&start);
+	    estring_append_printf(e, _("%s at %s"), duration_str, start_str);
+	    g_free(start_str);
+	}
+	else
+	{
+	    estring_append_string(e, duration_str);
+	}
+    	n++;
+    }
+
+    if (n)
+	estring_append_string(e, a_end);
+}
+
+static void
+log_update_build_start(gboolean final)
 {
     LogRec *bs;
     estring text;
-    int n = 0;
     
-    if (!num_ew_changed || (num_errors == 0 && num_warnings == 0))
-    	return;
+    if (!final && (!num_ew_changed || (num_errors == 0 && num_warnings == 0)))
+       return;
     if ((bs = log_rootmost_node()) == 0)
     	return; /* yeah like that's going to happen */
     assert(bs->node != 0);
     
     estring_init(&text);
     estring_append_string(&text, bs->line);
-    estring_append_string(&text, " (");
-    if (num_errors > 0)
-    {
-    	if (n)
-	    estring_append_string(&text, ", ");
-	estring_append_printf(&text, _("%d errors"), num_errors);
-	n++;
-    }
-    if (num_warnings > 0)
-    {
-    	if (n)
-	    estring_append_string(&text, ", ");
-	estring_append_printf(&text, _("%d warnings"), num_warnings);
-    	n++;
-    }
-    estring_append_string(&text, ")");
-
+    log_build_annotate(&text, final, /*dostart*/TRUE);
+    
     gtk_ctree_node_set_text(GTK_CTREE(logwin), bs->node, /*column*/0, text.data);
 
     estring_free(&text);
     
-    if (log_count_callback)
+    if (num_ew_changed && log_count_callback)
     	(*log_count_callback)(num_errors, num_warnings);
     
     num_ew_changed = FALSE;
@@ -731,7 +761,7 @@ log_add_line(const char *line)
 	lr = log_add_rec(pending[i], &res, con);
 	log_show_rec(lr);
 	/* TODO: do this exactly once when loading from file */
-	log_update_build_start();
+	log_update_build_start(FALSE);
     }
     num_pending = 0;
 
@@ -1128,6 +1158,17 @@ log_num_warnings(void)
     return num_warnings;
 }
 
+char *
+log_annotations(void)
+{
+    estring ann;
+    
+    estring_init(&ann);
+    log_build_annotate(&ann, /*final*/TRUE, /*dostart*/FALSE);
+
+    return ann.data;
+}
+
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static gboolean
@@ -1278,6 +1319,11 @@ log_start_build(const char *message)
     num_ew_changed = FALSE;
     filter_init();
     
+    time_mark(&start);
+    if (duration_str != NULL)
+	g_free(duration_str);
+    duration_str = NULL;
+
     filter_result_init(&res);
     res.code = FR_BUILDSTART;
 
@@ -1289,6 +1335,8 @@ void
 log_end_build(const char *target)
 {
     filter_post();
+
+    log_update_build_start(TRUE);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

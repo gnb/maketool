@@ -76,6 +76,7 @@ int log_get_flags(void);
 void log_set_flags(int);
 int log_num_errors(void);
 int log_num_warnings(void);
+char *log_annotations(void);
 
 void log_save(const char *file, Progress *);
 void log_open(const char *file, Progress *);
