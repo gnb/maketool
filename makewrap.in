@@ -1,0 +1,46 @@
+#!/bin/sh
+#
+# Maketool - GTK-based front end for gmake
+# Copyright (c) 1999-2002 Greg Banks
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#
+# Wrapper for non-GNU make programs which emits gmake-style messages on
+# entering and leaving directories, necessary for tracking which directory
+# a file belongs to in a recursive build.
+#
+
+ME=`basename $0`
+
+if [ -z "$MAKELEVEL" ]; then
+    MAKELEVEL=1
+else
+    MAKELEVEL=`expr $MAKELEVEL + 1`
+fi
+export MAKELEVEL
+
+if [ $MAKELEVEL -gt 1 ]; then
+    echo $ME"[$MAKELEVEL]: Entering directory \``/bin/pwd`'"
+fi
+
+@MAKE@ MAKE=$0 "$@"
+status=$?
+
+if [ $MAKELEVEL -gt 1 ]; then
+    echo $ME"[$MAKELEVEL]: Leaving directory"
+fi
+
+exit $status
