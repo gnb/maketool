@@ -23,7 +23,7 @@
 #include "maketool_task.h"
 #include "log.h"
 
-CVSID("$Id: autoconf.c,v 1.14 2003-07-25 14:18:41 gnb Exp $");
+CVSID("$Id: autoconf.c,v 1.15 2003-09-27 13:37:18 gnb Exp $");
 
 #define strassign(x, s) \
     do { \
@@ -574,6 +574,8 @@ configure_help_reap, 	    	/* reap */
 static void
 read_configure_options(void)
 {
+    Task *task;
+
     /* Delete all previously read options */
     while (all_options != 0)
     {
@@ -581,12 +583,14 @@ read_configure_options(void)
 	all_options = g_list_remove_link(all_options, all_options);
     }
     
-    task_run(task_create(
+    task = task_create(
     	(Task *)g_new(Task, 1),
 	g_strdup("./configure --help"),
 	/*env*/0,
 	&configure_help_ops,
-	TASK_LINEMODE));
+	TASK_LINEMODE);
+    if (!task_run(task))
+    	task_unref(task);   /* drops last reference & deletes */
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
