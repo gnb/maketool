@@ -1,5 +1,12 @@
 --- open ---
 
+x  Help->Help On reports "main-window" if clicked on the background of
+   any dialog, and only reports the right dialog if clicked on some
+   other widget in the dialog.
+   
+x  There is no way to handle help tags which point to anchors inside
+   an HTML page rather than being the page name.
+
 x  Display in the statusbar, between the message and the progress
    indicator, running counts of number of warnings and errors found
    since last build start.
