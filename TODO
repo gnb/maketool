@@ -194,6 +194,8 @@ x  Bug where make variable overrides specified on command line are
    ignored until Preferences dialog OK is pressed.
    
 x  Tweak icon to look good when scaled down for taskbar by modern GNOME.
+
+x  "make -n dist" fails.
      
 --- closed ---
 
