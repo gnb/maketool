@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.64 2003-09-28 10:35:34 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.65 2003-09-28 13:11:11 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -724,7 +724,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     
     table = gtk_table_new(8, 3, FALSE);
     gtk_container_border_width(GTK_CONTAINER(table), SPACING);
-    ui_set_help_name(table, "prefs-general-page");
+    ui_set_help_name(table, "general-pane");
     gtk_widget_show(table);
 
     
@@ -733,6 +733,7 @@ prefs_create_general_page(GtkWidget *toplevel)
      */
     frame = gtk_frame_new(_("Make runs commands"));
     gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 3, row, row+1);
+    ui_set_help_name(frame, "general-parallelism");
     gtk_widget_show(frame);
     
     table2 = gtk_table_new(3, 2, FALSE);
@@ -745,7 +746,6 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(run_radio[RUN_SERIES]), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table2), run_radio[RUN_SERIES], 0, 2, 0, 1);
-    ui_set_help_name(run_radio[RUN_SERIES], "prefs-run-series");
     gtk_widget_show(run_radio[RUN_SERIES]);
     
 
@@ -755,7 +755,6 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(run_radio[RUN_PARALLEL_PROC]), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table2), run_radio[RUN_PARALLEL_PROC], 0, 1, 1, 2);
-    ui_set_help_name(run_radio[RUN_PARALLEL_PROC], "prefs-run-proc");
     gtk_widget_show(run_radio[RUN_PARALLEL_PROC]);
 
     adj = gtk_adjustment_new(
@@ -779,7 +778,6 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(run_radio[RUN_PARALLEL_LOAD]), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table2), run_radio[RUN_PARALLEL_LOAD], 0, 1, 2, 3);
-    ui_set_help_name(run_radio[RUN_PARALLEL_LOAD], "prefs-run-load");
     gtk_widget_show(run_radio[RUN_PARALLEL_LOAD]);
     
     adj = gtk_adjustment_new(
@@ -803,7 +801,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(edit1_check), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), edit1_check, 0, 3, row, row+1);
-    ui_set_help_name(edit1_check, "prefs-auto-edit");
+    ui_set_help_name(edit1_check, "general-auto-edit-error");
     gtk_widget_show(edit1_check);
     row++;
     
@@ -815,7 +813,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), editw_check, 0, 3, row, row+1);
     gtk_widget_show(editw_check);
-    ui_set_help_name(editw_check, "prefs-edit-warnings");
+    ui_set_help_name(editw_check, "general-edit-next-ignores-warnings");
     row++;
     
     /*
@@ -825,7 +823,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(fail_check), "toggled", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), fail_check, 0, 3, row, row+1);
-    ui_set_help_name(fail_check, "prefs-kflag");
+    ui_set_help_name(fail_check, "general-continue-despite-failures");
     gtk_widget_show(fail_check);
     row++;
 
@@ -837,7 +835,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), emm_check, 0, 3, row, row+1);
     gtk_widget_show(emm_check);
-    ui_set_help_name(emm_check, "prefs-enable-mmf");
+    ui_set_help_name(emm_check, "general-enable-make-makefile");
     row++;
 
     /*
@@ -848,7 +846,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), soo_check, 0, 3, row, row+1);
     gtk_widget_show(soo_check);
-    ui_set_help_name(soo_check, "prefs-scroll-output");
+    ui_set_help_name(soo_check, "general-scroll-on-output");
     row++;
 
     /*
@@ -871,7 +869,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 3, row, row+1);
     gtk_widget_show(combo);
-    ui_set_help_name(combo, "prefs-start-action");
+    ui_set_help_name(combo, "general-start-build-action");
     start_action_combo = combo;
     row++;
 
@@ -896,7 +894,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 3, row, row+1);
     gtk_widget_show(combo);
-    ui_set_help_name(combo, "prefs-finish-action");
+    ui_set_help_name(combo, "general-finish-build-action");
     finish_action_combo = combo;
     row++;
 
@@ -934,7 +932,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 2, row, row+1);
     gtk_widget_show(combo);
-    ui_set_help_name(combo, "prefs-fflag");
+    ui_set_help_name(combo, "general-makefile");
     makefile_entry = GTK_COMBO(combo)->entry;
 
     button = gtk_button_new_with_label(_("Browse..."));
@@ -943,7 +941,7 @@ prefs_create_general_page(GtkWidget *toplevel)
     gtk_table_attach(GTK_TABLE(table), button, 2, 3, row, row+1,
 		       (GtkAttachOptions)0, (GtkAttachOptions)0,
 		       SPACING, 0);
-    ui_set_help_name(button, "prefs-fflag");
+    ui_set_help_name(button, "general-makefile");
     gtk_widget_show(button);
 
     row++;
@@ -1111,7 +1109,7 @@ prefs_create_variables_page(GtkWidget *toplevel)
 
     vbox = gtk_vbox_new(FALSE, SPACING);
     gtk_container_border_width(GTK_CONTAINER(vbox), SPACING);
-    ui_set_help_name(vbox, "prefs-variables-page");
+    ui_set_help_name(vbox, "variables-pane");
     gtk_widget_show(vbox);
     
     hbox = gtk_hbox_new(FALSE, 0);
@@ -1272,7 +1270,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     table = gtk_table_new(6, 2, FALSE);
     gtk_container_border_width(GTK_CONTAINER(table), SPACING);
     gtk_table_set_row_spacings(GTK_TABLE(table), SPACING);
-    ui_set_help_name(table, "prefs-programs-page");
+    ui_set_help_name(table, "programs-pane");
     gtk_widget_show(table);
     
     /*
@@ -1299,6 +1297,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 2, row, row+1);
     ui_combo_set_current(combo, curr);
+    ui_set_help_name(combo, "programs-make");
     gtk_widget_show(combo);
     makeprog_combo = combo;
     
@@ -1317,6 +1316,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    ui_set_help_name(entry, "programs-make-target");
     gtk_widget_show(entry);
     prog_make_entry = entry;
     
@@ -1335,6 +1335,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    ui_set_help_name(entry, "programs-list-targets");
     gtk_widget_show(entry);
     prog_targets_entry = entry;    
     row++;
@@ -1352,6 +1353,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    ui_set_help_name(entry, "programs-list-version");
     gtk_widget_show(entry);
     prog_version_entry = entry;
     row++;
@@ -1371,6 +1373,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 2, row, row+1);
+    ui_set_help_name(combo, "programs-edit");
     gtk_widget_show(combo);
     prog_edit_entry = entry;
     row++;
@@ -1388,6 +1391,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 2, row, row+1);
+    ui_set_help_name(entry, "programs-make-makefile");
     gtk_widget_show(entry);
     prog_make_makefile_entry = entry;
     row++;
@@ -1407,6 +1411,7 @@ prefs_create_programs_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 2, row, row+1);
+    ui_set_help_name(combo, "programs-help-browser");
     gtk_widget_show(combo);
     prog_help_browser_entry = entry;
     row++;
@@ -1557,6 +1562,7 @@ prefs_create_color_row(
     gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row+1,
 		       (GtkAttachOptions)(GTK_FILL|GTK_EXPAND), (GtkAttachOptions)0,
 		       0, 0);
+    ui_set_help_name(entry, "colors-text-field");
     gtk_widget_show(entry);
     
     button = gtk_button_new_with_label(_("Choose..."));
@@ -1564,6 +1570,7 @@ prefs_create_color_row(
     	GTK_SIGNAL_FUNC(color_choose_cb), GINT_TO_POINTER(color_num));
     gtk_table_attach(GTK_TABLE(table), button, 2, 3, row, row+1,
 		       (GtkAttachOptions)0, (GtkAttachOptions)0, SPACING, 0);
+    ui_set_help_name(button, "colors-choose");
     gtk_widget_show(button);
 
     /* 
@@ -1643,7 +1650,7 @@ prefs_create_colors_page(GtkWidget *toplevel)
     table = gtk_table_new(8, 3, FALSE);
     gtk_container_border_width(GTK_CONTAINER(table), SPACING);
     gtk_table_set_row_spacings(GTK_TABLE(table), SPACING);
-    ui_set_help_name(table, "prefs-colors-page");
+    ui_set_help_name(table, "colors-pane");
     gtk_widget_show(table);
     
     color_labels[COL_BG_INFO] = _("Information Background:");
@@ -1724,12 +1731,14 @@ prefs_create_colors_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(button), "clicked", 
     	GTK_SIGNAL_FUNC(color_reset_old_cb), 0);
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+    ui_set_help_name(button, "colors-reset-to-old");
     gtk_widget_show(button);
     
     button = gtk_button_new_with_label(_("Reset to Defaults"));
     gtk_signal_connect(GTK_OBJECT(button), "clicked", 
     	GTK_SIGNAL_FUNC(color_reset_defaults_cb), 0);
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+    ui_set_help_name(button, "colors-reset-to-defaults");
     gtk_widget_show(button);
     
     row++;
@@ -1783,6 +1792,7 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     int col, row;
     
     hbox = gtk_hbox_new(FALSE, SPACING);
+    ui_set_help_name(hbox, "page-setup-pane");
 
     label = gtk_label_new(_("Large\ncanvas\nsample\ngoes\nhere"));
     gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
@@ -1827,6 +1837,7 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(GTK_COMBO(combo)->entry), "changed", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 3, row, row+1);
+    ui_set_help_name(combo, "page-setup-paper-name");
     gtk_widget_show(combo);
     paper_name_combo = combo;
     
@@ -1847,6 +1858,7 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
     gtk_signal_connect(GTK_OBJECT(GTK_COMBO(combo)->entry), "changed", 
     	GTK_SIGNAL_FUNC(changed_cb), 0);
     gtk_table_attach_defaults(GTK_TABLE(table), combo, 1, 3, row, row+1);
+    ui_set_help_name(combo, "page-setup-paper-orientation");
     gtk_widget_show(combo);
     paper_orientation_combo = combo;
     
@@ -1865,6 +1877,7 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
 	0, 0);
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(var_changed_cb), 0);
+    ui_set_help_name(entry, "page-setup-paper-width");
     gtk_widget_show(entry);
     paper_width_entry = entry;
     
@@ -1887,6 +1900,7 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
 	0, 0);
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(var_changed_cb), 0);
+    ui_set_help_name(entry, "page-setup-paper-height");
     gtk_widget_show(entry);
     paper_height_entry = entry;
     
@@ -1924,6 +1938,7 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
 	0, 0);
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(var_changed_cb), 0);
+    ui_set_help_name(entry, "page-setup-margins-left");
     gtk_widget_show(entry);
     margin_left_entry = entry;
 
@@ -1946,6 +1961,7 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
 	0, 0);
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(var_changed_cb), 0);
+    ui_set_help_name(entry, "page-setup-margins-right");
     gtk_widget_show(entry);
     margin_right_entry = entry;
 
@@ -1968,6 +1984,7 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
 	0, 0);
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(var_changed_cb), 0);
+    ui_set_help_name(entry, "page-setup-margins-top");
     gtk_widget_show(entry);
     margin_top_entry = entry;
 
@@ -1990,6 +2007,7 @@ prefs_create_page_setup_page(GtkWidget *toplevel)
 	0, 0);
     gtk_signal_connect(GTK_OBJECT(entry), "changed", 
     	GTK_SIGNAL_FUNC(var_changed_cb), 0);
+    ui_set_help_name(entry, "page-setup-margins-bottom");
     gtk_widget_show(entry);
     margin_bottom_entry = entry;
 

@@ -6,7 +6,7 @@
 ]>
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.20 2003-09-28 12:32:00 gnb Exp $"
+         revision="$Id: help.sgml,v 1.21 2003-09-28 13:11:11 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool</title>
@@ -14,7 +14,7 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2003-09-28 12:32:00 $</pubdate>
+  <pubdate role="cvs">$Date: 2003-09-28 13:11:11 $</pubdate>
   <releaseinfo>This is version &version;</releaseinfo>
   <copyright>
     <year>2000</year>
@@ -1955,7 +1955,7 @@ background and foreground.  Each colour has two controls:
 
 <itemizedlist>
   <listitem>
-    <anchor id="colors-tex-field" xreflabel="Colors text field">
+    <anchor id="colors-text-field" xreflabel="Colors text field">
     <para>
     A text field which shows the hexadecimal value of the colour.
     You can type hexadecimal colours directly into this field.
