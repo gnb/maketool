@@ -24,7 +24,7 @@
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.39 2003-05-24 05:48:20 gnb Exp $");
+CVSID("$Id: help.c,v 1.40 2003-08-10 07:34:30 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*options_shell = 0;
@@ -51,7 +51,7 @@ licence_cb(GtkWidget *w, gpointer data)
 
 	licence_shell = ui_create_ok_dialog(toplevel, _("Maketool: Licence"));
 	ui_set_help_name(licence_shell, "licence-window");
-	gtk_widget_set_usize(licence_shell, 450, 300);
+	gtk_widget_set_usize(licence_shell, 590, 300);
 
 	hbox = gtk_hbox_new(FALSE, SPACING);
 	gtk_container_border_width(GTK_CONTAINER(hbox), SPACING);
