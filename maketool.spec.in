@@ -41,8 +41,11 @@ rm -rf $RPM_BUILD_ROOT
 %docdir /usr/share/@PACKAGE@/help
 /usr/share/@PACKAGE@/help
 /usr/share/locale/ja/LC_MESSAGES/maketool.mo
+/usr/share/locale/cs/LC_MESSAGES/maketool.mo
 
 %changelog
+* Mon Dec 11 2000 Greg Banks <gnb@alphalink.com.au>
+- Czech translation
 * Fri Dec 1 2000 Greg Banks <gnb@alphalink.com.au>
 - Japanese translation
 * Sun Nov 26 2000 Greg Banks <gnb@alphalink.com.au>
