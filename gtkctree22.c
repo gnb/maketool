@@ -3590,7 +3590,7 @@ gtk_ctree_new_with_titles (gint         columns,
   if (titles)
     {
       GtkCList *clist = GTK_CLIST (widget);
-      guint i;
+      gint i;
 
       for (i = 0; i < columns; i++)
 	gtk_clist_set_column_title (clist, i, titles[i]);
