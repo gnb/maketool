@@ -6,7 +6,7 @@
 ]>
 
 <article class="whitepaper" status="DRAFT" lang="en" id="maketool-help"
-         revision="$Id: help.sgml,v 1.19 2003-09-28 12:16:15 gnb Exp $"
+         revision="$Id: help.sgml,v 1.20 2003-09-28 12:32:00 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool</title>
@@ -14,7 +14,7 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2003-09-28 12:16:15 $</pubdate>
+  <pubdate role="cvs">$Date: 2003-09-28 12:32:00 $</pubdate>
   <releaseinfo>This is version &version;</releaseinfo>
   <copyright>
     <year>2000</year>
@@ -1947,12 +1947,59 @@ It allows you to control the colours used to show errors, warnings,
 and summarised lines in the log window.
 </para>
 
+<para>
+The colours are organised by the error severity: information, warning,
+error, and summary.  For each of these there are a pair of colours,
+background and foreground.  Each colour has two controls:
+</para>
+
+<itemizedlist>
+  <listitem>
+    <anchor id="colors-tex-field" xreflabel="Colors text field">
+    <para>
+    A text field which shows the hexadecimal value of the colour.
+    You can type hexadecimal colours directly into this field.
+    If the text field is empty, the default foreground or background
+    of the GTK theme will be used.
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+    <anchor id="colors-choose" xreflabel="Colors Choose button">
+    A <guibutton>Choose...</guibutton> button which when clicked
+    pops up a standard GTK colour selection dialog.  Pressing
+    <guibutton>OK</guibutton> in that dialog writes the hexadecimal
+    value of the currently selected colour into the text field.
+    </para>
+  </listitem>
+</itemizedlist>
+
+<para>
+The Colours pane also contains a Sample area which shows you how
+the currently selected areas will appear in the log window, and
+these buttons:
+</para>
+
 <variablelist>
 
   <varlistentry>
-    <term><guibutton>Unset</guibutton></term>
+    <term><guibutton>Reset to Old</guibutton></term>
     <listitem>
+      <anchor id="colors-reset-to-old" xreflabel="Reset to Old">
       <para>
+      Click this button to reset the colours to the colours which
+      were in force when the Preferences were last saved.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guibutton>Reset to Defaults</guibutton></term>
+    <listitem>
+      <anchor id="colors-reset-to-defaults" xreflabel="Reset to Defaults">
+      <para>
+      Click this button to reset the colours to the compiled-in
+      default colours.
       </para>
     </listitem>
   </varlistentry>
