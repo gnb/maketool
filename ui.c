@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.38 2003-10-03 12:18:21 gnb Exp $");
+CVSID("$Id: ui.c,v 1.39 2003-10-08 13:08:22 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -541,6 +541,67 @@ void
 ui_tool_add_space(GtkWidget *toolbar)
 {
     gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static const char tool_menu_key[] = "ui-tool-menu-key";
+
+static void
+ui_tool_drop_enter(GtkWidget *button, gpointer data)
+{
+    gtk_button_enter(GTK_BUTTON(data));
+}
+
+static void
+ui_tool_drop_leave(GtkWidget *button, gpointer data)
+{
+    gtk_button_leave(GTK_BUTTON(data));
+}
+
+GtkWidget *
+ui_tool_drop_menu_create(
+    GtkWidget *toolbar,
+    GtkWidget *linked_item, 	/* may be NULL */
+    gint group,
+    const char *helptag)
+{
+    GtkWidget *mbar, *mitem, *arrow, *menu;
+
+    mbar = gtk_menu_bar_new();
+    mitem = gtk_menu_item_new();
+    arrow = gtk_arrow_new(GTK_ARROW_DOWN, GTK_SHADOW_ETCHED_IN);
+    gtk_container_add(GTK_CONTAINER(mitem), arrow);
+    gtk_widget_show(arrow);
+    gtk_menu_bar_append(GTK_MENU_BAR(mbar), mitem);
+    gtk_widget_show(mitem);
+    gtk_toolbar_append_widget(GTK_TOOLBAR(toolbar), mbar, 0, 0);
+    gtk_widget_show(mbar);
+
+    menu = gtk_menu_new();
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(mitem), menu);
+    
+    gtk_object_set_data(GTK_OBJECT(mbar), tool_menu_key, menu);
+    if (linked_item != 0 && GTK_IS_BUTTON(linked_item))
+    {
+	gtk_signal_connect(GTK_OBJECT(mitem), "select",
+    		ui_tool_drop_enter, linked_item);
+	gtk_signal_connect(GTK_OBJECT(mitem), "deselect",
+    		ui_tool_drop_leave, linked_item);
+    }
+
+    if (group >= 0)
+    	ui_group_add(group, mbar);
+    if (helptag != 0)
+    	ui_set_help_tag(mbar, helptag);
+
+    return mbar;
+}
+
+GtkWidget *
+ui_tool_drop_menu_get_menu(GtkWidget *button)
+{
+    return gtk_object_get_data(GTK_OBJECT(button), tool_menu_key);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

@@ -32,7 +32,7 @@
 #include "mqueue.h"
 #include "progress.h"
 
-CVSID("$Id: main.c,v 1.103 2003-10-05 09:03:17 gnb Exp $");
+CVSID("$Id: main.c,v 1.104 2003-10-08 13:08:22 gnb Exp $");
 
 
 /*
@@ -50,7 +50,8 @@ typedef enum
 
 char		**cmd_targets;		/* targets on commandline */
 int 	    	cmd_num_targets;
-const char	*last_target = 0;	/* last target built, for `again' */
+#define TARGET_HISTORY_MAX  16
+static GList	*target_history = 0;	/* last target built is head of list */
 GList		*available_targets = 0;	/* all possible targets, for menu */
 GtkWidget	*build_menu;
 GtkWidget	*toolbar_hb, *messagebox;
@@ -67,6 +68,7 @@ GdkBitmap	*anim_masks[ANIM_MAX+1];
 GtkWidget	*anim;
 GtkWidget   	*toolbar;
 GtkWidget   	*again_menu_item, *again_tool_item;
+GtkWidget   	*target_history_menu;
 const char * const again_menu_label[2] = { N_("_Again"), N_("_Again (%s)") };
 const char * const again_tool_tooltip[2] = { N_("Build last target again"), N_("Build `%s' again") };
 gint	    	about_make_position;
@@ -93,6 +95,10 @@ static void set_main_title(void);
 static void construct_build_menu_basic_items(void);
 static void dir_previous_cb(GtkWidget *w, gpointer data);
 
+static const char *last_target(void);
+static void add_target_history(const char *);
+static void clear_target_history(void);
+static void build_start(const char *target);
 
 /*
  * Number of non-standard targets to be present before
@@ -193,7 +199,7 @@ grey_menu_items(void)
     LogRec *sel = log_selected();
     gboolean selected = (sel != 0);
     gboolean editable = (sel != 0 && sel->res.file != 0);
-    gboolean again = (last_target != 0 && !running);
+    gboolean again = (last_target() != 0 && !running);
     gboolean all = (!running && g_list_find_str(available_targets, "all") != 0);
     gboolean clean = (!running && g_list_find_str(available_targets, "clean") != 0);
 
@@ -336,25 +342,35 @@ abbreviate_targets(const char *t1, const char *t2, int maxlen)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static void
+target_history_cb(GtkWidget *w, gpointer data)
+{
+    const char *target = (const char *)data;
+
+    if (!task_is_running())
+    	build_start(target);
+}
 
 static void
-set_last_target(const char *target)
+update_target_history_menu(void)
 {
     GtkLabel *label;
     char *menulabel;
     char *tooltip;
     char *targ;
-    
-    last_target = target;
+    int idx;
+    GList *iter;
     
     /* Note: this assumes that the accelerator remains constant, i.e. Ctrl+A,
      *       even though the position of the underscore in the label
      *       may change.
      */
-    targ = (last_target == 0 ? 0 : 
-	      abbreviate_target(last_target,
+    /* Update the menu item in the Build menu */
+    targ = (last_target() == 0 ? 0 :
+    	    	abbreviate_target(last_target(),
 	      	    	    	BUILD_MENU_WIDTH_THRESHOLD-5/*heuristic*/));
-    menulabel = g_strdup_printf(_(again_menu_label[!!last_target]), targ);
+    idx = !!targ;
+    menulabel = g_strdup_printf(_(again_menu_label[idx]), targ);
     if (targ != 0)
 	g_free(targ);
     label = GTK_LABEL(GTK_BIN(again_menu_item)->child);
@@ -362,10 +378,71 @@ set_last_target(const char *target)
     gtk_label_parse_uline(label, menulabel);
     g_free(menulabel);
 
-    tooltip = g_strdup_printf(_(again_tool_tooltip[!!last_target]), last_target);
+    /* Update the tooltip on the Again tool */
+    tooltip = g_strdup_printf(_(again_tool_tooltip[idx]), last_target());
     gtk_tooltips_set_tip(GTK_TOOLBAR(toolbar)->tooltips, again_tool_item,
     	tooltip, 0);
     g_free(tooltip);
+    
+    /* Rebuild the menu on the Again tool */
+    ui_delete_menu_items(target_history_menu);
+    for (iter = target_history ; iter != 0 ; iter = iter->next)
+    {
+    	targ = (char *)iter->data;
+	
+    	ui_add_button_2(target_history_menu, targ, /*douline*/FALSE,
+    	    /*accel*/0, target_history_cb, targ, GR_AGAIN, /* position*/-1);
+    }
+}
+
+static void
+add_target_history(const char *target)
+{
+    GList *iter;
+
+    /*
+     * `target' is assumed to be non-NULL and to point
+     * to a saved string in the available_targets list.
+     */
+
+    /* check to see if already in history */
+    for (iter = target_history ; iter != 0 ; iter = iter->next)
+    {
+    	if (target == (const char *)iter->data)
+	{
+    	    target_history = g_list_remove_link(target_history, iter);
+	    break;
+	}
+    }
+    
+    /* add new target to head of history */
+    target_history = g_list_prepend(target_history, (gpointer)target);
+
+    /* trim tail to enforce history length */
+    while (g_list_length(target_history) > TARGET_HISTORY_MAX)
+    {
+    	GList *last = g_list_last(target_history);
+    	target_history = g_list_remove_link(target_history, last);
+    }
+
+    /* update gui */
+    update_target_history_menu();
+}
+    
+static void
+clear_target_history(void)
+{
+    /* remove entire history list */
+    while (target_history != 0)
+    	target_history = g_list_remove_link(target_history, target_history);
+    /* update gui */
+    update_target_history_menu();
+}
+
+static const char *
+last_target(void)
+{
+    return (target_history == 0 ? 0 : (const char *)target_history->data);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -730,7 +807,7 @@ list_targets(void)
     
     if (prefs.enable_make_makefile && ms_makefile_needs_update(makesys))
 	make_makefile();
-    set_last_target(0);
+    clear_target_history();
 
     if (mp_which_makefile(makeprog) == 0)
     {
@@ -919,7 +996,7 @@ make_start(Task *task)
 	break;
     }
 
-    set_last_target(mt->target);
+    add_target_history(mt->target);
     interrupted = FALSE;
     log_start_build(task->command);
 }
@@ -1357,8 +1434,8 @@ file_edit_makefile_cb(GtkWidget *w, gpointer data)
 static void
 build_again_cb(GtkWidget *w, gpointer data)
 {
-    if (last_target != 0 && !task_is_running())
-    	build_start(last_target);
+    if (last_target() != 0 && !task_is_running())
+    	build_start(last_target());
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -1771,10 +1848,13 @@ ui_create_menus(GtkWidget *menubar)
 static void
 ui_create_tools(GtkWidget *toolbar)
 {
+    GtkWidget *w;
     char *tooltip;
     
     again_tool_item = ui_tool_create(toolbar, _("Again"), _(again_tool_tooltip[0]),
     	again_xpm, build_again_cb, 0, GR_AGAIN, "again-tool");
+    w = ui_tool_drop_menu_create(toolbar, again_tool_item, GR_AGAIN, "again-tool");
+    target_history_menu = ui_tool_drop_menu_get_menu(w);
 
     ui_tool_create(toolbar, _("Stop"), _("Stop current build"),
     	stop_xpm, build_stop_cb, 0, GR_RUNNING, "stop-tool");

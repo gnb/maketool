@@ -64,6 +64,12 @@ GtkWidget *ui_tool_create(
     gint group,
     const char *helptag);
 void ui_tool_add_space(GtkWidget *toolbar);
+GtkWidget *ui_tool_drop_menu_create(
+    GtkWidget *toolbar,
+    GtkWidget *linked_item, 	/* may be NULL */
+    gint group,
+    const char *helptag);
+GtkWidget *ui_tool_drop_menu_get_menu(GtkWidget *);
 
 /* Menubar stuff */    
 
