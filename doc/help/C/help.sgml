@@ -2,7 +2,7 @@
 
 <article class="whitepaper" status="DRAFT" lang="EN" ID="maketool-help"
          xreflabel="maketool-help" 
-         revision="$Id: help.sgml,v 1.1 2000-08-06 10:46:59 gnb Exp $"
+         revision="$Id: help.sgml,v 1.2 2000-08-06 11:07:48 gnb Exp $"
          vendor="Greg Banks">
 <artheader>
   <title>Maketool online help</title>
@@ -10,7 +10,7 @@
     <firstname>Greg</firstname>
     <surname>Banks</surname>
   </author>
-  <pubdate role="cvs">$Date: 2000-08-06 10:46:59 $</pubdate>
+  <pubdate role="cvs">$Date: 2000-08-06 11:07:48 $</pubdate>
   <releaseinfo>This is version VERSION</releaseinfo>
   <copyright>
     <year>2000</year>
