@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: extract_targets.in,v 1.1 1999-10-16 16:36:56 gnb Exp $
+# $Id: extract_targets.in,v 1.2 1999-11-07 10:27:00 gnb Exp $
 #
 
 @GMAKE@ -n -p "$@" _no_such_target_ 2>/dev/null | awk '
@@ -46,6 +46,8 @@ BEGIN {
 	if (substr(targ, 0, 1) == "/")
 	    suitable = 0
 	if (substr(targ, 0, 3) == "../")
+	    suitable = 0
+	if (substr(targ, 0, 1) == "_")
 	    suitable = 0
 	if (substr(targ, length(targ)-1, 2) == ".o")
 	    suitable = 0
