@@ -28,3 +28,4 @@ samples
 debug
 build.*.log
 rpm.d
+version.m4
