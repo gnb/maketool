@@ -301,7 +301,7 @@ x  Option to always scroll to end on make output
 
 x  Handle user clicking E's X button on dialogs.
 
-x  A.T. Hofkamp says: make_makefile and extract_targets should live
+x  DONE: A.T. Hofkamp says: make_makefile and extract_targets should live
    somewhere like $prefix/libexec/maketool/ not $prefix/bin.
 
 x  A.T. Hofkamp says: when extract_targets is not found, the failure

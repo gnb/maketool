@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.26 2000-07-21 06:12:03 gnb Exp $
+# $Id: Makefile.in,v 1.27 2000-07-29 13:51:17 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -27,6 +27,7 @@ PACKAGE=	@PACKAGE@
 VERSION=	@VERSION@
 @USRDOC@DOCDIR=		$(prefix)/doc/$(PACKAGE)-$(VERSION)
 localedir=	$(prefix)/@DATADIRNAME@/locale
+libexecdir=	@libexecdir@/$(PACKAGE)
 
 CC=		@CC@
 # WARNING: using gcc -ansi on Linux breaks maketool, which
@@ -35,7 +36,7 @@ CC=		@CC@
 #CC=		gcc -Wall
 CFLAGS=		@CFLAGS@
 CPPFLAGS=	@GTK_CFLAGS@ -D_USE_BSD -I. -Iicons -Iintl \
-		-DLOCALEDIR=\"$(localedir)\" \
+		-DLOCALEDIR=\"$(localedir)\" -DLIBEXECDIR=\"$(libexecdir)\" \
 		@CPPFLAGS@ $(TESTCPPFLAGS)
 LDLIBS=		@GTK_LIBS@ @INTLLIBS@
 O=		objs
@@ -79,27 +80,27 @@ clean::
 
 # extract_targets shell script
 
-install:: $(BINDIR)/extract_targets
+install:: $(libexecdir)/extract_targets
 
-$(BINDIR)/extract_targets: extract_targets
+$(libexecdir)/extract_targets: extract_targets
 	test -d $(@D) || $(INSTALL) -m 755 -d $(@D)
 	$(INSTALL) -m 755 $< $@
 	
 uninstall::
-	$(RM) $(BINDIR)/extract_targets
+	$(RM) $(libexecdir)/extract_targets
 	
 ###
 
 # make_makefile shell script
 
-install:: $(BINDIR)/make_makefile
+install:: $(libexecdir)/make_makefile
 
-$(BINDIR)/make_makefile: make_makefile
+$(libexecdir)/make_makefile: make_makefile
 	test -d $(@D) || $(INSTALL) -m 755 -d $(@D)
 	$(INSTALL) -m 755 $< $@
 	
 uninstall::
-	$(RM) $(BINDIR)/make_makefile
+	$(RM) $(libexecdir)/make_makefile
 	
 ###
 

@@ -29,7 +29,7 @@
 #include <signal.h>
 #endif
 
-CVSID("$Id: main.c,v 1.61 2000-07-29 12:58:10 gnb Exp $");
+CVSID("$Id: main.c,v 1.62 2000-07-29 13:51:18 gnb Exp $");
 
 typedef enum
 {
@@ -1921,11 +1921,30 @@ enqueue_cmd_targets(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static void
+setup_environment(void)
+{
+    const char *oldpath;
+    char *newvar;
+    
+    oldpath = getenv("PATH");
+    if (oldpath == 0)
+    	oldpath = "";	    /* should never happen anyway */
+    newvar = g_strdup_printf("PATH=" LIBEXECDIR ":%s", oldpath);
+#if 0
+    fprintf(stderr, "putenv(\"%s\")\n", newvar);
+#endif
+    putenv(newvar);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 int
 main(int argc, char **argv)
 {
     bindtextdomain(PACKAGE, LOCALEDIR);
     textdomain(PACKAGE);
+    setup_environment();
     
     gtk_init(&argc, &argv);    
     preferences_load();
