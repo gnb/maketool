@@ -8,7 +8,6 @@
 #include <string.h>
 #include <errno.h>
 #include <signal.h>
-#include <sys/ioctl.h>
 #include "spawn.h"
 #include "filter.h"
 
@@ -23,14 +22,16 @@ typedef struct
 
 typedef enum
 {
-    SET_NOTEMPTY,
-    SET_NOTRUNNING,
-    SET_RUNNING,
-    SET_SELECTED,
-    SET_AGAIN,
+    GR_NONE=-1,
+    
+    GR_NOTEMPTY=0,
+    GR_NOTRUNNING,
+    GR_RUNNING,
+    GR_SELECTED,
+    GR_AGAIN,
 
     NUM_SETS
-} WidgetSet;
+} Groups;
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -50,7 +51,6 @@ GList		*widgets[NUM_SETS];
 pid_t		currentPid = -1;
 gboolean	interrupted = FALSE;
 gint		currentInput;
-int		currentFd;
 int		numErrors;
 int		numWarnings;
 GList		*log;	/* list of LogRecs */
@@ -69,7 +69,8 @@ GdkColor	warningBackground, errorBackground;
 #define PASTE3(x,y,z) x##y##z
 
 static LogRec *logSelected(void);
-static void handleLine(char *line);
+extern void help_about_show(GtkWidget *topl);
+extern void help_about_make_show(GtkWidget *topl);
 
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -89,20 +90,33 @@ message(const char *fmt, ...)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static GPtrArray *uiGroups = 0;
+
 static void
-widgets_set_sensitive(WidgetSet set, gboolean b)
+uiGroupSetSensitive(gint group, gboolean b)
 {
     GList *list;
     
-    for (list = widgets[set] ; list != 0 ; list = list->next)
+    list = g_ptr_array_index(uiGroups, group);
+    
+    for ( ; list != 0 ; list = list->next)
     	gtk_widget_set_sensitive(GTK_WIDGET(list->data), b);
 }
 
 static void
-widgets_add(WidgetSet set, GtkWidget *w)
+uiGroupAdd(gint group, GtkWidget *w)
 {
-    widgets[set] = g_list_prepend(widgets[set], w);
+    if (uiGroups == 0)
+    	uiGroups = g_ptr_array_new();
+	
+    if (group >= uiGroups->len)
+	g_ptr_array_set_size(uiGroups, group+1);
+	
+    g_ptr_array_index(uiGroups, group) = 
+    	g_list_prepend(g_ptr_array_index(uiGroups, group), w);
 }
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
 grey_menu_items(void)
@@ -112,11 +126,11 @@ grey_menu_items(void)
     gboolean selected = (logSelected() != 0);
     gboolean again = (lastTarget != 0 && !running);
 
-    widgets_set_sensitive(SET_NOTRUNNING, !running);
-    widgets_set_sensitive(SET_RUNNING, running);
-    widgets_set_sensitive(SET_NOTEMPTY, !empty);
-    widgets_set_sensitive(SET_SELECTED, selected);
-    widgets_set_sensitive(SET_AGAIN, again);
+    uiGroupSetSensitive(GR_NOTRUNNING, !running);
+    uiGroupSetSensitive(GR_RUNNING, running);
+    uiGroupSetSensitive(GR_NOTEMPTY, !empty);
+    uiGroupSetSensitive(GR_SELECTED, selected);
+    uiGroupSetSensitive(GR_AGAIN, again);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -193,7 +207,7 @@ lr_delete(LogRec *lr)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-logAddLine(LogRec *lr)
+logShowRec(LogRec *lr)
 {
     gboolean was_empty = GTK_CTREE_IS_EMPTY(logwin);
     GdkFont *font = 0;
@@ -258,6 +272,32 @@ logAddLine(LogRec *lr)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static GList *logPendingLines = 0;
+static GList *logDirectoryStack = 0;
+
+static void
+logAddLine(char *line)
+{
+    FilterResult res;
+    LogRec *lr;
+
+    res.file = 0;
+    res.line = 0;
+    res.column = 0;
+    filter_apply(line, &res);
+#if DEBUG
+    fprintf(stderr, "filter_apply: \"%s\" -> %d \"%s\" %d\n",
+    	line, (int)res.code, res.file, res.line);
+#endif
+    if (res.code == FR_UNDEFINED)
+    	res.code = FR_INFORMATION;
+    lr = lr_new(line, &res);
+    log = g_list_append(log, lr);		/* TODO: fix O(N^2) */
+    logShowRec(lr);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 static void
 logClear(void)
 {
@@ -285,7 +325,7 @@ logRepopulate(void)
     gtk_clist_freeze(GTK_CLIST(logwin));
     gtk_clist_clear(GTK_CLIST(logwin));
     for (list=log ; list!=0 ; list=list->next)
-	logAddLine((LogRec *)list->data);    	
+	logShowRec((LogRec *)list->data);    	
     gtk_clist_thaw(GTK_CLIST(logwin));
 }
 
@@ -335,7 +375,7 @@ logOpen(const char *file)
 	    *x = '\0';
 	if ((x = strchr(buf, '\r')) != 0)
 	    *x = '\0';
-    	handleLine(buf);
+    	logAddLine(buf);
     }
     
     fclose(fp);
@@ -356,16 +396,8 @@ logSelected(void)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
-reapEdit(pid_t pid, int status, struct rusage *usg, gpointer user_data)
-{
-    if (WIFEXITED(status) || WIFSIGNALED(status))
-    	fprintf(stderr, "Reaping editor pid %d\n", (int)pid);
-}
-
-static void
 startEdit(LogRec *lr)
 {
-    pid_t pid;
     char buf[2048];
     
     if (lr->res.file == 0 || lr->res.file[0] == '\0')
@@ -373,23 +405,8 @@ startEdit(LogRec *lr)
 	
     sprintf(buf, "nc -noask -line %d %s", lr->res.line, lr->res.file);
     
-    if ((pid = fork()) < 0)
-    {
-    	/* error */
-    	perror("fork");
-    }
-    else if (pid == 0)
-    {
-    	/* child */
-	execlp("/bin/sh", "/bin/sh", "-c", buf, 0);
-	perror("execlp");
-    }
-    else
-    {
-    	/* parent */
+    if (spawn_simple(buf, 0, 0) > 0)
 	message("Editing %s (line %d)", lr->res.file, lr->res.line);
-	spawn_add_reap_func(pid, reapEdit, (gpointer)0);
-    }
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -422,10 +439,7 @@ reapMake(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 	    
 	message("Finished making %s%s%s%s", target, errStr, warnStr, intStr);
 	
-	if (currentPid == pid)
-	    currentPid = -1;
-	gtk_input_remove(currentInput);
-	close(currentFd);
+	currentPid = -1;
 	anim_stop();
 	grey_menu_items();
     }
@@ -433,33 +447,9 @@ reapMake(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-static GList *pendingLines = 0;
-static GList *directoryStack = 0;
 
 static void
-handleLine(char *line)
-{
-    FilterResult res;
-    LogRec *lr;
-
-    res.file = 0;
-    res.line = 0;
-    res.column = 0;
-    filter_apply(line, &res);
-#if DEBUG
-    fprintf(stderr, "filter_apply: \"%s\" -> %d \"%s\" %d\n",
-    	line, (int)res.code, res.file, res.line);
-#endif
-    if (res.code == FR_UNDEFINED)
-    	res.code = FR_INFORMATION;
-    lr = lr_new(line, &res);
-    log = g_list_append(log, lr);		/* TODO: fix O(N^2) */
-    logAddLine(lr);
-}
-
-
-static void
-handleData(char *buf, int len)
+handleInput(int len, const char *buf, gpointer data)
 {
     static char linebuf[1024];
     static int nleftover = 0;
@@ -483,98 +473,33 @@ handleData(char *buf, int len)
     	/* got an end-of-line - isolate the line & feed it to handleLine() */
 	*p = '\0';
 	strncpy(&linebuf[nleftover], buf, sizeof(linebuf)-nleftover);
-	handleLine(linebuf);
+	logAddLine(linebuf);
 	nleftover = 0;
 	len -= (p - buf);
 	buf = ++p;
     }
 }
 
-
-static void
-handleInput(gpointer data, gint source, GdkInputCondition condition)
-{
-    if (source == currentFd && condition == GDK_INPUT_READ)
-    {
-    	int nremain = 0;
-	
-	if (ioctl(currentFd, FIONREAD, &nremain) < 0)
-	{
-	    perror("ioctl(FIONREAD)");
-	    return;
-	}
-	
-	while (nremain > 0)
-	{
-	    char buf[1025];
-	    int n = read(currentFd, buf, MIN(sizeof(buf)-1, nremain));
-	    nremain -= n;
-	    buf[n] = '\0';		/* so we can use str*() calls */
-	    handleData(buf, n);
-	}
-    }
-}
-
-
-#define READ 0
-#define WRITE 1
-#define STDOUT 1
-#define STDERR 2
 void
 buildStart(const char *target)
 {
-    pid_t pid;
-    int pipefds[2];
     char buf[2048];
     
     sprintf(buf, "make %s", target);
     
-    
-    if (pipe(pipefds) < 0)
+    currentPid = spawn_with_output(buf, reapMake, handleInput, (gpointer)target);
+    if (currentPid > 0)
     {
-    	perror("pipe");
-    	return;
-    }
-    
-    if ((pid = fork()) < 0)
-    {
-    	/* error */
-    	perror("fork");
-    }
-    else if (pid == 0)
-    {
-    	/* child */
-	close(pipefds[READ]);
-	dup2(pipefds[WRITE], STDOUT);
-	dup2(pipefds[WRITE], STDERR);
-	close(pipefds[WRITE]);
-	
-	execlp("/bin/sh", "/bin/sh", "-c", buf, 0);
-	perror("execlp");
-    }
-    else
-    {
-    	/* parent */
 	message("Making %s", target);
 	lastTarget = target;
-	spawn_add_reap_func(pid, reapMake, (gpointer)target);
-	currentPid = pid;
 	interrupted = FALSE;
-	currentFd = pipefds[READ];
-	close(pipefds[WRITE]);
 	filter_init();
 	numErrors = 0;
 	numWarnings = 0;
-	currentInput = gdk_input_add(currentFd,
-			    GDK_INPUT_READ, handleInput, (gpointer)0);
 	anim_start();
 	grey_menu_items();
     }
 }
-#undef READ
-#undef WRITE
-#undef STDOUT
-#undef STDERR
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -725,6 +650,21 @@ view_edit_cb(GtkWidget *w, gpointer data)
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
+help_about_cb(GtkWidget *w, gpointer data)
+{
+    help_about_show(toplevel);
+}
+
+
+static void
+help_about_make_cb(GtkWidget *w, gpointer data)
+{
+    help_about_make_show(toplevel);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
 log_click_cb(GtkCTree *tree, GtkCTreeNode *treeNode, gint column, gpointer data)
 {
     LogRec *lr = (LogRec *)gtk_ctree_node_get_row_data(tree, treeNode);
@@ -801,7 +741,8 @@ uiAddButton(
     GtkWidget *menu,
     const char *label,
     void (*callback)(GtkWidget*, gpointer),
-    gpointer calldata)
+    gpointer calldata,
+    gint group)
 {
     GtkWidget *item;
 
@@ -809,6 +750,8 @@ uiAddButton(
     gtk_menu_append(GTK_MENU(menu), item);
     gtk_signal_connect(GTK_OBJECT(item), "activate", 
     	GTK_SIGNAL_FUNC(callback), calldata);
+    if (group >= 0)
+    	uiGroupAdd(group, item);
     gtk_widget_show(item);
     return item;
 }
@@ -872,58 +815,41 @@ static void
 uiCreateMenus(GtkWidget *menubar)
 {
     GtkWidget *menu;
-    GtkWidget *item;
     
     menu = uiAddMenu(menubar, "File");
     uiAddTearoff(menu);
-    uiAddButton(menu, "Open Log...", file_open_cb, 0);
-    item = uiAddButton(menu, "Save Log...", file_save_cb, 0);
-    widgets_add(SET_NOTEMPTY, item);
+    uiAddButton(menu, "Open Log...", file_open_cb, 0, GR_NONE);
+    uiAddButton(menu, "Save Log...", file_save_cb, 0, GR_NOTEMPTY);
     uiAddSeparator(menu);
-    item = uiAddButton(menu, "Change Makefile...", unimplemented, 0);
-    widgets_add(SET_NOTRUNNING, item);
-    item = uiAddButton(menu, "Change directory...", unimplemented, 0);
-    widgets_add(SET_NOTRUNNING, item);
+    uiAddButton(menu, "Change Makefile...", unimplemented, 0, GR_NOTRUNNING);
+    uiAddButton(menu, "Change directory...", unimplemented, 0, GR_NOTRUNNING);
     uiAddSeparator(menu);
-    item = uiAddButton(menu, "Print", unimplemented, 0);
-    widgets_add(SET_NOTEMPTY, item);
-    uiAddButton(menu, "Print Settings...", unimplemented, 0);
+    uiAddButton(menu, "Print", unimplemented, 0, GR_NOTEMPTY);
+    uiAddButton(menu, "Print Settings...", unimplemented, 0, GR_NONE);
     uiAddSeparator(menu);
-    uiAddButton(menu, "Exit", file_exit_cb, 0);
+    uiAddButton(menu, "Exit", file_exit_cb, 0, GR_NONE);
     
     menu = uiAddMenu(menubar, "Build");
     uiAddTearoff(menu);
-    item = uiAddButton(menu, "Again", build_again_cb, 0);
-    widgets_add(SET_AGAIN, item);
-    item = uiAddButton(menu, "Stop", build_stop_cb, 0);
-    widgets_add(SET_RUNNING, item);
+    uiAddButton(menu, "Again", build_again_cb, 0, GR_AGAIN);
+    uiAddButton(menu, "Stop", build_stop_cb, 0, GR_RUNNING);
     uiAddSeparator(menu);
-    item = uiAddButton(menu, "all", build_cb, "all");
-    widgets_add(SET_NOTRUNNING, item);
-    item = uiAddButton(menu, "install", build_cb, "install");
-    widgets_add(SET_NOTRUNNING, item);
-    item = uiAddButton(menu, "clean", build_cb, "clean");
-    widgets_add(SET_NOTRUNNING, item);
+    uiAddButton(menu, "all", build_cb, "all", GR_NOTRUNNING);
+    uiAddButton(menu, "install", build_cb, "install", GR_NOTRUNNING);
+    uiAddButton(menu, "clean", build_cb, "clean", GR_NOTRUNNING);
     uiAddSeparator(menu);
 #if 1
-    item = uiAddButton(menu, "random", build_cb, "random");
-    widgets_add(SET_NOTRUNNING, item);
-    item = uiAddButton(menu, "delay", build_cb, "delay");
-    widgets_add(SET_NOTRUNNING, item);
-    item = uiAddButton(menu, "targets", build_cb, "targets");
-    widgets_add(SET_NOTRUNNING, item);
+    uiAddButton(menu, "random", build_cb, "random", GR_NOTRUNNING);
+    uiAddButton(menu, "delay", build_cb, "delay", GR_NOTRUNNING);
+    uiAddButton(menu, "targets", build_cb, "targets", GR_NOTRUNNING);
 #endif
     
     menu = uiAddMenu(menubar, "View");
     uiAddTearoff(menu);
-    item = uiAddButton(menu, "Clear Log", view_clear_cb, 0);
-    widgets_add(SET_NOTEMPTY, item);
-    item = uiAddButton(menu, "Edit", view_edit_cb, 0);
-    widgets_add(SET_SELECTED, item);
-    item = uiAddButton(menu, "Edit Next Error", unimplemented, 0);
-    widgets_add(SET_NOTEMPTY, item);
-    item = uiAddButton(menu, "Edit Prev Error", unimplemented, 0);
-    widgets_add(SET_NOTEMPTY, item);
+    uiAddButton(menu, "Clear Log", view_clear_cb, 0, GR_NOTEMPTY);
+    uiAddButton(menu, "Edit", view_edit_cb, 0, GR_SELECTED);
+    uiAddButton(menu, "Edit Next Error", unimplemented, 0, GR_NOTEMPTY);
+    uiAddButton(menu, "Edit Prev Error", unimplemented, 0, GR_NOTEMPTY);
     uiAddSeparator(menu);
     uiAddToggle(menu, "Toolbar", view_widget_cb, (gpointer)&toolbar, 0, TRUE);
     uiAddToggle(menu, "Messages", view_widget_cb, (gpointer)&messagebox, 0, TRUE);
@@ -932,18 +858,18 @@ uiCreateMenus(GtkWidget *menubar)
     uiAddToggle(menu, "Warnings", view_flags_cb, (gpointer)&showWarnings, 0, showWarnings);
     uiAddToggle(menu, "Information", view_flags_cb, (gpointer)&showInfo, 0, showInfo);
     uiAddSeparator(menu);
-    uiAddButton(menu, "Preferences", unimplemented, 0);
+    uiAddButton(menu, "Preferences", unimplemented, 0, GR_NONE);
     
     menu = uiAddMenuRight(menubar, "Help");
     uiAddTearoff(menu);
-    uiAddButton(menu, "About Maketool...", unimplemented, 0);
-    uiAddButton(menu, "About make...", unimplemented, 0);
+    uiAddButton(menu, "About Maketool...", help_about_cb, 0, GR_NONE);
+    uiAddButton(menu, "About make...", help_about_make_cb, 0, GR_NONE);
     uiAddSeparator(menu);
-    uiAddButton(menu, "Help on...", unimplemented, 0);
+    uiAddButton(menu, "Help on...", unimplemented, 0, GR_NONE);
     uiAddSeparator(menu);
-    uiAddButton(menu, "Tutorial", unimplemented, 0);
-    uiAddButton(menu, "Reference Index", unimplemented, 0);
-    uiAddButton(menu, "Home Page", unimplemented, 0);
+    uiAddButton(menu, "Tutorial", unimplemented, 0, GR_NONE);
+    uiAddButton(menu, "Reference Index", unimplemented, 0, GR_NONE);
+    uiAddButton(menu, "Home Page", unimplemented, 0, GR_NONE);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -955,13 +881,15 @@ uiToolCreate(
     const char *tooltip,
     char **pixmap_xpm,
     GtkSignalFunc callback,
-    gpointer user_data)
+    gpointer user_data,
+    gint group)
 {
     GdkPixmap *pm = 0;
     GdkBitmap *mask = 0;
+    GtkWidget *item;
 
     pm = gdk_pixmap_create_from_xpm_d(toplevel->window, &mask, 0, pixmap_xpm);
-    return gtk_toolbar_append_item(
+    item = gtk_toolbar_append_item(
     	GTK_TOOLBAR(toolbar),
     	name,
 	tooltip,
@@ -969,6 +897,9 @@ uiToolCreate(
     	gtk_pixmap_new(pm, mask),
 	callback,
 	user_data);
+    if (group >= 0)
+    	uiGroupAdd(group, item);
+    return item;
 }
 
 static void
@@ -984,35 +915,27 @@ uiToolAddSpace(GtkWidget *toolbar)
 static void
 uiCreateTools()
 {
-    GtkWidget *item;
-    
-    item = uiToolCreate(toolbar, "Again", "Build last target again",
-    	new_xpm, build_again_cb, 0);
-    widgets_add(SET_AGAIN, item);
+    uiToolCreate(toolbar, "Again", "Build last target again",
+    	new_xpm, build_again_cb, 0, GR_AGAIN);
     
     uiToolAddSpace(toolbar);
 
-    item = uiToolCreate(toolbar, "all", "Build `all'",
-    	new_xpm, build_cb, "all");
-    widgets_add(SET_NOTRUNNING, item);
-    item = uiToolCreate(toolbar, "clean", "Build `clean'",
-    	new_xpm, build_cb, "clean");
-    widgets_add(SET_NOTRUNNING, item);
+    uiToolCreate(toolbar, "all", "Build `all'",
+    	new_xpm, build_cb, "all", GR_NOTRUNNING);
+    uiToolCreate(toolbar, "clean", "Build `clean'",
+    	new_xpm, build_cb, "clean", GR_NOTRUNNING);
     
     uiToolAddSpace(toolbar);
     
-    item = uiToolCreate(toolbar, "Clear", "Clear log of messages",
-    	new_xpm, view_clear_cb, 0);
-    widgets_add(SET_NOTEMPTY, item);
-    item = uiToolCreate(toolbar, "Next", "Edit next error or warning",
-    	new_xpm, unimplemented, 0);
-    widgets_add(SET_NOTEMPTY, item);
+    uiToolCreate(toolbar, "Clear", "Clear log of messages",
+    	new_xpm, view_clear_cb, 0, GR_NOTEMPTY);
+    uiToolCreate(toolbar, "Next", "Edit next error or warning",
+    	new_xpm, unimplemented, 0, GR_NOTEMPTY);
     
     uiToolAddSpace(toolbar);
     
-    item = uiToolCreate(toolbar, "Print", "Print messages",
-    	new_xpm, unimplemented, 0);
-    widgets_add(SET_NOTEMPTY, item);
+    uiToolCreate(toolbar, "Print", "Print messages",
+    	new_xpm, unimplemented, 0, GR_NOTEMPTY);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

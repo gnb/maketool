@@ -2,119 +2,158 @@
 #include <stdio.h>
 #include <signal.h>
 #include <errno.h>
+#include <unistd.h>
 #include <sys/poll.h>
+#include <sys/ioctl.h>
+#include <gtk/gtk.h>
 
 #define DEBUG 0
 
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+pid_t
+spawn_simple(
+    const char *command,
+    GUnixReapFunc reaper,
+    gpointer reaper_data)
+{
+    pid_t pid;
+    
+    if ((pid = fork()) < 0)
+    {
+    	/* error */
+    	perror("fork");
+	return -1;
+    }
+    else if (pid == 0)
+    {
+    	/* child */
+	execlp("/bin/sh", "/bin/sh", "-c", command, 0);
+	perror("execlp");
+	exit(1);
+    }
+    else
+    {
+    	/* parent */
+	g_unix_add_reap_func(pid, reaper, reaper_data);
+    }
+    return pid;
+}    
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 typedef struct
 {
-    pid_t pid;
-    void (*reaper)(pid_t, int status, struct rusage*, gpointer);
+    GUnixReapFunc reap_func;
+    SpawnInputFunc input_func;
     gpointer user_data;
-} PidData;
-
-static GHashTable *spawn_piddata = 0;
-static int spawn_got_signal = 0;
-
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-static gboolean
-spawn_dispatch_reapers(gpointer data)
-{
-    PidData *pd;
-    pid_t pid;
-    int status = 0;
-    struct rusage usage;
-    
-    fprintf(stderr, "spawn_dispatch_reapers()\n");
-    
-    for (;;)
-    {
-	pid = wait3(&status, WNOHANG, &usage);
-	fprintf(stderr, "spawn_check_processes(): pid = %d\n", (int)pid);
-	if (pid <= 0)
-    	    break;
-
-	pd = (PidData *)g_hash_table_lookup(spawn_piddata, GINT_TO_POINTER(pid));
-	if (pd != 0)
-	{
-	    (*pd->reaper)(pid, status, &usage, pd->user_data);
-	    if (WIFEXITED(status) || WIFSIGNALED(status))
-	    	g_hash_table_remove(spawn_piddata, GINT_TO_POINTER(pid));
-	}
-    }
-    return FALSE;	/* stop calling this function */
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-/* TODO: copy #ifndef HAVE_POLL definition of g_poll() from glib's gmain.c */
-
-static gint
-spawn_poll_func(
-    GPollFD *ufds,
-    guint nfds,
-    gint timeout)
-{
-    int ret;
-    
-    ret = poll((struct pollfd*)ufds, nfds, timeout);
-    
-#if DEBUG
-    fprintf(stderr, "spawn_poll_func(): ret=%d errno=%d spawn_got_signal=%d\n",
-    	ret, errno, spawn_got_signal);
-#endif
-
-    if (spawn_got_signal > 0)
-    {
-    	g_idle_add(spawn_dispatch_reapers, (gpointer)0);
-    	spawn_got_signal = 0;
-    }
-    return ret;
-}
-
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+    int fd;
+    int input_tag;
+} SpawnData;
 
 static void
-spawn_signal_handler(int sig)
+spawn_output_reaper(pid_t pid, int status, struct rusage *usg, gpointer data)
 {
-    spawn_got_signal++;
+    SpawnData *so = (SpawnData *)data;
+    
+    if (so->reap_func != 0)
+	(*so->reap_func)(pid, status, usg, so->user_data);
+
+    if (WIFEXITED(status) || WIFSIGNALED(status))
+    {
+    	close(so->fd);
+	gtk_input_remove(so->input_tag);
+    	g_free(so);
+    }
 }
 
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+static void
+spawn_output_input(gpointer data, gint source, GdkInputCondition condition)
+{
+    SpawnData *so = (SpawnData *)data;
+    int nremain = 0;
+    
+    if (source != so->fd || condition != GDK_INPUT_READ)
+    	return;
+	
+    if (ioctl(so->fd, FIONREAD, &nremain) < 0)
+    {
+	perror("ioctl(FIONREAD)");
+	return;
+    }
 
-/*TODO:return a gint tag for removal*/
-void
-spawn_add_reap_func(
-    pid_t pid,
-    void (*reaper)(pid_t, int status, struct rusage *, gpointer),
+    while (nremain > 0)
+    {
+	char buf[1025];
+	int n = read(so->fd, buf, MIN(sizeof(buf)-1, nremain));
+	nremain -= n;
+	buf[n] = '\0';		/* so we can use str*() calls */
+	(*so->input_func)(n, buf, so->user_data);
+    }
+}
+
+#define READ 0
+#define WRITE 1
+#define STDOUT 1
+#define STDERR 2
+
+pid_t
+spawn_with_output(
+    const char *command,
+    GUnixReapFunc reaper,
+    SpawnInputFunc input,	/* called with data from child's std{err,out} */
     gpointer user_data)
 {
-    PidData *pd;
-    static gboolean first = TRUE;
+    pid_t pid;
+    int pipefds[2];
+    SpawnData *so;
     
-    if (first)
+    if (pipe(pipefds) < 0)
     {
-    	first = FALSE;
-	g_main_set_poll_func(spawn_poll_func);
-    	spawn_piddata = g_hash_table_new(g_direct_hash, g_direct_equal);
-	signal(SIGCHLD, spawn_signal_handler);
+    	perror("pipe");
+    	return -1;
     }
     
-    pd = g_new(PidData, 1);
-    pd->pid = pid;
-    pd->reaper = reaper;
-    pd->user_data = user_data;
-    g_hash_table_insert(spawn_piddata, GINT_TO_POINTER(pid), (gpointer)pd);
-    
-    fprintf(stderr, "spawn_add_reaper(): pid = %d\n", (int)pid);
+    if ((pid = fork()) < 0)
+    {
+    	/* error */
+    	perror("fork");
+	return -1;
+    }
+    else if (pid == 0)
+    {
+    	/* child */
+	close(pipefds[READ]);
+	dup2(pipefds[WRITE], STDOUT);
+	dup2(pipefds[WRITE], STDERR);
+	close(pipefds[WRITE]);
+	
+	execlp("/bin/sh", "/bin/sh", "-c", command, 0);
+	perror("execlp");
+	exit(1);
+    }
+    else
+    {
+    	/* parent */
+	close(pipefds[WRITE]);
+	
+	so = g_new(SpawnData, 1);
+	so->reap_func = reaper;
+	so->input_func = input;
+	so->user_data = user_data;
+	so->fd = pipefds[READ];
+	so->input_tag = gdk_input_add(so->fd,
+			    GDK_INPUT_READ, spawn_output_input, (gpointer)so);
+	g_unix_add_reap_func(pid, spawn_output_reaper, (gpointer)so);
+    }
+    return pid;
 }
+ 
+#undef READ
+#undef WRITE
+#undef STDOUT
+#undef STDERR
 
-/* TODO:
-void
-spawn_remove_reap_func(gint tag)
-*/
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 /*END*/
