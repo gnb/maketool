@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.59 2003-10-03 12:14:19 gnb Exp $
+# $Id: Makefile.in,v 1.60 2003-10-19 15:08:57 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -49,10 +49,10 @@ SOURCES=	main.c filter.c help.c preferences.c log.c print.c ps.c find.c \
 		makesys.c autoconf.c imake.c @OS_MAKESYS_SOURCE@ \
 		makeprog.c gmake.c pmake.c @OS_MAKEPROG_SOURCE@ \
 		ui.c uix.c task.c util.c glib_extra.c mqueue.c \
-		progress.c
+		progress.c gtkdtree.c
 HEADERS=	maketool.h filter.h common.h log.h ui.h \
 		util.h glib_extra.h ps.h maketool_task.h mqueue.h \
-		autoconf_strs.c progress.h
+		autoconf_strs.c progress.h gtkdtree.h
 OBJECTS=	$(SOURCES:.c=.o)
 
 top_srcdir=	.
@@ -195,6 +195,10 @@ distclean:: clean
 
 .c.o:
 	$(COMPILE.c) -c $<
+
+# Just too much wrong in GTK source to fix, so disable -pedantic
+gtkdtree.o:	gtkdtree.c
+	$(CC) $(CPPFLAGS) `echo $(CFLAGS) | sed -e 's|-pedantic||g'` -c $<
 
 ###
 # Some basic documentation (COPYRIGHT etc) used to be installed

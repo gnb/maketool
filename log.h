@@ -22,6 +22,7 @@
 
 #include "common.h"
 #include <gtk/gtk.h>
+#include "gtkdtree.h"
 #include "filter.h"
 #include "progress.h"
 #include "maketool_task.h"
@@ -37,7 +38,7 @@ typedef struct
 {
     char *line;
     FilterResult res;
-    GtkCTreeNode *node;
+    GtkDTreeNode *node;
     gboolean expanded;
     LogContext *context;    /* may be null */
 } LogRec;

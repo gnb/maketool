@@ -23,11 +23,11 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.54 2003-10-16 15:03:55 gnb Exp $");
+CVSID("$Id: log.c,v 1.55 2003-10-19 15:08:57 gnb Exp $");
 
-#ifndef GTK_CTREE_IS_EMPTY
-#define GTK_CTREE_IS_EMPTY(_ctree_) \
-	(gtk_ctree_node_nth(GTK_CTREE(_ctree_), 0) == 0)
+#ifndef GTK_DTREE_IS_EMPTY
+#define GTK_DTREE_IS_EMPTY(_dtree_) \
+	(gtk_dtree_node_nth(GTK_DTREE(_dtree_), 0) == 0)
 #endif
 
 #include "error.xpm"
@@ -44,7 +44,7 @@ typedef struct
 
 #define DO_FONTS 0  	/* TODO: support different fonts */
 
-static GtkWidget	*logwin;	/* a GtkCTree widget */
+static GtkWidget	*logwin;	/* a GtkDTree widget */
 static int		num_errors;
 static int		num_warnings;
 static gboolean     	num_ew_changed = FALSE;
@@ -513,7 +513,7 @@ log_get_text(const LogRec *lr)
 static void
 log_show_rec(LogRec *lr)
 {
-    gboolean was_empty = GTK_CTREE_IS_EMPTY(logwin);
+    gboolean was_empty = GTK_DTREE_IS_EMPTY(logwin);
     LogSeverity sev = L_INFO;
     LogRec *parent_rec = log_current_unique_node();
     char *text;
@@ -580,9 +580,9 @@ log_show_rec(LogRec *lr)
     text = (char *)log_get_text(lr);
     
     /* TODO: freeze & thaw if it redraws the wrong colour 1st */
-    lr->node = gtk_ctree_insert_node(GTK_CTREE(logwin),
+    lr->node = gtk_dtree_insert_node(GTK_DTREE(logwin),
     	(parent_rec == 0 ? 0 : parent_rec->node),/* parent */
-	(GtkCTreeNode*)0,			/* sibling */
+	(GtkDTreeNode*)0,			/* sibling */
 	&text,					/* text[] */
 	0,					/* spacing */
 	icons[sev].closed_pm,
@@ -591,12 +591,12 @@ log_show_rec(LogRec *lr)
 	icons[sev].open_mask,			/* pixmap_opened,mask_opened */
 	is_leaf,	    			/* is_leaf */
 	lr->expanded);				/* expanded */
-    gtk_ctree_node_set_row_data(GTK_CTREE(logwin), lr->node, (gpointer)lr);
+    gtk_dtree_node_set_row_data(GTK_DTREE(logwin), lr->node, (gpointer)lr);
     /* TODO: support different fonts */
     if (foreground_set[sev] != 0)
-	gtk_ctree_node_set_foreground(GTK_CTREE(logwin), lr->node, &foregrounds[sev]);
+	gtk_dtree_node_set_foreground(GTK_DTREE(logwin), lr->node, &foregrounds[sev]);
     if (background_set[sev] != 0)
-    	gtk_ctree_node_set_background(GTK_CTREE(logwin), lr->node, &backgrounds[sev]);
+    	gtk_dtree_node_set_background(GTK_DTREE(logwin), lr->node, &backgrounds[sev]);
     
     if (was_empty)
     	grey_menu_items();	/* log window just became non-empty */
@@ -636,7 +636,7 @@ log_update_build_start(void)
     }
     estring_append_string(&text, ")");
 
-    gtk_ctree_node_set_text(GTK_CTREE(logwin), bs->node, /*column*/0, text.data);
+    gtk_dtree_node_set_text(GTK_DTREE(logwin), bs->node, /*column*/0, text.data);
 
     estring_free(&text);
     
@@ -751,7 +751,7 @@ log_clear(void)
 gboolean
 log_is_empty(void)
 {
-    return GTK_CTREE_IS_EMPTY(logwin);
+    return GTK_DTREE_IS_EMPTY(logwin);
 }
 
 void
@@ -764,7 +764,7 @@ log_collapse_all(void)
     	LogRec *lr = (LogRec *)list->data;
 	
 	if (lr->res.code == FR_BUILDSTART)
-	    gtk_ctree_collapse(GTK_CTREE(logwin), lr->node);
+	    gtk_dtree_collapse(GTK_DTREE(logwin), lr->node);
     }
 }
 
@@ -787,13 +787,13 @@ log_repopulate(void)
     
     gtk_clist_freeze(GTK_CLIST(logwin));
     
-    /* figure out which log record is the first-visible in the ctree */
+    /* figure out which log record is the first-visible in the dtree */
     if (!log_is_empty())
     {
-	first = (LogRec *)gtk_ctree_node_get_row_data(
-    		GTK_CTREE(logwin),
-		gtk_ctree_node_nth(
-    		    GTK_CTREE(logwin),
+	first = (LogRec *)gtk_dtree_node_get_row_data(
+    		GTK_DTREE(logwin),
+		gtk_dtree_node_nth(
+    		    GTK_DTREE(logwin),
 		    ROW_FROM_YPIXEL(GTK_CLIST(logwin), 0)));
 #if DEBUG > 10
 	fprintf(stderr, "old first = \"%s\"\n", first->line);
@@ -825,7 +825,7 @@ log_repopulate(void)
 #if DEBUG > 10
 	    fprintf(stderr, "new first = \"%s\"\n", first->line);
 #endif
-    	    gtk_ctree_node_moveto(GTK_CTREE(logwin), first->node, 0,
+    	    gtk_dtree_node_moveto(GTK_DTREE(logwin), first->node, 0,
 	    	/* row_align */0.0, /* col_align */0.0);
 	    
 	}
@@ -959,11 +959,11 @@ static int
 log_get_indent_level(const LogRec *lr)
 {
     int indent = 0;
-    GtkCTreeNode *node = lr->node;
+    GtkDTreeNode *node = lr->node;
     
     for (;;)
     {
-    	GtkCTreeNode *parent = GTK_CTREE_ROW(node)->parent;
+    	GtkDTreeNode *parent = GTK_DTREE_ROW(node)->parent;
 	
 	if (parent == 0)
 	    return indent;
@@ -1060,8 +1060,8 @@ log_selected(void)
     if (GTK_CLIST(logwin)->selection == 0)
     	return 0;
 	
-    return (LogRec *)gtk_ctree_node_get_row_data(GTK_CTREE(logwin), 
-    		GTK_CTREE_NODE(GTK_CLIST(logwin)->selection->data));
+    return (LogRec *)gtk_dtree_node_get_row_data(GTK_DTREE(logwin), 
+    		GTK_DTREE_NODE(GTK_CLIST(logwin)->selection->data));
 }
 
 void
@@ -1069,9 +1069,9 @@ log_set_selected(LogRec *lr)
 {
     if (lr->node != 0)
     {
-	gtk_ctree_select(GTK_CTREE(logwin), lr->node);
-    	if (gtk_ctree_node_is_visible(GTK_CTREE(logwin), lr->node) != GTK_VISIBILITY_FULL)
-	    gtk_ctree_node_moveto(GTK_CTREE(logwin), lr->node, 0, 0.5, 0.0);
+	gtk_dtree_select(GTK_DTREE(logwin), lr->node);
+    	if (gtk_dtree_node_is_visible(GTK_DTREE(logwin), lr->node) != GTK_VISIBILITY_FULL)
+	    gtk_dtree_node_moveto(GTK_DTREE(logwin), lr->node, 0, 0.5, 0.0);
     }
 }
 
@@ -1082,8 +1082,8 @@ void
 log_ensure_visible(const LogRec *lr)
 {
     if (lr->node != 0 &&
-        gtk_ctree_node_is_visible(GTK_CTREE(logwin), lr->node) != GTK_VISIBILITY_FULL)
-	gtk_ctree_node_moveto(GTK_CTREE(logwin), lr->node, 0, 0.5, 0.0);
+        gtk_dtree_node_is_visible(GTK_DTREE(logwin), lr->node) != GTK_VISIBILITY_FULL)
+	gtk_dtree_node_moveto(GTK_DTREE(logwin), lr->node, 0, 0.5, 0.0);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
