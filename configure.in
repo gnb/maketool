@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
-dnl $Id: configure.in,v 1.39 2002-09-24 14:19:01 gnb Exp $
+dnl $Id: configure.in,v 1.40 2003-02-09 04:55:53 gnb Exp $
 dnl
 
 AC_INIT(main.c)
@@ -26,6 +26,8 @@ AC_CONFIG_HEADER(config.h)
 
 PACKAGE=maketool
 VERSION=0.7
+
+AC_CANONICAL_HOST
 
 dnl Checks for programs.
 AC_PROG_INSTALL
@@ -51,10 +53,10 @@ dnl defaults to off 'cos it's fairly unusual.
 AC_MSG_CHECKING([whether MWOS cross-compiler support is requested])
 AC_ARG_ENABLE(mwos,
 [  --enable-mwos           Enable filters for MWOS cross-compiler],
-ENABLE_MWOS=$enableval,ENABLE_MWOS=no)
-AC_MSG_RESULT($ENABLE_MWOS)
-if test "$ENABLE_MWOS" = "yes"; then
-    AC_DEFINE(ENABLE_MWOS)
+ENABLE_FILTER_MWOS=$enableval,ENABLE_FILTER_MWOS=no)
+AC_MSG_RESULT($ENABLE_FILTER_MWOS)
+if test "$ENABLE_FILTER_MWOS" = "yes"; then
+    AC_DEFINE(ENABLE_FILTER_MWOS)
 fi
 
 dnl Test for printer configuration.
@@ -146,6 +148,35 @@ dnl ===============================
 
 
 dnl ===============================
+
+dnl Maketool has specific support for some OS-specific
+dnl make programs and makefile systems.  Check to see
+dnl whether to enable any of them.
+AC_MSG_CHECKING(which OS-specific source to enable)
+
+OS_MAKEPROG_SOURCE=
+OS_MAKESYS_SOURCE=
+
+case "$host_os" in
+solaris*)
+    AC_DEFINE(ENABLE_FILTER_SUN)
+    ;;
+hpux*)
+    AC_DEFINE(ENABLE_FILTER_HPUX)
+    ;;
+irix*)
+    OS_MAKESYS_SOURCE="irix-makesys.c"
+    AC_DEFINE(HAVE_IRIX_SMAKE)
+    AC_DEFINE(HAVE_MAKESYS_IRIX)
+    AC_DEFINE(ENABLE_FILTER_MIPSPRO)
+    ;;
+esac
+
+AC_SUBST(OS_MAKEPROG_SOURCE)
+AC_SUBST(OS_MAKESYS_SOURCE)
+AC_MSG_RESULT($OS_MAKEPROG_SOURCE $OS_MAKESYS_SOURCE)
+
+dnl ===============================
 dnl Test for system make programs which need to be wrapped to
 dnl provide gmake-style directory enter/leave messages.
 AC_MSG_CHECKING(for non-GNU make programs)
@@ -193,4 +224,13 @@ AC_DEFINE(HAVE_WAIT3)
 AC_SUBST(ALL_LINGUAS)
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
-AC_OUTPUT(Makefile extract_targets maketool.spec intl/Makefile po/Makefile.in makesys/Makefile icons/Makefile doc/Makefile doc/help/Makefile doc/help/help-common.mk)
+AC_OUTPUT(
+    Makefile
+    maketool.spec
+    intl/Makefile
+    po/Makefile.in
+    makesys/Makefile
+    icons/Makefile
+    doc/Makefile
+    doc/help/Makefile
+    doc/help/help-common.mk)
