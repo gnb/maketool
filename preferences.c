@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.62 2003-09-24 10:28:46 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.63 2003-09-28 10:21:42 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -375,7 +375,8 @@ preferences_load(void)
     prefs.prog_list_targets = ui_config_get_string("prog_list_targets", 0);
     /* Detect and handle upgrade 0.7 -> 0.8 */
     if (prefs.prog_list_targets != 0 &&
-    	strstr(prefs.prog_list_targets, "gmake") != 0)
+    	(strstr(prefs.prog_list_targets, "gmake") != 0 ||
+	 strstr(prefs.prog_list_targets, "extract_targets") != 0))
     {
     	prefs.upgraded = TRUE;
     	g_free(prefs.prog_list_targets);
