@@ -23,7 +23,7 @@
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.27 2000-12-05 15:24:14 gnb Exp $");
+CVSID("$Id: help.c,v 1.28 2001-07-25 06:53:44 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*about_shell = 0;
@@ -426,6 +426,13 @@ help_on_cb(GtkWidget *w, void *user_data)
 	    	(name = ui_get_help_name(w)) != 0)
 		help_goto_helpname(name);
 	    break;
+	}
+	else if (event->type == GDK_ENTER_NOTIFY ||
+	    	 event->type == GDK_LEAVE_NOTIFY ||
+	    	 event->type == GDK_EXPOSE)
+	{
+	    /* pass these on to GTK so it can highlight buttons etc */
+	    gtk_main_do_event(event);
 	}
 	/* TODO: do we need to free the event?? */
     }
