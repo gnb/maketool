@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.43 2003-08-10 10:16:14 gnb Exp $");
+CVSID("$Id: log.c,v 1.44 2003-09-24 10:23:46 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -79,19 +79,27 @@ filter_result_init(FilterResult *res)
 static char *
 log_normalise_dir(const char *dir)
 {
-    char *curr;
-    char *nd;
-
     if (dir[0] == '/')
     	return g_strdup(dir);
     
-    curr = g_get_current_dir();
-    nd = g_strconcat(curr, "/", dir, 0);
-    g_free(curr);
-    
-    return nd;
+    return g_strconcat(current_dir, "/", dir, 0);
 }
 
+static char *
+log_denormalise_dir(const char *dir)
+{
+    int cdlen = strlen(current_dir);
+    
+    if (strncmp(dir, current_dir, cdlen) || dir[cdlen] != '/')
+    	return g_strdup(dir);
+
+    dir += cdlen;
+    while (*dir == '/')
+    	dir++;
+    if (*dir == '\0')
+    	return g_strdup(".");
+    return g_strdup(dir);
+}
 
 static void
 log_change_dir(const char *dir)
@@ -329,6 +337,9 @@ log_show_rec(LogRec *lr)
 	{
     	    log_push_node(lr);
 	    is_leaf = FALSE;
+	    if (lr->res.summary != 0)
+	    	g_free(lr->res.summary);
+	    lr->res.summary = log_denormalise_dir(lr->res.file);
 	}
 	break;
     case FR_POPDIR:
