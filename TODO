@@ -1,5 +1,12 @@
 --- open ---
 
+x  In Configure Options window, make NLS, getext, GTK and X stuff "advanced".
+
+x  Move the makesystem-specific commands from the Build menu itself
+   into a new submenu named after the make system, e.g. "automake Commands".
+   Note that the difference between autoconf-dist and autoconf-maint
+   should be hidden at this point.
+   
 x  Move "File->Edit Makefile" to the Edit menu, and make its label
    change at runtime to reflect the MakeSystem's "source" makefile
    (with a defaulting mechanism to find GNUmakefiles).
