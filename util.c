@@ -19,8 +19,10 @@
 
 #include "util.h"
 #include <stdarg.h>
+#include <time.h>
+#include <sys/time.h>
 
-CVSID("$Id: util.c,v 1.20 2004-11-07 02:16:49 gnb Exp $");
+CVSID("$Id: util.c,v 1.21 2004-11-07 05:35:19 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -355,6 +357,98 @@ file_denormalise(const char *path, unsigned flags)
     	(d = file_denormalise_1(path, file_home(), "~", "~/")) != 0)
     	return d;
     return g_strdup(path);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+void
+time_mark(time_mark_t *mark)
+{
+    gettimeofday(mark, 0);
+}
+
+static void
+time_elapsed(time_mark_t *mark, struct timeval *delta)
+{
+    struct timeval now;
+    
+    gettimeofday(&now, 0);
+    
+    delta->tv_sec = now.tv_sec - mark->tv_sec;
+    if (now.tv_usec > mark->tv_usec)
+    {
+    	delta->tv_usec = now.tv_usec - mark->tv_usec;
+    }
+    else
+    {
+    	delta->tv_usec = 1000000 - now.tv_usec + mark->tv_usec;
+	delta->tv_sec--;
+    }
+}
+
+double
+time_elapsed_seconds(time_mark_t *mark)
+{
+    struct timeval delta;
+    
+    time_elapsed(mark, &delta);
+    return (double)delta.tv_sec + (double)delta.tv_usec / 1.0e6;
+}
+
+char *
+time_elapsed_str(time_mark_t *mark)
+{
+    struct timeval delta;
+    estring e;
+    long sec;
+    int i;
+    static const char *labels[] = {
+    	N_("day"),
+	N_("hour"),
+	N_("min"),
+	N_("sec")
+    };
+    static long factors[] = { 86400, 3600, 60, 0 };
+    
+    time_elapsed(mark, &delta);
+    estring_init(&e);
+    
+    sec = delta.tv_sec;
+    for (i = 0 ; factors[i] ; i++)
+    {
+	long t = sec / factors[i];
+	sec %= factors[i];
+
+    	if (t)
+	{
+    	    if (e.length)
+		estring_append_char(&e, ' ');
+    	    estring_append_printf(&e, "%ld %s", t, _(labels[i]));
+    	}
+    }
+    
+    if (sec || !e.length)
+    {
+    	if (e.length)
+	    estring_append_char(&e, ' ');
+    	estring_append_printf(&e, "%ld.%01ld %s",
+	    sec, (delta.tv_usec + 50000) / 100000, _(labels[i]));
+    }
+    
+    assert(e.length > 0);
+    return e.data;
+}
+
+char *
+time_start_str(time_mark_t *mark)
+{
+    char buf[256];
+    struct tm tm;
+    
+    strftime(buf, sizeof(buf),
+    	     "%Y/%m/%d %H:%M:%S",
+    	     localtime_r(&mark->tv_sec, &tm));
+    return g_strdup(buf);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

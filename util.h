@@ -100,4 +100,32 @@ char *file_denormalise(const char *path, unsigned flags);
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+/*
+ * Support for timing intervals.
+ */
+
+typedef struct timeval	    time_mark_t;
+
+/*
+ * Initialise a time mark to the current time
+ */
+void time_mark(time_mark_t *);
+/*
+ * Returns the time since the mark in floating-point seconds.
+ */
+double time_elapsed_seconds(time_mark_t *);
+/*
+ * Formats an optimal human-readable string describing the
+ * time since the mark.  Returns a new string which needs
+ * to be g_free()d.
+ */
+char *time_elapsed_str(time_mark_t *);
+/*
+ * Formats a string describing the time mark itself.  Returns
+ * a new string which needs to be g_free()d.
+ */
+char *time_start_str(time_mark_t *);
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 #endif /* _UTIL_H_ */
