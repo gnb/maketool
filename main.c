@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.89 2003-05-04 06:33:33 gnb Exp $");
+CVSID("$Id: main.c,v 1.90 2003-05-13 01:16:53 gnb Exp $");
 
 
 /*
@@ -168,7 +168,6 @@ expand_prog(
     int line,
     const char *target)
 {
-    int i;
     char *out;
     const char *expands[256];
     estring fflag;
@@ -245,7 +244,7 @@ abbreviate_aux(estring *e, const char *str, int limit)
     {
     	len = limit;
 
-	if (len > sizeof(ellipsis)-1)
+	if (len > (int)sizeof(ellipsis)-1)
 	{
 	    estring_append_chars(e, str, len-(sizeof(ellipsis)-1));
 	    estring_append_string(e, ellipsis);
@@ -277,11 +276,11 @@ abbreviate_targets(const char *t1, const char *t2, int maxlen)
 
     estring_init(&e);
     
-    if (l1 + sizeof(dash) + l2 > maxlen)
-	l1 = (l1 < 4 ? l1 : (maxlen - sizeof(dash)) * l1 / (l1 + l2));
+    if (l1 + (int)sizeof(dash) + l2 > maxlen)
+	l1 = (l1 < 4 ? l1 : (maxlen - (int)sizeof(dash)) * l1 / (l1 + l2));
     l1 = abbreviate_aux(&e, t1, l1);
     estring_append_string(&e, dash);
-    abbreviate_aux(&e, t2, (maxlen - sizeof(dash)) - l1);
+    abbreviate_aux(&e, t2, (maxlen - (int)sizeof(dash)) - l1);
 
     return e.data;
 }
@@ -751,7 +750,7 @@ finish_prog_task(const char *target)
 }
 
 
-void
+static void
 finish_prog_start(const char *target)
 {
     task_enqueue(finish_prog_task(target));
@@ -886,7 +885,7 @@ make_task(const char *target)
 }
 
 
-void
+static void
 build_start(const char *target)
 {
     first_error = TRUE;
@@ -1527,7 +1526,6 @@ construct_build_menu_basic_items(void)
     int i;
     const MakeSystem *ms;
     gboolean need_sep = FALSE;
-    gboolean need_mf = FALSE;
     
     again_menu_item = ui_add_button(build_menu, _(again_menu_label[0]), "<Ctrl>A", build_again_cb, 0, GR_AGAIN);
     ui_add_button(build_menu, _("_Stop"), 0, build_stop_cb, 0, GR_RUNNING);

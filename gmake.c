@@ -26,7 +26,7 @@
 #error Why are you even bothering to compile with POSIX regular expressions?
 #endif
 
-CVSID("$Id: gmake.c,v 1.3 2003-05-04 06:33:02 gnb Exp $");
+CVSID("$Id: gmake.c,v 1.4 2003-05-13 01:16:01 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -214,7 +214,7 @@ gmake_list_targets_destroy(Task *task)
 
     if (ltt->targets != 0)
     {
-    	int i;
+    	unsigned int i;
 	
 	for (i = 0 ; i < ltt->targets->len ; i++)
 	    g_free(ltt->targets->pdata[i]);

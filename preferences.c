@@ -22,7 +22,7 @@
 #include "util.h"
 #include "log.h"
 
-CVSID("$Id: preferences.c,v 1.57 2003-05-04 05:38:31 gnb Exp $");
+CVSID("$Id: preferences.c,v 1.58 2003-05-13 01:18:34 gnb Exp $");
 
 static GtkWidget	*prefs_shell = 0;
 static GtkWidget    	*notebook;
@@ -100,7 +100,7 @@ var_str_to_type(const char *str)
 {
     int i;
     
-    for (i=0 ; i<ARRAYLEN(var_type_strs) ; i++)
+    for (i=0 ; i<(int)ARRAYLEN(var_type_strs) ; i++)
 	if (!strcmp(str, var_type_strs[i]))
     	    return i;
     return 0;

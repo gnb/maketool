@@ -21,7 +21,7 @@
 #define _config_h_ 1
 
 /*
- * $Id: config.h.in,v 1.17 2003-05-04 04:10:41 gnb Exp $
+ * $Id: config.h.in,v 1.18 2003-05-13 01:13:59 gnb Exp $
  */
 
 /*
@@ -138,6 +138,7 @@
 #define HAVE_UNISTD_H 0
 #define STDC_HEADERS 0
 #define RETSIGTYPE void
+#define inline inline
 /* autoconf defines specifically for gettext */
 #define ENABLE_NLS 0
 #define HAVE_CATGETS 0

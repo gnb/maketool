@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.28 2003-02-09 04:57:59 gnb Exp $");
+CVSID("$Id: filter.c,v 1.29 2003-05-13 01:15:17 gnb Exp $");
 
 typedef struct
 {
@@ -102,7 +102,7 @@ filter_add(
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-void
+static void
 filter_set_start(const char *name)
 {
     GList *iter;

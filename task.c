@@ -31,7 +31,7 @@
 #include <sys/filio.h>
 #endif
 
-CVSID("$Id: task.c,v 1.12 2003-02-09 05:03:23 gnb Exp $");
+CVSID("$Id: task.c,v 1.13 2003-05-13 01:19:09 gnb Exp $");
 
 /*
  * TODO: GDK is used only for the gdk_input_*() functions, which
@@ -223,7 +223,7 @@ task_input_func(gpointer user_data, gint source, GdkInputCondition condition)
     while (nremain > 0)
     {
 	char buf[1025];
-	int n = read(task->fd, buf, MIN(sizeof(buf)-1, nremain));
+	int n = read(task->fd, buf, MIN((int)sizeof(buf)-1, nremain));
 	nremain -= n;
 	buf[n] = '\0';		/* so we can use str*() calls */
 
@@ -264,7 +264,7 @@ task_override_env(Task *task)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-pid_t
+static pid_t
 task_spawn_simple(Task *task)
 {
     pid_t pid;

@@ -18,12 +18,13 @@
  */
 
 #include "maketool.h"
+#include "filter.h"
 #include "maketool_task.h"
 #include "ui.h"
 #include "util.h"
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: help.c,v 1.37 2003-05-04 05:37:55 gnb Exp $");
+CVSID("$Id: help.c,v 1.38 2003-05-13 01:16:14 gnb Exp $");
 
 static GtkWidget	*licence_shell = 0;
 static GtkWidget	*options_shell = 0;
@@ -380,7 +381,7 @@ help_find_help_file(const char *name)
 	if (loc == 0 || strcmp(loc, "C"))
 	    locales[i++] = "C";
 	locales[i] = 0;
-	assert(i < sizeof(locales)/sizeof(locales[0]));
+	assert(i < (int)ARRAYLEN(locales));
 	
 #if 1
     	fprintf(stderr, "help_find_help_file: search locales:");
@@ -454,12 +455,12 @@ help_on_cb(GtkWidget *w, void *user_data)
 	
 	source = gdk_bitmap_create_from_data(
 	    toplevel->window,
-	    help_cursor_bits,
+	    (char*)help_cursor_bits,
 	    help_cursor_width,
 	    help_cursor_height);
 	mask = gdk_bitmap_create_from_data(
 	    toplevel->window,
-	    help_cursor_mask_bits,
+	    (char*)help_cursor_mask_bits,
 	    help_cursor_width,
 	    help_cursor_height);
 	fg.red = 0; fg.green = 0; fg.blue = 0; /* black */

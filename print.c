@@ -22,7 +22,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: print.c,v 1.11 2001-08-02 08:28:00 gnb Exp $");
+CVSID("$Id: print.c,v 1.12 2003-05-13 01:18:54 gnb Exp $");
 
 static GtkWidget	*print_shell = 0;
 typedef enum { D_PRINTER, D_FILE, D_NUM_DESTS } DEST;
@@ -104,7 +104,7 @@ lpr_init(void)
     fclose(fp);
 }
 
-char *
+static char *
 _lpr_job_command(const char *printer)
 {
     return g_strdup_printf("lpr -P\"%s\"", printer);
@@ -147,7 +147,7 @@ lpr_init(void)
     pclose(fp);
 }
 
-char *
+static char *
 _lpr_job_command(const char *printer)
 {
     return g_strdup_printf("lp -d \"%s\"", printer);
@@ -161,7 +161,7 @@ lpr_init(void)
     fprintf(stderr, "No printer support compiled into this executable\n");
 }
 
-char *
+static char *
 _lpr_job_command(const char *printer)
 {
     return g_strdup("echo No printer support compiled into this executable");
@@ -290,7 +290,7 @@ print_dest_changed_cb(GtkWidget *w, gpointer data)
     int i;
     
     for (i=0 ; i<D_NUM_DESTS ; i++)
-    	ui_group_set_sensitive(GR_PRINT_PRINTER+i, (i == dest));
+    	ui_group_set_sensitive(GR_PRINT_PRINTER+i, (i == (int)dest));
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

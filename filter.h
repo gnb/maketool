@@ -21,6 +21,7 @@
 #define _FILTER_H_
 
 #include "common.h"
+#include "util.h"
 
 typedef enum 
 {
@@ -54,5 +55,6 @@ typedef struct
 void filter_load(void);
 void filter_init(void);
 void filter_apply(const char *line, FilterResult *result);
+void filter_describe_all(estring *e, int lod, const char *indent);
 
 #endif /* _FILTER_H_ */

@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.30 2003-05-04 04:27:56 gnb Exp $");
+CVSID("$Id: ui.c,v 1.31 2003-05-13 01:19:20 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -85,7 +85,7 @@ ui_group_destroy_cb(GtkWidget *w, gpointer user_data)
 }
 
 void
-ui_group_add(gint group, GtkWidget *w)
+ui_group_add(guint group, GtkWidget *w)
 {
     if (ui_groups == 0)
     	ui_groups = g_ptr_array_new();
@@ -101,7 +101,7 @@ ui_group_add(gint group, GtkWidget *w)
 }
 
 void
-ui_group_set_sensitive(gint group, gboolean b)
+ui_group_set_sensitive(guint group, gboolean b)
 {
     GList *list;
     

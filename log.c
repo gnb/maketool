@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.40 2002-09-24 14:10:51 gnb Exp $");
+CVSID("$Id: log.c,v 1.41 2003-05-13 01:16:24 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -423,7 +423,7 @@ log_add_line(const char *line)
     static FilterResult res;
     static char *pending[MAX_PENDING];
     static int num_pending;
-    LogRec *lr;
+    LogRec *lr = 0;
     estring fullpath;
     int i;
 

@@ -245,6 +245,7 @@ EXTERN GtkWidget *toplevel;
  
 /*main.c*/
 void message(const char *fmt, ...);
+void message_flush(void);
 void grey_menu_items(void);
 char *expand_prog(const char *prog, const char *file, int line, const char *target);
 void handle_line(Task *task, int len, const char *line);
@@ -256,6 +257,9 @@ gboolean filter_target(const char *targ);
 extern const MakeSystem *makesys;
 extern const MakeProgram *makeprog;
 /* print.c */ 
+void lpr_init(void);
+FILE *lpr_job_begin(const char *printer);
+void lpr_job_end(FILE *fp);
 void file_print_cb(GtkWidget *, gpointer);
 /* help.c */ 
 void help_about_cb(GtkWidget *, gpointer);
@@ -288,8 +292,7 @@ extern const MakeProgram * const makeprograms[];
 const MakeProgram *mp_find(const char *name);
 /* autoconf.c */
 long show_configure_window(gboolean from_client);
-/* filter.c */
-void filter_describe_all(estring *e, int lod, const char *indent);
+
 
 
 #define g_list_find_str(l, s) \

@@ -24,7 +24,7 @@
 #include <regex.h>	/* POSIX regular expression fns */
 #include <gdk/gdkkeysyms.h>
 
-CVSID("$Id: find.c,v 1.15 2002-09-24 14:12:10 gnb Exp $");
+CVSID("$Id: find.c,v 1.16 2003-05-13 01:15:43 gnb Exp $");
 
 #define FINDCASE 0  	/* TODO: implement case-insensitive literals */
 
@@ -32,6 +32,7 @@ static GtkWidget	*find_shell = 0;
 typedef enum { FD_FORWARDS, FD_BACKWARDS, FD_MAX_DIRECTIONS } FindDirections;
 typedef enum
 {
+    FT_NONE=-1,	    	/* invalid value */
     FT_LITERAL,     	/* case-INsensitive literal */
 #if FINDCASE
     FT_CASE_LITERAL,	/* case-sensitive literal */
@@ -102,7 +103,7 @@ find_state_get(FindState *state)
 {
     int i;
     
-    state->type = -1;
+    state->type = FT_NONE;
     state->string = 0;
 
     /* get current type */
@@ -114,7 +115,7 @@ find_state_get(FindState *state)
 	    break;
 	}
     }
-    if (state->type == -1)
+    if (state->type == FT_NONE)
     	return FALSE;
     
     /* TODO: separately reinit these */
@@ -217,6 +218,7 @@ find_apply_func(LogRec *lr, gpointer user_data)
         found = !regexec(&state->regexp, log_get_text(lr), 0, 0, 0);
 	break;
 	
+    case FT_NONE:
     case FT_MAX_TYPES:
     	break;	    /* shut up gcc -Wall */
     }
@@ -300,7 +302,7 @@ find_close_cb(GtkWidget *w, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-gboolean
+static gboolean
 find_keypress_cb(GtkWidget *w, GdkEvent *event, gpointer user_data)
 {
     static const char regexp_metachars[] = "[]*+()^$";

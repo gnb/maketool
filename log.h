@@ -23,6 +23,7 @@
 #include "common.h"
 #include <gtk/gtk.h>
 #include "filter.h"
+#include "maketool_task.h"
 
 typedef struct
 {
@@ -84,5 +85,11 @@ void log_apply_after(LogApplyFunc func, gboolean forwards,
 void log_get_icon(LogSeverity level,
     GdkPixmap **open_pm, GdkBitmap **open_mask,
     GdkPixmap **closed_pm, GdkBitmap **closed_mask);
+
+/*
+ * Create a task whose output goes into the log.  Takes over
+ * the new string `command'.  In main.c.
+ */
+Task *logged_task(char *command);
 
 #endif /* _LOG_H_ */

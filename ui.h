@@ -31,8 +31,8 @@ void ui_combo_set_current(GtkWidget *, int);
 void ui_clist_get_strings(GtkWidget*, int row, int ncols, char *text[]);
 void ui_clist_set_strings(GtkWidget*, int row, int ncols, char *text[]);
 
-void ui_group_add(gint group, GtkWidget *w);
-void ui_group_set_sensitive(gint group, gboolean b);
+void ui_group_add(guint group, GtkWidget *w);
+void ui_group_set_sensitive(guint group, gboolean b);
 
 GtkWidget *ui_create_file_sel(
     GtkWidget *parent,
@@ -114,7 +114,7 @@ GtkWidget *ui_message_dialog(GtkWidget *parent, const char *title,
 GtkWidget *ui_message_dialog_f(GtkWidget *parent, const char *title,
     	    	    	     const char *fmt, ...)
 #ifdef __GNUC__
-__attribute__(( format(printf, 3, 4) ));
+__attribute__(( format(printf, 3, 4) ))
 #endif
 ;
 /* Show the given message dialog and wait until the user presses OK */

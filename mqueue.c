@@ -20,7 +20,7 @@
 #include "mqueue.h"
 #include <gdk/gdkx.h>
 
-CVSID("$Id: mqueue.c,v 1.2 2002-09-24 14:13:52 gnb Exp $");
+CVSID("$Id: mqueue.c,v 1.3 2003-05-13 01:17:20 gnb Exp $");
 
 typedef struct
 {
@@ -158,7 +158,7 @@ mq_message_event(GdkEvent *event)
     
     /* Parse the property data into a sequence of header/body pairs. */
     for (offset = 0 ; 
-    	 offset+sizeof(hdr) < length ; 
+    	 offset+(int)sizeof(hdr) < length ; 
 	 )
     {
     	/* deal with alignment issue by copying */

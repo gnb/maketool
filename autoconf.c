@@ -23,9 +23,7 @@
 #include "maketool_task.h"
 #include "log.h"
 
-CVSID("$Id: autoconf.c,v 1.11 2003-02-09 04:51:26 gnb Exp $");
-
-extern Task *logged_task(char *command);
+CVSID("$Id: autoconf.c,v 1.12 2003-05-13 01:13:44 gnb Exp $");
 
 #define strassign(x, s) \
     do { \
@@ -1115,13 +1113,13 @@ build_configure_cb(GtkWidget *w, gpointer data)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-gboolean
+static gboolean
 check_for_configure_in(void)
 {
     return file_exists("configure.in");
 }
 
-gboolean
+static gboolean
 check_for_configure(void)
 {
     FILE *fp;
