@@ -5,12 +5,14 @@ include(_styles.html)
 ENDHEAD
 BEGINBODY
 
-define(LATESTVERSION,0.5)
+define(LATEST_VERSION,0.5.1)
+define(PREVIOUS_VERSION,0.5)
+define(COUNTER_START_DATE,`10 Oct 1999')
 
 <!-- TODO: mention in the features page that it's released under GPL -->
 <!-- TODO: news... ? -->
 <P>
-The latest version available is <B>LATESTVERSION</B>.
+The latest version available is <B>LATEST_VERSION</B>.
 </P>
 
 <P>
@@ -21,13 +23,15 @@ if you really need an older version.
 </P>
 
 <P>
-Download the i386-linux RPM: <A HREF="maketool-LATESTVERSION-1.i386.rpm">maketool-LATESTVERSION-1.i386.rpm</A><BR>
-Download the source tarball: <A HREF="maketool-LATESTVERSION-src.tgz">maketool-LATESTVERSION-src.tgz</A><BR>
+Download the i386-linux RPM: <A HREF="maketool-LATEST_VERSION-1.i386.rpm">maketool-LATEST_VERSION-1.i386.rpm</A><BR>
+Download the source tarball: <A HREF="maketool-LATEST_VERSION-src.tgz">maketool-LATEST_VERSION-src.tgz</A><BR>
+Download the patch from PREVIOUS_VERSION to LATEST_VERSION:
+<A HREF="maketool-PREVIOUS_VERSION-LATEST_VERSION.patch.gz">maketool-PREVIOUS_VERSION-LATEST_VERSION.patch.gz</A><BR>
 </P>
 
 <P>
 Maketool has also been ported to NetBSD, you can
-<A HREF="ftp://ftp.netbsd.org/pub/NetBSD/packages/pkgsrc/devel/maketool/README.html">get the packages here</A>.
+<A HREF="ftp://ftp.netbsd.org/pub/NetBSD/packages/pkgsrc/devel/maketool/README.html" TARGET="_top">get the packages here</A>.
 <B>Disclaimer:</B> I don't control that site, please don't complain to me if anything goes wrong.
 </P>
 
@@ -44,7 +48,7 @@ port patches, but I am currently unable to test those myself.
 <BR>
 You are the
 <img src="http://www.alphalink.com.au/~gnb/Count.cgi?ft=0&dd=D&md=7&comma=T&df=maketool.dat" alt="Counter" border=0 align=absmiddle>
-<SUP>th</SUP> person to visit this page.
+<SUP>th</SUP> person to visit this page since COUNTER_START_DATE.
 </P>
 
 ENDBODY

@@ -2,7 +2,10 @@
 PAGES=		index.html index_c.html index_d.html banner.html toc.html \
 		features.html download.html \
 		screenshots.html changelog.html
-IMAGES=		maketool_n.gif mainw.gif fm.mini.jpg tocbg.gif
+IMAGES=		maketool_n.gif mainw.gif fm.mini.jpg tocbg.gif \
+		autoconf.gif autoconf_t.gif kernel.gif kernel_t.gif \
+		colors.jpg colors_t.jpg about_make.gif about_make_t.gif \
+		arrow_l2.gif arrow_r2.gif
 
 # TODO: link to screen2.jpg from somewhere
 

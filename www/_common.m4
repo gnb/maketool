@@ -25,3 +25,7 @@ define(ENDBODY,
 define(EMAILME,
 <A HREF="mailto:gnb@alphalink.com.au?Subject=maketool">$1</A>
 )dnl
+dnl Usage: THUMBNAIL(some/dir/fred,gif,[alternate text])
+define(THUMBNAIL,
+<A HREF="$1.$2"><IMG SRC="$1_t.$2" ALT="$3" BORDER=0></A>
+)dnl

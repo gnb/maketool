@@ -13,4 +13,64 @@ of the errors and warnings from the make run.
 <IMG WIDTH=430 HEIGHT=287 SRC="mainw.gif" ALT="main window">
 </CENTER>
 
+<P>
+Here are some more screenshots, showing off some of maketool's
+features. Click on the thumbnail images to see full-sized images.
+</P>
+
+
+<TABLE ROWS=3 COLUMNS=1 WIDTH="100%">
+
+  <TABLE ROWS=1 COLUMNS=2>
+    <TR>
+      <TD VALIGN=TOP>THUMBNAIL(autoconf,gif,autoconf)</TD>
+      <TD VALIGN=TOP>
+        <IMG SRC="arrow_l2.gif" ALT="<--------"><BR>
+	Since version 0.5, maketool explicitly supports projects using
+	autoconf. This image shows what maketool does for you when you
+	start it in a directory containing a <I>configure.in</I> which is
+	newer than the Makefile.
+      </TD>
+    </TR>
+  </TABLE>
+
+  <TABLE ROWS=1 COLUMNS=2>
+    <TR>
+      <TD VALIGN=TOP>
+        <IMG SRC="arrow_r2.gif" ALT="-------->"><BR>
+	Maketool can now be usefully used to compile Linux kernels. The
+	new <I>Indent Directories</I> option, plus a feature which automatically
+	splits the Build menu if it would be too long, mean maketool takes
+	large, multiple-directory projects in its stride.
+      </TD>
+      <TD VALIGN=TOP>THUMBNAIL(kernel,gif,kernel)</TD>
+    </TR>
+  </TABLE>
+
+  <TABLE ROWS=1 COLUMNS=2>
+    <TR>
+      <TD VALIGN=TOP>THUMBNAIL(colors,jpg,colours)</TD>
+      <TD VALIGN=TOP>
+        <IMG SRC="arrow_l2.gif" ALT="<--------"><BR>
+	You can configure the colours maketool uses to colour-code
+	errors and warnings to cater for personal taste or cultural
+	preference.
+      </TD>
+    </TR>
+  </TABLE>
+
+  <TABLE ROWS=1 COLUMNS=2>
+    <TR>
+      <TD VALIGN=TOP>
+        <IMG SRC="arrow_r2.gif" ALT="-------->"><BR>
+	The <I>About Make</I> window pays tribute to the authors
+	of GNU make. Maketool is just a front end to GNU make and
+	would be nothing without the efforts of these people.
+      </TD>
+      <TD VALIGN=TOP>THUMBNAIL(about_make,gif,about_make)</TD>
+    </TR>
+  </TABLE>
+
+</TABLE>
+
 ENDBODY
