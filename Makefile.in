@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.61 2003-10-21 14:35:40 gnb Exp $
+# $Id: Makefile.in,v 1.62 2003-10-25 10:55:57 gnb Exp $
 #
 
 prefix=		@prefix@
@@ -33,6 +33,7 @@ pkglibexecdir=	$(libexecdir)/$(PACKAGE)
 helpdir=	$(pkgdatadir)/help
 NON_GNU_MAKES=	@NON_GNU_MAKES@
 RM=		/bin/rm -f
+GTK_LIBSRC=	@GTK_LIBSRC@
 
 CC=		@CC@
 #CC=		gcc -Wall
@@ -49,16 +50,16 @@ SOURCES=	main.c filter.c help.c preferences.c log.c print.c ps.c find.c \
 		makesys.c autoconf.c imake.c @OS_MAKESYS_SOURCE@ \
 		makeprog.c gmake.c pmake.c @OS_MAKEPROG_SOURCE@ \
 		ui.c uix.c task.c util.c glib_extra.c mqueue.c \
-		progress.c @GTK_EXTRA_SOURCE@
+		progress.c
 HEADERS=	maketool.h filter.h common.h log.h ui.h \
 		util.h glib_extra.h ps.h maketool_task.h mqueue.h \
-		autoconf_strs.c progress.h gtkdtree.h
+		autoconf_strs.c progress.h
 OBJECTS=	$(SOURCES:.c=.o)
 
 top_srcdir=	.
 top_builddir=	.
 
-SUBDIRS=	icons intl po makesys doc
+SUBDIRS=	icons intl po makesys lib doc
 
 ###
 
@@ -66,7 +67,7 @@ SUBDIRS=	icons intl po makesys doc
 
 all:: maketool
 
-maketool: _libintl $(OBJECTS)
+maketool: _libintl $(OBJECTS) _libgtk
 	$(_PURIFY) $(LINK.c) -o $@ $(OBJECTS) $(LDLIBS)
 	
 install:: $(BINDIR)/maketool
@@ -163,6 +164,9 @@ all install uninstall clean maintainer-clean distclean::
 _libintl:
 	cd intl ; $(MAKE) all
 		
+_libgtk:
+	[ x"$(GTK_LIBSRC)" = x ] || (cd lib/$(GTK_LIBSRC) ; $(MAKE) all)
+		
 ###
 
 argstest:
@@ -196,13 +200,6 @@ distclean:: clean
 .c.o:
 	$(COMPILE.c) -c $<
 
-# Just too much wrong in GTK source to fix, so disable -pedantic
-gtkctree12.o:	gtkctree12.c
-	$(CC) $(CPPFLAGS) `echo $(CFLAGS) | sed -e 's|-pedantic||g'` -c $<
-
-gtkctree22.o:	gtkctree22.c
-	$(CC) $(CPPFLAGS) `echo $(CFLAGS) | sed -e 's|-pedantic||g'` -c $<
-
 ###
 # Some basic documentation (COPYRIGHT etc) used to be installed
 # into /usr/doc at this point in the Makefile.  That's now
@@ -220,7 +217,7 @@ DISTFILES=	\
 		configure Makefile.in config.h.in mkinstalldirs makewrap.in \
 		version.m4.in excludes \
 		\
-		$(SOURCES) $(HEADERS) @ALL_OS_SOURCE@ @ALL_GTK_SOURCE@ \
+		$(SOURCES) $(HEADERS) @ALL_OS_SOURCE@ \
 		$(CLIENT_SOURCES) $(CLIENT_HEADERS)
 
 

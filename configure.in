@@ -18,7 +18,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
-dnl $Id: configure.in,v 1.64 2003-10-21 14:36:22 gnb Exp $
+dnl $Id: configure.in,v 1.65 2003-10-25 10:55:57 gnb Exp $
 dnl
 
 AC_INIT(main.c)
@@ -194,21 +194,21 @@ if test $gtk2 = yes ; then
     # code is ported to GtkTextView.
     GTK_CFLAGS="$GTK_CFLAGS -DGTK_ENABLE_BROKEN"
     GTK2=1
-    GTK_EXTRA_SOURCE=gtkctree22.c
+    GTK_LIBSRC="gtk2"
 else
     # fall back to gtk 1.2
     AC_MSG_WARN([GNOME version 2 libraries not found, falling back to 1.2])
     AM_PATH_GTK(1.2.0,,AC_MSG_ERROR(maketool requires the GTK+ library))
     GTK2=0
-    GTK_EXTRA_SOURCE=gtkctree12.c
+    GTK_LIBSRC="gtk1.2"
 fi
-ALL_GTK_SOURCE=
-ALL_GTK_SOURCE="$ALL_GTK_SOURCE gtkctree12.c gtkctree12.h"
-ALL_GTK_SOURCE="$ALL_GTK_SOURCE gtkctree22.c gtkctree22.h"
+if test x"$GTK_LIBSRC" != x ; then
+    GTK_CFLAGS="-I\${top_srcdir}/lib/\${GTK_LIBSRC} $GTK_CFLAGS"
+    GTK_LIBS="\${top_srcdir}/lib/\${GTK_LIBSRC}/gtk/gtkctree.o $GTK_LIBS"
+fi
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
-AC_SUBST(GTK_EXTRA_SOURCE)
-AC_SUBST(ALL_GTK_SOURCE)
+AC_SUBST(GTK_LIBSRC)
 AC_DEFINE_UNQUOTED(GTK2,$GTK2,[
  * defined to 1 if version 2 of the GTK toolkit is used
 ])
@@ -252,6 +252,11 @@ AC_OUTPUT(
     po/Makefile.in
     makesys/Makefile
     icons/Makefile
+    lib/Makefile
+    lib/gtk1.2/Makefile
+    lib/gtk1.2/gtk/Makefile
+    lib/gtk2/Makefile
+    lib/gtk2/gtk/Makefile
     doc/Makefile
     doc/help/Makefile
     doc/help/common/help.mk

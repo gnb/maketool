@@ -1,0 +1,256 @@
+This patch against GTK+ 2.2.1 fixes some minor compile warnings
+and changes the tree data structure so that appending a row is
+always O(1).
+
+diff -aur gtk+-2.2.1/gtk/gtkctree.c lib/gtk2/gtk/gtkctree.c
+--- gtk+-2.2.1/gtk/gtkctree.c	Wed Nov 20 12:07:28 2002
++++ lib/gtk2/gtk/gtkctree.c	Sat Oct 25 14:47:15 2003
+@@ -33,10 +33,10 @@
+ 
+ #include <stdlib.h>
+ #include "gtkctree.h"
+-#include "gtkbindings.h"
+-#include "gtkmain.h"
+-#include "gtkmarshalers.h"
+-#include "gtkdnd.h"
++#include <gtk/gtkbindings.h>
++#include <gtk/gtkmain.h>
++#include <gtk/gtkmarshal.h>
++#include <gtk/gtkdnd.h>
+ #include <gdk/gdkkeysyms.h>
+ 
+ #define PM_SIZE                    8
+@@ -436,7 +436,7 @@
+ 		    GTK_RUN_FIRST,
+ 		    GTK_CLASS_TYPE (object_class),
+ 		    GTK_SIGNAL_OFFSET (GtkCTreeClass, tree_select_row),
+-		    _gtk_marshal_VOID__POINTER_INT,
++		    gtk_marshal_VOID__POINTER_INT,
+ 		    GTK_TYPE_NONE, 2,
+ 		    GTK_TYPE_CTREE_NODE,
+ 		    GTK_TYPE_INT);
+@@ -445,7 +445,7 @@
+ 		    GTK_RUN_FIRST,
+ 		    GTK_CLASS_TYPE (object_class),
+ 		    GTK_SIGNAL_OFFSET (GtkCTreeClass, tree_unselect_row),
+-		    _gtk_marshal_VOID__POINTER_INT,
++		    gtk_marshal_VOID__POINTER_INT,
+ 		    GTK_TYPE_NONE, 2,
+ 		    GTK_TYPE_CTREE_NODE,
+ 		    GTK_TYPE_INT);
+@@ -454,7 +454,7 @@
+ 		    GTK_RUN_LAST,
+ 		    GTK_CLASS_TYPE (object_class),
+ 		    GTK_SIGNAL_OFFSET (GtkCTreeClass, tree_expand),
+-		    _gtk_marshal_VOID__POINTER,
++		    gtk_marshal_VOID__POINTER,
+ 		    GTK_TYPE_NONE, 1,
+ 		    GTK_TYPE_CTREE_NODE);
+   ctree_signals[TREE_COLLAPSE] =
+@@ -462,7 +462,7 @@
+ 		    GTK_RUN_LAST,
+ 		    GTK_CLASS_TYPE (object_class),
+ 		    GTK_SIGNAL_OFFSET (GtkCTreeClass, tree_collapse),
+-		    _gtk_marshal_VOID__POINTER,
++		    gtk_marshal_VOID__POINTER,
+ 		    GTK_TYPE_NONE, 1,
+ 		    GTK_TYPE_CTREE_NODE);
+   ctree_signals[TREE_MOVE] =
+@@ -470,7 +470,7 @@
+ 		    GTK_RUN_LAST,
+ 		    GTK_CLASS_TYPE (object_class),
+ 		    GTK_SIGNAL_OFFSET (GtkCTreeClass, tree_move),
+-		    _gtk_marshal_VOID__POINTER_POINTER_POINTER,
++		    gtk_marshal_VOID__POINTER_POINTER_POINTER,
+ 		    GTK_TYPE_NONE, 3,
+ 		    GTK_TYPE_CTREE_NODE,
+ 		    GTK_TYPE_CTREE_NODE,
+@@ -481,7 +481,7 @@
+ 		    GTK_CLASS_TYPE (object_class),
+ 		    GTK_SIGNAL_OFFSET (GtkCTreeClass,
+ 				       change_focus_row_expansion),
+-		    _gtk_marshal_VOID__ENUM,
++		    gtk_marshal_VOID__ENUM,
+ 		    GTK_TYPE_NONE, 1, GTK_TYPE_CTREE_EXPANSION_TYPE);
+ 
+   binding_set = gtk_binding_set_by_class (klass);
+@@ -2058,14 +2058,11 @@
+   if (!node)
+     return NULL;
+ 
+-  work = GTK_CTREE_ROW (node)->children;
++  work = GTK_CTREE_ROW (node)->children_tail;
+ 
+   if (!work || !GTK_CTREE_ROW (node)->expanded)
+     return node;
+ 
+-  while (GTK_CTREE_ROW (work)->sibling)
+-    work = GTK_CTREE_ROW (work)->sibling;
+-
+   return gtk_ctree_last_visible (ctree, work);
+ }
+ 
+@@ -2115,19 +2112,13 @@
+       clist->rows += rows;
+     }
+ 
+-  if (parent)
+-    work = (GList *)(GTK_CTREE_ROW (parent)->children);
+-  else
+-    work = clist->row_list;
+-
+   if (sibling)
+     {
+-      if (work != (GList *)sibling)
+-	{
+-	  while (GTK_CTREE_ROW (work)->sibling != sibling)
+-	    work = (GList *)(GTK_CTREE_ROW (work)->sibling);
+-	  GTK_CTREE_ROW (work)->sibling = node;
+-	}
++      GtkCTreeNode *prev = GTK_CTREE_ROW (sibling)->sibling_prev;
++      if (prev != NULL)
++	  GTK_CTREE_ROW (prev)->sibling = node;
++      GTK_CTREE_ROW (node)->sibling_prev = prev;
++      GTK_CTREE_ROW (sibling)->sibling_prev = node;
+ 
+       if (sibling == GTK_CTREE_NODE (clist->row_list))
+ 	clist->row_list = (GList *) node;
+@@ -2148,16 +2139,22 @@
+     }
+   else
+     {
+-      if (work)
++      GtkCTreeNode **tailp;
++
++      if (parent)
++	tailp = &GTK_CTREE_ROW (parent)->children_tail;
++      else
++	tailp = (GtkCTreeNode **) &GTK_CLIST(ctree)->row_list_end;
++
++      if (*tailp)
+ 	{
+-	  /* find sibling */
+-	  while (GTK_CTREE_ROW (work)->sibling)
+-	    work = (GList *)(GTK_CTREE_ROW (work)->sibling);
+-	  GTK_CTREE_ROW (work)->sibling = node;
+-	  
++	  GTK_CTREE_ROW (*tailp)->sibling = node;
++	  GTK_CTREE_ROW (node)->sibling_prev = *tailp;
++
+ 	  /* find last visible child of sibling */
+-	  work = (GList *) gtk_ctree_last_visible (ctree,
+-						   GTK_CTREE_NODE (work));
++	  work = (GList *)gtk_ctree_last_visible (ctree, *tailp);
++
++	  *tailp = node;
+ 	  
+ 	  list_end->next = work->next;
+ 	  if (work->next)
+@@ -2168,6 +2165,7 @@
+ 	}
+       else
+ 	{
++	  *tailp = node;
+ 	  if (parent)
+ 	    {
+ 	      GTK_CTREE_ROW (parent)->children = node;
+@@ -2203,7 +2201,7 @@
+       clist->row_list_end->next == (GList *)node)
+     clist->row_list_end = list_end;
+ 
+-  if (visible && update_focus_row)
++  if (visible && update_focus_row && clist->row_list_end != list_end)
+     {
+       gint pos;
+ 	  
+@@ -2312,29 +2310,25 @@
+ 	{
+ 	  GTK_CTREE_ROW (parent)->children = GTK_CTREE_ROW (node)->sibling;
+ 	  if (!GTK_CTREE_ROW (parent)->children)
+-	    gtk_ctree_collapse (ctree, parent);
++	    {
++	      GTK_CTREE_ROW (parent)->children_tail = NULL;
++	      gtk_ctree_collapse (ctree, parent);
++	    }
+ 	}
+       else
+ 	{
+-	  GtkCTreeNode *sibling;
+-
+-	  sibling = GTK_CTREE_ROW (parent)->children;
+-	  while (GTK_CTREE_ROW (sibling)->sibling != node)
+-	    sibling = GTK_CTREE_ROW (sibling)->sibling;
++	  GtkCTreeNode *sibling = GTK_CTREE_ROW (node)->sibling_prev;
+ 	  GTK_CTREE_ROW (sibling)->sibling = GTK_CTREE_ROW (node)->sibling;
+ 	}
+     }
+   else
+     {
++    	/* gnbTODO: doesn't appear to maintain clist->row_list_end */
+       if (clist->row_list == (GList *)node)
+ 	clist->row_list = (GList *) (GTK_CTREE_ROW (node)->sibling);
+       else
+ 	{
+-	  GtkCTreeNode *sibling;
+-
+-	  sibling = GTK_CTREE_NODE (clist->row_list);
+-	  while (GTK_CTREE_ROW (sibling)->sibling != node)
+-	    sibling = GTK_CTREE_ROW (sibling)->sibling;
++	  GtkCTreeNode *sibling = GTK_CTREE_ROW (node)->sibling_prev;
+ 	  GTK_CTREE_ROW (sibling)->sibling = GTK_CTREE_ROW (node)->sibling;
+ 	}
+     }
+@@ -3228,7 +3222,9 @@
+   ctree_row->expanded      = FALSE;
+   ctree_row->parent        = NULL;
+   ctree_row->sibling       = NULL;
++  ctree_row->sibling_prev  = NULL;
+   ctree_row->children      = NULL;
++  ctree_row->children_tail = NULL;
+   ctree_row->pixmap_closed = NULL;
+   ctree_row->mask_closed   = NULL;
+   ctree_row->pixmap_opened = NULL;
+@@ -3594,7 +3590,7 @@
+   if (titles)
+     {
+       GtkCList *clist = GTK_CLIST (widget);
+-      guint i;
++      gint i;
+ 
+       for (i = 0; i < columns; i++)
+ 	gtk_clist_set_column_title (clist, i, titles[i]);
+@@ -4076,8 +4072,10 @@
+   if (!node) 
+     return NULL;
+ 
+-  while (GTK_CTREE_ROW (node)->sibling)
+-    node = GTK_CTREE_ROW (node)->sibling;
++  if (GTK_CTREE_ROW (node)->parent)
++    node = GTK_CTREE_ROW (GTK_CTREE_ROW (node)->parent)->children_tail;
++  else
++    node = GTK_CTREE_NODE (GTK_CLIST (ctree)->row_list_end);
+   
+   if (GTK_CTREE_ROW (node)->children)
+     return gtk_ctree_last (ctree, GTK_CTREE_ROW (node)->children);
+@@ -4111,7 +4109,7 @@
+ {
+   g_return_val_if_fail (GTK_IS_CTREE (ctree), NULL);
+ 
+-  if ((row < 0) || (row >= GTK_CLIST(ctree)->rows))
++  if (((gint)row < 0) || ((gint)row >= GTK_CLIST(ctree)->rows))
+     return NULL;
+  
+   return GTK_CTREE_NODE (g_list_nth (GTK_CLIST (ctree)->row_list, row));
+diff -aur gtk+-2.2.1/gtk/gtkctree.h lib/gtk2/gtk/gtkctree.h
+--- gtk+-2.2.1/gtk/gtkctree.h	Tue Sep 25 11:12:08 2001
++++ lib/gtk2/gtk/gtkctree.h	Sat Oct 25 14:30:34 2003
+@@ -152,7 +152,9 @@
+   
+   GtkCTreeNode *parent;
+   GtkCTreeNode *sibling;
++  GtkCTreeNode *sibling_prev;
+   GtkCTreeNode *children;
++  GtkCTreeNode *children_tail;
+   
+   GdkPixmap *pixmap_closed;
+   GdkBitmap *mask_closed;

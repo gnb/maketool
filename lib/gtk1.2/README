@@ -1,0 +1,11 @@
+
+This directory contains a subset of the GTK+ 1.2.10 source,
+with a patch applied to make it more efficient for maketool's
+purposes.  The code is not a part of maketool proper, and indeed
+maketool will build and run without it (just slower).  The
+code remains under the original GTK+ licence, see the file
+COPYING.  Note in particular that this licence differs from
+the licence under which maketool itself is distributed.
+
+Greg Banks
+25 Oct 2003.

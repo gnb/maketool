@@ -21,16 +21,7 @@
 #define _UI_H_
 
 #include "common.h"
-
-#define __GTK_CTREE_H__ 1
 #include <gtk/gtk.h>
-
-#undef __GTK_CTREE_H__
-#if GTK2
-#include "gtkctree22.h"
-#else
-#include "gtkctree12.h"
-#endif
 
 #if GTK2
 typedef void (*ui_callback_t)(GtkWidget *w, gpointer data);
