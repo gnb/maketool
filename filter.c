@@ -22,7 +22,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.40 2003-10-10 09:34:11 gnb Exp $");
+CVSID("$Id: filter.c,v 1.41 2003-10-10 09:37:21 gnb Exp $");
 
 typedef struct
 {
@@ -812,6 +812,39 @@ filter_apply_one(
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+#if DEBUG
+static const char *
+code_as_string(FilterCode code)
+{
+    static const char * const names[] = 
+    {
+	"UNDEFINED",
+	"INFORMATION",
+	"WARNING",
+	"ERROR",
+	"BUILDSTART",
+	"CHANGEDIR",
+	"PUSHDIR",
+	"POPDIR",
+	"DONE"
+    };
+    static char buf[128];
+    
+    buf[0] = '\0';
+    if (code & FR_PENDING)
+    {
+    	code &= ~FR_PENDING;
+	strcpy(buf, "PENDING|");
+    }
+    if (code >= 0 && code <= FR_DONE)
+    	strcat(buf, names[code]);
+    else
+    	sprintf(buf+strlen(buf), "%d (unknown)", code);
+	
+    return buf;
+}
+#endif
+
 void
 filter_apply(const char *line, FilterResult *result)
 {
@@ -822,7 +855,7 @@ filter_apply(const char *line, FilterResult *result)
     {
 	Filter *f = (Filter*)fl->data;
 	matched = filter_apply_one(f, line, result);
-#if DEBUG
+#if DEBUG > 2
 	fprintf(stderr, "filter [%s] on \"%s\" -> %s %d (%s) state=\"%s\"\n",
 		f->comment,
 		line, 
@@ -832,7 +865,20 @@ filter_apply(const char *line, FilterResult *result)
 		filter_state);
 #endif
 	if (matched)
+	{
+#if DEBUG
+    	    switch ((result->code & FR_CODE_MASK))
+	    {
+	    case FR_ERROR:
+    	    case FR_WARNING:
+	    	fprintf(stderr, "filter [%s] matched \"%s\" as %s\n",
+		    	    f->comment, line, code_as_string(result->code));
+		break;
+	    default:
+	    }
+#endif
 	    return;
+	}
     }
     result->code = FR_UNDEFINED;
     filter_state = "";
