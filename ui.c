@@ -20,7 +20,7 @@
 #include "ui.h"
 #include "util.h"
 
-CVSID("$Id: ui.c,v 1.27 2001-09-02 12:41:49 gnb Exp $");
+CVSID("$Id: ui.c,v 1.28 2002-09-24 14:06:31 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -121,7 +121,8 @@ ui_file_sel_ok_cb(GtkWidget *w, gpointer data)
     GtkWidget *filesel = GTK_WIDGET(data);
     void (*callback)(const char *filename);
     
-    callback = gtk_object_get_data(GTK_OBJECT(filesel), FILESEL_CALLBACK_DATA);
+    callback = (void (*)(const char*))gtk_object_get_data(
+    	    	    	    GTK_OBJECT(filesel), FILESEL_CALLBACK_DATA);
     (*callback)(gtk_file_selection_get_filename(GTK_FILE_SELECTION(filesel)));
     gtk_widget_hide(filesel);
 }
