@@ -19,7 +19,7 @@
 
 #include "ui.h"
 
-CVSID("$Id: ui.c,v 1.11 1999-06-13 13:37:55 gnb Exp $");
+CVSID("$Id: ui.c,v 1.12 1999-06-14 00:49:49 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -139,6 +139,24 @@ ui_set_accel_group(GtkAccelGroup *ag)
     ui_accel_group = ag;
 }
 
+static GtkWidget *
+_ui_create_label(
+    GtkWidget *item,
+    const char *label,
+    guint *uline_key_p)
+{
+    GtkWidget *label_w;
+    
+    label_w = gtk_accel_label_new(label);
+    if (uline_key_p != 0)
+	 *uline_key_p = gtk_label_parse_uline(GTK_LABEL(label_w), label);
+    gtk_misc_set_alignment(GTK_MISC(label_w), 0.0, 0.5);
+    gtk_accel_label_set_accel_widget(GTK_ACCEL_LABEL(label_w), item);
+    gtk_container_add(GTK_CONTAINER(item), label_w);
+    gtk_widget_show(label_w);
+    return label_w;
+}    
+
 
 static GtkWidget *
 _ui_add_menu_aux(
@@ -146,16 +164,11 @@ _ui_add_menu_aux(
     const char *label,
     gboolean is_right)
 {
-    GtkWidget *menu, *item, *label_w;
+    GtkWidget *menu, *item;
     guint uline_key;
     
-    label_w = gtk_accel_label_new(label);
-    uline_key = gtk_label_parse_uline(GTK_LABEL(label_w), label);
-    gtk_misc_set_alignment(GTK_MISC(label_w), 0.0, 0.5);
-    gtk_widget_show(label_w);
-
     item = gtk_menu_item_new();
-    gtk_container_add(GTK_CONTAINER(item), label_w);
+    _ui_create_label(item, label, &uline_key);
     gtk_widget_show(item);
     
     gtk_widget_add_accelerator(item, "activate_item", 
@@ -225,9 +238,13 @@ _ui_add_accel(
     	return;
 
     gtk_accelerator_parse(accel, &key, &mods);
+    gtk_widget_add_accelerator(item, "activate_item", 
+			    ui_accel_group, key, mods, GTK_ACCEL_VISIBLE);
+#if 0
     gtk_accel_group_add(ui_accel_group,
 	    key, mods, GTK_ACCEL_VISIBLE,
 	    GTK_OBJECT(item), "activate");
+#endif
 }
 
 
@@ -242,19 +259,11 @@ ui_add_button_2(
     gint group)
 {
     GtkWidget *item;
-    GtkWidget *label_w;
     guint uline_key = 0;
     
-    label_w = gtk_accel_label_new(label);
-    if (douline)
-	 uline_key = gtk_label_parse_uline(GTK_LABEL(label_w), label);
-    gtk_misc_set_alignment(GTK_MISC(label_w), 0.0, 0.5);
-    gtk_widget_show(label_w);
-
-
     item = gtk_menu_item_new();
-    gtk_container_add(GTK_CONTAINER(item), label_w);
-    
+    _ui_create_label(item, label, (douline ? &uline_key : 0));
+
     gtk_menu_append(GTK_MENU(menu), item);
     gtk_signal_connect(GTK_OBJECT(item), "activate", 
     	GTK_SIGNAL_FUNC(callback), calldata);
@@ -307,7 +316,7 @@ ui_add_toggle(
     GtkWidget *radio_other,
     gboolean set)
 {
-    GtkWidget *item, *label_w;
+    GtkWidget *item;
     guint uline_key;
     
     if (radio_other == 0)
@@ -322,12 +331,7 @@ ui_add_toggle(
 	item = gtk_radio_menu_item_new(group);
     }
 
-    label_w = gtk_accel_label_new(label);
-    uline_key = gtk_label_parse_uline(GTK_LABEL(label_w), label);
-    gtk_misc_set_alignment(GTK_MISC(label_w), 0.0, 0.5);
-    gtk_widget_show(label_w);
-
-    gtk_container_add(GTK_CONTAINER(item), label_w);
+    _ui_create_label(item, label, &uline_key);
     
     gtk_menu_append(GTK_MENU(menu), item);
     gtk_signal_connect(GTK_OBJECT(item), "activate", 
