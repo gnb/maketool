@@ -5,8 +5,10 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <stdarg.h>
+#include <string.h>
 #include <sys/ioctl.h>
 #include "spawn.h"
+#include "filter.h"
 
 
 const char	*argv0;
@@ -20,11 +22,17 @@ GList		*widgets_notempty, *widgets_notrunning, *widgets_running;
 pid_t		currentPid = -1;
 gint		currentInput;
 int		currentFd;
+int		numErrors;
+int		numWarnings;
 
 #define ANIM_MAX 8
-GdkPixmap	*anim_pixmaps[ANIM_MAX+1];
-GdkBitmap	*anim_masks[ANIM_MAX+1];
+GdkPixmap	*animPixmaps[ANIM_MAX+1];
+GdkBitmap	*animMasks[ANIM_MAX+1];
 GtkWidget	*anim;
+
+GdkFont		*warningFont, *errorFont;
+GdkColor	warningForeground, errorForeground;
+GdkColor	warningBackground, errorBackground;
 
 #define SPACING 4
 
@@ -57,7 +65,6 @@ widget_list_set_sensitive(GList *list, gboolean b)
     }
 }
 
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
 grey_menu_items(void)
@@ -72,6 +79,40 @@ grey_menu_items(void)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
+static int anim_current = 0;
+static gint anim_timer = -1;
+
+static gint
+anim_advance(gpointer data)
+{
+    if (anim_current++ == ANIM_MAX)
+    	anim_current = 1;
+    gtk_pixmap_set(GTK_PIXMAP(anim),
+    	animPixmaps[anim_current], animMasks[anim_current]);
+    return TRUE;  /* keep going */
+}
+
+static void
+anim_stop(void)
+{
+    if (anim_timer >= 0)
+    {
+	gtk_timeout_remove(anim_timer);
+	anim_timer = -1;
+    }
+    gtk_pixmap_set(GTK_PIXMAP(anim),
+    	animPixmaps[0], animMasks[0]);
+}
+
+static void
+anim_start(void)
+{
+    if (anim_timer < 0)
+	anim_timer = gtk_timeout_add(200/* millisec */, anim_advance, 0);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
 static void
 reapMake(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 {
@@ -79,12 +120,125 @@ reapMake(pid_t pid, int status, struct rusage *usg, gpointer user_data)
     
     if (WIFEXITED(status) || WIFSIGNALED(status))
     {
-	message("Finished making %s", target);
+    	char errStr[256];
+    	char warnStr[256];
+	
+	if (numErrors > 0)
+	    sprintf(errStr, ", %d errors", numErrors);
+	else
+	    errStr[0] = '\0';
+	    
+	if (numWarnings > 0)
+	    sprintf(warnStr, ", %d warnings", numWarnings);
+	else
+	    warnStr[0] = '\0';
+	    
+	message("Finished making %s%s%s", target, errStr, warnStr);
+	
 	if (currentPid == pid)
 	    currentPid = -1;
 	gtk_input_remove(currentInput);
 	close(currentFd);
+	anim_stop();
 	grey_menu_items();
+    }
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static GList *pendingLines = 0;
+static GList *directoryStack = 0;
+
+static void
+handleLine(char *line)
+{
+    gboolean do_grey = (gtk_text_get_length(GTK_TEXT(logwin)) == 0);
+    GdkFont *font = 0;
+    GdkColor *fore = 0;
+    GdkColor *back = 0;
+    FilterResult res;
+    char result_str[1024];
+    
+    result_str[0] = '\0';
+    res = filter_apply(line, result_str, sizeof(result_str));
+#if DEBUG
+    fprintf(stderr, "filter_apply: \"%s\" -> %d \"%s\"\n", line, res, result_str);
+#endif
+    switch (res)
+    {
+    case FR_UNDEFINED:		/* same as INFORMATION */
+    case FR_INFORMATION:
+    	/* use default font, fgnd, bgnd */
+    	break;
+    case FR_WARNING:
+    	font = warningFont;
+	fore = &warningForeground;
+	back = &warningBackground;
+	numWarnings++;
+    	break;
+    case FR_ERROR:
+    	font = errorFont;
+	fore = &errorForeground;
+	back = &errorBackground;
+	numErrors++;
+    	break;
+    case FR_CHANGEDIR:
+    	/* TODO: */
+    	break;
+    case FR_PUSHDIR:
+    	/* TODO: */
+    	break;
+    case FR_POPDIR:
+    	/* TODO: */
+    	break;
+    case FR_PENDING:
+    	/* TODO: */
+    	break;
+    }
+    
+#if DEBUG    
+    gtk_text_insert(GTK_TEXT(logwin), font, fore, back, "-->", 3);
+#endif
+    gtk_text_insert(GTK_TEXT(logwin), font, fore, back, line, -1);
+#if DEBUG
+    gtk_text_insert(GTK_TEXT(logwin), font, fore, back, "<--\n", 4);
+#else
+    gtk_text_insert(GTK_TEXT(logwin), 0, 0, 0, "\n", 1);
+#endif
+
+    if (do_grey)
+    	grey_menu_items();
+}
+
+static void
+handleData(char *buf, int len)
+{
+    static char linebuf[1024];
+    static int nleftover = 0;
+    
+#if DEBUG   
+    fprintf(stderr, "handleData(): \"");
+    fwrite(buf, len, 1, stderr);
+    fprintf(stderr, "\"\n");
+#endif    
+    
+    while (len > 0 && *buf)
+    {
+	char *p = strchr(buf, '\n');
+	if (p == 0)
+	{
+    	    /* only a part of a line left - append to linebuf */
+	    strncpy(&linebuf[nleftover], buf, sizeof(linebuf)-nleftover);
+	    nleftover += len;
+	    return;
+	}
+    	/* got an end-of-line - isolate the line & feed it to handleLine() */
+	*p = '\0';
+	strncpy(&linebuf[nleftover], buf, sizeof(linebuf)-nleftover);
+	handleLine(linebuf);
+	nleftover = 0;
+	len -= (p - buf);
+	buf = ++p;
     }
 }
 
@@ -95,22 +249,20 @@ handleInput(gpointer data, gint source, GdkInputCondition condition)
     if (source == currentFd && condition == GDK_INPUT_READ)
     {
     	int nremain = 0;
-	char buf[1024];
 	
 	if (ioctl(currentFd, FIONREAD, &nremain) < 0)
 	{
 	    perror("ioctl(FIONREAD)");
 	    return;
 	}
+	
 	while (nremain > 0)
 	{
-	    gboolean do_grey;
-	    int n = read(currentFd, buf, MIN(sizeof(buf), nremain));
+	    char buf[1025];
+	    int n = read(currentFd, buf, MIN(sizeof(buf)-1, nremain));
 	    nremain -= n;
-	    /* TODO: split into lines and classify */
-	    do_grey = (gtk_text_get_length(GTK_TEXT(logwin)) == 0);
-	    gtk_text_insert(GTK_TEXT(logwin), 0, 0, 0, buf, n);
-	    grey_menu_items();
+	    buf[n] = '\0';		/* so we can use str*() calls */
+	    handleData(buf, n);
 	}
     }
 }
@@ -119,6 +271,7 @@ handleInput(gpointer data, gint source, GdkInputCondition condition)
 #define READ 0
 #define WRITE 1
 #define STDOUT 1
+#define STDERR 2
 void
 buildStart(const char *target)
 {
@@ -145,6 +298,7 @@ buildStart(const char *target)
     	/* child */
 	close(pipefds[READ]);
 	dup2(pipefds[WRITE], STDOUT);
+	dup2(pipefds[WRITE], STDERR);
 	close(pipefds[WRITE]);
 	
 	execlp("/bin/sh", "/bin/sh", "-c", buf, 0);
@@ -158,14 +312,19 @@ buildStart(const char *target)
 	currentPid = pid;
 	currentFd = pipefds[READ];
 	close(pipefds[WRITE]);
+	filter_init();
+	numErrors = 0;
+	numWarnings = 0;
 	currentInput = gdk_input_add(currentFd,
 			    GDK_INPUT_READ, handleInput, (gpointer)0);
+	anim_start();
 	grey_menu_items();
     }
 }
 #undef READ
 #undef WRITE
 #undef STDOUT
+#undef STDERR
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -208,47 +367,6 @@ clear_log_cb(GtkWidget *w, gpointer data)
     grey_menu_items();
 }
 
-/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
-
-#if 0
-
-static int anim_current = 0;
-
-static void
-anim_advance(void)
-{
-    if (anim_current++ == ANIM_MAX)
-    	anim_current = 1;
-    gtk_pixmap_set(GTK_PIXMAP(anim),
-    	anim_pixmaps[anim_current], anim_masks[anim_current]);
-}
-
-
-static gint timer = -1;
-
-static gint
-timer_func(gpointer data)
-{
-    anim_advance();
-    return TRUE;  /* keep going */
-}
-
-static void
-test_anim_cb(GtkWidget *w, gpointer data)
-{
-    if (timer < 0)
-    {
-        int delay = 200; /* millisec */
-	timer = gtk_timeout_add(delay, timer_func, 0);
-    }
-    else
-    {
-    	gtk_timeout_remove(timer);
-	timer = -1;
-    }
-}
-
-#endif
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 static void
@@ -454,8 +572,8 @@ uiCreateTools()
 #include "anim8.xpm"
 
 #define ANIM_INIT(n) \
-    anim_pixmaps[n] = gdk_pixmap_create_from_xpm_d(toplevel->window, \
-    	&anim_masks[n], 0, PASTE3(anim,n,_xpm));
+    animPixmaps[n] = gdk_pixmap_create_from_xpm_d(toplevel->window, \
+    	&animMasks[n], 0, PASTE3(anim,n,_xpm));
 
 static void
 uiInitAnimPixmaps(void)
@@ -469,6 +587,29 @@ uiInitAnimPixmaps(void)
     ANIM_INIT(6);
     ANIM_INIT(7);
     ANIM_INIT(8);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static void
+uiInitFontsAndColors(void)
+{
+    GdkColormap *colormap = gtk_widget_get_colormap(toplevel);
+    
+    warningFont = 0;
+    errorFont = 0;
+    
+    gdk_color_parse("yellow", &warningBackground);
+    gdk_colormap_alloc_color(colormap, &warningBackground, FALSE, TRUE);
+
+    gdk_color_parse("red", &errorBackground);
+    gdk_colormap_alloc_color(colormap, &errorBackground, FALSE, TRUE);
+
+    gdk_color_parse("black", &errorForeground);
+    gdk_colormap_alloc_color(colormap, &errorForeground, FALSE, TRUE);
+
+    gdk_color_parse("black", &warningForeground);
+    gdk_colormap_alloc_color(colormap, &warningForeground, FALSE, TRUE);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -488,6 +629,8 @@ uiCreate(void)
     	GTK_SIGNAL_FUNC(file_exit_cb), NULL);
     gtk_container_border_width(GTK_CONTAINER(toplevel), 0);
     gtk_widget_show(GTK_WIDGET(toplevel));
+    
+    uiInitFontsAndColors();
     
     tooltips = gtk_tooltips_new();
 
@@ -537,7 +680,7 @@ uiCreate(void)
     
     uiInitAnimPixmaps();
 
-    anim = gtk_pixmap_new(anim_pixmaps[0], anim_masks[0]);
+    anim = gtk_pixmap_new(animPixmaps[0], animMasks[0]);
     gtk_box_pack_start(GTK_BOX(messagebox), anim, FALSE, FALSE, 0);   
     gtk_widget_show(anim);
 
@@ -589,6 +732,7 @@ main(int argc, char **argv)
     gtk_init(&argc, &argv);
     parseArgs(argc, argv);
     uiCreate();
+    filter_load();
     gtk_main();
     return 0;
 }

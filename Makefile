@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 1999-05-14 17:23:23 gnb Exp $
+# $Id: Makefile,v 1.2 1999-05-15 14:44:30 gnb Exp $
 #
 # Makefile for maketool.
 #
@@ -10,7 +10,7 @@ CPPFLAGS:=	$(shell gtk-config --cflags) -D_USE_BSD
 LDLIBS:=	$(shell gtk-config --libs)
 O=		o.i586-unknown-linux
 
-SOURCES=	main.c spawn.c
+SOURCES=	main.c spawn.c filter.c
 OBJECTS=	$(SOURCES:%.c=$O/%.o)
 
 maketool: $(OBJECTS)
@@ -24,10 +24,10 @@ $O/.stamp:
 	touch $@
 	
 random:
-	echo "This is the result of target random"		
+	$(CC) -c -o $O/crud.o crud.c
 	
 targets:
-	echo "This is the result of target targets"	
+	yes ' ' | head -20 | awk '{print NR}'
 	
 delay:
 	sleep 10
