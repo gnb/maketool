@@ -10,6 +10,7 @@ COPYTARBALL=no
 # which is probably a bad idea, but regardless it needs to be ignored
 # when checking for modified files.
 CVSIGNORES="aclocal.m4"
+MSGCONTEXT="buildrpm[$LOCALHOST:$$]"
 
 fatal ()
 {
@@ -19,7 +20,7 @@ fatal ()
 
 message ()
 {
-    echo "buildrpm: $*"
+    echo "$MSGCONTEXT: $*"
 }
 
 usage ()
@@ -78,6 +79,7 @@ case "$BUILDHOST" in
     (
 	set -x
 	ssh $BUILDHOST "cd $PWD && \
+	    export __BUILDRPM_LOGGED=yes && \
     	    ./buildrpm \
 	    	--cvs-update=$CVSTAG \
 		--force=$FORCE \
