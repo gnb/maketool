@@ -14,3 +14,5 @@ maketool.spec
 maketool-*.rpm
 licence.c
 make_makefile
+screendumps
+examples
