@@ -23,7 +23,7 @@
 #include "util.h"
 #include "ps.h"
 
-CVSID("$Id: log.c,v 1.45 2003-09-24 10:51:15 gnb Exp $");
+CVSID("$Id: log.c,v 1.46 2003-09-27 04:15:37 gnb Exp $");
 
 #ifndef GTK_CTREE_IS_EMPTY
 #define GTK_CTREE_IS_EMPTY(_ctree_) \
@@ -75,37 +75,10 @@ filter_result_init(FilterResult *res)
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
-/* returns a new string */
-static char *
-log_normalise_dir(const char *dir)
-{
-    if (dir[0] == '/')
-    	return g_strdup(dir);
-    
-    return g_strconcat(current_directory(), "/", dir, 0);
-}
-
-static char *
-log_denormalise_dir(const char *dir)
-{
-    const char *pwd = current_directory();
-    int cdlen = strlen(pwd);
-    
-    if (strncmp(dir, pwd, cdlen) || dir[cdlen] != '/')
-    	return g_strdup(dir);
-
-    dir += cdlen;
-    while (*dir == '/')
-    	dir++;
-    if (*dir == '\0')
-    	return g_strdup(".");
-    return g_strdup(dir);
-}
-
 static void
 log_change_dir(const char *dir)
 {
-    char *norm = log_normalise_dir(dir);
+    char *norm = file_normalise(dir);
 
 #if DEBUG
     fprintf(stderr, "log_change_dir(\"%s\") -> \"%s\"\n", dir, norm);
@@ -122,7 +95,7 @@ log_change_dir(const char *dir)
 static void
 log_push_dir(const char *dir)
 {
-    char *norm = log_normalise_dir(dir);
+    char *norm = file_normalise(dir);
 
 #if DEBUG
     fprintf(stderr, "log_push_dir(\"%s\") -> \"%s\"\n", dir, norm);
@@ -275,6 +248,8 @@ log_del_rec(LogRec *lr)
 {
     if (lr->res.file != 0)
     	g_free(lr->res.file);
+    if (lr->res.summary != 0)
+    	g_free(lr->res.summary);
     g_free(lr->line);
     g_free(lr);
 }
@@ -340,7 +315,7 @@ log_show_rec(LogRec *lr)
 	    is_leaf = FALSE;
 	    if (lr->res.summary != 0)
 	    	g_free(lr->res.summary);
-	    lr->res.summary = log_denormalise_dir(lr->res.file);
+	    lr->res.summary = file_denormalise(lr->res.file, DEN_ALL);
 	}
 	break;
     case FR_POPDIR:
@@ -657,6 +632,7 @@ void
 log_open(const char *file)
 {
     FILE *fp;
+    char *dfile;
     int len;
     estring leftover;
     char *startstr, buf[1025];
@@ -670,9 +646,11 @@ log_open(const char *file)
     }
     
     gtk_clist_freeze(GTK_CLIST(logwin));
-    startstr = g_strdup_printf(_("Log file %s"), file);
+    dfile = file_denormalise(file, DEN_HOME);
+    startstr = g_strdup_printf(_("Log file %s"), dfile);
     log_start_build(startstr);
     g_free(startstr);
+    g_free(dfile);
 
 
     estring_init(&leftover);

@@ -21,7 +21,7 @@
 #include <stdarg.h>
 #include <sys/stat.h>
 
-CVSID("$Id: util.c,v 1.17 2003-05-24 05:48:21 gnb Exp $");
+CVSID("$Id: util.c,v 1.18 2003-09-27 04:15:37 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -245,6 +245,107 @@ file_exists(const char *pathname)
     struct stat sb;
     
     return (stat(pathname, &sb) >= 0 && S_ISREG(sb.st_mode));
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+const char *
+file_home(void)
+{
+    static char *home = 0;
+
+    if (home == 0)
+    {
+    	home = getenv("HOME");
+	if (home == 0)
+	    home = "";
+	home = g_strdup(home);
+    }
+
+    assert(home != 0);
+    return home;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+static char *currdir = 0;
+
+const char *
+file_current(void)
+{
+    if (currdir == 0)
+    	currdir = g_get_current_dir();
+    return currdir;
+}
+
+int
+file_change_current(const char *dir)
+{
+    if (chdir(dir) < 0)
+    	return -1;
+
+    if (currdir != 0)
+    {
+    	g_free(currdir);
+	currdir = 0;
+    }
+    return 0;
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+/* TODO: handle path components "." and ".." */
+char *
+file_normalise(const char *path)
+{
+    if (path[0] == '/')
+    	return g_strdup(path);
+    
+    return g_strconcat(file_current(), "/", path, 0);
+}
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+/*
+ * If `pref' is the initial subset of pathname components of `path',
+ * return a new string, else return 0.  The returned string has
+ * the prefix replaced with `replace1', or `replace0' if the 
+ * prefix is the whole path.
+ */
+static char *
+file_denormalise_1(
+    const char *path,
+    const char *pref,
+    const char *replace0,
+    const char *replace1)
+{
+    int preflen = strlen(pref);
+
+    if (!strncmp(path, pref, preflen) &&
+    	(path[preflen] == '\0' || path[preflen] == '/'))
+    {
+    	path += preflen;
+	while (*path == '/')
+    	    path++;
+	if (*path == '\0')
+	    return g_strdup(replace0);
+	return g_strconcat(replace1, path, 0);
+    }
+    return 0;
+}
+
+char *
+file_denormalise(const char *path, unsigned flags)
+{
+    char *d;
+    
+    if ((flags & DEN_PWD) &&
+    	(d = file_denormalise_1(path, file_current(), ".", "")) != 0)
+    	return d;
+    if ((flags & DEN_HOME) &&
+    	(d = file_denormalise_1(path, file_home(), "~", "~/")) != 0)
+    	return d;
+    return g_strdup(path);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

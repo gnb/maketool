@@ -32,7 +32,7 @@
 #include <errno.h>
 #include "mqueue.h"
 
-CVSID("$Id: main.c,v 1.95 2003-09-24 10:50:54 gnb Exp $");
+CVSID("$Id: main.c,v 1.96 2003-09-27 04:15:37 gnb Exp $");
 
 
 /*
@@ -51,7 +51,6 @@ typedef enum
 char		**cmd_targets;		/* targets on commandline */
 int 	    	cmd_num_targets;
 const char	*last_target = 0;	/* last target built, for `again' */
-char	    	*directory;
 GList		*available_targets = 0;	/* all possible targets, for menu */
 GtkWidget	*build_menu;
 GtkWidget	*toolbar_hb, *messagebox;
@@ -1071,11 +1070,13 @@ construct_dir_previous_menu(void)
     for (list = prefs.dir_history, i = 0 ; list != 0 ; list = list->next, i++)
     {
     	char *dir = (char *)list->data;
-	
+	char *dendir = file_denormalise(dir, DEN_HOME);
+
 	if (i < 9)
 	    g_snprintf(accelbuf, sizeof(accelbuf), "<Ctrl>%c", (i+'1'));
-	ui_add_button_2(dir_previous_menu, dir, FALSE, (i<9 ? accelbuf : 0),
+	ui_add_button_2(dir_previous_menu, dendir, FALSE, (i<9 ? accelbuf : 0),
 	    	dir_previous_cb, dir, GR_NOTRUNNING, -1);
+	g_free(dendir);
     }
     
     if (prefs.dir_history == 0)
@@ -1086,47 +1087,49 @@ construct_dir_previous_menu(void)
 static gboolean
 change_directory(const char *dir)
 {
+    char *olddir;
+
 #if DEBUG > 5
     fprintf(stderr, "Changing dir to: %s\n", dir);
 #endif
-    
-    if (chdir(dir) < 0)
+
+    olddir = g_strdup(file_current());
+
+    if (file_change_current(dir) < 0)
     {
+	if (messageent != 0)
+	    message("%s: %s", dir, strerror(errno));
     	return FALSE;
     }
 
     /*
      * Update directory history
      */
-    if (directory != 0)
+    if (g_list_find_str(prefs.dir_history, olddir) != 0)
     {
-	if (g_list_find_str(prefs.dir_history, directory) != 0)
-	{
-	    /* already in list */
-	    g_free(directory);
-	}
-	else
-	{
-	    /* not already in history list, prepend it */
-	    prefs.dir_history = g_list_prepend(prefs.dir_history, directory);
-
-	    /* trim list to fit */
-	    while (g_list_length(prefs.dir_history) > MAX_DIR_HISTORY)
-	    {
-		GList *last = g_list_last(prefs.dir_history);
-		g_free((char *)last->data);
-		prefs.dir_history = g_list_remove_link(prefs.dir_history, last);
-	    }
-
-    	    /* save dir history, and everything else */
-    	    preferences_save();
-
-    	    /* update Previous Directory menu */
-	    if (dir_previous_menu != 0)
-    		construct_dir_previous_menu();
-	}
+	/* already in list */
+	g_free(olddir);
     }
-    directory = g_get_current_dir();
+    else
+    {
+	/* not already in history list, prepend it */
+	prefs.dir_history = g_list_prepend(prefs.dir_history, olddir);
+
+	/* trim list to fit */
+	while (g_list_length(prefs.dir_history) > MAX_DIR_HISTORY)
+	{
+	    GList *last = g_list_last(prefs.dir_history);
+	    g_free((char *)last->data);
+	    prefs.dir_history = g_list_remove_link(prefs.dir_history, last);
+	}
+
+    	/* save dir history, and everything else */
+    	preferences_save();
+
+    	/* update Previous Directory menu */
+	if (dir_previous_menu != 0)
+    	    construct_dir_previous_menu();
+    }
 	
     /* Check for presence of autoconf-related files */
     set_makeprog(prefs.makeprog);
@@ -1138,20 +1141,12 @@ change_directory(const char *dir)
 	set_main_title();
 	
     if (messageent != 0)
-	message("Directory %s", directory);
+	message("Directory %s", file_current());
 
     if (build_menu != 0)
     	list_targets();
     
     return TRUE;
-}
-
-const char *
-current_directory(void)
-{
-    if (directory == 0)
-    	directory = g_get_current_dir();
-    return directory;
 }
 
 static void
@@ -1187,7 +1182,7 @@ file_change_dir_cb(GtkWidget *w, gpointer data)
      * Filesel window needs the trailing / so it doesn't
      * try to interpret the dirname as a filename.
      */
-    fakefile = g_strdup_printf("%s/", current_directory());
+    fakefile = g_strdup_printf("%s/", file_current());
     gtk_file_selection_set_filename(GTK_FILE_SELECTION(filesel), fakefile);
     g_free(fakefile);
     
@@ -1810,30 +1805,14 @@ clipboard_init(GtkWidget *w)
 static void
 set_main_title(void)
 {
-    const char *pwd = current_directory();
+    char *denpwd = file_denormalise(file_current(), DEN_HOME);
     char *title;
     const char *title_prefix = _("Maketool");
-    static char *home = 0;
-    static int homelen;
     
-    assert(pwd != 0);
-
-    if (home == 0)
-    {
-    	home = getenv("HOME");
-	if (home == 0)
-	    home = "";
-	home = g_strdup(home);
-	homelen = strlen(home);
-    }
-    assert(home != 0);
-    
-    if (!strncmp(home, pwd, homelen) && pwd[homelen] == '/')
-	title = g_strdup_printf("%s %s: ~/%s", title_prefix, VERSION, pwd+homelen+1);
-    else
-	title = g_strdup_printf("%s %s: %s", title_prefix, VERSION, pwd);
+    title = g_strdup_printf("%s %s: %s", title_prefix, VERSION, denpwd);
     gtk_window_set_title(GTK_WINDOW(toplevel), title);
     g_free(title);
+    g_free(denpwd);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/

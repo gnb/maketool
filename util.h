@@ -67,6 +67,36 @@ char *expand_string(const char *in, const char *expands[256]);
 
 gboolean file_exists(const char *pathname);
 
+/* Returns the user's home directory.  Never returns NULL */
+const char *file_home(void);
+
+/* Returns the cached current directory.  Never returns NULL */
+const char *file_current(void);
+/*
+ * Change UNIX current directory and invalidate cached string.
+ * Returns 0 on success or -1 and errno on failure.
+ */
+int file_change_current(const char *dir);
+
+/*
+ * Returns a new string with a full UNIX pathname representing
+ * the `path', which may be absolute or relative.
+ */
+char *file_normalise(const char *path);
+
+/*
+ * Return a new string denormalised according to flags.
+ * A denormalised string will have an initial prefix replaced
+ * with a shorter string designed to still appear as legal
+ * shell filename syntax but be easier for a human to read.
+ * `flags' control which prefixes are enabled.  Always returns
+ * a new string, even if it's just a copy of `path'.
+ */
+#define DEN_HOME    (1<<0)  	/* replace $HOME prefix with ~ */
+#define DEN_PWD     (1<<1)  	/* remove current directory prefix */
+#define DEN_ALL     (~0)
+char *file_denormalise(const char *path, unsigned flags);
+
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
 #endif /* _UTIL_H_ */
