@@ -21,7 +21,7 @@
 #if HAVE_REGCOMP
 #include <regex.h>	/* POSIX regular expression fns */
 
-CVSID("$Id: filter.c,v 1.9 1999-07-18 01:46:04 gnb Exp $");
+CVSID("$Id: filter.c,v 1.10 1999-08-07 14:59:07 gnb Exp $");
 
 typedef struct
 {
@@ -196,14 +196,32 @@ filter_load(void)
     	"C/C++ compile line");		/* comment */
     filter_add(
     	"",				/* state */
+	"^javac[ \t].*[ \t]([A-Za-z_*][A-Za-z0-3_*]*).java", /* regexp */
+	FR_INFORMATION,			/* code */
+	"\\1.java",			/* file */
+	"",				/* line */
+	"",				/* col */
+	"Compiling \\1.java",		/* summary */
+    	"Java compile line");		/* comment */
+    filter_add(
+    	"",				/* state */
 	"^(cc|c89|gcc|CC|c++|g++|ld).*[ \t]*-o[ \t]*([^ \t]*)", /* regexp */
 	FR_INFORMATION,			/* code */
-	"\\2",				/* file */
+	"",				/* file */
 	"",				/* line */
 	"",				/* col */
 	"Linking \\2",			/* summary */
     	"C/C++ link line");		/* comment */
-    /* TODO: support for ar, libtool */	
+    filter_add(
+    	"",				/* state */
+	"^ar[ \t][ \t]*[rc][a-z]*[ \t][ \t]*(lib[^ \t]*.a)", /* regexp */
+	FR_INFORMATION,			/* code */
+	"",				/* file */
+	"",				/* line */
+	"",				/* col */
+	"Building library \\1",		/* summary */
+    	"Archive library link line");	/* comment */
+    /* TODO: support for libtool */	
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
