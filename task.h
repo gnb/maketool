@@ -84,6 +84,12 @@ void task_start(void);
 gboolean task_spawn(Task *);
 
 /*
+ * Immediately spawn the given task and block waiting
+ * for its completion (main loop events are dispatched)
+ */
+gboolean task_run(Task *);
+
+/*
  * Returns TRUE iff a task is currently running.
  */
 gboolean task_is_running(void);

@@ -31,7 +31,7 @@
 #include <sys/filio.h>
 #endif
 
-CVSID("$Id: task.c,v 1.8 2001-07-26 16:51:48 gnb Exp $");
+CVSID("$Id: task.c,v 1.9 2001-09-21 04:32:36 gnb Exp $");
 
 static GList *task_all = 0;
 static void (*task_work_start_cb)(void) = 0;
@@ -306,6 +306,22 @@ task_spawn(Task *task)
     return (task->pid != -1);
 }
 
+
+/*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
+
+/* TODO: task object is leaked and possibly app logic confused if spawn fails */
+
+gboolean
+task_run(Task *task)
+{
+    if (!task_spawn(task))
+    	return FALSE;
+    
+    while (task->pid != -1)
+    	g_main_iteration(/*block*/TRUE);
+	
+    return TRUE;
+}
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
