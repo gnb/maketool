@@ -23,10 +23,6 @@ x  Limit the sizes of target names in the Build menu, especially
 x  When the user cancels a ./configure run from the GUI, this should
    show in the log window instead of "*** [config.status] Error 1".
    
-x  Allow the Makefile to be built on-demand, with an entry in the
-   first part of the Build menu.  Turn off automatically building
-   by default.
-
 x  Help: make the browser command configuruable in preferences.
 
 x  Help: organise smart way to generate index at least semi-automatically.
@@ -218,7 +214,8 @@ x  During configure option GUI field validation, if user enters whitespace
 x  Keyboard navigation in Configure Options dialog is broken; focus
    never enters the notebook pages.
    
-   
+x  When ./configure is run from make_makefile(), config.status is also
+   run afterward, redundantly.
 
 --- closed ---
 
@@ -488,5 +485,9 @@ x  DONE: Handle dependancies of multiple files on their .in counterparts via
    temporary `Makefiles' target.
    
 x  DONE: Need a function to remove config.cache.
+
+x  DONE: Allow the Makefile to be built on-demand, with an entry in the
+   first part of the Build menu.  Turn off automatically building
+   by default.
 
 
