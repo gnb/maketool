@@ -4,7 +4,7 @@ Version: @VERSION@
 Release: 1
 Copyright: GPL
 Group: Development/Building
-Source: http://www.alphalink.com.au/~gnb/@PACKAGE@/@PACKAGE@-@VERSION@-src.tgz
+Source: http://www.alphalink.com.au/~gnb/@PACKAGE@/@PACKAGE@-@VERSION@-src.tar.gz
 BuildRoot: /var/tmp/@PACKAGE@-root
 Vendor: Greg Banks
 
