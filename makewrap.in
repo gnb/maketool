@@ -29,14 +29,15 @@ changequote(<,>)
 ME=base
 
 if [ -z "$MAKELEVEL" ]; then
-    MAKELEVEL=1
+    MAKELEVEL=0
 else
     MAKELEVEL=`expr $MAKELEVEL + 1`
 fi
 export MAKELEVEL
 
-if [ $MAKELEVEL -gt 1 ]; then
-    echo $ME"[$MAKELEVEL]: Entering directory \``/bin/pwd`'"
+HERE=`/bin/pwd`
+if [ $MAKELEVEL -gt 0 ]; then
+    echo $ME"[$MAKELEVEL]: Entering directory \`$HERE'"
 fi
 
 define(<smake_hack>,ifelse(
@@ -75,8 +76,8 @@ exe "${OPTS[@]}" "${VOVER[@]}" MAKE=$ME "${TARGS[@]}">,
 <exe MAKE=$ME "$@">)
 status=$?
 
-if [ $MAKELEVEL -gt 1 ]; then
-    echo $ME"[$MAKELEVEL]: Leaving directory"
+if [ $MAKELEVEL -gt 0 ]; then
+    echo $ME"[$MAKELEVEL]: Leaving directory \`$HERE'"
 fi
 
 exit $status
