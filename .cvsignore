@@ -1,3 +1,4 @@
 *.bck
 maketool
 o.i586-unknown-linux
+make.log
