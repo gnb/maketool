@@ -22,7 +22,7 @@
 #include "util.h"
 #include <time.h>
 
-CVSID("$Id: ps.c,v 1.6 2001-07-26 16:26:36 gnb Exp $");
+CVSID("$Id: ps.c,v 1.7 2001-09-21 04:32:03 gnb Exp $");
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
 
@@ -235,7 +235,7 @@ ps_prologue(PsDocument *ps)
 	    	ps->styles[i].background.green,
 	    	ps->styles[i].background.blue);
     }
-    fprintf(ps->fp, "end %MaketoolDict\n");
+    fprintf(ps->fp, "end %%MaketoolDict\n");
     fprintf(ps->fp, "%%%%EndSetup\n");
 }
 
