@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # 
-# $Id: Makefile.in,v 1.1 1999-11-02 08:21:09 gnb Exp $
+# $Id: Makefile.in,v 1.2 1999-11-02 08:27:55 gnb Exp $
 #
 
 
@@ -33,4 +33,4 @@ clean:
 	$(RM) crud.o
 	
 reallyclean: clean
-	$(RM) Makefile configure config.status config.cache
+	$(RM) Makefile config.status config.cache
