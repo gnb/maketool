@@ -20,7 +20,8 @@ Maketool's features include:
   <LI>Runs make and detects compiler errors and warnings in the output.
   <LI>Double-clicking on errors starts an editor with that file and line.
   <LI>Works with any makefile system that uses GNU make.
-  <LI>Automatically updates Makefile if project uses autoconf or imake.
+  <LI>Automatically updates Makefile if project uses automake, autoconf or imake.
+  <LI>GUI for selecting configure options for automake and autoconf.
   <LI>Special handling for standard GNU targets such as <I>all</I>,
       <I>install</I>, <I>clean</I> etc.
   <LI>Save and reload logs of make runs.
@@ -37,7 +38,8 @@ Maketool's features include:
 I personally test maketool on these platforms:
 </P>
 <UL>
-  <LI>RedHat Linux 5.2 on i386
+  <LI>RedHat Linux 7.1 on i386
+  <LI>Mandrake Linux 7.1 on i386
 </UL>
 <P>
 I have received reports of maketool running on these platforms:
@@ -63,9 +65,10 @@ THANKS(Frederick Bruckman,`NetBSD port, bugfixes')
 THANKS(Alistair Crooks,Solaris port)
 THANKS(Francesco Lamonica,bug report)
 THANKS(Albert Hofkamp,`bugs, lots of good suggestions')
-THANKS(Vaclav Slavik,`bugs, suggestions')
+THANKS(Vaclav Slavik,`bugs, suggestions, Czech translation')
 THANKS(David T Bath,Solaris patch)
 THANKS(SATO Satoru,Japanese translation and I18N patches)
+THANKS(Rajesh Gupta,bugs)
 ENDTHANKS
 
 ENDBODY

@@ -13,7 +13,7 @@ and SRPM.
 <P>
 I have started using a system of classifying the changes in each
 version, to give you a better idea of how maketool development is progressing.
-Starting with 0.6.99, the classifications are listed at the start of
+Starting with 0.7, the classifications are listed at the start of
 each line item, as one of the following codes:
 </P>
 

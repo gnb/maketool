@@ -18,59 +18,64 @@ Here are some more screenshots, showing off some of maketool's
 features. Click on the thumbnail images to see full-sized images.
 </P>
 
-
-<TABLE ROWS=3 COLUMNS=1 WIDTH="100%">
-
-  <TABLE ROWS=1 COLUMNS=2>
+define(SCREENSHOT_L,`
+  <TABLE ROWS=2 COLUMNS=2 CELLPADDING=0 CELLSPACING=0 BORDER=0>
     <TR>
-      <TD VALIGN=TOP>THUMBNAIL(autoconf,gif,autoconf)</TD>
-      <TD VALIGN=TOP>
-        <IMG SRC="arrow_l2.gif" ALT="<--------"><BR>
-	Since version 0.5, maketool explicitly supports projects using
-	autoconf. This image shows what maketool does for you when you
-	start it in a directory containing a <I>configure.in</I> which is
-	newer than the Makefile.
-      </TD>
+      <TD VALIGN=TOP ROWSPAN=2>THUMBNAIL($1,$2,$3)</TD>
+      <TD ALIGN=LEFT VALIGN=TOP><IMG SRC="arrow_l2.gif" ALT="<--------"></TD>
+    </TR>
+    <TR>
+      <TD VALIGN=TOP>$4</TD>
     </TR>
   </TABLE>
-
-  <TABLE ROWS=1 COLUMNS=2>
+')
+define(SCREENSHOT_R,`
+  <TABLE ROWS=2 COLUMNS=2 CELLPADDING=0 CELLSPACING=0 BORDER=0>
     <TR>
-      <TD VALIGN=TOP>
-        <IMG SRC="arrow_r2.gif" ALT="-------->"><BR>
+      <TD ALIGN=RIGHT VALIGN=TOP><IMG SRC="arrow_r2.gif" ALT="-------->"></TD>
+      <TD VALIGN=TOP ROWSPAN=2>THUMBNAIL($1,$2,$3)</TD>
+    </TR>
+    <TR>
+      <TD VALIGN=TOP>$4</TD>
+    </TR>
+  </TABLE>
+')
+
+changequote([,])
+<TABLE ROWS=6 COLUMNS=1 WIDTH="100%">
+
+  SCREENSHOT_L(autoconf,gif,autoconf,[
+	Maketool explicitly supports projects using automake, autoconf,
+	and imake. This image shows what maketool does for you when you
+	build the <I>all</I> target in a directory containing a
+	<I>configure.in</I> which is newer than the Makefile.])
+
+  SCREENSHOT_R(acgui,gif,autoconf gui,[
+	Maketool now provides a GUI for choosing options for the
+	automake/autoconf configure script.  This image shows the
+	GUI running on maketool's own configure script.])
+
+  SCREENSHOT_L(ja,gif,japanese,[
+	Complete Japanese and Czech translations now provided.  The
+	image shows Japanese.])
+
+  SCREENSHOT_R(kernel,gif,kernel,[
 	Maketool can now be usefully used to compile Linux kernels. The
 	new <I>Indent Directories</I> option, plus a feature which automatically
 	splits the Build menu if it would be too long, mean maketool takes
-	large, multiple-directory projects in its stride.
-      </TD>
-      <TD VALIGN=TOP>THUMBNAIL(kernel,gif,kernel)</TD>
-    </TR>
-  </TABLE>
+	large, multiple-directory projects in its stride.])
 
-  <TABLE ROWS=1 COLUMNS=2>
-    <TR>
-      <TD VALIGN=TOP>THUMBNAIL(colors,jpg,colours)</TD>
-      <TD VALIGN=TOP>
-        <IMG SRC="arrow_l2.gif" ALT="<--------"><BR>
+  SCREENSHOT_L(colors,jpg,colours,[
 	You can configure the colours maketool uses to colour-code
 	errors and warnings to cater for personal taste or cultural
-	preference.
-      </TD>
-    </TR>
-  </TABLE>
+	preference.])
 
-  <TABLE ROWS=1 COLUMNS=2>
-    <TR>
-      <TD VALIGN=TOP>
-        <IMG SRC="arrow_r2.gif" ALT="-------->"><BR>
+  SCREENSHOT_R(about_make,gif,about_make,[
 	The <I>About Make</I> window pays tribute to the authors
 	of GNU make. Maketool is just a front end to GNU make and
-	would be nothing without the efforts of these people.
-      </TD>
-      <TD VALIGN=TOP>THUMBNAIL(about_make,gif,about_make)</TD>
-    </TR>
-  </TABLE>
+	would be nothing without the efforts of these people.])
 
 </TABLE>
+changequote()
 
 ENDBODY
