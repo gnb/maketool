@@ -190,18 +190,16 @@ dnl Use the latest version of gtk which actually is complete and works.
 dnl Should result in: gtk 1.2 on RedHat 7.3, gtk 2 on RedHat 8 & greater.
 
 PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.0.3, [gtk2=yes],[gtk2=no])
+GTK_LIBSRC=
 if test $gtk2 = yes ; then
     # Need GTK_ENABLE_BROKEN to get GtkText at least until this
     # code is ported to GtkTextView.
     GTK_CFLAGS="$GTK_CFLAGS -DGTK_ENABLE_BROKEN"
     GTK2=1
-    GTK_LIBSRC="gtk2"
+#    GTK_LIBSRC="gtk2"
 else
-    # fall back to gtk 1.2
-    AC_MSG_WARN([GNOME version 2 libraries not found, falling back to 1.2])
-    AM_PATH_GTK(1.2.0,,AC_MSG_ERROR(maketool requires the GTK+ library))
-    GTK2=0
-    GTK_LIBSRC="gtk1.2"
+    AC_MSG_ERROR([GNOME version 2 libraries not found])
+    exit 1;
 fi
 if test x"$GTK_LIBSRC" != x ; then
     GTK_CFLAGS="-I\${top_srcdir}/lib/\${GTK_LIBSRC} $GTK_CFLAGS"
