@@ -1,3 +1,4 @@
+*.o
 Makefile
 autom4te.cache
 config.h
@@ -5,5 +6,8 @@ config.h.in
 config.log
 config.status
 configure
+licence.c
+maketool
 maketool.spec
+maketool_client
 version.m4
