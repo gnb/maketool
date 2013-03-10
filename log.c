@@ -362,7 +362,7 @@ log_get_filenames(LogRec *lr)
 	if (j < i)
 	    continue;	/* skip dup dir in context */
 	
-    	ff = g_strconcat(lr->context->dirs[i], "/", lr->res.file, 0);
+    	ff = g_strconcat(lr->context->dirs[i], "/", lr->res.file, (char *)0);
 #if DEBUG
     	fprintf(stderr, "log_get_filenames: trying \"%s\"\n", ff);
 #endif

@@ -317,9 +317,9 @@ add_option(
     if (def == 0)
     	defval = 0;
     else if (!strprefix(def, "PREFIX/"))
-    	defval = g_strconcat("${prefix}", def+6, 0);
+    	defval = g_strconcat("${prefix}", def+6, (char *)0);
     else if (!strprefix(def, "EPREFIX/"))
-    	defval = g_strconcat("${exec_prefix}", def+7, 0);
+    	defval = g_strconcat("${exec_prefix}", def+7, (char *)0);
     else if (!strcmp(name, "exec-prefix"))
     	defval = g_strdup("${prefix}");
     else

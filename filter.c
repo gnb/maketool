@@ -993,7 +993,7 @@ filter_apply_one(
 		    ((f->code & FR_PENDING) || f->code == FR_DONE))
 		{
 		    /* append to the summary */
-		    char *sum = g_strconcat(result->summary, " ", buf.data, 0);
+		    char *sum = g_strconcat(result->summary, " ", buf.data, (char *)0);
 #if DEBUG
 	    	    fprintf(stderr, "filter_apply_one: appending summary \"%s\" to \"%s\"\n",
 			result->summary, sum);

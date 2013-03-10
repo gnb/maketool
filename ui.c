@@ -1135,7 +1135,7 @@ ui_config_backup(void)
 {
     char *bakfile;
     
-    bakfile = g_strconcat(ui_config_filename, ".OLD", 0);
+    bakfile = g_strconcat(ui_config_filename, ".OLD", (char *)0);
     if (rename(ui_config_filename, bakfile) < 0)
     	perror(bakfile);
     g_free(bakfile);

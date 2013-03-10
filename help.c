@@ -397,7 +397,7 @@ help_init_indexes(void)
 
     for (i = 0 ; help_locales[i] != 0 ; i++)
     {
-    	file = g_strconcat(HELPDIR "/", help_locales[i], "/index.dat", 0);
+    	file = g_strconcat(HELPDIR "/", help_locales[i], "/index.dat", (char *)0);
     	help_indexes[i] = help_read_index(file);
     	g_free(file);
     }
@@ -434,7 +434,7 @@ help_lookup(const char *tag)
 	    
 	    if ((urlpart = g_hash_table_lookup(help_indexes[i], tag)) != 0)
 	    {
-    		url = g_strconcat(URLPREFIX HELPDIR "/", help_locales[i], "/", urlpart, 0);
+    		url = g_strconcat(URLPREFIX HELPDIR "/", help_locales[i], "/", urlpart, (char *)0);
 
 	    	filesep = strrchr(url, '/');
 		filesep = strchr(filesep, '#');
@@ -452,7 +452,7 @@ help_lookup(const char *tag)
 	}
 
     	/* not found in index, maybe there's a file of that name */
-    	url = g_strconcat(URLPREFIX HELPDIR "/", help_locales[i], "/", tag, ".html", 0);
+    	url = g_strconcat(URLPREFIX HELPDIR "/", help_locales[i], "/", tag, ".html", (char *)0);
 #if DEBUG > 2
 	fprintf(stderr, "help_lookup: trying \"%s\"\n", url);
 #endif

@@ -360,7 +360,7 @@ task_spawn_simple(Task *task)
 	if (task->flags & TASK_GROUPLEADER)
 	    setpgid(0, 0);
 
-	execlp("/bin/sh", "/bin/sh", "-c", task->command, 0);
+	execlp("/bin/sh", "/bin/sh", "-c", task->command, (char *)0);
 	perror("execlp");
 	exit(1);
     }
@@ -410,7 +410,7 @@ task_spawn_with_input(Task *task)
 	if (task->flags & TASK_GROUPLEADER)
 	    setpgid(0, 0);
 
-	execl("/bin/sh", "/bin/sh", "-c", task->command, 0);
+	execl("/bin/sh", "/bin/sh", "-c", task->command, (char *)0);
 	perror("execl");
 	exit(1);
     }

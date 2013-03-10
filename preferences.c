@@ -990,7 +990,7 @@ var_handle_equal(void)
     valuex = gtk_entry_get_text(GTK_ENTRY(var_value_entry));
     valuex = safe_str(valuex);
 
-    name = g_strconcat(namex, valuex, 0);
+    name = g_strconcat(namex, valuex, (char *)0);
     value = strchr(name, '=');
     *value++ = '\0';
     

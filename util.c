@@ -312,7 +312,7 @@ file_normalise(const char *path)
     if (path[0] == '/')
     	return g_strdup(path);
     
-    return g_strconcat(file_current(), "/", path, 0);
+    return g_strconcat(file_current(), "/", path, (char *)0);
 }
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -340,7 +340,7 @@ file_denormalise_1(
     	    path++;
 	if (*path == '\0')
 	    return g_strdup(replace0);
-	return g_strconcat(replace1, path, 0);
+	return g_strconcat(replace1, path, (char *)0);
     }
     return 0;
 }
