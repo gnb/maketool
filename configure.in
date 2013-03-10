@@ -220,7 +220,7 @@ dnl A bunch of warning options for gcc.  Note that we add
 dnl warning flags *after* using $CC to test for most features,
 dnl to avoid spurious failures due to a pedantic compiler.
 AC_GCC_ADD_CFLAGS([-Wall -Wchar-subscripts -Wmissing-declarations
-    -Wmissing-prototypes -Wnested-externs -Wpointer-arithmetic
+    -Wmissing-prototypes -Wnested-externs -Wpointer-arith
     -Wsign-compare -pedantic])
 
 dnl Remove -Werror if present. It makes life difficult when compiling
