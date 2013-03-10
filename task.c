@@ -272,7 +272,10 @@ task_reap_func(pid_t pid, int status, struct rusage *usg, gpointer user_data)
 gboolean
 task_is_successful(const Task *task)
 {
-    return (WIFEXITED(task->status) && WEXITSTATUS(task->status) == 0);
+    /* This temporary is necessary because WIFEXITED(const int)
+     * generates compile warnings these days */
+    int status = task->status;
+    return (WIFEXITED(status) && WEXITSTATUS(status) == 0);
 }
 
 
