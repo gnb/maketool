@@ -1,0 +1,5 @@
+maketool (0.8.4-1) stable; urgency=low
+
+  * Initial Ubuntu package
+
+ -- Greg Banks <gnb@fmeh.org>  Sat, 16 Mar 2013 11:06:39 +1100

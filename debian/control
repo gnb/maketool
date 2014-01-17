@@ -1,0 +1,14 @@
+Source: maketool
+Section: devel
+Priority: optional
+Maintainer: Greg Banks <gnb@fmeh.org>
+Build-Depends: debhelper (>= 4.1.16), libgtk2.0-dev
+
+Package: maketool
+Architecture: any
+Depends: ${shlibs:Depends}, libgtk2.0
+Description: GTK+ front end for gmake
+ Maketool is a simple GUI front end for the GNU make program,
+ written using the GTK toolkit. It presents a menu of targets
+ and detects compiler error messages in the output of make.
+ Double-clicking on an error message starts an editor.
